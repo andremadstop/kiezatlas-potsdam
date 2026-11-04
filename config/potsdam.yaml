@@ -1,0 +1,76 @@
+# Kiezatlas Potsdam: Quellen für die Geodaten-Import-Pipeline (github.com/andremadstop/geodaten-import-pipeline).
+# Eigene Konfiguration und eigene Zieltabellen (sql/001_kiezatlas.sql). Aufruf: skripte/lauf.sh
+berichte: berichte
+sprache: de
+quellen:
+  stadtteile:
+    # Amtliche Stadtteile der Landeshauptstadt Potsdam, Open-Data-Portal (dl-zero-de/2.0). Kein
+    # automatischer Abruf: Die robots.txt des Portals sperrt /api/ und die Downloads für Programme,
+    # die Anfrage bei der Stadt läuft (04.11.2026). Bis dahin Handdownload, aufbereitet von
+    # skripte/01_vorbereiten.py.
+    titel: "Stadtteile der Landeshauptstadt Potsdam"
+    typ: csv
+    pfad: vorbereitet/stadtteile.csv
+    trenner: ";"
+    id_spalte: nr
+    wkt_spalte: wkt
+    srid: 4326
+    spalten: {name: name}
+    rhythmus: monatlich
+    lizenz: "© Landeshauptstadt Potsdam, dl-zero-de/2.0"
+    ziel:
+      tabelle: stadtteil
+      loeschen: false    # Raumdaten bleiben (wie Antwort 74 der TH)
+      schluessel: [nr]
+      geometrie: geom
+      spalten: {nr: _id, name: name}
+
+  zensus_gitter:
+    # Zensus 2022, 100-m-Gitter, sechs Themen in einer Zeile je Zelle (skripte/01_vorbereiten.py aus den
+    # Destatis-Dateien). Mittelpunkt der Zelle in ETRS89-LAEA (EPSG:3035), die Pipeline transformiert.
+    titel: "Zensus 2022, 100-m-Gitter, Potsdam und Umgebung"
+    typ: csv
+    pfad: vorbereitet/zensus_potsdam.csv
+    trenner: ";"
+    id_spalte: gitter_id
+    x_spalte: x
+    y_spalte: y
+    srid: 3035
+    zahl_felder: [d_alter]
+    rhythmus: monatlich
+    lizenz: "© Statistische Ämter des Bundes und der Länder, 2024/2025, dl-de/by-2-0"
+    ziel:
+      tabelle: zensus_zelle
+      schluessel: [gitter_id]
+      geometrie: geom
+      spalten: {gitter_id: _id, ew: ew, a_ges: a_ges, a_u18: a_u18, a_18_29: a_18_29, a_30_49: a_30_49,
+                a_50_64: a_50_64, a_65p: a_65p, d_alter: d_alter, h_ges: h_ges, h_fern: h_fern,
+                h_etage: h_etage, h_block: h_block, h_zentral: h_zentral, h_oefen: h_oefen, h_keine: h_keine,
+                e_ges: e_ges, e_gas: e_gas, e_oel: e_oel, e_holz: e_holz, e_bio: e_bio, e_wp: e_wp,
+                e_strom: e_strom, e_kohle: e_kohle, e_fern: e_fern, e_kein: e_kein, w_ges: w_ges,
+                w_v1919: w_v1919, w_1919_48: w_1919_48, w_1949_78: w_1949_78, w_1979_90: w_1979_90,
+                w_1991_00: w_1991_00, w_2001_13: w_2001_13, w_2014_19: w_2014_19, w_2020p: w_2020p}
+
+  gebaeude_alkis:
+    # WFS der Geobasis Brandenburg (LGB): ALKIS vereinfacht, Gebäude im Rechteck um Potsdam (EPSG:25833),
+    # in 1-km-Kacheln mit 1 s Pause zwischen den Abrufen. Der Dienst hat keine robots.txt; die
+    # Bedingungen stehen in den AccessConstraints der Capabilities.
+    titel: "Gebäude ALKIS vereinfacht, Potsdam"
+    typ: wfs
+    url: https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs
+    typename: ave:GebaeudeBauwerk
+    id_feld: oid
+    geometrie_feld: geometrie
+    crs: urn:ogc:def:crs:EPSG::25833
+    bbox: [356000, 5801000, 376000, 5820000]
+    kachel_m: 1000
+    pause_s: 1
+    felder: {funktion: funktion, gebnutzbez: gebnutzbez, anzahlgs: anzahlgs, aktualit: aktualit}
+    rhythmus: monatlich
+    lizenz: "© GeoBasis-DE/LGB, dl-de/by-2-0"
+    ziel:
+      tabelle: gebaeude
+      loeschen: false
+      schluessel: [oid]
+      geometrie: geom
+      spalten: {oid: _id, funktion: funktion, gebnutzbez: gebnutzbez, anzahlgs: anzahlgs, aktualit: aktualit}

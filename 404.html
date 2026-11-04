@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seite nicht gefunden: Kiezatlas Potsdam</title>
+<meta name="description" content="Diese Adresse gibt es im Kiezatlas Potsdam nicht. Zurück zur Karte der Stadtteile.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Kiezatlas Potsdam">
+<meta property="og:description" content="Diese Adresse gibt es im Kiezatlas Potsdam nicht.">
+<meta property="og:image" content="https://souverain-systems.de/kiezatlas/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="atlas.css">
+<style>
+.leer{min-height:100svh;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center;gap:clamp(24px,5vw,80px);padding:calc(var(--kopf) + 32px) var(--gut) 48px}
+.leer__gitter{display:block;aspect-ratio:1;width:min(100%,70svh);height:auto}
+.leer h1{font:600 var(--t-xl)/1 var(--f-display);letter-spacing:-.015em;margin:0 0 .4em}
+.leer p{max-width:36ch;margin:0 0 1.4em}
+@media (max-width:860px){.leer{grid-template-columns:1fr}.leer__gitter{max-width:340px}}
+</style>
+</head>
+<body>
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+<header class="kopfleiste">
+  <a class="marke" href="./"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+</header>
+<main id="inhalt" class="leer">
+  <svg class="leer__gitter" viewBox="-0.5 -0.5 101 101" aria-hidden="true"><g stroke="#cdd1cc" stroke-width=".4"><line x1="0" y1="0" x2="0" y2="100"/><line x1="0" y1="0" x2="100" y2="0"/><line x1="20" y1="0" x2="20" y2="100"/><line x1="0" y1="20" x2="100" y2="20"/><line x1="40" y1="0" x2="40" y2="100"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="60" y1="0" x2="60" y2="100"/><line x1="0" y1="60" x2="100" y2="60"/><line x1="80" y1="0" x2="80" y2="100"/><line x1="0" y1="80" x2="100" y2="80"/><line x1="100" y1="0" x2="100" y2="100"/><line x1="0" y1="100" x2="100" y2="100"/></g><rect x="40" y="40" width="20" height="20" fill="#fafbf8" stroke="#6a2c82" stroke-width=".5" stroke-dasharray="1.5 1"/><circle cx="50" cy="50" r="1.4" fill="#13212a" stroke="#fff" stroke-width=".5"/></svg>
+  <div>
+    <h1>Diese Zelle ist leer.</h1>
+    <p>Unter dieser Adresse gibt es nichts. Im Gitter heißt eine leere Stelle: dort wohnt niemand, oder der Wert ist geheim gehalten. Hier ist es nur ein falscher Link.</p>
+    <a class="knopf knopf--voll" href="./"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Zurück zur Karte</span></a>
+  </div>
+</main>
+<footer class="fuss-seite"><p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p></footer>
+</body>
+</html>

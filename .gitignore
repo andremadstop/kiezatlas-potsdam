@@ -1,0 +1,7 @@
+.env
+rohdaten
+berichte/
+vorbereitet/
+.venv/
+node_modules/
+.shots/

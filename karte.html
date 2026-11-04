@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karte: Kiezatlas Potsdam</title>
+<meta name="description" content="Die Karte des Kiezatlas Potsdam zum freien Erkunden: Zensus 2022 im 100-Meter-Gitter, Stadtteile, Gebäude und Luftbild, mit Steckbrief und Quelle bei jeder Zahl.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/karte.html">
+<meta name="theme-color" content="#f1f2ee">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kiezatlas Potsdam: Karte">
+<meta property="og:description" content="Potsdam im 100-Meter-Gitter des Zensus 2022 frei erkunden.">
+<meta property="og:image" content="https://souverain-systems.de/kiezatlas/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="karte.css">
+</head>
+<body class="kartenseite">
+<a class="sprung" href="#werkzeug-start">Zum Werkzeug springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="index.html"><span>Zur Geschichte</span></a></li>
+      <li><a class="nav" href="index.html#schaugrafik"><span>Schaugrafik</span></a></li>
+      <li><a class="nav" href="index.html#methode"><span>Methode</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="kartenflaeche" id="inhalt">
+  <div class="kartenrahmen">
+    <div id="karte" role="region" aria-label="Karte von Potsdam. Mit Pfeiltasten verschieben, Plus und Minus zoomen."></div>
+    <div class="werkzeug" role="toolbar" aria-label="Thema und Ansicht">
+      <fieldset class="themen" id="thema"><legend class="nur-sr">Thema der Karte</legend></fieldset>
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="dreid"><span>3D</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="luftbild"><span>Luftbild</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="gebaeude"><span>Gebäude</span></label>
+      </div>
+    </div>
+    <div class="legende" id="legende"></div>
+    <div class="schild" id="schild" aria-hidden="true"></div>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  <aside class="seite" id="seite" aria-label="Gebiet und Steckbrief">
+    <button class="seite__griff" id="seite-griff" type="button" aria-expanded="false" aria-controls="seite-inhalt">
+      <span class="seite__griffstrich" aria-hidden="true"></span>
+      <span class="seite__grifftext"><b id="griff-name">Ganz Potsdam</b> <span>Gebiet und Steckbrief</span></span>
+    </button>
+    <div class="seite__inhalt" id="seite-inhalt">
+      <div class="block" id="werkzeug-start" tabindex="-1">
+        <h1 class="seite__titel">Karte frei erkunden</h1>
+        <p class="fuss seite__lede">Nichts bewegt sich von selbst. Thema oben wählen, Stadtteil hier oder per Klick in die Karte; jede Ansicht lässt sich als Link teilen.</p>
+        <label class="suche"><span>Stadtteil suchen</span>
+          <input type="search" id="suche" placeholder="Name oder Nummer" autocomplete="off">
+        </label>
+        <ul class="trefferliste" id="treffer" aria-label="Stadtteile"></ul>
+      </div>
+      <div class="block steckbrief-k">
+        <h2 class="steckbrief__name" id="sb-name">Potsdam</h2>
+        <p class="steckbrief__art" id="sb-art"></p>
+        <div class="seite__aktion">
+          <button class="knopf knopf--rand" type="button" id="zoom-teil"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf Stadtteil zoomen</span></button>
+          <button class="knopf knopf--rand" type="button" id="link-teilen"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Link zu dieser Ansicht</span></button>
+        </div>
+        <p class="fuss" id="teilen-hinweis" aria-live="polite"></p>
+        <div class="kacheln" id="kacheln"></div>
+        <p class="fuss" id="sb-fuss"></p>
+        <p class="fuss" id="gegenprobe"></p>
+        <div class="verteilungen" id="verteilungen"></div>
+      </div>
+      <div class="block seite__fuss">
+        <p class="fuss">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung. Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Gebäude und Luftbild © GeoBasis-DE/LGB, dl-de/by-2-0. Hintergrund © basemap.de / BKG, dl-de/by-2-0. Vollständige Quellen: <a class="link" href="index.html#quellen">Quellen und Lizenzen</a>.</p>
+        <p class="fuss">Datenschutz: Die Karte lädt Kacheln von basemap.de und, wenn eingeschaltet, Luftbilder der LGB; diese Server sehen die IP-Adresse. Keine Cookies, keine Zählung.</p>
+        <p class="fuss-seite__links"><a class="link" href="index.html">Zur Geschichte</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<script defer src="daten/kennzahlen.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="karte.js"></script>
+</body>
+</html>

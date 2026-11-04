@@ -1,0 +1,55 @@
+/* Kiezatlas Potsdam: freie Karte (karte.html). Baut auf atlas.css auf. */
+.kartenseite{overflow:hidden;height:100dvh}
+.kartenflaeche{position:fixed;inset:var(--kopf) 0 0 0;display:grid;grid-template-columns:minmax(0,1fr) 380px}
+.kartenrahmen{position:relative;min-width:0;background:#e6e9e4}
+.kartenseite .werkzeug{top:12px}
+.kartenseite .kopfleiste{translate:none!important}
+.seite{background:var(--surface);border-left:1px solid var(--ink);overflow:auto;overscroll-behavior:contain}
+.seite__griff{display:none}
+.block{padding:18px 20px;border-bottom:1px solid var(--line)}
+.block:focus{outline:none}
+.suche{display:flex;flex-direction:column;gap:6px;font-size:.875rem;color:var(--muted)}
+.suche input{font:500 1rem var(--f-text);padding:9px 10px;min-height:42px;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink)}
+.suche input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.trefferliste{list-style:none;margin:10px 0 0;padding:0;max-height:15rem;overflow:auto;border-top:1px solid var(--ink)}
+.trefferliste li{border-bottom:1px solid var(--line)}
+.treffer{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:12px 2.2em minmax(0,1fr);align-items:center;gap:8px;width:100%;min-height:36px;padding:4px 6px;position:relative;isolation:isolate;font-size:.9375rem}
+.treffer::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--accent-soft);transform-origin:0 50%;scale:0 1;transition:scale .4s var(--ease)}
+.treffer i{width:10px;height:10px}
+.treffer b{font:600 1rem/1 var(--f-display)}
+@media (hover:hover){.treffer:hover::before{scale:1 1}}
+.treffer:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.treffer:focus-visible::before{scale:1 1}
+.treffer[aria-pressed="true"]{color:#fff}
+.treffer[aria-pressed="true"]::before{scale:1 1;background:var(--accent)}
+.steckbrief-k .steckbrief__name{margin-top:0}
+.seite__aktion{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
+.seite__aktion .knopf{min-height:40px;font-size:.875rem}
+.steckbrief-k .kacheln{margin-top:12px}
+.steckbrief-k .verteilungen{grid-template-columns:1fr;margin-top:20px}
+.seite__fuss .fuss{font-size:.8125rem}
+.kartenseite .legende{bottom:40px}
+.kartenseite .maplibregl-ctrl-top-right{top:auto;bottom:150px}
+
+@media (max-width:860px){
+  .kartenseite .kopfleiste ul{gap:14px}
+  .kartenflaeche{display:block}
+  .kartenrahmen{position:absolute;inset:0 0 64px 0}
+  .kartenseite .werkzeug{top:8px}
+  .kartenseite .legende{top:58px;bottom:auto;left:8px}
+  .kartenseite .maplibregl-ctrl-top-right{bottom:24px}
+  .seite{position:absolute;left:0;right:0;bottom:0;height:min(78dvh,640px);border-left:0;border-top:1px solid var(--ink);overflow:hidden;display:flex;flex-direction:column;z-index:6;translate:0 calc(100% - 64px);transition:translate .45s var(--ease);box-shadow:0 -8px 24px rgba(19,33,42,.12)}
+  .seite.offen{translate:0 0}
+  .seite__griff{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:64px;padding:8px 16px 10px;cursor:pointer;flex:0 0 auto;background:var(--surface)}
+  .seite__griff:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+  .seite__griffstrich{width:44px;height:4px;background:var(--line)}
+  .seite__grifftext{display:flex;gap:8px;align-items:baseline;font-size:.875rem;color:var(--muted)}
+  .seite__grifftext b{font:600 1.15rem/1.1 var(--f-display);color:var(--ink)}
+  .seite__inhalt{overflow:auto;overscroll-behavior:contain;flex:1 1 auto}
+  .seite:not(.offen) .seite__inhalt{visibility:hidden}
+}
+@media (prefers-reduced-motion:reduce){.seite{transition:none}}
+.seite__titel{font:600 var(--t-l)/1.05 var(--f-display);letter-spacing:-.01em;margin:0 0 6px}
+.seite__lede{margin:0 0 14px}
+.treffer[aria-pressed="true"]:hover::before{background:var(--ink)}
+.seite a.link,.seite .fuss a{padding-block:4px;display:inline-block}

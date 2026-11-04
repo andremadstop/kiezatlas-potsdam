@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiezatlas Potsdam: Stadtteile in Zahlen und Karte</title>
+<meta name="description" content="Alle Stadtteile Potsdams in Zahlen und Karte: Zensus 2022 im 100-Meter-Gitter, amtliche Stadtteile und Gebäude der Landesvermessung, mit Quelle bei jeder Zahl.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/">
+<meta name="theme-color" content="#f1f2ee">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kiezatlas Potsdam">
+<meta property="og:description" content="Potsdam im 100-Meter-Gitter des Zensus 2022: Stadtteile vergleichen, Grenzfälle nachrechnen, Schaugrafiken für den Druck.">
+<meta property="og:image" content="https://souverain-systems.de/kiezatlas/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="vendor/maplibre-gl.css"></noscript>
+<link rel="stylesheet" href="atlas.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Kiezatlas Potsdam","description":"Kennzahlen je Stadtteil der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter), amtlichen Stadtteilen und ALKIS-Gebäuden.","inLanguage":"de","spatialCoverage":"Potsdam","creator":{"@type":"Organization","name":"Stiebitz Souverain Systems UG (haftungsbeschränkt)","address":"Potsdam"}}</script>
+</head>
+<body>
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Abschnitte">
+    <ul>
+      <li><a class="nav nav--karte" href="karte.html"><span>Karte frei erkunden</span></a></li>
+      <li><a class="nav" href="#fragen"><span>Fragen</span></a></li>
+      <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
+      <li><a class="nav" href="#schaugrafik"><span>Schaugrafik</span></a></li>
+      <li><a class="nav" href="#grenzfall"><span>Grenzfall</span></a></li>
+      <li><a class="nav" href="#methode"><span>Methode</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt" tabindex="-1">
+
+<!-- ============ ERZÄHLUNG: Titel, Fragen, Karte ============ -->
+<section class="erzaehlung" id="oben" aria-labelledby="titel">
+  <div class="auftakt frage" data-schritt="0">
+    <h1 id="titel" class="titel"><span class="titel__z"><span>Kiezatlas</span></span> <span class="titel__z"><span>Potsdam</span></span></h1>
+    <p class="lede">Wer wo wohnt, wie alt die Häuser sind und womit geheizt wird, für Potsdam und jeden seiner <span data-feld="anzahl-teile"></span> Stadtteile: aus dem Zensus 2022 im 100-Meter-Gitter, den amtlichen Stadtteilen und den Gebäuden der Landesvermessung. Jede Zahl nennt ihre Quelle.</p>
+    <div class="auftakt__aktion">
+      <a class="knopf knopf--voll" href="#frage-1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Mit der ersten Frage beginnen</span></a>
+      <span class="entwurf">Prototyp, Stand <span data-feld="stand"></span>.</span>
+    </div>
+    <dl class="stadtzahlen" id="stadtzahlen" aria-label="Ganz Potsdam in Zahlen"></dl>
+    <p class="stadtzahlen__quelle"><span data-feld="flaeche-stadt"></span> km² Stadtgebiet, <span data-feld="zellen-stadt"></span> Gitterzellen mit Zensuswerten. Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung.</p>
+
+  </div>
+
+  <div class="buehne" id="buehne">
+    <div id="karte" role="region" aria-label="Karte von Potsdam; Bedienung über die Werkzeugleiste darüber" tabindex="-1"></div>
+    <div class="werkzeug" role="toolbar" aria-label="Kartenwerkzeug">
+      <fieldset class="themen" id="thema"><legend class="nur-sr">Thema der Karte</legend></fieldset>
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="luftbild"><span>Luftbild</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="dreid"><span>Gebäude 3D</span></label>
+      </div>
+    </div>
+    <div class="legende" id="legende"></div>
+    <div class="schild" id="schild" aria-hidden="true"></div>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  <ol class="fragen" id="fragen" aria-label="Fragen an die Karte">
+    <li class="frage" id="frage-1" data-schritt="1">
+      <p class="frage__nr">Frage 1</p>
+      <h2 class="frage__titel">Wie viele Menschen wohnen in meiner Nachbarschaft?</h2>
+      <p>Jetzt richtet sich die Stadt auf. Jede Säule ist eine Zelle des Zensus-Gitters, 100 mal 100 Meter; je höher und dunkler, desto mehr Menschen wohnen darin. Die vollste Zelle liegt im Stadtteil <b data-q="ew-max-teil"></b> mit <b data-q="ew-max"></b> Einwohnern, in der Hälfte aller Zellen sind es höchstens <span data-q="ew-median"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Eine Säule anklicken oder antippen zeigt ihre Werte mit Quelle. Verschieben durch Ziehen, zoomen per Doppelklick oder mit den Knöpfen rechts; am Handy mit zwei Fingern.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-2" data-schritt="2">
+      <p class="frage__nr">Frage 2</p>
+      <h2 class="frage__titel">Wie alt ist meine Nachbarschaft?</h2>
+      <p>Das Gitter zeigt nun das Durchschnittsalter je Zelle. Unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern ist der Anteil der Menschen ab 65 im Stadtteil <b data-q="alt-hoch"></b> am höchsten (<span data-q="alt-hoch-wert"></span>) und im Stadtteil <b data-q="alt-tief"></b> am niedrigsten (<span data-q="alt-tief-wert"></span>); für ganz Potsdam sind es <span data-q="alt-stadt"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Thema wechselt in der Leiste über der Karte. Die Legende erklärt Farben und Höhen; grau und flach sind Zellen, deren Wert zu unscharf ist.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="2"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-3" data-schritt="3">
+      <p class="frage__nr">Frage 3</p>
+      <h2 class="frage__titel">Wo wohnen die meisten Kinder?</h2>
+      <p>Die meisten Kinder und Jugendlichen unter 18 leben im Stadtteil <b data-q="kind-teil"></b>: <span data-q="kind-zahl"></span> von <span data-q="kind-nenner"></span> Einwohnern, also <span data-q="kind-anteil"></span>. <span data-q="kind-anteilig"></span></p>
+      <p class="frage__kann"><b>So geht’s:</b> Einen Stadtteil wählen per Klick in die Karte, in der Liste der Stadtteile oder im Steckbrief. Kennzahlen und Verteilungen weiter unten folgen der Auswahl.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="3"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-4" data-schritt="4">
+      <p class="frage__nr">Frage 4</p>
+      <h2 class="frage__titel">Wie alt sind die Häuser in meinem Stadtteil?</h2>
+      <p>Gefärbt ist jetzt der Anteil der Wohnungen in Gebäuden von vor 1949. Im Stadtteil <b data-q="altbau-teil"></b> sind es <span data-q="altbau-wert"></span>, in ganz Potsdam <span data-q="altbau-stadt"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der Zahl der Geschosse genähert.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="4" data-gebaeude="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Gebäude in 3D zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-5" data-schritt="5">
+      <p class="frage__nr">Frage 5</p>
+      <h2 class="frage__titel">Womit wird bei uns geheizt?</h2>
+      <p>In Potsdam hängen <span data-q="fern-stadt"></span> der Wohnungen an der Fernwärme. Am höchsten ist der Anteil im Stadtteil <b data-q="fern-hoch"></b> (<span data-q="fern-hoch-wert"></span>), am niedrigsten im Stadtteil <b data-q="fern-tief"></b> (<span data-q="fern-tief-wert"></span>), jeweils unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Luftbild der Landesvermessung ersetzt auf Wunsch die graue Hintergrundkarte; so wird sichtbar, welche Bebauung hinter den Säulen steht.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="5" data-luftbild="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Luftbild einblenden</span></button>
+    </li>
+    <li class="frage frage--grenze" id="frage-6" data-schritt="6">
+      <p class="frage__nr">Frage 6</p>
+      <h2 class="frage__titel">Wem gehört eine Zelle auf der Grenze?</h2>
+      <p>Gitter und Stadtteilgrenzen passen nicht aufeinander. Diese Zelle mit <span data-q="gz-ew"></span> Einwohnern liegt zum Teil im Stadtteil <b data-q="gz-a"></b>, zum Teil im Stadtteil <b data-q="gz-b"></b>. Gezählt wird sie ganz für den Stadtteil, in dem ihr Mittelpunkt liegt: <b data-q="gz-eigner"></b>.</p>
+      <p class="frage__kann"><b>Nachgerechnet:</b> Die Datenbank zählt alle Einwohner zur Probe auch nach Flächenanteil. Der Abschnitt Grenzfall zeigt, wie viel das je Stadtteil ausmacht.</p>
+      <a class="knopf knopf--rand" href="#grenzfall"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Zum Grenzfall</span></a>
+    </li>
+    <li class="frage" id="frage-7" data-schritt="7">
+      <p class="frage__nr">Frage 7</p>
+      <h2 class="frage__titel">Und wie kommt das ins Heft?</h2>
+      <p>Jedes Gebiet, auch mehrere zum Vergleich, lässt sich als Schaugrafik mitnehmen: als SVG, als PNG in Druckauflösung oder über die Druckansicht als PDF. Titel, Stichtag und Quellenvermerk stehen immer mit drauf.</p>
+      <a class="knopf knopf--rand" href="#schaugrafik"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Schaugrafik gestalten</span></a>
+    </li>
+    <li class="frage frage--frei" id="frage-8" data-schritt="8">
+      <p class="frage__nr">Selbst erkunden</p>
+      <h2 class="frage__titel">Jetzt gehört die Karte Ihnen.</h2>
+      <p>Alle Themen stehen in der Leiste über der Karte. Ein Klick auf einen Stadtteil wählt ihn aus; darunter lassen sich alle Stadtteile vergleichen. Ohne Führung, ohne Kamerafahrten und mit teilbarem Link: die Karte zum freien Erkunden.</p>
+      <div class="frage__knoepfe">
+        <a class="knopf knopf--voll" href="karte.html"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Karte frei erkunden</span></a>
+        <a class="knopf knopf--rand" href="#stadtteile"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Stadtteile vergleichen</span></a>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ============ STADTTEILE: Register und Steckbrief ============ -->
+<section class="register" id="stadtteile" aria-labelledby="h-teile">
+  <div class="register__kopf">
+    <h2 id="h-teile" class="abschnitt">Die <span data-feld="anzahl-teile"></span> Stadtteile</h2>
+    <p class="abschnitt__unter">Nummeriert von <span data-feld="nr-erste"></span> bis <span data-feld="nr-letzte"></span>; die erste Ziffer nennt den Stadtbezirk, ein Farbton je Bezirk wie in der Karte. Sortieren zum Vergleichen, auswählen für den Steckbrief.</p>
+  </div>
+  <div class="register__liste">
+    <div class="sortierung" role="group" aria-label="Sortieren nach" id="sortierung"></div>
+    <div id="teile"></div>
+  </div>
+  <aside class="steckbrief" id="steckbrief" aria-labelledby="sb-name">
+    <label class="gebiet">Gebiet <select id="gebiet"></select></label>
+    <h3 class="steckbrief__name" id="sb-name" data-feld="name">Potsdam</h3>
+    <p class="steckbrief__art"><span data-feld="art"></span>, <span data-feld="flaeche"></span> km²</p>
+    <div class="kacheln" id="kacheln" aria-live="polite"></div>
+    <p class="fuss" id="sb-fuss">Grundlage: <span data-feld="zellen"></span> Gitterzellen zu 100 × 100 m, deren Mittelpunkt im Gebiet liegt; <span data-feld="gebaeude"></span>. Stichtag des Zensus: 15. Mai 2022.</p>
+    <p class="fuss" id="gegenprobe"></p>
+    <div class="steckbrief__aktion">
+      <button class="knopf knopf--rand" type="button" id="sb-karte"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+      <button class="knopf knopf--rand" type="button" id="sb-grafik"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Als Schaugrafik</span></button>
+    </div>
+  </aside>
+  <div class="verteilungen-block">
+    <h3 class="unterabschnitt">Verteilungen: <span data-feld="name">Potsdam</span></h3>
+    <p class="abschnitt__unter">Summen über alle Zellen im Gebiet. Heizung und Baujahr zählen Wohnungen, nicht Gebäude.</p>
+    <div class="verteilungen" id="verteilungen"></div>
+  </div>
+</section>
+
+<!-- ============ SCHAUGRAFIK ============ -->
+<section class="schaugrafik" id="schaugrafik" aria-labelledby="h-schau">
+  <div class="schau__kopf">
+    <h2 id="h-schau" class="abschnitt">Schaugrafik für den Druck</h2>
+    <p class="abschnitt__unter">Ein Gebiet oder bis zu vier zum Vergleich, die gewünschten Rubriken und ein Format wählen. Die Grafik entsteht im Browser aus denselben Daten wie die Seite, ohne Kartenkacheln, mit Quellenvermerk und Lizenz.</p>
+  </div>
+  <form class="schau__form" id="schau-form" aria-label="Schaugrafik einstellen">
+    <fieldset class="schau__gebiete">
+      <legend>Gebiet <span class="leise" id="schau-zaehler"></span></legend>
+      <div class="schau__gebietliste" id="schau-gebiete"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Rubriken</legend>
+      <div class="schau__haken" id="schau-rubriken"></div>
+      <label class="feld">Thema der Karte <select id="schau-kartenthema"></select></label>
+    </fieldset>
+    <fieldset>
+      <legend>Format</legend>
+      <div class="schau__haken" id="schau-format"></div>
+    </fieldset>
+    <div class="schau__aktion">
+      <button class="knopf knopf--voll" type="button" id="schau-svg"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">SVG laden</span></button>
+      <button class="knopf knopf--voll" type="button" id="schau-png"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">PNG laden, 300 dpi</span></button>
+      <button class="knopf knopf--rand" type="button" id="schau-druck"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Drucken oder als PDF</span></button>
+    </div>
+    <p class="fuss" id="schau-hinweis" aria-live="polite"></p>
+  </form>
+  <figure class="schau__vorschau" aria-labelledby="schau-cap">
+    <div class="schau__blatt" id="schau-blatt"></div>
+    <figcaption id="schau-cap" class="fuss">Vorschau. Format <span id="schau-mass"></span>.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ GRENZFALL ============ -->
+<section class="grenzfall" id="grenzfall" aria-labelledby="h-grenz">
+  <div class="grenz__bild">
+    <figure>
+      <div id="grenz-figur" class="grenz__figur"></div>
+      <figcaption class="fuss" id="grenz-cap"></figcaption>
+    </figure>
+  </div>
+  <div class="grenz__text">
+    <h2 id="h-grenz" class="abschnitt">Grenzfall: Wem gehört eine Zelle auf der Grenze?</h2>
+    <p class="grenz__lead" id="grenz-lead"></p>
+    <p>Gezählt wird nach dem Mittelpunkt der Zelle; zur Probe rechnet die Datenbank dieselben Einwohner nach dem Flächenanteil. Die Beispielzelle links zeigt beide Wege.</p>
+    <div class="umschalter" role="group" aria-label="Zählweise der Beispielzelle">
+      <button type="button" class="umschalter__k" data-modus="mittelpunkt" aria-pressed="true">Nach Mittelpunkt</button>
+      <button type="button" class="umschalter__k" data-modus="flaeche" aria-pressed="false">Nach Fläche</button>
+    </div>
+    <p id="grenz-zelle-text" class="grenz__zelle" aria-live="polite"></p>
+    <p class="grenz__kern" id="grenz-kern"></p>
+  </div>
+  <div class="grenz__tabelle">
+    <table class="tabelle" id="grenz-tab">
+      <caption class="nur-sr">Einwohner je Stadtteil nach Mittelpunkt und nach Flächenanteil</caption>
+      <thead><tr><th scope="col">Stadtteil</th><th scope="col">nach Mittelpunkt</th><th scope="col">nach Fläche</th><th scope="col">Abweichung</th><th scope="col">in Personen</th><th scope="col">Grenzzellen</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" class="mehr" id="grenz-mehr" aria-expanded="false" aria-controls="grenz-tab">Alle Stadtteile zeigen</button>
+    <p class="fuss">Sortiert nach der Größe der Abweichung. Welche Methode richtiger ist, hängt von der Frage ab: Der Mittelpunkt zählt jede Person genau einmal und ganz, der Flächenanteil nimmt an, dass Menschen gleichmäßig über die Zelle verteilt wohnen. Kleine Stadtteile schwanken in Prozent stark, obwohl es nur wenige Personen sind. Für Vergleiche über die Zeit kommt es vor allem darauf an, immer dieselbe Methode zu nehmen.</p>
+  </div>
+</section>
+
+<!-- ============ METHODE ============ -->
+<section class="methode" id="methode" aria-labelledby="h-methode">
+  <h2 id="h-methode" class="abschnitt">Wie die Zahlen entstehen</h2>
+  <ol class="kette">
+    <li><span class="kette__nr" aria-hidden="true">1</span><h3>Rohdaten</h3><p>Stadtteile (von Hand aus dem Open-Data-Portal), Zensus-Gitter von Destatis, Gebäude aus dem WFS der Landesvermessung.</p></li>
+    <li><span class="kette__nr" aria-hidden="true">2</span><h3>Import-Pipeline</h3><p>Lädt jede Quelle mit Abgleich, Bericht je Lauf und Pausen zwischen den Abrufen; Gebäude in 1-km-Kacheln.</p></li>
+    <li><span class="kette__nr" aria-hidden="true">3</span><h3>PostGIS</h3><p>Eine Datenbank mit Rollen nach geringsten Rechten; gelesen wird mit einer reinen Leserolle.</p></li>
+    <li><span class="kette__nr" aria-hidden="true">4</span><h3>Auswertung</h3><p>Zuordnung von Zellen und Gebäuden, Summen, Anteile und der Grenzfall-Vergleich laufen in SQL.</p></li>
+    <li><span class="kette__nr" aria-hidden="true">5</span><h3>Diese Seite</h3><p>Zeigt nur das Ergebnis. Im Fließtext steht keine von Hand eingesetzte Zahl.</p></li>
+  </ol>
+  <div class="methode__absaetze">
+    <div>
+      <h3>Daten und Datenbank</h3>
+      <p>Die Geodaten-Import-Pipeline der UG lädt Stadtteile, Zensus-Gitter und Gebäude in eine PostGIS-Datenbank, mit Abgleich je Quelle, Bericht je Lauf und Rhythmus; die Gebäude kommen direkt aus dem WFS der Landesvermessung, in 1-km-Kacheln mit Pause zwischen den Abrufen. Zuordnung und Summen rechnet die Datenbank.</p>
+    </div>
+    <div>
+      <h3>Abgrenzung und Zellen</h3>
+      <p>Amtliche Stadtteile aus dem Open-Data-Portal der Stadt (Stand 31.12.2025). Eine Gitterzelle zählt zu dem Stadtteil, in dem ihr Mittelpunkt liegt; Zellen an Grenzen werden also ganz oder gar nicht gezählt, jede genau einmal. Viele Stadtteile schließen Park-, Wald- und Wasserflächen ein; eine Dichte über die Gesamtfläche fehlt deshalb bewusst.</p>
+    </div>
+    <div>
+      <h3>Geheimhaltung</h3>
+      <p>Der Zensus verändert Fallzahlen mit der Cell-Key-Methode stochastisch leicht. Summen über viele Zellen weichen deshalb etwas von amtlichen Gebietssummen ab, kleine Einzelwerte sind unscharf; in einzelnen Zellen ergeben Anteile sogar mehr als 100 %. Die Einwohnerzahl ist darum gerundet. Anteile werden nur innerhalb derselben Zensus-Tabelle gebildet.</p>
+    </div>
+    <div>
+      <h3>Säulen, Farben, Gebäude</h3>
+      <p>Farbe und Höhe einer Säule zeigen denselben Wert: Einwohner über die Wurzel, damit wenige dichte Zellen nicht alles überragen; Anteile bis 100 %. Zellen mit weniger als zehn Personen bzw. Wohnungen liegen flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUELLEN ============ -->
+<section class="quellen-block" id="quellen" aria-labelledby="h-quellen">
+  <h2 id="h-quellen" class="abschnitt">Quellen und Lizenzen</h2>
+  <ul class="quellen">
+    <li>Zensus 2022, Gitterzellen 100 m (Bevölkerungszahl; Alter in 5 Altersklassen; Durchschnittsalter; Energieträger der Heizung; überwiegende Heizungsart; Wohnungen nach modifizierten Mikrozensus-Baujahresklassen). <span class="vermerk">© Statistische Ämter des Bundes und der Länder, 2024 bzw. 2025</span>; Destatis: freie Nutzung mit Namensnennung, in Open-Data-Katalogen als <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> geführt. Eigene Auswertung (Zuordnung zu Stadtteilen, Summen, Anteile). Datensätze: <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html">Destatis, Gitterdaten Zensus 2022</a>.</li>
+    <li>Stadtteile in Potsdam. Landeshauptstadt Potsdam, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/zero-2-0">dl-zero-de/2.0</a>. Datensatz: <a href="https://opendata.potsdam.de/explore/dataset/stadtteile/">opendata.potsdam.de/explore/dataset/stadtteile</a> (von Hand heruntergeladen).</li>
+    <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse, Höhe genähert). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
+    <li>Luftbild: Digitale Orthophotos DOP20. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. Dienst: <code>https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms</code>.</li>
+    <li>Hintergrundkarte: basemap.de Web Raster grau. <span class="vermerk">© basemap.de / BKG</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
+    <li>Gegenproben: Regionaldatenbank Deutschland, Tabelle 12411-01-01-5-B (Bevölkerungsstand Potsdam); Landeshauptstadt Potsdam, „Stadtteile im Blick 2022“, S. 26 (Potsdam West). Je eine Zahl übernommen.</li>
+    <li>Werkzeuge: Geodaten-Import-Pipeline (Apache-2.0, <a href="https://github.com/andremadstop/geodaten-import-pipeline">github.com/andremadstop/geodaten-import-pipeline</a>), PostgreSQL mit PostGIS, MapLibre GL JS 4.7.1 (BSD-3-Clause), GSAP 3.15.1 (GreenSock Standard License). Schrift: Barlow und Barlow Semi Condensed (SIL Open Font License 1.1).</li>
+  </ul>
+</section>
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__marke" aria-hidden="true">Kiezatlas Potsdam</p>
+  <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
+  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
+  <p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
+</footer>
+
+<div id="druck" aria-hidden="true"></div>
+
+<script defer src="daten/kennzahlen.js"></script>
+<script defer src="kopf.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="vendor/gsap.min.js"></script>
+<script defer src="vendor/ScrollTrigger.min.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="atlas.js"></script>
+<script defer src="schaugrafik.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Datenbank des Kiezatlas Potsdam: PostGIS, dieselbe festgeschriebene Version wie die
+# Geodaten-Import-Pipeline. Nur auf dem eigenen Rechner erreichbar.
+#   docker compose up -d --wait db
+services:
+  db:
+    image: postgis/postgis:16-3.6@sha256:d07ce3f06f657b6516c7511412232e97174d7e9dcf4c9fe520109b682b44a201
+    environment:
+      POSTGRES_DB: kiezatlas
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?in .env setzen}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:${PG_PORT:-55461}:5432"
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U admin -d kiezatlas"]
+      interval: 5s
+      retries: 20
+volumes:
+  pgdata:

@@ -1,0 +1,42 @@
+{
+  "lauf_id": "20261104T132324Z",
+  "start": "2026-11-04T13:23:24.971799+00:00",
+  "probelauf": false,
+  "sprache": "de",
+  "quellen": [
+    {
+      "quelle": "stadtteile",
+      "typ": "csv",
+      "status": "ok",
+      "zaehler": {
+        "gelesen": 32,
+        "neu": 32,
+        "geaendert": 0,
+        "unveraendert": 0,
+        "geloescht": 0,
+        "uebernommen": 0,
+        "zurueckgehalten": 0
+      },
+      "warnungen": [],
+      "hinweise": [],
+      "info": {
+        "ziel": "stadtteil",
+        "felder": [
+          "name",
+          "nr",
+          "wkt"
+        ],
+        "objekte": 32,
+        "metadaten": 0
+      },
+      "letzte_abfrage": null,
+      "unvollstaendig": false,
+      "laufzeit_s": 0.11
+    }
+  ],
+  "laufzeit_s": 0.13,
+  "fehlgeschlagen": [],
+  "angehalten": [],
+  "unvollstaendig": [],
+  "karte": "20261104T132324Z-karte.html"
+}

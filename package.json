@@ -1,0 +1,17 @@
+{
+  "name": "kiezatlas-potsdam",
+  "version": "1.0.0",
+  "description": "Alle 32 Stadtteile der Landeshauptstadt Potsdam in Zahlen und Karte, nur aus offenen amtlichen Daten: Zensus 2022 im 100-Meter-Gitter, die amtlichen Stadtteile und die Gebäudeumrisse der Landesvermessung. Wer wo wohnt, wie alt die Häuser sind, womit geheizt wird, für die ganze Stadt und jeden Stadtteil, und bei jeder Zahl, woher sie kommt.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "devDependencies": {
+    "axe-core": "^4.14.0",
+    "gsap": "^3.15.1",
+    "maplibre-gl": "^4.7.1",
+    "playwright": "^1.64.1"
+  }
+}

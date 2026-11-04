@@ -1,0 +1,3 @@
+Importlauf 20261104T132325Z · 1.58 s
+  zensus_gitter            ok     neu  6348  geändert     0  gelöscht     0  unverändert     0
+  Änderungskarte: 20261104T132325Z-karte.html
