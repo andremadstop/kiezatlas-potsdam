@@ -39,13 +39,16 @@ pruefe("## 9. Ergebnis und Entscheidung" in protokoll and "nicht ausgerollt" in 
 zeiten, luftbild = [], set()
 for zeile in (KIEZ_DATEN / "abrufprotokoll.tsv").read_text(encoding="utf-8").splitlines()[1:]:
     t = zeile.split("\t")
-    if len(t) > 6 and t[1] == "isk.geobasis-bb.de":
+    # nur die Anfragen von B3: WMS (mapproxy) und die robots.txt-Prüfung direkt davor (10:27 UTC)
+    if len(t) > 6 and t[1] == "isk.geobasis-bb.de" and (
+            "/mapproxy/" in t[2] or (t[2].endswith("/robots.txt") and t[0].startswith("2026-11-05T10:27"))):
         zeiten.append(datetime.fromisoformat(t[0]))
         if "luftbild_lgb/2026-11-05/" in t[6]:
             luftbild.add(t[6].split("luftbild_lgb/2026-11-05/")[1])
 abstaende = [(b - a).total_seconds() for a, b in pairwise(zeiten)]
-pruefe(bool(abstaende) and min(abstaende) >= 10.0,
-       f"Abrufprotokoll isk.geobasis-bb.de: {len(zeiten)} Anfragen, kleinster Abstand {min(abstaende):.1f} s")
+kleinster = min(abstaende) if abstaende else float("nan")
+pruefe(bool(abstaende) and kleinster >= 10.0,
+       f"Abrufprotokoll, B3-Anfragen an isk.geobasis-bb.de: {len(zeiten)}, kleinster Abstand {kleinster:.1f} s")
 dateien = {str(p.relative_to(ABLAGE)) for p in ABLAGE.rglob("*")
            if p.is_file() and p.name != "HERKUNFT.md" and "referenz" not in p.parts}
 pruefe(dateien <= luftbild, f"alle {len(dateien)} Luftbild-Dateien stehen im Abrufprotokoll")

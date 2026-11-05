@@ -130,6 +130,9 @@ Ein Lauf der Methode aus §8, ohne Änderung danach. Zahlen in `berichte/B3_pilo
   nach vorn: 11 Gebäude mit k_ref = 0 landen bei 2015, 6 bei 2021. Die Zensus-Gegenprobe zeigt dieselbe Richtung:
   947 Wohngebäude erstmals 2015 bis 2021 gegen 757 Gebäude mit Wohnraum ab 2010 im Zensus (Größenordnung, ALKIS zählt
   Reihenhäuser einzeln).
+- **Die Entscheidung hängt nicht an der 80-%-Linie.** Beim Hauptkriterium fehlt ein Gebäude (45 von 56 wären
+  80,4 %). Entscheidend ist die Nebenbedingung: 32,1 % Fehldatierung alter Gebäude gegen erlaubte 10 %, mehr als das
+  Dreifache. Einzelne Korrekturen an der Sichtprüfung ändern daran nichts.
 - **Was trägt:** Neubauten nach 2012 erkennt die Automatik meist richtig oder um eine Stufe daneben (51 von 56,
   91,1 %). Für eine Klammer je Gebäude reicht das nicht, weil die Fehldatierung alter Gebäude den Bestand verfälscht.
 - **Grenze der Messung:** Referenz und Automatik lesen dieselben Bilder; die Sichtprüfung hat der Agent gemacht, nicht

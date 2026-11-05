@@ -334,7 +334,10 @@ def _wert(vorlage_kanten, maske, kanten_k, such_px):
 
 
 def k_aus_sichtbar(sichtbar: list[bool]) -> int:
-    """Treppe 'ab k sichtbar' mit den wenigsten Abweichungen; Gleichstand -> spätere Stufe."""
+    """Treppe 'ab k sichtbar' mit den wenigsten Abweichungen; Gleichstand -> spätere Stufe.
+
+    Die letzte Befliegung ist der heutige Stand und gilt immer als sichtbar (der Umriss stammt aus dem heutigen
+    ALKIS), deshalb gibt es die Stufe „nie sichtbar“ nicht."""
     letzte = len(sichtbar) - 1
     beste_k, beste_fehler = letzte, None
     for k in range(letzte + 1):
