@@ -94,6 +94,8 @@ async function planer(basis, art) {
   pruef(js <= GRENZE_JS_KB, `Startgewicht ${js} KB gz JS (Grenze ${GRENZE_JS_KB}); geladen: ${[...new Set(geladen)].filter((u) => u.endsWith(".js")).map((u) => u.split("/").slice(-2).join("/")).join(", ")}`);
   const zellenAmStart = geladen.some((u) => u.endsWith("/daten/zellen.js"));
   pruef(!zellenAmStart, "zellen.js lädt nicht beim Start, erst bei einer Entfernung");
+  const planerAmStart = geladen.some((u) => /\/daten\/(fixtures\/)?planer(_fuss_odbl)?\.js$/.test(u));
+  pruef(!planerAmStart, "Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit");
   const beispiel = await page.evaluate(() => !document.getElementById("beispiel").hidden);
   pruef(beispiel, "Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind");
   // Chips je Art
@@ -104,12 +106,25 @@ async function planer(basis, art) {
   const zl = await page.evaluate(() => ({ sicht: window.KIEZ_KARTE.getLayoutProperty("zellen", "visibility"), n: window.KIEZ_KARTE.querySourceFeatures("zellen").length }));
   pruef(zl.sicht === "visible" && zl.n > 0, `Erreichbarkeit Kita (Luftlinie) als Zellthema: ${zl.n} Zellen gezeichnet`);
   // Raumeinheit wählen: Versorgungstabelle
-  await page.click('#raeume .treffer[data-nr="13"]'); await page.waitForTimeout(200);
+  await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page);
   let z = await zahlenPruefen(page);
   pruef(z.zeilen > 0 && z.ohneQuelle === 0 && z.ohneMethode === 0 && z.ewVermerk && z.quellenListe > 0,
     `Versorgungstabelle Luftlinie: ${z.zeilen} Zeilen, ohne Quelle ${z.ohneQuelle}, ohne Methode ${z.ohneMethode}, Einwohner mit Vermerk ${z.ewVermerk}, ${z.quellenListe} Vermerke mit Lizenz`);
   pruef(z.orientierung > 0 && z.orientierung === z.orientierungMarkiert, `Orientierungswerte gekennzeichnet: ${z.orientierungMarkiert} von ${z.orientierung}`);
   pruef(z.legende && z.legende.vermerk && z.legende.methode, `Legende der Entfernung mit Methode und sichtbarem Vermerk`);
+  // Klick auf eine Zelle: Entfernung mit Methode und vollständigem dl-de-Vermerk (Bearbeitungshinweis + Link)
+  const zelle = await page.evaluate(() => {
+    const m = window.KIEZ_KARTE, f = m.queryRenderedFeatures({ layers: ["zellen"] })[0]; if (!f) return null;
+    const r = f.geometry.coordinates[0], c = [(r[0][0] + r[2][0]) / 2, (r[0][1] + r[2][1]) / 2], p = m.project(c);
+    m.fire("click", { point: p, lngLat: m.unproject(p), originalEvent: {} });
+    const box = [...document.querySelectorAll(".maplibregl-popup-content")].find((x) => /Gitterzelle/.test(x.textContent));
+    const t = box ? { text: box.textContent, link: !!box.querySelector('a[href*="govdata.de/dl-de/by-2-0"]') } : null;
+    document.querySelectorAll(".maplibregl-popup").forEach((x) => x.remove()); return t;
+  });
+  pruef(!!zelle && /Luftlinie/.test(zelle.text) && /Daten verändert \(eigene Berechnung\)/.test(zelle.text) && zelle.link,
+    `Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (${zelle ? "gefunden" : "kein Popup"})`);
+  // Der Klick in die Karte wählt auch die Raumeinheit darunter (oder hebt die Wahl auf): wieder 13 wählen
+  if (!(await page.$('#raeume .treffer[data-nr="13"][aria-pressed="true"]'))) { await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page); }
   await page.check('#weg input[value="fuss"]', { force: true }); await warteBereit(page);
   z = await zahlenPruefen(page);
   const odbl = await page.evaluate(() => !document.getElementById("fuss-odbl").hidden && /ODbL/.test(document.getElementById("legende").textContent + document.querySelector(".vs-quellen").textContent));
@@ -149,6 +164,28 @@ async function rundreise(basis, art) {
   pruef(z1.ein === "arzt,grundschule,kita" && z1.zu === "grundschule" && z1.weg === "fuss" && z1.r === "14" && z1.zellen === "visible"
     && JSON.stringify({ ...z1, k: 0 }) === JSON.stringify({ ...z2, k: 0 }) && kGleich(z1.k, z2.k),
     `Hash-Rundreise über ${art}: ${z1.hash}&k=${z1.k} -> neu geladen gleich (${z2.hash}&k=${z2.k})`);
+}
+
+async function raumebeneFremd() {
+  // Versorgungsdatei auf Planungsräumen (nach H1), Karte kennt nur Stadtteile: keine falsche Zuordnung
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+  const page = await ctx.newPage(), fehler = [];
+  page.on("pageerror", (e) => fehler.push(e.message));
+  await page.route("**/*", async (r) => {
+    const u = r.request().url();
+    if (!eigen(u)) return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    if (/\/daten\/fixtures\/planer\.js$/.test(u.split(/[?#]/)[0])) {
+      const t = fs.readFileSync(path.join(WURZEL, "daten", "fixtures", "planer.js"), "utf8").replace(/"raumebene":\s*"stadtteil"/, '"raumebene":"planungsraum"');
+      return r.fulfill({ status: 200, contentType: "text/javascript", body: t });
+    }
+    return r.continue();
+  });
+  await page.goto(HTTP + "planer.html#r=13", { waitUntil: "load" });
+  await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });
+  const z = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, ebene: window.KIEZ_PLANER && window.KIEZ_PLANER.raumebene }));
+  pruef(z.ebene === "planungsraum" && z.zeilen === 0 && /Planungsräumen/.test(z.text) && fehler.length === 0,
+    `Datei auf Planungsräumen: keine Zuordnung zu Stadtteilen, Hinweis statt Tabelle (${z.zeilen} Zeilen, Fehler ${fehler.length})`);
+  await ctx.close();
 }
 
 async function ruhig() {
@@ -224,6 +261,7 @@ try {
     const liste = await textseiten(basis, art);
     if (art === "HTTP") downloadsPruefen(liste);
   }
+  await raumebeneFremd();
   await ruhig();
 } catch (e) { pruef(false, "Abbruch: " + (e && e.message ? e.message.split("\n")[0] : e)); }
 await browser.close(); server.close();
