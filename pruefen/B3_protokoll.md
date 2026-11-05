@@ -95,3 +95,22 @@ Eingetragen am 05.11.2026 nach der Sichtung, vor dem ersten Code des Klassifikat
 - Gebäude gesamt 200 / k_ref ≥ 4 (nach 2009): **56** / k_ref = 3: 29 / k_ref ≤ 2: 108 / unklar: 7
 - Verteilung k_ref (ohne unklar): 0: 41, 1: 27, 2: 40, 3: 29, 4: 23, 5: 16, 6: 9, 7: 8
 - `frueher_moeglich`: 30 Gebäude (alle k_ref ≤ 2), `form_abweichend` (Vorgängerbau an der Stelle): 14 Gebäude
+
+## 8. Methode der Automatik (vor dem ersten Lauf festgelegt)
+
+Committet zusammen mit dem Code, **bevor** `auswerten` zum ersten Mal läuft. Kein Parameter wird an der Referenz
+abgestimmt; ändert sich die Methode nach dem ersten Lauf, stehen beide Läufe im Bericht.
+
+1. Je Hauptgebäude des Rahmens (2.374) und Befliegung k ein Ausschnitt um den heutigen ALKIS-Umriss in Graustufen,
+   geglättet auf die Bodenauflösung der Befliegung (Gauß, sigma = halbe Bodenauflösung: 1953 1 m, 1996 0,5 m,
+   2007 0,4 m, ab 2012 0,2 m).
+2. Kantenbild (Sobel-Betrag). Vorlage ist das Kantenbild der aktuellen Befliegung (2024) am selben Ort, gleich geglättet.
+3. Wert(k) = größte Pearson-Korrelation zwischen Vorlage und Kantenbild k in der Maske „Umriss + 1,5 m Puffer“,
+   gesucht über Verschiebungen bis ±2 m (Lagefehler zwischen den Befliegungen).
+4. Schwelle je Befliegung = 95-%-Quantil einer Nullverteilung: dieselbe Vorlage gegen den Ausschnitt um den
+   Mittelpunkt eines anderen Rahmengebäudes (fester Partner: nächstes in der Los-Reihenfolge) in derselben Befliegung.
+5. sichtbar(k) = Wert(k) > Schwelle(k); 2024 gilt als sichtbar. k_auto ist die Stufe der Treppe „ab k sichtbar“ mit
+   den wenigsten Abweichungen von sichtbar(0…7); bei Gleichstand die spätere Stufe.
+6. Klammer: `nicht_vor` = Flugjahr der Befliegung k_auto − 1 (bei k_auto = 0 leer), `nicht_nach` = Flugjahr k_auto.
+   Geschrieben werden nur Gebäude des Rahmens im Pilotgebiet (keine Nebengebäude, E5).
+7. Erst nach der Klammer liest das Skript `referenz.csv` (SHA256 wird vorher geprüft) und wertet nach §5 aus.

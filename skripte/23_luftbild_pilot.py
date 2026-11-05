@@ -242,12 +242,333 @@ def stichprobe(lose: int) -> int:
     return 0
 
 
+# --------------------------------------------------------------------------------------- Auswertung
+# Methode (vor dem ersten Lauf festgelegt, nicht an der Referenz abgestimmt; pruefen/B3_protokoll.md §8):
+#   1. Je Gebäude und Befliegung k ein Ausschnitt um den heutigen ALKIS-Umriss, in Graustufen, auf die
+#      Bodenauflösung der Befliegung geglättet (Gauß, sigma = halbe Bodenauflösung).
+#   2. Kantenbild (Sobel-Betrag). Vorlage = Kantenbild der aktuellen Befliegung (k = 7) am selben Ort.
+#   3. Wert(k) = größte Pearson-Korrelation zwischen Vorlage und Kantenbild k innerhalb des um 1,5 m
+#      gepufferten Umrisses, gesucht über Verschiebungen bis ±2 m (Lagefehler zwischen den Befliegungen).
+#   4. Schwelle je Befliegung = 95-%-Quantil einer Nullverteilung: dieselbe Vorlage gegen den Ausschnitt eines
+#      anderen Gebäudes des Rahmens (fester Partner) in derselben Befliegung.
+#   5. „sichtbar(k)“ = Wert(k) > Schwelle(k); sichtbar(7) gilt per Definition. k_auto = die Stufe, ab der die
+#      Treppenfunktion „ab k sichtbar“ die wenigsten Abweichungen von sichtbar(0..7) hat; bei Gleichstand die
+#      spätere Stufe (Sichtbarkeit muss belegt sein).
+BODEN_M = [1.0, 0.5, 0.4, 0.2, 0.2, 0.2, 0.2, 0.2]   # Bodenauflösung je Befliegung (Capabilities/Handbuch)
+FLUGJAHR = [1953, 1996, 2007, 2012, 2015, 2018, 2021, 2024]   # info_*.txt, „Ersterstellung“
+PUFFER_M = 1.5
+SUCHE_M = 2.0
+QUANTIL = 0.95
+QUELLE_JA = "LGB DOP-Zeitreihe, Pilot Bornstedt"
+QUELLE_NEIN = "LGB DOP-Zeitreihe, Pilot Bornstedt (nicht ausgerollt)"
+REFERENZ_SHA = "6f5a0fb5ceb6ffb737292cca9852e414ea8f7794b5169f84291e1ae8270d4173"
+NACH_2009_AB = 4          # k_ref >= 4: erstmals 2015 oder später zu sehen (Flug 2012 noch ohne)
+WOHNEN = ("Wohnhaus", "Wohngebäude", "Wohngebäude mit Handel und Dienstleistungen", "Wohnheim",
+          "Wohn- und Bürogebäude", "Wohn- und Geschäftsgebäude", "Wohn- und Betriebsgebäude",
+          "Wohngebäude mit Gemeinbedarf", "Wohngebäude mit Gewerbe und Industrie")
+
+
+def _graubilder():
+    import numpy as np
+    bilder = []
+    for schluessel, *_ in EPOCHEN:
+        bilder.append(np.asarray(Mosaik(schluessel, "L").bild, dtype=np.uint8))
+    return bilder
+
+
+class Vorlage:
+    """Ausschnitt-Raster und Maske um einen Umriss (Pixel im Mosaik, 0,4 m)."""
+
+    def __init__(self, geom):
+        import numpy as np
+        from PIL import Image, ImageDraw
+        rand = PUFFER_M + SUCHE_M + 1.0
+        a, b, c, d = geom.bounds
+        self.p0 = Mosaik.pixel(a - rand, d + rand)
+        p1 = Mosaik.pixel(c + rand, b - rand)
+        self.groesse = (p1[0] - self.p0[0], p1[1] - self.p0[1])        # (breite, hoehe)
+        maske = Image.new("1", self.groesse, 0)
+        zeichner = ImageDraw.Draw(maske)
+        gepuffert = geom.buffer(PUFFER_M)
+        for poly in (gepuffert.geoms if gepuffert.geom_type == "MultiPolygon" else [gepuffert]):
+            punkte = [((x - AUSSCHNITT[0]) / AUFLOESUNG - self.p0[0],
+                       (AUSSCHNITT[3] - y) / AUFLOESUNG - self.p0[1]) for x, y in poly.exterior.coords]
+            zeichner.polygon(punkte, fill=1)
+            for loch in poly.interiors:
+                zeichner.polygon([((x - AUSSCHNITT[0]) / AUFLOESUNG - self.p0[0],
+                                   (AUSSCHNITT[3] - y) / AUFLOESUNG - self.p0[1]) for x, y in loch.coords], fill=0)
+        self.maske = np.asarray(maske, dtype=bool)
+        self.mitte = ((a + c) / 2, (b + d) / 2)
+
+
+def _kanten(bild, p0, groesse, sigma_px, rand_px):
+    """Kantenbild (Sobel-Betrag) eines Ausschnitts, mit rand_px Zugabe ringsum; None am Mosaikrand."""
+    import numpy as np
+    from scipy import ndimage
+    x0, y0 = p0[0] - rand_px, p0[1] - rand_px
+    x1, y1 = p0[0] + groesse[0] + rand_px, p0[1] + groesse[1] + rand_px
+    if x0 < 0 or y0 < 0 or x1 > bild.shape[1] or y1 > bild.shape[0]:
+        return None
+    stueck = ndimage.gaussian_filter(bild[y0:y1, x0:x1].astype(np.float32), sigma_px)
+    return np.hypot(ndimage.sobel(stueck, 1), ndimage.sobel(stueck, 0))
+
+
+def _wert(vorlage_kanten, maske, kanten_k, such_px):
+    """Größte Korrelation über alle Verschiebungen bis ±such_px innerhalb der Maske."""
+    import numpy as np
+    v = vorlage_kanten[maske]
+    v = v - v.mean()
+    nv = np.sqrt((v * v).sum())
+    if nv == 0:
+        return float("nan")
+    h, b = maske.shape
+    bester = -1.0
+    for dy in range(2 * such_px + 1):
+        for dx in range(2 * such_px + 1):
+            w = kanten_k[dy:dy + h, dx:dx + b][maske]
+            w = w - w.mean()
+            nw = np.sqrt((w * w).sum())
+            if nw > 0:
+                bester = max(bester, float((v * w).sum() / (nv * nw)))
+    return bester
+
+
+def k_aus_sichtbar(sichtbar: list[bool]) -> int:
+    """Treppe 'ab k sichtbar' mit den wenigsten Abweichungen; Gleichstand -> spätere Stufe."""
+    letzte = len(sichtbar) - 1
+    beste_k, beste_fehler = letzte, None
+    for k in range(letzte + 1):
+        fehler = sum(sichtbar[j] for j in range(k)) + sum(not sichtbar[j] for j in range(k, letzte + 1))
+        if beste_fehler is None or fehler <= beste_fehler:
+            beste_k, beste_fehler = k, fehler
+    return beste_k
+
+
+def _zensus_bornstedt(cur):
+    """Zensus 2022, Gebäude mit Wohnraum nach Baujahr, 100-m-Zellen mit Mittelpunkt in Bornstedt (offline)."""
+    import csv
+    import io
+    import zipfile
+    zip_pfad = KIEZ_DATEN / "zensus" / "2022" / "Gebaeude_nach_Baujahr_Jahrzehnte.zip"
+    cur.execute("SELECT ST_XMin(e), ST_YMin(e), ST_XMax(e), ST_YMax(e) FROM "
+                "(SELECT ST_Extent(ST_Transform(geom, 3035)) e FROM public.stadtteil WHERE nr = %s) q", (PILOT_NR,))
+    x0, y0, x1, y1 = cur.fetchone()
+    zeilen = []
+    with zipfile.ZipFile(zip_pfad) as z, z.open("Gebaeude_nach_Baujahr/Zensus2022_Baujahr_JZ_100m-Gitter.csv") as f:
+        for r in csv.DictReader(io.TextIOWrapper(f, encoding="latin-1"), delimiter=";"):
+            x, y = int(r["x_mp_100m"]), int(r["y_mp_100m"])
+            if x0 - 100 <= x <= x1 + 100 and y0 - 100 <= y <= y1 + 100:
+                zeilen.append(r)
+
+    def zahl(s):
+        return int(s) if s.strip().isdigit() else 0          # „–“ (verfälscht/geheim) zählt als 0
+
+    cur.execute("CREATE TEMP TABLE b3_zensus (x int, y int, gesamt int, a2010 int, a2016 int, a2000 int) "
+                "ON COMMIT DROP")
+    with cur.copy("COPY b3_zensus FROM STDIN") as kopie:
+        for r in zeilen:
+            kopie.write_row((int(r["x_mp_100m"]), int(r["y_mp_100m"]), zahl(r["Insgesamt_Gebaeude"]),
+                             zahl(r["a2010bis2015"]), zahl(r["a2016undspaeter"]), zahl(r["a2000bis2009"])))
+    cur.execute("""SELECT count(*), sum(gesamt), sum(a2000), sum(a2010), sum(a2016)
+                   FROM b3_zensus z JOIN public.stadtteil s ON s.nr = %s
+                    AND ST_Within(ST_Transform(ST_SetSRID(ST_MakePoint(z.x, z.y), 3035), 4326), s.geom)""",
+                (PILOT_NR,))
+    return cur.fetchone()
+
+
+def auswerten() -> int:
+    import csv
+    import hashlib
+    import statistics
+
+    import numpy as np
+    from shapely import wkb
+
+    ref_datei = REFERENZ / "referenz.csv"
+    if hashlib.sha256(ref_datei.read_bytes()).hexdigest() != REFERENZ_SHA:
+        print("referenz.csv weicht vom festgelegten SHA256 ab, Abbruch", file=sys.stderr)
+        return 3
+    with verbindung() as con, con.cursor() as cur:
+        zeilen = rahmen(cur)
+    oids = [z[0] for z in zeilen]
+    funktion = {z[0]: z[1] for z in zeilen}
+    geoms = [wkb.loads(bytes(z[4])) for z in zeilen]
+    n = len(geoms)
+    print(f"Rahmen: {n} Hauptgebäude, lade Mosaike", file=sys.stderr)
+    bilder = _graubilder()
+    such_px = round(SUCHE_M / AUFLOESUNG)
+    vorlagen = [Vorlage(g) for g in geoms]
+    partner = [(i + 1) % n for i in range(n)]                 # fester Partner für die Nullverteilung
+    werte = np.full((n, len(EPOCHEN)), np.nan)
+    null = np.full((n, len(EPOCHEN)), np.nan)
+    for k in range(len(EPOCHEN) - 1):
+        sigma = BODEN_M[k] / AUFLOESUNG / 2
+        for i, v in enumerate(vorlagen):
+            vk = _kanten(bilder[-1], v.p0, v.groesse, sigma, 0)
+            ek = _kanten(bilder[k], v.p0, v.groesse, sigma, such_px)
+            if vk is None or ek is None:
+                continue
+            werte[i, k] = _wert(vk, v.maske, ek, such_px)
+            # Null: dieselbe Vorlage gegen den Ort des Partners (gleiche Ausschnittgröße, um dessen Mitte)
+            w = vorlagen[partner[i]]
+            mx, my = Mosaik.pixel(*w.mitte)
+            p0 = (mx - v.groesse[0] // 2, my - v.groesse[1] // 2)
+            ek0 = _kanten(bilder[k], p0, v.groesse, sigma, such_px)
+            if ek0 is not None:
+                null[i, k] = _wert(vk, v.maske, ek0, such_px)
+        print(f"Befliegung {k} ({EPOCHEN[k][0]}) fertig", file=sys.stderr)
+    schwelle = [float(np.nanquantile(null[:, k], QUANTIL)) for k in range(len(EPOCHEN) - 1)]
+    k_auto = {}
+    for i, oid in enumerate(oids):
+        if np.isnan(werte[i, :-1]).any():
+            continue
+        sichtbar = [bool(werte[i, k] > schwelle[k]) for k in range(len(EPOCHEN) - 1)] + [True]
+        k_auto[oid] = k_aus_sichtbar(sichtbar)
+
+    # ---- Abgleich mit der Referenz (erst jetzt gelesen)
+    with ref_datei.open(encoding="utf-8") as f:
+        ref = list(csv.DictReader(f))
+    def quote(auswahl, bedingung):
+        auswahl = [r for r in auswahl if r["oid"] in k_auto]
+        treffer = sum(bedingung(r) for r in auswahl)
+        return treffer, len(auswahl)
+    klar = [r for r in ref if r["unklar"] == "0"]
+    nach = [r for r in klar if int(r["k_ref"]) >= NACH_2009_AB]
+    k3 = [r for r in klar if int(r["k_ref"]) == 3]
+    alt_genau = [r for r in klar if int(r["k_ref"]) <= 2 and r["frueher_moeglich"] == "0"]
+    vor = [r for r in klar if int(r["k_ref"]) < NACH_2009_AB]
+    gleich = lambda r: k_auto[r["oid"]] == int(r["k_ref"])
+    nah = lambda r: abs(k_auto[r["oid"]] - int(r["k_ref"])) <= 1
+    haupt = quote(nach, gleich)
+    neben = quote(vor, lambda r: k_auto[r["oid"]] >= NACH_2009_AB)
+    haupt_quote = haupt[0] / haupt[1] if haupt[1] else 0.0
+    neben_quote = neben[0] / neben[1] if neben[1] else 1.0
+    ausrollen = haupt[1] >= 50 and haupt_quote >= 0.80 and neben_quote <= 0.10
+    quelle = QUELLE_JA if ausrollen else QUELLE_NEIN
+
+    # Verwechslungstafel (Zeilen k_ref, Spalten k_auto) für die Referenz ohne unklar
+    tafel = [[0] * len(EPOCHEN) for _ in EPOCHEN]
+    for r in klar:
+        if r["oid"] in k_auto:
+            tafel[int(r["k_ref"])][k_auto[r["oid"]]] += 1
+
+    # ---- Datenbank: Klammer je Gebäude des Rahmens (nur Pilotgebiet, keine Nebengebäude)
+    with verbindung() as con, con.cursor() as cur:
+        cur.execute("DELETE FROM auswertung.jahr_klammer WHERE quelle IN (%s, %s)", (QUELLE_JA, QUELLE_NEIN))
+        with cur.copy("COPY auswertung.jahr_klammer (oid_bezug, nicht_vor, nicht_nach, quelle) FROM STDIN") as kopie:
+            for oid, k in k_auto.items():
+                kopie.write_row((oid, FLUGJAHR[k - 1] if k > 0 else None, FLUGJAHR[k], quelle))
+        zensus = _zensus_bornstedt(cur)
+        con.commit()
+    verteilung = [sum(1 for k in k_auto.values() if k == j) for j in range(len(EPOCHEN))]
+    wohnen_neu_46 = sum(1 for o, k in k_auto.items() if funktion[o] in WOHNEN and 4 <= k <= 6)
+    wohnen_neu_47 = sum(1 for o, k in k_auto.items() if funktion[o] in WOHNEN and 4 <= k <= 7)
+    wohnen_neu_ref = [r for r in nach if r["funktion"] in WOHNEN]
+    breite = [FLUGJAHR[k] - FLUGJAHR[k - 1] for k in k_auto.values() if k > 0]
+    _bericht(n=n, k_auto=k_auto, schwelle=schwelle, null=null, werte=werte, haupt=haupt, neben=neben,
+             k3=quote(k3, gleich), alt=quote(alt_genau, gleich), nah=quote(nach, nah),
+             klar=klar, ref=ref, tafel=tafel, ausrollen=ausrollen, quelle=quelle, verteilung=verteilung,
+             zensus=zensus, wohnen_neu_46=wohnen_neu_46, wohnen_neu_47=wohnen_neu_47,
+             wohnhaus=quote(wohnen_neu_ref, gleich),
+             rest=quote([r for r in nach if r["funktion"] not in WOHNEN], gleich),
+             lose={los: quote([r for r in nach if r["los"] == los], gleich)
+                   for los in sorted({r["los"] for r in nach})},
+             median_breite=statistics.median(breite) if breite else None)
+    print(f"Hauptkriterium {haupt[0]}/{haupt[1]}, Nebenbedingung {neben[0]}/{neben[1]}, "
+          f"ausrollen={ausrollen}", file=sys.stderr)
+    return 0
+
+
+def _pz(a: int, b: int) -> str:
+    return f"{a} von {b} ({100 * a / b:.1f} %)".replace(".", ",") if b else "–"
+
+
+def _bericht(**w) -> None:
+    import numpy as np
+    zz = w["zensus"]
+    zeilen = [
+        "# B3 Luftbild-Pilot Bornstedt: Ergebnis",
+        "",
+        f"Stand {datetime.now(UTC):%d.%m.%Y}. Erzeugt von `skripte/23_luftbild_pilot.py auswerten`. Protokoll, Stichprobe und",
+        "Trefferregel stehen in `pruefen/B3_protokoll.md` und wurden vor diesem Lauf festgelegt (Commits f482058, 67bffd5).",
+        "Dieser Bericht enthält nur Zählungen, keine Gebäudekennungen.",
+        "",
+        "## Entscheidung",
+        "",
+        f"- **{'Ausrollen: ja' if w['ausrollen'] else 'Ausrollen: nein'}.** Hauptkriterium (Bauplan B3): Die automatische Klammer trifft",
+        f"  bei {_pz(*w['haupt'])} Referenzgebäuden, die erst nach dem Flug vom 20.05.2012 zu sehen sind (Schwelle 80 %,",
+        "  mindestens 50 Gebäude).",
+        f"- Nebenbedingung: Von den Referenzgebäuden, die 2012 schon zu sehen sind, datiert die Automatik {_pz(*w['neben'])}",
+        "  fälschlich auf „nach 2012“ (zulässig höchstens 10 %).",
+        f"- Folge: Die {len(w['k_auto'])} Zeilen in `auswertung.jahr_klammer` tragen die Quelle „{w['quelle']}“.",
+        "  B4 nimmt nur Zeilen ohne den Zusatz „nicht ausgerollt“ als Kaskadenstufe." if not w["ausrollen"] else
+        "  B4 darf sie als Kaskadenstufe 2 nehmen, vorerst nur für Bornstedt.",
+        "",
+        "## Referenz und Treffer",
+        "",
+        "| Gruppe | Treffer (k_auto = k_ref) |",
+        "|---|---|",
+        f"| erstmals ab 2015 zu sehen (k_ref ≥ 4), Hauptkriterium | {_pz(*w['haupt'])} |",
+        f"| davon Wohngebäude | {_pz(*w['wohnhaus'])} |",
+        f"| davon übrige Hauptgebäude | {_pz(*w['rest'])} |",
+        f"| erstmals 2012 zu sehen (k_ref = 3, 2007 bis 2012) | {_pz(*w['k3'])} |",
+        f"| bis 2007 zu sehen, Stufe sicher (k_ref ≤ 2) | {_pz(*w['alt'])} |",
+        f"| k_ref ≥ 4, höchstens eine Stufe daneben | {_pz(*w['nah'])} |",
+        "",
+        "Treffer im Hauptkriterium je Los: " + ", ".join(f"Los {los}: {_pz(*q)}" for los, q in w["lose"].items()) + ".",
+        "",
+        f"Referenz: 200 Gebäude in 5 Losen, davon {sum(r['unklar'] == '1' for r in w['ref'])} unklar (nicht gewertet).",
+        "Sichtprüfung durch den Agenten auf denselben Bildern; gemessen ist „Automatik gegen Sichtprüfung“.",
+        "",
+        "Verwechslungstafel (Zeile = Sichtprüfung k_ref, Spalte = Automatik k_auto, ohne unklar):",
+        "",
+        "| k_ref \\ k_auto | " + " | ".join(str(j) for j in range(8)) + " |",
+        "|---|" + "---:|" * 8,
+    ]
+    for kr in range(8):
+        zeilen.append(f"| {kr} ({FLUGJAHR[kr]}) | " + " | ".join(str(x) for x in w["tafel"][kr]) + " |")
+    zeilen += [
+        "",
+        "## Automatik",
+        "",
+        f"- Gebäude im Rahmen: {w['n']}, davon mit Klammer: {len(w['k_auto'])}.",
+        "- Verteilung k_auto (erste Befliegung mit Gebäude): " + ", ".join(
+            f"{FLUGJAHR[j]}: {c}" for j, c in enumerate(w["verteilung"])) + ".",
+        f"- Median der Klammerbreite (ohne „schon 1953“): {w['median_breite']} Jahre." if w["median_breite"] else "",
+        "- Schwellen (95-%-Quantil der Nullverteilung) je Befliegung: " + ", ".join(
+            f"{FLUGJAHR[k]}: {s:.2f}".replace(".", ",") for k, s in enumerate(w["schwelle"])) + ".",
+        "- Median des Werts am eigenen Ort je Befliegung: " + ", ".join(
+            f"{FLUGJAHR[k]}: {np.nanmedian(w['werte'][:, k]):.2f}".replace(".", ",") for k in range(7)) + ".",
+        "",
+        "## Gegenprobe Zensus 2022 (beschreibend, kein Abbruchkriterium)",
+        "",
+        f"- 100-m-Zellen mit Mittelpunkt in Bornstedt: {zz[0]}, Gebäude mit Wohnraum insgesamt {zz[1]},",
+        f"  davon 2000 bis 2009: {zz[2]}, 2010 bis 2015: {zz[3]}, 2016 und später: {zz[4]}",
+        f"  (zusammen ab 2010: {zz[3] + zz[4]}). Werte mit Cell-Key-Verfahren, „–“ als 0 gezählt; Stichtag 15.05.2022.",
+        f"- Automatik, Wohngebäude im Rahmen, erstmals 2015 bis 2021 zu sehen: {w['wohnen_neu_46']};",
+        f"  erstmals 2015 bis 2024: {w['wohnen_neu_47']}.",
+        "- Vergleich nur in der Größenordnung: ALKIS zählt Gebäudeteile (Reihenhäuser einzeln), der Zensus Gebäude mit",
+        "  Wohnraum; Flugjahre und Zensus-Klassen decken sich nicht (Bauten von 2010 bis Mai 2012 sind schon im Flug 2012).",
+        "",
+        "## Lizenz",
+        "",
+        "Luftbilder: © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung).",
+        "Zensus: © Statistisches Bundesamt (Destatis), Zensus 2022, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0),",
+        "Daten verändert (eigene Berechnung).",
+        "",
+    ]
+    BERICHT.parent.mkdir(parents=True, exist_ok=True)
+    BERICHT.write_text("\n".join(z for z in zeilen if z is not None) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     schritt = sys.argv[1] if len(sys.argv) > 1 else ""
     if schritt == "abrufen":
         return abrufen()
     if schritt == "stichprobe":
         return stichprobe(int(sys.argv[2]) if len(sys.argv) > 2 else 1)
+    if schritt == "auswerten":
+        return auswerten()
     print(__doc__)
     return 2
 
