@@ -79,6 +79,14 @@
 .j-legende__muster--punkte{background:radial-gradient(circle,var(--ink) 0 1.2px,var(--papier) 1.4px) 0 0/5px 5px}
 .j-legende__muster--blass{background:var(--b5);opacity:.4}
 .j-legende__quelle{flex-basis:100%}
+/* Gebäude ab Zoom 14: geschätzt heller, belegt kräftig mit Rand, nicht datiert grau, andere Bauzeit blass */
+.j-legende__muster--geschaetzt{background:var(--b6);opacity:.58}
+.j-legende__muster--belegt{background:var(--b6);outline:1.5px solid var(--ink)}
+.j-legende__muster--nd{background:#bcc0ba}
+.j-legende__muster--rest{background:#e5e7e2;outline-color:#9da39b}
+.j-legende__hinweis{font-weight:500;color:var(--ink)}
+.pop-status{font-weight:600}
+.pop-status--geschaetzt{font-style:italic}
 
 .j-punkt{display:inline-block;width:10px;height:10px;margin-right:7px;vertical-align:-1px}
 .pop-tab td:first-child{white-space:nowrap}
@@ -173,6 +181,13 @@
 }
 .j-tabelle--links td{text-align:left;padding-left:16px}
 .j-tabelle code{font-size:.875rem}
+.j-wege{padding-left:1.3em}
+.j-wege li{margin-bottom:.5em}
+.j-unter{font:600 1.05rem/1.2 var(--f-display);margin:28px 0 4px}
+#j-m-ruecktest .j-tabelle{margin:10px 0 6px}
+#j-m-ruecktest .j-tabelle th:first-child{white-space:normal}
+#j-m-ruecktest .j-tabelle :is(th,td)+:is(th,td){padding-left:12px}
+@media (max-width:860px){#j-m-ruecktest .j-tabelle{font-size:.8125rem}#j-m-ruecktest .j-tabelle thead th{font-size:.75rem}}
 
 /* Reduzierte Bewegung: auf den Bauzeit-Seiten keine Übergänge und keine Animation, auch nicht aus atlas.css */
 @media (prefers-reduced-motion:reduce){

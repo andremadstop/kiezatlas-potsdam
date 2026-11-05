@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Methode der Bauzeiten: Kiezatlas Potsdam</title>
-<meta name="description" content="Wie die Seite Bauzeiten Potsdam entsteht: Zensus 2022, Gebäude mit Wohnraum nach Baujahr im 100-Meter-Gitter, Geheimhaltung, Näherung je Stadtteil und Grenzen der Aussage.">
+<meta name="description" content="Wie die Seite Bauzeiten Potsdam entsteht: Zensus 2022 im 100-Meter-Gitter, Geheimhaltung, Näherung je Stadtteil, die Schätzung je Gebäude mit Rücktest und die Grenzen der Aussage.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#f1f2ee">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -29,7 +29,7 @@
 <main class="j-blatt" id="inhalt">
   <div class="j-blatt__kopf">
     <h1 class="j-blatt__titel">Methode</h1>
-    <p class="j-blatt__lede">Woher die Bauzeiten kommen, was sie zählen und wo die Aussage endet. Alle Zahlen auf dieser Seite rechnet der Browser aus derselben Datei, die auch die Karte zeichnet.</p>
+    <p class="j-blatt__lede">Woher die Bauzeiten kommen, was sie zählen und wo die Aussage endet. Alle Zahlen auf dieser Seite rechnet der Browser aus denselben Dateien, die auch die Karte zeichnet.</p>
     <p class="j-fixture" id="j-fixture" hidden></p>
   </div>
 
@@ -98,11 +98,62 @@
     </div>
   </section>
 
+  <section class="j-teil" id="m-gebaeude" aria-labelledby="m-geb">
+    <h2 id="m-geb">Gebäude: Bauzeit je Haus</h2>
+    <div class="j-teil__text">
+      <p>Ab Zoom 14 zeigt die Karte die <span data-j="g-alle">…</span> Gebäudeumrisse der Landesvermessung in Potsdam (ALKIS vereinfacht, Kopie vom 5. November 2026). Der Zensus nennt keine Bauzeit je Gebäude, nur Summen je Zelle. Jedes Gebäude bekommt deshalb eine Bauzeitklasse aus einer Folge von Wegen; der erste Weg, der ein Ergebnis liefert, gilt:</p>
+      <table class="j-tabelle" id="j-m-stufen">
+        <caption class="nur-sr">Gebäude je Stufe der Schätzung</caption>
+        <thead><tr><th scope="col">Stufe</th><th scope="col">Gebäude</th><th scope="col">mit Wohnraum</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <ol class="j-wege">
+        <li><b>Genaues Jahr</b> aus einer Quelle mit klarer Lizenz. Bisher keine: Die Denkmallisten aus Wikipedia und vom Landesamt dienen nur der Prüfung, weil ihre Nutzung als Datenbank lizenzrechtlich nicht geklärt ist.</li>
+        <li><b>Luftbildklammer</b> aus Luftbildern verschiedener Jahre. Im Versuch für Bornstedt blieb die Trefferquote unter der vorab gesetzten Schwelle, deshalb nicht genutzt.</li>
+        <li><b>Großsiedlung:</b> Für acht Großsiedlungen ist die Bauzeit belegt (Broschüre „Potsdamer Platte“ der Stadt, 2008). Die Grenzen der Gebiete sind aus der Bauform der Gebäude abgeleitet.</li>
+        <li><b>Zensus-Verteilung:</b> Die Zahl der Gebäude je Bauzeit in der 100-m-Zelle wird auf die Wohngebäude der Zelle verteilt, gelenkt von ihrer Form im Kataster (Dachform, Höhe, Grundfläche, Bauweise, Nutzung). Fehlen Klassen wegen der Geheimhaltung, füllt sie der Rest der umgebenden 1-km-Zelle auf, sofern diese ganz in der Stadt liegt.</li>
+        <li><b>Nachbarn:</b> Wo der Zensus nicht reicht (mehr Umrisse als gezählte Gebäude, Zelle ohne Wert), gilt die häufigste Bauzeit der datierten Gebäude im Umkreis von 100 m, wenn es mindestens drei sind.</li>
+        <li><b>Nicht datiert:</b> <span data-j="g-neben">…</span> Nebengebäude wie Garagen, Lauben und Schuppen und Gebäude ohne Ergebnis. Die Karte zeigt sie grau.</li>
+      </ol>
+      <p>Wohngebäude tragen kein Einzeljahr, nur eine Klasse: Das Kataster führt keine Zahl der Wohnungen, und ein Jahr je Einfamilienhaus könnte auf die Eigentümer verweisen. Ausnahme wären Denkmale aus einer freigegebenen Quelle. Heute tragen <span data-j="g-jahr">…</span> Gebäude ein Jahr. Die Gebäudedateien enthalten keine Adressen und keine Kennungen.</p>
+      <p>Der Aufbau als Folge von Wegen mit Rücktest folgt dem Berliner Projekt visinage als Methodenvorbild. Daten, Klassen und Prüfsätze sind eigene.</p>
+    </div>
+  </section>
+
+  <section class="j-teil" id="m-ruecktest" aria-labelledby="m-rt">
+    <h2 id="m-rt">Wie oft die Schätzung trifft</h2>
+    <div class="j-teil__text">
+      <p>Geprüft wird an Gebäuden mit bekannter Bauzeit, die in keine Schätzung eingehen. Treffer heißt: Die geschätzte Klasse überschneidet die bekannte Bauzeit. Die Regeln standen vor dem Lauf fest. Die Quoten gelten nur für die jeweiligen Prüfgebäude, nicht für die ganze Stadt.</p>
+      <div id="j-m-ruecktest"></div>
+      <p>Gegenprobe ohne bekannte Jahre: An den Gebäuden der Großsiedlungen wurde die Zensus-Verteilung allein gerechnet. Sie ergibt bei <span data-j="g-gegen">…</span> von <span data-j="g-gegen-n">…</span> Gebäuden dieselbe Klasse wie die belegte Bauzeit des Gebiets. Das vergleicht zwei Schätzungen, nicht Schätzung und Wahrheit.</p>
+      <ul>
+        <li>Die Denkmale stammen fast alle aus der Zeit vor 1919 und stehen meist in Altbauzellen, in denen der Zensus selbst kaum anderes zeigt. Dort ist die Klasse leicht zu treffen.</li>
+        <li>Die Luftbildprüfung deckt nur Bornstedt ab. Viele ihrer Spannen liegen über einer Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.</li>
+        <li>Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude.</li>
+        <li>Beim Berliner Vorbild trafen die Schätzungen in dessen Rücktest <span data-j="g-berlin">…</span>. Mit Potsdam ist das nicht vergleichbar: Hier gibt es acht breite Klassen statt Jahrzehnten, eine davon 30 Jahre lang, und andere Prüfsätze.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="j-teil" id="m-schieflage" aria-labelledby="m-sf">
+    <h2 id="m-sf">Gebäudekarte und Zensus</h2>
+    <div class="j-teil__text">
+      <p>Zählt man die geschätzten Wohngebäude über die ganze Stadt, weicht die Mischung vom Zensus ab: mehr Häuser aus der Zeit <span data-j="g-sf-alt-k">…</span> (<span data-j="g-sf-alt">…</span>), weniger aus <span data-j="g-sf-ddr-k">…</span> (<span data-j="g-sf-ddr">…</span>). Zwei Gründe: In der Altstadt zerfällt ein Block in viele Umrisse, die über die Nachbarn datiert werden; ein Plattenbau-Riegel ist dagegen oft ein Umriss, aber mehrere Gebäude im Zensus. Für Summen gelten deshalb die Zellen, nicht die Gebäudekarte.</p>
+      <table class="j-tabelle" id="j-m-schieflage">
+        <caption class="nur-sr">Gebäude mit Wohnraum je Bauzeit, Zensus und Schätzung je Gebäude, ganze Stadt</caption>
+        <thead><tr><th scope="col">Bauzeit</th><th scope="col">Zensus, rund</th><th scope="col">Gebäudekarte</th><th scope="col">Abweichung</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p>Die Großsiedlungen (Stufe 3) entstehen ohne Zensus. Gegen den Zensus geprüft halten sie in <span data-j="g-summen">…</span> Paaren aus Stadtteil und Bauzeit die Grenze von 10&nbsp;% Überschreitung ein.</p>
+      <p class="fuss">Zahlen aus dem Bericht <code>berichte/B4_holdout.md</code> (SHA256 beginnt mit <span data-j="g-sha">…</span>) und aus den Gebäudedateien, Stand <span data-j="g-stand">…</span>; zusammengeführt von <code>skripte/26_jahre_methode.py</code>. Zensuswerte gerundet und durch die Geheimhaltung verändert.</p>
+    </div>
+  </section>
+
   <section class="j-teil" aria-labelledby="m-grenzen">
     <h2 id="m-grenzen">Grenzen der Aussage</h2>
     <div class="j-teil__text">
       <ul>
-        <li>Die Karte zeigt Zellen, keine Gebäude. Sie sagt nichts über ein einzelnes Haus oder Grundstück.</li>
+        <li>Die Zellen zeigen Summen, keine Gebäude. Die Gebäude aus der Nähe sind Schätzungen; sie sagen nichts Sicheres über ein einzelnes Haus oder Grundstück.</li>
         <li>Die Bauzeit stammt aus der Gebäude- und Wohnungszählung des Zensus, also aus den Angaben der Eigentümer. Umbauten und Sanierungen ändern sie nicht.</li>
         <li>Grundlage sind die bewohnten Zellen des Atlas. Eine Zelle mit Gebäuden, aber ohne gemeldete Einwohner, fiele heraus; in Potsdam betrifft das laut Auswertung (Bericht B1) keine Zelle.</li>
         <li>Neubaugebiete, die nach dem 15. Mai 2022 bezogen wurden, fehlen.</li>
@@ -126,6 +177,7 @@
 </footer>
 
 <script defer src="daten/kennzahlen.js"></script>
+<script defer src="daten/jahre_methode.js"></script>
 <script defer src="themen.js"></script>
 <script defer src="jahre.js"></script>
 </body>

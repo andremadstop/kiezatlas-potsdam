@@ -1,10 +1,13 @@
-// Prüfung Paket B5 (Zweig 1): Seiten jahre.html, jahre-methode.html, jahre-daten.html.
+// Prüfung Paket B5 (Zweig 1 und 2): Seiten jahre.html, jahre-methode.html, jahre-daten.html.
 // Je Seite per file:// und per HTTP (127.0.0.1): lädt bis window.KIEZ_BEREIT, keine Konsolenfehler, axe ohne
 // Verstoß, alle Zahlenfelder gefüllt, bei 375 px kein waagrechtes Scrollen, Farbtöne der gerenderten Seite
 // und der Kartenfarben außerhalb 20°–70°. Dazu auf jahre.html: Fragen stellen die Karte ein, reduzierte
 // Bewegung ohne Animation, Klassenleiste per Klick und Tastatur, Zell-Popup mit Quelle, Hash-Rundreise,
 // Vergleichsliste, keine Gebäudedateien geladen. Auf jahre-daten.html: alle vier Downloads, Inhalt geprüft.
 // Statisch: verbotene Tokens, Namen und Schriften (Bauplan Abschnitt 5), keine Geviertstriche, Palette.
+// Zweig 2 (Gebäude ab Zoom 14 aus daten/jahre/<nr>.js): Datenvertrag aller 32 Dateien, daten/jahre_methode.js
+// aktuell, Gebäude erst ab Zoom 14 und nie beim Start geladen, Zeitfilter ohne Nachladen, Gebäude-Popup mit
+// Quelle und Status (echt; „belegt“ mit der Fixture über HTTP), Hash mit Blick, Rücktest auf der Methodenseite.
 //
 // Kein Netz: Anfragen an fremde Server (Kacheln basemap.de, Luftbild LGB) beantwortet der Browser selbst
 // mit einem leeren 1-px-PNG (wie pruefen/seiten.mjs). So entsteht kein Abruf bei fremden Diensten.
@@ -18,6 +21,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";  // Node ≥ 22.5; für den Abgleich des GeoPackage
+import { execFileSync } from "node:child_process";
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const WURZEL = path.resolve(HIER, "..");
@@ -63,15 +67,51 @@ const FARBMUSTER = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)/g;
 
 // ---------- Statische Prüfung der eigenen Dateien
 console.log("Statisch (" + EIGENE.join(", ") + ")");
-const VERBOTEN = [/#05060B/i, /#EAE7DE/i, /#8BE8D2/i, /Unbounded/i, /Host Grotesk/i, /Newsreader/i, /\bGeist\b/i, /Atlas der Fragen/i, /Jahresring/i, /\bRing\b/, /visinage/i, /—/];
+const VERBOTEN = [/#05060B/i, /#EAE7DE/i, /#8BE8D2/i, /Unbounded/i, /Host Grotesk/i, /Newsreader/i, /\bGeist\b/i, /Atlas der Fragen/i, /Jahresring/i, /\bRing\b/, /—/];
 let statischeFarben = [];
 for (const f of EIGENE) {
   const t = fs.readFileSync(path.join(WURZEL, f), "utf8");
   const treffer = VERBOTEN.filter((r) => r.test(t)).map(String);
   pruef(treffer.length === 0, `${f}: keine verbotenen Tokens, Namen, Schriften, Geviertstriche ${treffer.join(" ")}`);
+  // Methodenvorbild: genau eine Nennung, nur auf der Methodenseite (Bauplan Abschnitt 5, Prüfbericht)
+  const vis = (t.match(/visinage/gi) || []).length;
+  pruef(f === "jahre-methode.html" ? vis === 1 : vis === 0, `${f}: „visinage“ ${vis}-mal (erlaubt: ${f === "jahre-methode.html" ? "genau einmal als Methodenvorbild" : "nie"})`);
   if (/\.(css|js)$/.test(f)) statischeFarben = statischeFarben.concat(t.match(FARBMUSTER) || []);
   pruef(!/\bfetch\s*\(|XMLHttpRequest/.test(t), `${f}: kein fetch/XHR (file://)`);
-  pruef(!/daten\/gebaeude\//.test(t), `${f}: keine Gebäudedateien (Zweig 1 färbt keine Gebäude)`);
+  pruef(!/daten\/gebaeude\//.test(t), `${f}: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)`);
+}
+
+// ---------- Datenvertrag der Gebäudedateien (B4) und Methodendatei (Zweig 2)
+console.log("\nGebäudedateien daten/jahre/*.js");
+const ladeJs = (p) => { const s = fs.readFileSync(p, "utf8"); return JSON.parse(s.slice(s.indexOf("=") + 1).trim().replace(/;$/, "")); };
+const JAHRE = path.join(WURZEL, "daten", "jahre");
+const JDATEIEN = fs.readdirSync(JAHRE).filter((f) => /^\d{2}\.js$/.test(f)).sort();
+let gebAlle = 0;
+{
+  const fehl = [], NAMEN = ["j", "k", "g", "q", "s"];
+  for (const f of JDATEIEN) {
+    const d = ladeJs(path.join(JAHRE, f));
+    if (d.fixture) fehl.push(f + ": Fixture");
+    for (const [q, v] of Object.entries(d.quellen)) if (!v.quelle || !/Daten verändert \(eigene Berechnung\)/.test(v.vermerk) || !/govdata\.de\/dl-de\/by-2-0/.test(v.vermerk)) fehl.push(`${f}: Quelle ${q} ohne Vermerk „Daten verändert“ oder Lizenzlink`);
+    for (const x of d.features) {
+      gebAlle++;
+      const p = x.properties, extra = Object.keys(p).filter((k) => !NAMEN.includes(k));
+      if (extra.length) fehl.push(`${f}: Feld ${extra.join(",")}`);
+      if (!["belegt", "geschaetzt", "nicht_datiert"].includes(p.g)) fehl.push(`${f}: g=${p.g}`);
+      if ((p.k == null) !== (p.g === "nicht_datiert")) fehl.push(`${f}: k=${p.k} bei g=${p.g}`);
+      if (p.g !== "nicht_datiert" && !(p.q && d.quellen[p.q])) fehl.push(`${f}: Quelle ${p.q} fehlt`);
+      if (p.j != null && p.g !== "belegt") fehl.push(`${f}: Jahr bei ${p.g}`);
+      if (fehl.length > 5) break;
+    }
+  }
+  pruef(JDATEIEN.length === 32 && fehl.length === 0, `${JDATEIEN.length} Dateien, ${gebAlle} Gebäude: nur j/k/g/q/s, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ ${fehl.slice(0, 5).join(" | ")}`);
+  let ok = true, aus = "";
+  try { aus = execFileSync("python3", ["-I", path.join(WURZEL, "skripte", "26_jahre_methode.py"), "--pruefen"], { encoding: "utf8" }).trim(); } catch (e) { ok = false; aus = String(e.stdout || e.message).trim(); }
+  let vertrag = "";
+  try { vertrag = execFileSync("python3", ["-I", path.join(WURZEL, "pruefen", "B5_methode.py")], { encoding: "utf8" }).trim(); } catch (e) { vertrag = "FEHLT " + String(e.stdout || e.message).trim(); }
+  pruef(/^\s*ok\s/.test(vertrag), `daten/jahre_methode.js gegen pruefen/B5_schema/jahre_methode.json (Prüfmaschine aus daten.py): ${vertrag.replace(/\s+/g, " ")}`);
+  const M = ladeJs(path.join(WURZEL, "daten", "jahre_methode.js"));
+  pruef(ok && M.gebaeude === gebAlle && M.ruecktest.every((r) => r.je_bauzeit.length && r.je_stufe.every((x) => x.n > 0)), `daten/jahre_methode.js aktuell (${aus}), ${M.gebaeude} Gebäude, Rücktest je Bauzeit und Stufe mit n`);
 }
 {
   const v = verboteneToene(statischeFarben);
@@ -142,14 +182,15 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
     pruef(v.length === 0, `axe: ${v.length} Verstöße ${v.join(", ")}`);
     const farben = await gerenderteFarben(page), vb = verboteneToene(farben);
     pruef(vb.length === 0, `gerenderte Farben (${new Set(farben).size} verschiedene, DOM + Kartenstil) ohne Farbton ${HUE_VON}°–${HUE_BIS}° ${vb.slice(0, 6).join(" ")}`);
-    pruef(!geladen.some((u) => /daten\/gebaeude\//.test(u)), "keine Gebäudedatei geladen");
+    pruef(!geladen.some((u) => /daten\/gebaeude\//.test(u)), "keine ALKIS-Gebäudedatei daten/gebaeude/ geladen");
+    pruef(!geladen.some((u) => /daten\/jahre\//.test(u)), "beim Start keine Gebäudedatei daten/jahre/ geladen");
 
     if (seite === "jahre.html") {
       // Reduzierte Bewegung: keine CSS-Animation, Kartenstil ohne Übergang, Kamera springt
       pruef(await page.evaluate(() => document.getAnimations().length === 0), "reduzierte Bewegung: keine laufende Animation nach dem Laden");
       pruef(await page.evaluate(() => { const t = window.KIEZ_KARTE.getStyle().transition; return t && t.duration === 0; }), "reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)");
       pruef(await page.$eval("#j-abspielen", (b) => b.hidden), "reduzierte Bewegung: „Nacheinander“ ausgeblendet");
-      const erwartet = { 1: ["spanne", 0, 0, false], 2: ["spanne", 2, 3, false], 3: ["spanne", 4, 7, true], 4: ["spanne", 6, 7, false], 5: ["ueberblick"], 6: ["ueberblick"] };
+      const erwartet = { 1: ["spanne", 0, 0, false], 2: ["spanne", 2, 3, false], 3: ["spanne", 4, 7, true], 4: ["spanne", 6, 7, false], 5: ["ueberblick"], 6: ["ueberblick"], 7: ["ueberblick"] };
       for (const n of Object.keys(erwartet)) {
         await page.$eval("#frage-" + n, (e) => e.scrollIntoView({ block: "center" }));
         await page.waitForFunction((n) => document.getElementById("frage-" + n).classList.contains("ist-aktiv"), n, { timeout: 5000 }).catch(() => {});
@@ -159,6 +200,8 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
         const ok = s.a === e[0] && (e.length < 2 || (s.v === e[1] && s.b === e[2] && s.d === e[3]));
         pruef(ok && !s.beweg && s.anim === 0, `Frage ${n}: Karte eingestellt (${s.a} ${s.v}–${s.b}${s.d ? " 3D" : ""}), Kamera steht, keine Animation${ok && !s.beweg && s.anim === 0 ? "" : " " + JSON.stringify(s)}`);
       }
+      // zurück auf ganz Potsdam (Frage 7 endete bei den Gebäuden)
+      await page.evaluate(() => window.KIEZ_JAHRE.schritt(6));
       // Klassenleiste: Klick und Tastatur
       await page.$eval("#j-klassen", (e) => e.scrollIntoView({ block: "center" }));
       await page.click("#j-klassen .j-klasse:nth-child(4)");
@@ -178,7 +221,7 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       // Zell-Popup
       // erst die Ansicht (schritt setzt die Kamera auf ganz Potsdam), dann nah heran, damit eine Zelle viele Pixel groß ist
       await page.evaluate(() => window.KIEZ_JAHRE.schritt(5));
-      await page.evaluate(() => window.KIEZ_KARTE.jumpTo({ center: [13.0645, 52.3989], zoom: 14, pitch: 0 }));
+      await page.evaluate(() => window.KIEZ_KARTE.jumpTo({ center: [13.0645, 52.3989], zoom: 13.6, pitch: 0 }));
       await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
       const punkt = await page.evaluate(() => {
         // erste Zelle mit Klasse, deren Mitte frei auf der Kartenfläche liegt (nicht unter Werkzeug, Knöpfen, Leiste)
@@ -200,6 +243,73 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const sortiert = await page.$$eval("#j-liste .j-zeile__wert", (l) => l.map((x) => x.textContent));
       const zahlen = sortiert.filter((x) => /%/.test(x)).map((x) => /unter 1/.test(x) ? 0.5 : parseInt(x, 10));
       pruef(zahlen.every((v, i) => i === 0 || zahlen[i - 1] >= v), "Vergleich: Sortierung nach Anteil absteigend");
+      // ---------- Zweig 2: Gebäude
+      const jahreAnfragen = () => geladen.filter((u) => /daten\/jahre\/\d{2}\.js/.test(u)).length;
+      const vor12 = jahreAnfragen();
+      await page.evaluate(() => window.KIEZ_KARTE.jumpTo({ center: [13.06, 52.40], zoom: 12.5 }));
+      await page.waitForTimeout(300);
+      pruef(jahreAnfragen() === vor12 && await page.evaluate(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe", "geb-nd", "geb-rest"] }).length === 0), "unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen");
+      const leg0 = await page.$eval("#j-legende", (e) => e.textContent);
+      pruef(/ab Zoom 14/.test(leg0), "unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin");
+      // Frage 7 führt zu den Gebäuden am Stern
+      await page.$eval("#frage-7", (e) => e.scrollIntoView({ block: "center" }));
+      await page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 15000 }).catch(() => {});
+      await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(300);
+      let g = await page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), ...window.KIEZ_JAHRE.geb(), n: window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe"] }).length, anim: document.getAnimations().length }));
+      pruef(g.z >= 14 && g.geladen.includes("71") && g.n > 50 && g.anim === 0, `Frage 7: Zoom ${g.z.toFixed(1)}, Gebäude aus ${g.geladen.join(", ")} (${g.n} farbig im Bild), keine Animation`);
+      pruef(g.im_bild.length <= 4 && jahreAnfragen() === g.geladen.length, `höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (${jahreAnfragen()} Anfragen, ${g.geladen.length} Dateien)`);
+      const leg1 = await page.$eval("#j-legende", (e) => e.textContent), st1 = await page.$eval("#kartenstatus", (e) => e.textContent);
+      pruef(/geschätzt/.test(leg1) && /nicht datiert/.test(leg1) && /keine Aussage über einzelne Grundstücke/.test(leg1) && /Daten verändert \(eigene Berechnung\)/.test(leg1) && /Gebäude aus 71/.test(st1), `ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „${st1.slice(0, 80)}…“`);
+      pruef(/blick=13\.12\d+,52\.37\d+,1[45]\.\d\d/.test(await page.evaluate(() => location.hash)), "Adresse merkt sich den Blick auf die Gebäude (blick=…)");
+      // Klick auf ein Gebäude: frei liegende Mitte eines gerenderten Umrisses
+      const klickGeb = async (schicht, bed) => {
+        const pt = await page.evaluate(([schicht, bed]) => {
+          const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect(), lw = m.getCanvas();
+          for (const f of m.queryRenderedFeatures({ layers: [schicht] })) {
+            if (bed && f.properties.g !== bed) continue;
+            const c = f.geometry.type === "Polygon" ? f.geometry.coordinates[0] : f.geometry.coordinates[0][0];
+            const x0 = c.reduce((a, p) => a + p[0], 0) / c.length, y0 = c.reduce((a, p) => a + p[1], 0) / c.length, p = m.project([x0, y0]);
+            const hit = m.queryRenderedFeatures([p.x, p.y], { layers: ["geb-farbe", "geb-nd", "geb-rest"] });
+            if (hit.length && hit[0].layer.id === schicht && document.elementFromPoint(r.left + p.x, r.top + p.y) === lw) return { x: r.left + p.x, y: r.top + p.y };
+          }
+          return null;
+        }, [schicht, bed]);
+        if (!pt) return "kein freier Punkt";
+        await page.mouse.click(pt.x, pt.y); await page.waitForTimeout(200);
+        return page.$eval(".maplibregl-popup-content", (e) => e.textContent).catch(() => "kein Popup");
+      };
+      const popG = await klickGeb("geb-farbe", "geschaetzt");
+      pruef(/Bauzeit \d|Bauzeit vor|Bauzeit ab/.test(popG) && /geschätzt/.test(popG) && /Quelle: /.test(popG) && /Daten verändert \(eigene Berechnung\)/.test(popG) && /keine Aussage über einzelne Grundstücke/.test(popG) && !/Gebäude mit Wohnraum<|Zelle \d/.test(popG),
+        `Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (${popG.slice(0, 70)}…)`);
+      const popN = await klickGeb("geb-nd");
+      pruef(/Nicht datiert/.test(popN) && /Umriss: .*GeoBasis-DE\/LGB/.test(popN), "Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses");
+      // Zeitfilter: Leiste und Regler filtern die Gebäude, ohne neu zu laden
+      const vorher = jahreAnfragen(), nAlle = g.n;
+      await page.click("#j-klassen .j-klasse:nth-child(3)");
+      await page.focus("#j-bis"); await page.keyboard.press("ArrowRight");
+      await page.waitForTimeout(250);
+      const f = await page.evaluate(() => ({ filt: JSON.stringify(window.KIEZ_KARTE.getFilter("geb-farbe")), ks: [...new Set(window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe"] }).map((x) => x.properties.k))].sort(), rest: window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-rest"] }).length }));
+      pruef(jahreAnfragen() === vorher && /2\]/.test(f.filt) && /3\]/.test(f.filt) && f.ks.every((k) => k === 2 || k === 3) && f.rest > 0,
+        `Zeitfilter 1949–1990: nur Klassen ${f.ks.join(",")} farbig, übrige blass, ${jahreAnfragen() - vorher} neue Anfragen`);
+      const leg2 = await page.$eval("#j-legende", (e) => e.textContent);
+      pruef(/andere Bauzeit/.test(leg2), "Zeitfilter: Legende nennt „andere Bauzeit“");
+      const va2 = await axe(page);
+      pruef(va2.length === 0, `Gebäudeansicht: axe ${va2.length} Verstöße ${va2.join(", ")}`);
+      const vb2 = verboteneToene(await gerenderteFarben(page));
+      pruef(vb2.length === 0, `Gebäudeansicht: Farben ohne Farbton ${HUE_VON}°–${HUE_BIS}° ${vb2.slice(0, 4).join(" ")}`);
+      pruef(await page.evaluate(() => document.getAnimations().length === 0), "Gebäudeansicht: reduzierte Bewegung ohne Animation");
+    }
+    if (seite === "jahre-methode.html") {
+      const M = await page.evaluate(() => window.KIEZ_JAHRE_METHODE);
+      const m = await page.evaluate(() => ({ stufen: document.querySelectorAll("#j-m-stufen tbody tr").length, tabs: [...document.querySelectorAll("#j-m-ruecktest table")].map((t) => t.querySelectorAll("tbody tr").length), rt: document.getElementById("j-m-ruecktest").textContent, sf: document.querySelectorAll("#j-m-schieflage tbody tr").length, text: document.getElementById("inhalt").textContent }));
+      const erwRt = M.ruecktest.flatMap((r) => [r.je_bauzeit.length, r.je_stufe.length]);
+      const quoten = M.ruecktest.flatMap((r) => r.je_bauzeit.concat(r.je_stufe)).filter((x) => x.bewertet != null).map((x) => `${x.treffer.toLocaleString("de-DE")} von ${x.bewertet.toLocaleString("de-DE")} (${x.quote.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`);
+      pruef(m.stufen === 7 && JSON.stringify(m.tabs) === JSON.stringify(erwRt) && quoten.every((q) => m.rt.includes(q)) && m.sf === M.schieflage.length,
+        `Methode: Stufentabelle, ${m.tabs.length} Rücktest-Tabellen je Bauzeit und Stufe (${quoten.length} Quoten mit n, gleich daten/jahre_methode.js), Vergleich mit dem Zensus`);
+      pruef(/\+41\s%/.test(m.text) && /\u221235\s%/.test(m.text) && /nicht vergleichbar/.test(m.text) && /Prüfgebäude/.test(m.text) && /Denkmale stammen fast alle/.test(m.text),
+        "Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl");
+      pruef((m.text.match(/visinage/gi) || []).length === 1 && /Methodenvorbild/.test(m.text), "Methode: Vorbild genau einmal genannt, als Methodenvorbild");
     }
     if (seite === "jahre-daten.html") {
       const n = await page.evaluate(() => window.KIEZ_JAHRE_ZELLEN.gebaeude.filter((x) => x != null).length);
@@ -285,6 +395,60 @@ console.log("\nHash und Bewegung");
   pruef(s[0] === "spanne" && s[1] === 2 && s[2] === 3 && s[3] === true && s[4] === "52", `Hash wird gelesen und bleibt (${s[5]})`);
   await bild(page, "B5_1440_hash.png");
   await ctx.close();
+  // Blick aus der Adresse: Gebäude sofort geladen
+  for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
+    const v = await oeffnen(basis, "jahre.html", { hash: "#ansicht=spanne&von=4&bis=7&blick=13.06010,52.40020,15.50" });
+    await v.page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 15000 }).catch(() => {});
+    await v.page.waitForTimeout(400);
+    const s = await v.page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), g: window.KIEZ_JAHRE.geb(), ks: [...new Set(window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe"] }).map((x) => x.properties.k))].sort(), S: window.KIEZ_JAHRE.S }));
+    pruef(Math.abs(s.z - 15.5) < 0.01 && s.g.geladen.length > 0 && s.ks.length > 0 && s.ks.every((k) => k >= 4) && s.S.von === 4, `${art}: Adresse mit blick= öffnet die Gebäude (${s.g.geladen.join(", ")}), Filter ab 1991 aktiv (Klassen ${s.ks.join(",")})`);
+    pruef(v.fehler.length === 0, `${art}: Gebäudeansicht ohne Konsolenfehler ${v.fehler.slice(0, 2).join(" | ")}`);
+    await bild(v.page, "B5_1440_gebaeude_" + art + ".png");
+    await v.ctx.close();
+  }
+  // „belegt“ gibt es in den echten Daten nicht (Stufe 1 und 2 leer): Fixture für Babelsberg Nord über HTTP einspielen
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+    const page = await ctx.newPage(), fehler = [];
+    await page.route("**/*", (r) => {
+      const u = r.request().url();
+      if (/\/daten\/jahre\/52\.js$/.test(u)) return r.fulfill({ status: 200, contentType: "text/javascript", body: fs.readFileSync(path.join(WURZEL, "daten", "fixtures", "jahre", "52.js")) });
+      if (eigen(u)) return r.continue();
+      return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    });
+    page.on("pageerror", (e) => fehler.push(e.message));
+    await page.goto(HTTP + "jahre.html#ansicht=ueberblick&blick=13.09846,52.40150,17.20", { waitUntil: "load" });
+    await page.waitForFunction(() => window.KIEZ_BEREIT === true && window.KIEZ_JAHRE && window.KIEZ_JAHRE.geb().geladen.includes("52"), null, { timeout: 30000 }).catch(() => {});
+    await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(400);
+    const pt = await page.evaluate(() => {
+      const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect(), lw = m.getCanvas();
+      for (const f of m.queryRenderedFeatures({ layers: ["geb-farbe"] }).filter((x) => x.properties.g === "belegt")) {
+        const c = f.geometry.coordinates[0], p = m.project([c.reduce((a, q) => a + q[0], 0) / c.length, c.reduce((a, q) => a + q[1], 0) / c.length]);
+        if (document.elementFromPoint(r.left + p.x, r.top + p.y) === lw) return { x: r.left + p.x, y: r.top + p.y };
+      }
+      return null;
+    });
+    if (pt) { await page.mouse.click(pt.x, pt.y); await page.waitForTimeout(200); }
+    const pop = await page.$eval(".maplibregl-popup-content", (e) => e.textContent).catch(() => "");
+    const leg = await page.$eval("#j-legende", (e) => e.textContent), meld = await page.$eval("#j-fixture", (e) => e.hidden ? "" : e.textContent);
+    const linie = await page.evaluate(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-belegt"] }).length);
+    pruef(/belegt/.test(pop) && /Baujahr \d{4}/.test(pop) && /Quelle: /.test(pop) && /Belegt aus einer Quelle/.test(pop) && /belegt \(kräftig, mit Rand\)/.test(leg) && linie > 0 && /Beispieldaten/.test(meld) && fehler.length === 0,
+      `Fixture: „belegt“ kräftig mit Rand (${linie} Ränder), Popup mit Baujahr und Quelle, Legende, Beispieldaten-Hinweis (${pop.slice(0, 50)}…)`);
+    await bild(page, "B5_1440_fixture_belegt.png");
+    await ctx.close();
+  }
+  // Handy in der Gebäudeansicht
+  {
+    const h = await oeffnen(FILE, "jahre.html", { breite: 375, hoehe: 812, hash: "#ansicht=ueberblick&blick=13.12800,52.37900,15.40" });
+    await h.page.waitForFunction(() => window.KIEZ_JAHRE.geb().geladen.length > 0, null, { timeout: 15000 }).catch(() => {});
+    await h.page.waitForTimeout(400);
+    const quer = await h.page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth, window.KIEZ_JAHRE.geb().geladen.length]);
+    const va = await axe(h.page);
+    pruef(quer[0] <= quer[1] && quer[2] > 0 && va.length === 0, `375 px Gebäudeansicht: kein waagrechtes Scrollen (${quer[0]} ≤ ${quer[1]}), axe ${va.length} ${va.join(", ")}`);
+    await bild(h.page, "B5_375_gebaeude.png");
+    await h.ctx.close();
+  }
   const b = await oeffnen(FILE, "jahre.html", { bewegung: "no-preference" });
   pruef(!(await b.page.$eval("#j-abspielen", (x) => x.hidden)), "ohne reduzierte Bewegung: „Nacheinander“ sichtbar");
   pruef(await b.page.evaluate(() => window.KIEZ_KARTE.getStyle().transition.duration > 0), "ohne reduzierte Bewegung: Kartenstil blendet über");
