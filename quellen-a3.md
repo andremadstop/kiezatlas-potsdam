@@ -21,6 +21,11 @@ Gebäudejahre bleiben OSM-frei (E1).
 ## Abrufweg
 
 Kein Agentenabruf: Geofabrik- und BBBike-Downloads, Overpass, osmnx und taginfo sind für Programme verboten
-(Bauplan 0.3). Andre lädt die PBF im Browser und legt sie unter `$KIEZ_DATEN/osm/<stand>/` ab (oder in
-`$KIEZ_DATEN/eingang/`). Fehlt dort `HERKUNFT.md`, legt `skripte/12_osm.py` sie mit Größe, SHA256 und
-Dateikopf an; Bezugsadresse und Abrufdatum trägt Andre nach.
+(Bauplan 0.3). Andre lädt die PBF im Browser und legt sie unter `$KIEZ_DATEN/osm/<stand>/` ab. Aus dem gemeinsamen
+`$KIEZ_DATEN/eingang/` lädt das Skript nicht (es bricht mit der Bitte ab, die Datei zu verschieben), damit jede
+Lieferung ihre eigene `HERKUNFT.md` hat. Fehlt sie im Zielordner, legt `skripte/12_osm.py` sie mit Größe, SHA256
+und Dateikopf an; Bezugsadresse und Abrufdatum trägt Andre nach.
+
+Empfohlen ist der **BBBike-Auszug Potsdam** (Rechteck, enthält den Berliner Teil des Puffers). Geofabrik
+Brandenburg endet an der Landesgrenze: Der Berliner Teil des Puffers (Wannsee, Kladow) fehlt dann, der Bericht
+zeigt das als leere 1-km-Kacheln.

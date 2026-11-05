@@ -7,6 +7,7 @@ Stand 05.11.2026. Code fertig und getestet, **echte Daten fehlen** (H5: OSM-PBF 
 ```sh
 skripte/12_osm.sh test                                  # Mini-PBF, ohne Datenbank
 A3_DB_TEST=1 skripte/12_osm.sh test                     # dazu Trockenlauf gegen die DB (ROLLBACK)
+# PBF liegt unter $KIEZ_DATEN/osm/<stand>/ (aus eingang/ lädt das Skript nicht)
 skripte/12_osm.sh laden --pbf "$KIEZ_DATEN/osm/<stand>/<datei>.osm.pbf" --trockenlauf
 skripte/12_osm.sh laden --pbf "$KIEZ_DATEN/osm/<stand>/<datei>.osm.pbf"
 skripte/12_osm.sh pruefen                               # fünf Abnahmekriterien, Ausgang 0 = alle erfüllt
@@ -23,9 +24,12 @@ und INSERT in einer Transaktion).
 - `netz_kante` ist ungerichtet, eine Zeile je Knotenpaar (`von < nach`), `laenge_m` in EPSG:25833 (Fehler
   gegenüber der wahren Länge unter 0,05 %). Gehrichtung spielt keine Rolle (Einbahnstraßen gelten für Fußgänger
   nicht).
-- Ausschnitt: Kanten, die den Puffer „Stadtgebiet + 2 km“ berühren. Berlin liegt teilweise im Puffer; E7 (Berlin
-  vorerst nicht) betrifft die Ziele, nicht das Netz. `osm_poi` enthält auch Einrichtungen im Berliner Teil des
-  Puffers: A5 filtert sie bei Bedarf.
+- Ausschnitt: Kanten, die den Puffer „Stadtgebiet + 2 km“ berühren. Berlin liegt teilweise im Puffer.
+  `osm_poi` enthält auch Einrichtungen im Berliner Teil des Puffers; es gibt keine Spalte dafür und keine
+  Berliner Grenze in der Datenbank. Offen für Andre: Gilt E7 („Berlin vorerst nicht“, entschieden für MBJS)
+  auch für OSM-Einrichtungen? Dann braucht es eine Grenze (z. B. aus der PBF, `boundary=administrative`).
+- Abdeckung: Der Bericht prüft das Rechteck der Datei und zählt 1-km-Kacheln im Puffer ohne einen OSM-Knoten.
+  Empfohlen ist der BBBike-Auszug Potsdam; Geofabrik Brandenburg endet an der Berliner Grenze.
 - Dubletten: dieselbe Einrichtung als Punkt und Fläche (Abstand ≤ 25 m, gleiche Art): nur der Punkt bleibt.
 
 ## Für P0 (DDL)

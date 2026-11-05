@@ -1,7 +1,7 @@
 """A3: OSM-Einrichtungen und Fußwegnetz aus einer Hand-PBF (offline) nach auswertung.*.
 
 Eingang: eine OpenStreetMap-PBF, von Andre von Hand geladen (H5: BBBike-Auszug Potsdam oder Geofabrik
-Brandenburg), abgelegt unter $KIEZ_DATEN/osm/<stand>/ oder $KIEZ_DATEN/eingang/. Kein Netzabruf:
+Brandenburg), abgelegt unter $KIEZ_DATEN/osm/<stand>/ (nicht im gemeinsamen eingang/). Kein Netzabruf:
 kein Overpass, kein osmnx-Download, kein Abruf bei Geofabrik oder BBBike.
 
 Ausgang (Rolle kiezatlas_rechnen, nur eigene Tabellen laut Bauplan 0.4):
@@ -375,6 +375,39 @@ def vollstaendigkeit(cur) -> dict:
 
 # ------------------------------------------------------------------------------- Kennzahlen
 
+KACHEL_LON, KACHEL_LAT = 0.0147, 0.009   # rund 1 km x 1 km bei 52,4° N
+
+
+def abdeckung(cur, erg: osm_pbf.Ergebnis, rechteck: tuple[float, float, float, float]) -> dict:
+    """Wie gut deckt die Datei den Puffer ab? Rechteckprüfung plus 1-km-Kacheln ohne jeden OSM-Knoten.
+
+    Leere Kacheln gibt es auch auf großen Seen; viele leere Kacheln an einem Rand deuten auf einen Auszug,
+    der dort endet (z. B. Geofabrik Brandenburg ohne Berlin).
+    """
+    w, s, o, n = rechteck
+    ausd = erg.ausdehnung
+    rechteck_ok = ausd is not None and (ausd[0] <= w + RAND_GRAD and ausd[1] <= s + RAND_GRAD
+                                        and ausd[2] >= o - RAND_GRAD and ausd[3] >= n - RAND_GRAD)
+    nx = int(np.ceil((o - w) / KACHEL_LON))
+    ny = int(np.ceil((n - s) / KACHEL_LAT))
+    cur.execute("""
+        SELECT i, j FROM generate_series(0, %(nx)s - 1) i, generate_series(0, %(ny)s - 1) j
+        WHERE EXISTS (SELECT 1 FROM a3_puffer p WHERE ST_Intersects(p.geom, ST_Transform(ST_MakeEnvelope(
+            %(w)s + i * %(dx)s, %(s)s + j * %(dy)s, %(w)s + (i + 1) * %(dx)s, %(s)s + (j + 1) * %(dy)s, 4326), 25833)))
+    """, {"nx": nx, "ny": ny, "w": w, "s": s, "dx": KACHEL_LON, "dy": KACHEL_LAT})
+    im_puffer = {(i, j) for i, j in cur.fetchall()}
+    if erg.knoten_id.size:
+        ki = np.floor((erg.knoten_lon - w) / KACHEL_LON).astype(np.int64)
+        kj = np.floor((erg.knoten_lat - s) / KACHEL_LAT).astype(np.int64)
+        belegt = set(zip(ki.tolist(), kj.tolist()))
+    else:
+        belegt = set()
+    leer = sorted(im_puffer - belegt)
+    return {"rechteck_ok": rechteck_ok, "kacheln": len(im_puffer), "leer": len(leer),
+            "leer_beispiele": [(round(w + (i + 0.5) * KACHEL_LON, 3), round(s + (j + 0.5) * KACHEL_LAT, 3))
+                               for i, j in leer[:8]]}
+
+
 def kennzahlen(cur) -> dict:
     """Netzkennzahlen für die Abnahme (auch von pruefen/a3_pruefen.py genutzt). Braucht a3_stadt."""
     from scipy.sparse import coo_matrix
@@ -426,12 +459,11 @@ def bericht_schreiben(pfad: Path, *, pbf: Path, summe: str, erg: osm_pbf.Ergebni
         q = "–" if v["quote"] is None else f"{v['quote']:.1f} %".replace(".", ",")
         return (f"| {art} | {v['mbjs']} | {v['mbjs_mit_osm']} | **{q}** | {v['osm']} | {v['osm_mit_mbjs']} |")
 
-    deckt = "ja"
-    if erg.ausdehnung is not None and kz.get("leserechteck"):
-        w, s, o, n = kz["leserechteck"]
-        ew, es, eo, en = erg.ausdehnung
-        if ew > w + RAND_GRAD or es > s + RAND_GRAD or eo < o - RAND_GRAD or en < n - RAND_GRAD:
-            deckt = "**nein**: die Datei endet innerhalb des Puffers, Randwerte sind unvollständig"
+    ab = kz["abdeckung"]
+    deckt = (f"Ausdehnung der Datei umfasst das Leserechteck: {'ja' if ab['rechteck_ok'] else '**nein**'} "
+             f"(nur Rechteckprüfung). 1-km-Kacheln im Puffer ohne einen einzigen OSM-Knoten: {ab['leer']} von "
+             f"{ab['kacheln']} (große Seen sind leer; viele leere Kacheln an einem Rand heißen: Auszug endet dort)"
+             + (f", Mitten z. B. {ab['leer_beispiele']}" if ab["leer"] else "") + ".")
     def pz(anteil: float) -> str:
         return f"{100 * anteil:.1f} %".replace(".", ",")
 
@@ -440,7 +472,8 @@ def bericht_schreiben(pfad: Path, *, pbf: Path, summe: str, erg: osm_pbf.Ergebni
         "# A3 Vollständigkeit: OpenStreetMap gegen MBJS" + (" (TROCKENLAUF, nichts gespeichert)" if trocken else ""),
         "",
         f"Erzeugt von `skripte/12_osm.py` am {dt.date.today().isoformat()}. Daten: {ODBL}.",
-        f"PBF: `{pbf.name}` (SHA256 `{summe[:16]}…`), Datenstand {stand}. Deckt den Puffer (Stadtgebiet + 2 km) ab: {deckt}.",
+        f"PBF: `{pbf.name}` (SHA256 `{summe[:16]}…`), Datenstand {stand}.",
+        f"Abdeckung des Puffers (Stadtgebiet + 2 km): {deckt}",
         "",
         f"## Kitas und Schulen im Stadtgebiet (Treffer: OSM-Objekt höchstens {TREFFER_M} m entfernt, bei Flächen vom Rand)",
         "",
@@ -486,6 +519,11 @@ def main() -> int:
     pbf = a.pbf.resolve()
     if not pbf.is_file():
         raise SystemExit(f"PBF fehlt: {pbf} (Handdownload H5 nach $KIEZ_DATEN/osm/<stand>/)")
+    if pbf.parent.name == "eingang" and not a.trockenlauf:
+        # Rohdaten nur unter $KIEZ_DATEN/<quelle>/<stand>/ mit eigener HERKUNFT.md (Bauplan 0.2);
+        # im gemeinsamen Eingang würde HERKUNFT.md einer anderen Lieferung getroffen.
+        raise SystemExit(f"{pbf.name} liegt im Eingang. Bitte nach $KIEZ_DATEN/osm/<stand>/ verschieben "
+                         "(stand = Datenstand der Datei, z. B. 2026-11-06), dann erneut starten.")
     t0 = time.time()
     summe = sha256(pbf)
     with verbinden() as conn:
@@ -504,7 +542,7 @@ def main() -> int:
             geschrieben = schreiben(cur, von, nach, knoten, koords, pois, bildung)
             voll = vollstaendigkeit(cur)
             kz = kennzahlen(cur)
-            kz["leserechteck"] = rechteck
+            kz["abdeckung"] = abdeckung(cur, erg, rechteck)
             stand = (dt.datetime.fromtimestamp(erg.kopf.zeitstempel, dt.UTC).date().isoformat()
                      if erg.kopf and erg.kopf.zeitstempel
                      else dt.date.fromtimestamp(pbf.stat().st_mtime).isoformat() + " (Dateidatum)")
@@ -512,7 +550,8 @@ def main() -> int:
                               voll=voll, kz=kz, trocken=a.trockenlauf)
             print(f"Einrichtungen {geschrieben['poi_je_art']}; Netz {geschrieben['knoten']} Knoten, "
                   f"{geschrieben['kanten']} Kanten; Vollständigkeit Kita {voll['kita']['quote']} %, "
-                  f"Schule {voll['schule']['quote']} %; Bericht {a.bericht}")
+                  f"Schule {voll['schule']['quote']} %; leere 1-km-Kacheln im Puffer {kz['abdeckung']['leer']} "
+                  f"von {kz['abdeckung']['kacheln']}; Bericht {a.bericht}")
         if a.trockenlauf:
             conn.rollback()
             print("Trockenlauf: ROLLBACK, in auswertung ist nichts geändert.")

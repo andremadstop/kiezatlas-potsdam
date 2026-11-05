@@ -134,6 +134,17 @@ def test_relation_zweiter_durchgang(erg):
     assert ids == {121, 122}
 
 
+def test_eingang_wird_abgelehnt(pbf, tmp_path):
+    eingang = tmp_path / "eingang"
+    eingang.mkdir()
+    ziel = eingang / "x.osm.pbf"
+    ziel.write_bytes(pbf.read_bytes())
+    lauf = subprocess.run([sys.executable, "-I", str(WURZEL / "skripte" / "12_osm.py"), "--pbf", str(ziel)],
+                          capture_output=True, text=True, check=False, env={**os.environ, "PGUSER": "niemand"})
+    assert lauf.returncode != 0 and "Eingang" in lauf.stderr
+    assert not (eingang / "HERKUNFT.md").exists()
+
+
 # ------------------------------------------------------------------------------- Datenbank
 
 @pytest.mark.skipif(os.environ.get("A3_DB_TEST") != "1" or os.environ.get("PGUSER") != "kiezatlas_rechnen",
@@ -155,6 +166,7 @@ def test_trockenlauf_datenbank(pbf, tmp_path):
     assert "Netz 10 Knoten, 13 Kanten" in lauf.stdout
     text = bericht.read_text(encoding="utf-8")
     assert "Trefferquote" in text and "TROCKENLAUF" in text
+    assert "nur Rechteckprüfung" in text and "1-km-Kacheln im Puffer" in text
     with psycopg.connect("") as c, c.cursor() as cur:
         cur.execute("SELECT (SELECT count(*) FROM auswertung.osm_poi), (SELECT count(*) FROM auswertung.netz_knoten),"
                     " (SELECT count(*) FROM auswertung.netz_kante)")
