@@ -113,6 +113,10 @@ def main() -> int:
         print("[4] Gegenproben in CSV und Steckbriefen")
         # Steckbriefe je Raumeinheit (Stadtteile oder Planungsräume): die ersten beiden vorhandenen nehmen
         sb = sorted(p.name for p in (WURZEL / "daten" / "export" / "steckbriefe").glob("*.html"))
+        if len(sb) < 2:
+            erwarte(False, f"mindestens zwei Steckbriefe in daten/export/steckbriefe ({len(sb)})")
+            print(f"\n{len(fehler)} Befunde")
+            return 1
         erst, zweit = f"steckbriefe/{sb[0]}", f"steckbriefe/{sb[1]}"
         faelle_text = [
             ("Adresse in CSV", "csv/einrichtung.csv", "Grundschule", "Grundschule Lindenstraße 5", "Hausnummer"),

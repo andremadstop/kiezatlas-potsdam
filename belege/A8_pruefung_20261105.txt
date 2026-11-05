@@ -244,3 +244,18 @@ $ pdffonts (alle PDFs, Schriftnamen):
 
 Sichtprüfung: Steckbrief 403 Babelsberg Süd, Seite 1 und 2 als Bild angesehen (Karte mit Grenze, Zellen, Einrichtungen, Maßstab; Versorgungstabelle).
 Nicht geprüft: Öffnen in QGIS (kein QGIS auf der Workstation); geprüft sind XML, Pfade, Klassenfelder, Kategorien, layer_styles.
+
+## Gegenprobe /code-review (medium) über 33e9c9d..20fecaa: 10 Funde
+
+Behoben (danach Export bytegleich zum Stand davor, A8_export.py 0 Befunde, A8_test_pfade.py 0 Befunde, ruff sauber):
+- Fixture-Lauf ruft die A6-Raumquelle nicht mehr auf (sonst Abbruch bei veralteter CSV, obwohl Beispieldaten auf Stadtteilen rechnen)
+- Lizenz der Raumgrenzen in der Tabelle lizenz aus derselben Quelle wie der Vermerk (planer.js quellen.planungsraum, sonst QUELLEN in 15_planer.py); eigene Kopie des Vermerks entfernt
+- Hilfetext von --raum-lizenz nennt die tatsächliche Quelle
+- Toleranz direkt aus planer.js rundung.ew (fehlt sie, bricht der Lauf ab statt still 10 anzunehmen)
+- Zellen ohne Raum nur als Meldung wie in A6 (ohne_raum); Abbruch nur, wenn Einwohner je Raum von planer.js abweichen
+- Zeichen % in Name oder WKT der Raumquelle bricht mit klarer Meldung ab (Positionsparameter)
+- A8_test_pfade.py meldet weniger als zwei Steckbriefe als Befund statt IndexError
+
+Begründet offen:
+- WKT der 19 Räume als Literal in jeder Abfrage: gemessene Laufzeit rund 140 s für den ganzen Export, für 19 Flächen hinnehmbar; entfällt, sobald der Ladekoordinator public.planungsraum füllt
+- LIMIT 1 bei der Zellzuordnung gegenüber dem Join in A6: bei überlappenden Flächen weicht die Summe je Raum ab, und genau das fängt die Gegenprobe mit Abbruch (heute 0 Abweichungen)

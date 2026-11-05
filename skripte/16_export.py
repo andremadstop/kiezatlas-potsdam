@@ -69,7 +69,6 @@ VERMERK = {
     "mbjs": f"© Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
     "lgb": f"© GeoBasis-DE/LGB, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
     "stadtteil": f"© Landeshauptstadt Potsdam, dl-zero-de/2.0 ({DLZERO})",
-    "planungsraum": f"© Landeshauptstadt Potsdam, Planungsräume, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
     "vbb": f"VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 ({CCBY}), {VERAENDERT}",
     "osm": f"© OpenStreetMap-Mitwirkende, Open Database License 1.0 ({ODBL}), {VERAENDERT}",
 }
@@ -313,7 +312,7 @@ class GPKG:
 
 
 # ---------------------------------------------------------------------------------------------- Datenbank
-def raumquelle_a6(cur) -> tuple[str, str, str]:
+def raumquelle_a6(cur) -> tuple[str, str, str, dict]:
     """Raumebene, SQL-Ausdruck der Raumeinheiten und Herkunft, in derselben Reihenfolge wie A6 (15_planer.raumquelle):
     public.planungsraum, sonst vorbereitet/planungsraeume.csv als unnest(), sonst Stadtteile; Abbruch, wenn H1 vorliegt,
     aber nicht vorbereitet ist. Die Parameter von A6 werden als Literale eingesetzt (von psycopg maskiert), damit der
@@ -329,10 +328,13 @@ def raumquelle_a6(cur) -> tuple[str, str, str]:
     spec.loader.exec_module(mod)
     raumebene, tab, par, herkunft = mod.raumquelle(cur)
     for k, v in (par or {}).items():
-        tab = tab.replace(f"%({k})s", sql.Literal(v).as_string(cur))
+        lit = sql.Literal(v).as_string(cur)
+        if "%" in lit:  # die Abfragen nutzen Positionsparameter; ein % in Name oder WKT wäre ein Platzhalter
+            raise SystemExit(f"Raumquelle: Zeichen % in {k}, bitte Namen in vorbereitet/planungsraeume.csv prüfen")
+        tab = tab.replace(f"%({k})s", lit)
     if "%(" in tab:
         raise SystemExit(f"Raumquelle von A6 mit unbekanntem Parameter: {tab[:200]}")
-    return raumebene, tab, herkunft
+    return raumebene, tab, herkunft, mod.QUELLEN.get("planungsraum") or {}
 
 
 def db_lesen(cur, tab: str, ein_ids: list[str], zellen: list[str]) -> dict:
@@ -1008,7 +1010,7 @@ def main() -> int:
     ap.add_argument(
         "--raum-lizenz",
         default=None,
-        help="Vermerk der Planungsraum-Grenzen (Standard: H1, LHP, dl-de/by-2-0 laut eingang/HERKUNFT.md)",
+        help="Vermerk der Planungsraum-Grenzen (Standard: quellen.planungsraum aus planer.js bzw. 15_planer.py)",
     )
     ap.add_argument("--ohne-beleg", action="store_true", help="keinen Beleg unter belege/ schreiben")
     a = ap.parse_args()
@@ -1035,21 +1037,27 @@ def main() -> int:
     with psycopg.connect() as con:
         con.read_only = True
         with con.cursor() as cur:
-            ebene_db, tab, raum_herkunft = raumquelle_a6(cur)
-            if fixture and ebene_db != raumebene and raumebene == "stadtteil":
+            if fixture and raumebene == "stadtteil":
                 # Beispieldaten rechnen auf Stadtteilen; nur für die Prüfung des Pfads, nie nach daten/export
-                ebene_db, tab, raum_herkunft = "stadtteil", "public.stadtteil", "public.stadtteil (Beispieldaten)"
+                ebene_db, tab, raum_herkunft, pr_quelle = "stadtteil", "public.stadtteil", "public.stadtteil", {}
+            else:
+                ebene_db, tab, raum_herkunft, pr_quelle = raumquelle_a6(cur)
             if ebene_db != raumebene:
                 raise SystemExit(
                     f"Raumquelle ({ebene_db}, {raum_herkunft}) und planer.js ({raumebene}) passen nicht zusammen; "
                     "erst A6 neu laufen lassen."
                 )
             d = db_lesen(cur, tab, [f["properties"]["id"] for f in ein["features"]], ids)
-            raum_vermerk = a.raum_lizenz or (
-                (planer["quellen"].get("planungsraum") or {}).get("vermerk") or VERMERK["planungsraum"]
-                if raumebene == "planungsraum"
-                else VERMERK["stadtteil"]
-            )
+            # Lizenz und Vermerk der Grenzen aus derselben Quelle: planer.js, sonst A6 (QUELLEN in 15_planer.py)
+            pr_quelle = planer["quellen"].get("planungsraum") or pr_quelle
+            if raumebene == "planungsraum":
+                if not (a.raum_lizenz or pr_quelle.get("vermerk")):
+                    raise SystemExit("Planungsräume ohne Vermerk: --raum-lizenz angeben")
+                raum_vermerk = a.raum_lizenz or pr_quelle["vermerk"]
+                raum_lizenz = "siehe Vermerk" if a.raum_lizenz else pr_quelle.get("lizenz", "")
+            else:
+                raum_vermerk, raum_lizenz = VERMERK["stadtteil"], "dl-zero-de/2.0"
+            raum_link = {"dl-de/by-2-0": DLDE, "dl-zero-de/2.0": DLZERO}.get(raum_lizenz, "")
             fehlend = [f for f in ein["features"] if f["properties"]["id"] not in d["einrichtung"]]
             if fehlend and not fixture:
                 raise SystemExit(f"{len(fehlend)} Einrichtungen aus einrichtungen.js fehlen in auswertung.einrichtung")
@@ -1251,7 +1259,7 @@ def main() -> int:
         for g in ids:
             if zprops[g].get("ew") and d["zelle"][g]["raum"]:
                 summe[d["zelle"][g]["raum"]] = summe.get(d["zelle"][g]["raum"], 0) + zprops[g]["ew"]
-        toleranz = int(planer.get("rundung", {}).get("ew", 10)) if isinstance(planer.get("rundung"), dict) else 10
+        toleranz = int(planer["rundung"]["ew"])
         abw = {
             nr: (summe.get(nr, 0), r["ew"])
             for nr, r in planer["raeume"].items()
@@ -1262,7 +1270,9 @@ def main() -> int:
             f"{len(planer['raeume'])} Räumen um mehr als die halbe Rundung ({toleranz} EW) von planer.js ab"
             f"{(' ' + str(abw)) if abw else ''}; Summe {sum(summe.values()):,} EW".replace(",", ".")
         )
-        if (ohne or abw) and not fixture:
+        # Abbruch nur, wenn die Zuordnung der Geometrie andere Einwohner je Raum ergibt als die veröffentlichten
+        # Werte; Zellen ohne Raum führt A6 selbst nur als Meldung (ohne_raum), hier ebenso
+        if abw and not fixture:
             raise SystemExit(meldungen[-1])
     # gruenflaeche
     g_felder = [
@@ -1327,9 +1337,9 @@ def main() -> int:
     l_zeilen = [
         [
             "raumeinheit (Grenzen)",
-            "dl-zero-de/2.0" if raumebene == "stadtteil" else "dl-de/by-2-0",
+            raum_lizenz,
             raum_vermerk,
-            DLZERO if raumebene == "stadtteil" else DLDE,
+            raum_link,
         ],
         ["stadtteil", "dl-zero-de/2.0", VERMERK["stadtteil"], DLZERO],
         [
