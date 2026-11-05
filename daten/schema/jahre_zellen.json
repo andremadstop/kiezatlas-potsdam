@@ -1,0 +1,149 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Gebäude mit Wohnraum nach Baujahr je Zelle",
+ "x-datei": "jahre_zellen.js",
+ "x-global": "^KIEZ_JAHRE_ZELLEN$",
+ "x-odbl": false,
+ "x-eigentuemer": "B1 (skripte/21_jahre_zensus.py)",
+ "description": "Zensus 2022, Gebäude mit Wohnraum je 100-m-Zelle, Werte in der Reihenfolge von daten/zellen.js. Keine Gebäudefärbung aus Zellklassen.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "stand",
+  "merkmal",
+  "beschriftung",
+  "klassen",
+  "quellen",
+  "anzahl",
+  "erste_id",
+  "letzte_id",
+  "schluessel",
+  "gebaeude",
+  "anteile",
+  "vorherrschend"
+ ],
+ "properties": {
+  "fixture": {
+   "const": true,
+   "description": "nur in daten/fixtures/: klar unechte Beispielwerte"
+  },
+  "stand": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "description": "Tag der Auswertung"
+  },
+  "hinweis": {
+   "type": "string"
+  },
+  "anzahl": {
+   "type": "integer",
+   "minimum": 1,
+   "description": "Zahl der Zellen = Länge jeder Werteliste = Zahl der Features in daten/zellen.js"
+  },
+  "erste_id": {
+   "type": "string",
+   "pattern": "^CRS3035RES100m"
+  },
+  "letzte_id": {
+   "type": "string",
+   "pattern": "^CRS3035RES100m"
+  },
+  "schluessel": {
+   "const": "zellen.js-Reihenfolge",
+   "description": "Index i gehört zu KIEZ_ZELLEN.features[i] (sortiert nach gitter_id)"
+  },
+  "merkmal": {
+   "enum": [
+    "jahrzehnte",
+    "mz_klassen"
+   ]
+  },
+  "beschriftung": {
+   "const": "Gebäude mit Wohnraum je Zelle, nicht einzelne Gebäude"
+  },
+  "klassen": {
+   "type": "array",
+   "minItems": 2,
+   "items": {
+    "type": "string"
+   }
+  },
+  "quellen": {
+   "type": "object",
+   "minProperties": 1,
+   "additionalProperties": {
+    "$ref": "#/$defs/quelle"
+   }
+  },
+  "gebaeude": {
+   "type": "array",
+   "items": {
+    "type": [
+     "integer",
+     "null"
+    ]
+   },
+   "x-laenge": "anzahl"
+  },
+  "anteile": {
+   "type": "array",
+   "x-laenge": "anzahl",
+   "items": {
+    "anyOf": [
+     {
+      "type": "null"
+     },
+     {
+      "type": "array",
+      "items": {
+       "type": "number",
+       "minimum": 0
+      }
+     }
+    ]
+   }
+  },
+  "vorherrschend": {
+   "type": "array",
+   "x-laenge": "anzahl",
+   "items": {
+    "type": [
+     "integer",
+     "null"
+    ]
+   }
+  }
+ },
+ "$defs": {
+  "quelle": {
+   "type": "object",
+   "required": [
+    "quelle",
+    "lizenz",
+    "vermerk"
+   ],
+   "properties": {
+    "quelle": {
+     "type": "string",
+     "minLength": 3
+    },
+    "lizenz": {
+     "type": "string",
+     "minLength": 3
+    },
+    "vermerk": {
+     "type": "string",
+     "minLength": 10,
+     "description": "Namensnennung wie gefordert. Bei dl-de/by-2-0 mit Link zum Lizenztext und, wenn verändert, 'Daten verändert (eigene Berechnung)'."
+    },
+    "url": {
+     "type": "string"
+    },
+    "stand": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false
+  }
+ }
+}

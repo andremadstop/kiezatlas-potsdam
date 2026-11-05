@@ -1,0 +1,5 @@
+Importlauf 20261105T093628Z · 5.0 s
+  mbjs_kita                ok     neu   220  geändert     0  gelöscht     0  unverändert     0
+      Warnung: Nur 220 von 240 gemeldeten Objekten erhalten (Seiten ohne feste Reihenfolge?), seitengroesse erhöhen
+      Hinweis: Dienst meldet ImplementsSorting=FALSE, Seiten ohne feste Reihenfolge
+  Änderungskarte: 20261105T093628Z-karte.html

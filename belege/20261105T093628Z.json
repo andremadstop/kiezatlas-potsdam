@@ -1,0 +1,65 @@
+{
+  "lauf_id": "20261105T093628Z",
+  "start": "2026-11-05T09:36:28.460335+00:00",
+  "probelauf": false,
+  "sprache": "de",
+  "quellen": [
+    {
+      "quelle": "mbjs_kita",
+      "typ": "wfs",
+      "status": "ok",
+      "zaehler": {
+        "gelesen": 220,
+        "neu": 220,
+        "geaendert": 0,
+        "unveraendert": 0,
+        "geloescht": 0,
+        "uebernommen": 0,
+        "zurueckgehalten": 0
+      },
+      "warnungen": [
+        "Nur 220 von 240 gemeldeten Objekten erhalten (Seiten ohne feste Reihenfolge?), seitengroesse erhöhen"
+      ],
+      "hinweise": [
+        "Dienst meldet ImplementsSorting=FALSE, Seiten ohne feste Reihenfolge"
+      ],
+      "info": {
+        "ziel": "mbjs_kita",
+        "kontakt": {
+          "anbieter": "Ministerium für Bildung, Jugend und Sport des Landes Brandenburg",
+          "email": "edugis@mbjs.brandenburg.de"
+        },
+        "titel": "Kindertagesstätten im Land Brandenburg (WFS-MBJS-KITA)",
+        "beschreibung": "Der Downloaddienst (WFS) - Kindertagesstätten im Land Brandenburg (WFS-MBJS-KITA) - beinhaltet die Standorte der Kindertagesstätten im Land Brandenburg. Die Bereitstellung des Dienstes erfolgt durch das Ministerium für Bildung, Jugend und Sport (MBJS).",
+        "update_sequence": null,
+        "felder": [
+          "altersstruktur",
+          "einrichtungsart",
+          "hausnr",
+          "hausnrerw",
+          "id_kita",
+          "kapazitaet",
+          "msGeometry",
+          "name",
+          "ort",
+          "ortsteil",
+          "plz",
+          "strasse"
+        ],
+        "seiten": 1,
+        "objekte": 220,
+        "metadaten": 0
+      },
+      "letzte_abfrage": "https://schullandschaft.brandenburg.de/edugis/wfs/kitas?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAMES=ms%3AKITA_Standorte&SRSNAME=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A25833&COUNT=1000&STARTINDEX=0&BBOX=353000%2C5798000%2C379000%2C5823000%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A25833",
+      "unvollstaendig": true,
+      "laufzeit_s": 4.99
+    }
+  ],
+  "laufzeit_s": 5.0,
+  "fehlgeschlagen": [],
+  "angehalten": [],
+  "unvollstaendig": [
+    "mbjs_kita"
+  ],
+  "karte": "20261105T093628Z-karte.html"
+}

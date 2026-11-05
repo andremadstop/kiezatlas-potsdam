@@ -1,0 +1,51 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Gebäude je Stadtteil (Bestand)",
+ "x-datei": "gebaeude/*.js",
+ "x-global": "^KIEZ_GEB_\\d{2}$",
+ "type": "object",
+ "required": [
+  "type",
+  "features"
+ ],
+ "properties": {
+  "type": {
+   "const": "FeatureCollection"
+  },
+  "features": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "geometry",
+     "properties"
+    ],
+    "properties": {
+     "properties": {
+      "type": "object",
+      "required": [
+       "f",
+       "gs",
+       "h"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "f": {
+        "type": "string"
+       },
+       "gs": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "h": {
+        "type": "number"
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

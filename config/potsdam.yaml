@@ -74,3 +74,140 @@ quellen:
       schluessel: [oid]
       geometrie: geom
       spalten: {oid: _id, funktion: funktion, gebnutzbez: gebnutzbez, anzahlgs: anzahlgs, aktualit: aktualit}
+
+  # ---------------------------------------------------------------------------------------------
+  # Ausbau Planer-Ebene und Gebäudejahre (Paket P0, 05.11.2026). Jeder Lauf nur mit --nur <quelle>
+  # (skripte/lauf.sh erzwingt das). Ziele in sql/002_ausbau.sql. Rohdaten-Herkunft: QUELLEN.md.
+
+  zensus_struktur:
+    # Zensus 2022, Strukturmerkmale im 100-m-Gitter (Altersgruppen, Haushalte, Familien, Senioren,
+    # Staatsangehörigkeit, Miete, Leerstand, Wohnfläche). A1 bereitet die Destatis-Zips aus
+    # $KIEZ_DATEN/zensus/2022/ zu vorbereitet/zensus_struktur.csv auf (Spaltennamen = Zielspalten,
+    # dazu gitter_id, x, y in EPSG:3035) und lädt per --nur zensus_struktur.
+    titel: "Zensus 2022, Strukturmerkmale im 100-m-Gitter, Potsdam und Umgebung"
+    typ: csv
+    pfad: vorbereitet/zensus_struktur.csv
+    trenner: ";"
+    id_spalte: gitter_id
+    x_spalte: x
+    y_spalte: y
+    srid: 3035
+    zahl_felder: [miete_qm, leer_quote, wfl_je_bew]
+    rhythmus: jaehrlich
+    lizenz: "© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)"
+    ziel:
+      tabelle: zensus_struktur
+      schluessel: [gitter_id]
+      geometrie: geom
+      spalten: {gitter_id: _id,
+                i_ges: i_ges, i_u3: i_u3, i_3_5: i_3_5, i_6_9: i_6_9, i_10_15: i_10_15, i_16_18: i_16_18,
+                i_19_24: i_19_24, i_25_39: i_25_39, i_40_59: i_40_59, i_60_66: i_60_66, i_67_74: i_67_74,
+                i_75p: i_75p,
+                hh_ges: hh_ges, hh_1: hh_1, hh_2: hh_2, hh_3: hh_3, hh_4: hh_4, hh_5: hh_5, hh_6p: hh_6p,
+                ht_ges: ht_ges, ht_single: ht_single, ht_paar_ohne: ht_paar_ohne, ht_paar_mit: ht_paar_mit,
+                ht_alleinerz: ht_alleinerz, ht_mehrpers: ht_mehrpers,
+                kf_ges: kf_ges, kf_ehe_ohne: kf_ehe_ohne, kf_ehe_u18: kf_ehe_u18, kf_ehe_ab18: kf_ehe_ab18,
+                kf_lp_ohne: kf_lp_ohne, kf_lp_u18: kf_lp_u18, kf_lp_ab18: kf_lp_ab18,
+                kf_nel_ohne: kf_nel_ohne, kf_nel_u18: kf_nel_u18, kf_nel_ab18: kf_nel_ab18,
+                kf_vater_u18: kf_vater_u18, kf_vater_ab18: kf_vater_ab18,
+                kf_mutter_u18: kf_mutter_u18, kf_mutter_ab18: kf_mutter_ab18,
+                sen_ges: sen_ges, sen_nur: sen_nur, sen_mit: sen_mit, sen_ohne: sen_ohne,
+                st_ges: st_ges, st_de: st_de, st_ausland: st_ausland, st_eu27: st_eu27,
+                st_europa: st_europa, st_welt: st_welt, st_sonst: st_sonst,
+                miete_qm: miete_qm, leer_quote: leer_quote, wfl_je_bew: wfl_je_bew, geaendert: geaendert}
+
+  mbjs_kita:
+    # MBJS Brandenburg, WFS-MBJS-KITA (MapServer, WFS 2.0 mit Paging). Keine robots.txt (404 am
+    # 05.11.2026); Bedingungen in den AccessConstraints: dl-de/by-2-0, „© Ministerium für Bildung,
+    # Jugend und Sport“. Rechteck um Potsdam plus rund 3 km (Randeffekt, E7: Brandenburg ja).
+    # Ohne Straße, Hausnummer und Kontaktdaten (nur die Felder unter felder werden gelesen).
+    titel: "Kita-Standorte MBJS Brandenburg, Potsdam und Umland"
+    typ: wfs
+    url: https://schullandschaft.brandenburg.de/edugis/wfs/kitas
+    typename: ms:KITA_Standorte
+    id_feld: id_kita
+    geometrie_feld: msGeometry
+    crs: urn:ogc:def:crs:EPSG::25833
+    bbox: [353000, 5798000, 379000, 5823000]
+    seitengroesse: 1000
+    pause_s: 2
+    felder: {name: name, einrichtungsart: einrichtungsart, altersstruktur: altersstruktur,
+             kapazitaet: kapazitaet, ortsteil: ortsteil, plz: plz, ort: ort}
+    rhythmus: monatlich
+    lizenz: "© Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0)"
+    ziel:
+      tabelle: mbjs_kita
+      schluessel: [id_kita]
+      geometrie: geom
+      spalten: {id_kita: _id, name: name, einrichtungsart: einrichtungsart, altersstruktur: altersstruktur,
+                kapazitaet: kapazitaet, ortsteil: ortsteil, plz: plz, ort: ort}
+
+  mbjs_schule:
+    # MBJS Brandenburg, WFS-MBJS-SCHOOL, wie mbjs_kita. Ohne Telefon, Fax, Dienst-E-Mail, Homepage, Straße.
+    titel: "Schulstandorte MBJS Brandenburg, Potsdam und Umland"
+    typ: wfs
+    url: https://schullandschaft.brandenburg.de/edugis/wfs/schulen
+    typename: ms:Schul_Standorte
+    id_feld: schul_nr
+    geometrie_feld: msGeometry
+    crs: urn:ogc:def:crs:EPSG::25833
+    bbox: [353000, 5798000, 379000, 5823000]
+    seitengroesse: 1000
+    pause_s: 2
+    felder: {schulname: schulname, plz: plz, ort: ort, kreis: kreis, schulamt_nr: schulamt_nr,
+             schulform_kurzbez: schulform_kurzbez, schulform: schulform, schulformgrp_sl: schulformgrp_sl,
+             traeger: traeger, schultraeger_grp: schultraeger_grp, schueler: schueler,
+             besonderheiten_sl: besonderheiten_sl}
+    rhythmus: monatlich
+    lizenz: "© Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0)"
+    ziel:
+      tabelle: mbjs_schule
+      schluessel: [schul_nr]
+      geometrie: geom
+      spalten: {schul_nr: _id, schulname: schulname, plz: plz, ort: ort, kreis: kreis, schulamt_nr: schulamt_nr,
+                schulform_kurzbez: schulform_kurzbez, schulform: schulform, schulformgrp_sl: schulformgrp_sl,
+                traeger: traeger, schultraeger_grp: schultraeger_grp, schueler: schueler,
+                besonderheiten_sl: besonderheiten_sl}
+
+  alkis_nutzung:
+    # ALKIS vereinfacht, tatsächliche Nutzung (Grünanlage, Park, Kleingarten, Wald …), derselbe Dienst
+    # wie gebaeude_alkis. Kein Paging: 2-km-Kacheln, 1 s Pause (isk.geobasis-bb.de hat keine robots.txt).
+    titel: "Tatsächliche Nutzung ALKIS vereinfacht, Potsdam"
+    typ: wfs
+    url: https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs
+    typename: ave:Nutzung
+    id_feld: oid
+    geometrie_feld: geometrie
+    crs: urn:ogc:def:crs:EPSG::25833
+    bbox: [356000, 5801000, 376000, 5820000]
+    kachel_m: 2000
+    pause_s: 1
+    felder: {nutzart: nutzart, bez: bez, name: name, aktualit: aktualit}
+    rhythmus: monatlich
+    lizenz: "© GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0)"
+    ziel:
+      tabelle: alkis_nutzung
+      schluessel: [oid]
+      geometrie: geom
+      spalten: {oid: _id, nutzart: nutzart, bez: bez, name: name, aktualit: aktualit}
+
+  planungsraeume:
+    # Planungsräume der Landeshauptstadt Potsdam, Handdownload H1 vom Open-Data-Portal (kein
+    # automatischer Abruf, robots.txt sperrt /api/ und Downloads). Aufbereitet von
+    # skripte/03_planungsraeume.py. Lizenz beim Handdownload ablesen und hier eintragen.
+    titel: "Planungsräume der Landeshauptstadt Potsdam"
+    typ: csv
+    pfad: vorbereitet/planungsraeume.csv
+    trenner: ";"
+    id_spalte: nr
+    wkt_spalte: wkt
+    srid: 4326
+    spalten: {name: name}
+    rhythmus: jaehrlich
+    lizenz: "© Landeshauptstadt Potsdam, Lizenz laut Handdownload (offen, siehe QUELLEN.md)"
+    ziel:
+      tabelle: planungsraum
+      loeschen: false
+      schluessel: [nr]
+      geometrie: geom
+      spalten: {nr: _id, name: name}

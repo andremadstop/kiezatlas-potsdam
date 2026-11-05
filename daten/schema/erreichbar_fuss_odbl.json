@@ -1,0 +1,122 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Erreichbarkeit je Zelle, fussweg",
+ "x-datei": "erreichbar_fuss_odbl.js",
+ "x-global": "^KIEZ_ERREICHBAR_FUSS$",
+ "x-odbl": true,
+ "x-eigentuemer": "A6 (skripte/15_planer.py)",
+ "description": "Entfernung jeder Zelle zur nächsten Einrichtung je Art. Werte in der Reihenfolge von daten/zellen.js; null = Zelle unbewohnt oder ohne Wert.",
+ "type": "object",
+ "required": [
+  "stand",
+  "methode",
+  "einheit",
+  "quellen",
+  "arten",
+  "anzahl",
+  "erste_id",
+  "letzte_id",
+  "schluessel",
+  "werte"
+ ],
+ "additionalProperties": false,
+ "properties": {
+  "fixture": {
+   "const": true,
+   "description": "nur in daten/fixtures/: klar unechte Beispielwerte"
+  },
+  "stand": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "description": "Tag der Auswertung"
+  },
+  "hinweis": {
+   "type": "string"
+  },
+  "anzahl": {
+   "type": "integer",
+   "minimum": 1,
+   "description": "Zahl der Zellen = Länge jeder Werteliste = Zahl der Features in daten/zellen.js"
+  },
+  "erste_id": {
+   "type": "string",
+   "pattern": "^CRS3035RES100m"
+  },
+  "letzte_id": {
+   "type": "string",
+   "pattern": "^CRS3035RES100m"
+  },
+  "schluessel": {
+   "const": "zellen.js-Reihenfolge",
+   "description": "Index i gehört zu KIEZ_ZELLEN.features[i] (sortiert nach gitter_id)"
+  },
+  "methode": {
+   "const": "fussweg"
+  },
+  "einheit": {
+   "enum": [
+    "m",
+    "min"
+   ]
+  },
+  "quellen": {
+   "type": "object",
+   "minProperties": 1,
+   "additionalProperties": {
+    "$ref": "#/$defs/quelle"
+   }
+  },
+  "arten": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "string"
+   }
+  },
+  "werte": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "array",
+    "items": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "x-laenge": "anzahl"
+   }
+  }
+ },
+ "$defs": {
+  "quelle": {
+   "type": "object",
+   "required": [
+    "quelle",
+    "lizenz",
+    "vermerk"
+   ],
+   "properties": {
+    "quelle": {
+     "type": "string",
+     "minLength": 3
+    },
+    "lizenz": {
+     "type": "string",
+     "minLength": 3
+    },
+    "vermerk": {
+     "type": "string",
+     "minLength": 10,
+     "description": "Namensnennung wie gefordert. Bei dl-de/by-2-0 mit Link zum Lizenztext und, wenn verändert, 'Daten verändert (eigene Berechnung)'."
+    },
+    "url": {
+     "type": "string"
+    },
+    "stand": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false
+  }
+ }
+}

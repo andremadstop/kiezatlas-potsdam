@@ -1,0 +1,137 @@
+# Richtwerte und Annahmen der Planer-Ebene (Kiezatlas Potsdam, Ausbau A).
+# Angelegt von P0 (05.11.2026) mit allen bis dahin bekannten Einträgen (Prüfbericht, Korrektur 19).
+# Eigentümer: A6 (skripte/15_planer.py liest die Datei). Ausnahme: Den Abschnitt `oepnv` pflegt nur A4,
+# zwischen den Markern „A4 Anfang“ und „A4 Ende“; A6 ändert dort nichts. Kein Wert im Code.
+#
+# Felder je Wert:
+#   wert/werte  Zahl oder Liste (Einheit in `einheit`); null = noch nicht aus der Quelle gelesen
+#   status      amtlich (Potsdamer bzw. Brandenburger Norm mit Beleg) | orientierung (ohne Primärbeleg,
+#               in der Seite als „Orientierung, kein Richtwert“) | berliner_methode | offen
+#   quelle      Dokument; seite = Fundstelle; geprueft = Datum, an dem jemand die Fundstelle gelesen hat
+#   methode     luftlinie | fussweg | flaeche | quote
+# Offene Punkte (Prüfbericht 11, 28): Aktualität von NVP, EHK und Satzung ist ungeprüft; Werte mit
+# geprueft: null stammen aus der Erkundung und müssen vor der Veröffentlichung an der Quelle bestätigt werden.
+
+stand: 2026-11-05
+
+geheimhaltung:
+  # Korrektur 15 und Bauplan A6: feine Zensusklassen nur je Raumeinheit mit mindestens so vielen Einwohnern
+  min_ew_raumeinheit: 100
+  rundung_ew: 10              # Einwohnerzahlen in planer.js auf 10 runden
+  rundung_anteil_prozent: 1   # Anteile ganzzahlig
+  unsicherheit: "Zensus 2022 mit Cell-Key-Verfahren: kleine Werte sind verändert, Summen vieler Zellen weichen ab. Stichtag 15.05.2022."
+
+stichtage:
+  zensus: 2022-05-15
+  mbjs_kita_schule: 2026-11-05   # Abruf; Schülerzahlen tragen eigenen Stand (z. B. „Stand: 2022“)
+  alkis_nutzung: 2026-11-05
+  neubau_hinweis: "Neubaugebiete nach dem 15.05.2022 fehlen in den Zensuszahlen, u. a. Krampnitz, Bornstedter Feld, Golm."
+
+raumebene:
+  bevorzugt: planungsraum      # sobald H1 geladen ist (public.planungsraum), Korrektur 2
+  ersatz: stadtteil            # bis dahin die 32 amtlichen Stadtteile
+
+# ---------------------------------------------------------------------------------- ÖPNV
+# A4 Anfang
+oepnv:
+  quelle: "Nahverkehrsplan Landeshauptstadt Potsdam 2019, Kap. 4.1.3, Tab. 4.2/4.3"
+  url: https://www.potsdam.de/system/files/documents/2020-09-29_nvp_potsdam_mit_anlagen.pdf
+  seite: "S. 58–59"
+  geprueft: null
+  methode: luftlinie
+  einzugsradius_m:
+    # Zuordnung zu Bedienungsklasse bzw. Raumtyp laut NVP vor A4 nachlesen (Prüfbericht 11)
+    bus: {werte: [300, 400, 500], status: amtlich}
+    tram: {werte: [350, 450], status: amtlich}
+  erschliessung_anteil_prozent: {wert: 80, status: amtlich, gilt_fuer: "Teilflächen mit mehr als 200 EW"}
+  taktklassen:
+    # Grenzen (Fahrten je Richtung in der Hauptverkehrszeit) aus Tab. 4.2/4.3 übernehmen
+    I: {fahrten_hvz_je_richtung_min: null, status: offen}
+    II: {fahrten_hvz_je_richtung_min: null, status: offen}
+    III: {fahrten_hvz_je_richtung_min: null, status: offen}
+# A4 Ende
+
+# ---------------------------------------------------------------------------------- Nahversorgung
+nahversorgung:
+  quelle: "Einzelhandelskonzept (EHK) Landeshauptstadt Potsdam 2014"
+  geprueft: null
+  methode: luftlinie
+  wohnungsnah_m: {wert: 500, status: amtlich}
+  zentrum_m: {wert: 1000, status: amtlich}
+
+# ---------------------------------------------------------------------------------- Schule
+schulweg:
+  quelle: "Schülerfahrtkostensatzung Landeshauptstadt Potsdam 2016"
+  geprueft: null
+  methode: luftlinie
+  hinweis: "Anspruchsschwelle für die Fahrtkostenerstattung, kein Versorgungsrichtwert"
+  primarstufe_km: {wert: 2.0, status: amtlich}
+  sek1_km: {wert: 4.5, status: amtlich}
+  sek2_km: {wert: 6.0, status: amtlich}
+grundschule:
+  hinweis: "Grundschulen werden über Schulbezirke geplant (§ 106 BbgSchulG). Ohne Schulbezirke (H2) tragen Werte vorlaeufig: true."
+  radius_orientierung_m: {wert: 1000, status: orientierung}
+
+# ---------------------------------------------------------------------------------- Kita
+kita:
+  hinweis: "In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind auf die Raumeinheit beziehen, nicht auf einen Radius."
+  radius_orientierung_m: {wert: 500, status: orientierung}
+  platz_kind_relation:
+    plaetze: "Kapazität laut MBJS (Betriebserlaubnis), nicht belegte Plätze; je id_kita einmal"
+    kinder_krippe_kita: "Zensus i_u3 + i_3_5"
+    kinder_hort: "Zensus i_6_9"
+    kombinierte_einrichtungen: "Kapazität nach altersstruktur aufteilen oder getrennt ausweisen (Prüfbericht 9)"
+    tagespflege: "fehlt bewusst (personenbezogen); unterschätzt die Versorgung unter 3 Jahren"
+  versorgungsquoten:
+    # Potsdamer Kita-Bedarfsplanung bzw. Baulandmodell; Werte noch nicht gelesen
+    quelle: "Integrierte Kita- und Schulentwicklungsplanung 2021–2026; Potsdamer Baulandmodell, Fortschreibung 2019, Anlage B"
+    krippe: {wert: null, status: offen}
+    kita: {wert: null, status: offen}
+    hort: {wert: null, status: offen}
+
+baulandmodell:
+  # Prüfbericht 8: Versorgungsquoten für Krippe, Kita, Hort und Grundschule je Wohneinheit (Potsdamer Norm für Gemeinbedarf)
+  quelle: "Potsdamer Baulandmodell, Fortschreibung 2019, Anlage B"
+  url: https://potsdam.de/system/files/documents/anlage1potsdamerbaulandmodell-fortschreibung2019.pdf
+  geprueft: null
+  je_wohneinheit:
+    krippe: {wert: null, status: offen}
+    kita: {wert: null, status: offen}
+    hort: {wert: null, status: offen}
+    grundschule: {wert: null, status: offen}
+
+# ---------------------------------------------------------------------------------- Spielplatz
+spielplatz:
+  hinweis: "Ohne Primärbeleg für Potsdam (E6): nur als einstellbare Orientierung"
+  radien_orientierung_m: {werte: [200, 400, 1000], status: orientierung}
+
+# ---------------------------------------------------------------------------------- Grün
+gruen:
+  quelle: "Umweltatlas Berlin, Versorgung mit öffentlichen, wohnungsnahen Grünanlagen 2020 (Methode)"
+  url: https://www.berlin.de/umweltatlas/nutzung/oeffentliche-gruenanlagen/2020/methode/
+  geprueft: null
+  m2_je_ew: {wert: 6, status: berliner_methode}
+  radius_m: {wert: 500, status: berliner_methode}
+  methode: luftlinie
+gruen_definition:
+  # Prüfbericht 14: Was als Grünfläche zählt, entscheidet A2 mit A6 und trägt es hier ein (status bleibt offen bis dahin)
+  status: offen
+  quelle_daten: "public.alkis_nutzung (ALKIS vereinfacht, ave:Nutzung)"
+  vorschlag_zaehlt: {nutzart: ["Sport-, Freizeit- und Erholungsfläche"], bez: ["Grünanlage", "Park"]}
+  vorschlag_getrennt: {bez: ["Kleingarten", "Friedhof"], nutzart: ["Wald"]}
+  mindestflaeche_m2: null
+  offen: "SPSG-Parks (Sanssouci, Neuer Garten, Babelsberg) zählen mit oder getrennt? Straßengrün? Spielplätze stehen nicht in bez (Abfrage 05.11.2026)."
+
+# ---------------------------------------------------------------------------------- Ärzte, Pflege
+gesundheit:
+  hinweis: "Die KV plant auf Mittelbereichsebene, OSM ist ohne Kapazität: nur Entfernung und Lage, keine Versorgungsaussage (Prüfbericht 13)"
+  versorgungsaussage: false
+
+# ---------------------------------------------------------------------------------- Prognose
+prognose:
+  # Prüfbericht 8, H11: Bevölkerungsprognose je Planungsraum (Handdownload), Spalte „Prognose 2030/2035“ in A6
+  quelle: null
+  jahre: [2030, 2035]
+  status: offen
+
+geschwindigkeit_fuss_kmh: 4.8

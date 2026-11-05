@@ -1,0 +1,103 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Zellen (Bestand)",
+ "x-datei": "zellen.js",
+ "x-global": "^KIEZ_ZELLEN$",
+ "x-eigentuemer": "02_auswerten.py (unverändert)",
+ "type": "object",
+ "required": [
+  "type",
+  "features"
+ ],
+ "properties": {
+  "type": {
+   "const": "FeatureCollection"
+  },
+  "features": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "type",
+     "geometry",
+     "properties"
+    ],
+    "properties": {
+     "type": {
+      "const": "Feature"
+     },
+     "geometry": {
+      "type": "object"
+     },
+     "properties": {
+      "type": "object",
+      "required": [
+       "id",
+       "st",
+       "ew"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "type": "string",
+        "pattern": "^CRS3035RES100m"
+       },
+       "st": {
+        "type": "string"
+       },
+       "ew": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "d_alter": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "q_u18": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "q_65p": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "q_v1949": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "q_fern": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "w_ges": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "a_ges": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,4 @@
+Importlauf 20261105T093707Z · 5.02 s
+  mbjs_schule              ok     neu   106  geändert     0  gelöscht     0  unverändert     0
+      Hinweis: Dienst meldet ImplementsSorting=FALSE, Seiten ohne feste Reihenfolge
+  Änderungskarte: 20261105T093707Z-karte.html

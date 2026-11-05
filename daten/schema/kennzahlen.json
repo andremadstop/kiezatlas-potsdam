@@ -1,0 +1,44 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Kennzahlen (Bestand)",
+ "x-datei": "kennzahlen.js",
+ "x-global": "^KIEZ_KENNZAHLEN$",
+ "type": "object",
+ "required": [
+  "stand_auswertung",
+  "stadt",
+  "stadtteile",
+  "kontrolle"
+ ],
+ "properties": {
+  "stadt": {
+   "type": "object",
+   "required": [
+    "zellen",
+    "kacheln",
+    "verteilungen",
+    "gebaeude"
+   ]
+  },
+  "stadtteile": {
+   "type": "object",
+   "patternProperties": {
+    "^\\d{2}$": {
+     "type": "object",
+     "required": [
+      "name",
+      "zellen",
+      "kacheln"
+     ]
+    }
+   }
+  },
+  "kontrolle": {
+   "type": "object",
+   "required": [
+    "gebaeude_im_rechteck",
+    "gebaeude_in_potsdam"
+   ]
+  }
+ }
+}
