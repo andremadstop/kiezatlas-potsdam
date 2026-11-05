@@ -1,7 +1,7 @@
 """Prüfung Paket B2 (genaue Jahre): Abnahmekriterien direkt gegen Datenbank, Abrufprotokoll und Dateien.
 
   1. Jede Zeile in auswertung.jahr_beleg hat quelle, lizenz und beleg_url (nicht NULL, nicht leer)
-  2. Umbau nie als Baujahr: keine Zeile mit art 'bau', deren Quelle ein Umbau-Merkmal trägt; Wikipedia-, OSM-
+  2. Umbau nie als Baujahr: Feld- und Satzregeln an festen Fällen; Wikipedia-, OSM-
      und BLDAM-Zeilen nur als Prüfspalte (nur_pruefung = true); jedes oid_bezug steht im Snapshot
      (Die Handstichprobe von 20 Einträgen steht im Bericht berichte/B2_genaue_jahre.md.)
   3. Zahl genau datierter Gebäude (Prüfspalte und Kaskade getrennt, keine Schwelle)
@@ -53,9 +53,18 @@ def main() -> int:
         pruefe(n > 0 and leer == 0, f"jahr_beleg: {n} Zeilen, davon {leer} ohne quelle/lizenz/beleg_url")
 
         # 2. Umbau nie als Bau, Lizenzgrenzen, Snapshot-Bezug
-        cur.execute("""SELECT count(*) FROM auswertung.jahr_beleg
-                       WHERE art = 'bau' AND (quelle ~* 'umbau' OR beleg_url ~* 'umbau')""")
-        pruefe(cur.fetchone()[0] == 0, "keine Bau-Zeile mit Umbau-Merkmal in quelle/beleg_url")
+        # „Umbau nie als Baujahr“ belegt die Handstichprobe im Bericht; hier nur die Regeln selbst an festen Fällen
+        sys.path.insert(0, str(WURZEL / "skripte"))
+        regeln = __import__("22_jahre_genau")
+        faelle = {"1739, Umbau 1851/1890": [(1739, 1739, "bau"), (1851, 1890, "umbau")],
+                  "1781 (rekonstruiert 1956/7)": [(1781, 1781, "unklar"), (1956, 1957, "umbau")],
+                  "1847–1849 Um- und Erweiterungsbau": [(1847, 1849, "umbau")],
+                  "1765 (1783 aus statischen Gründen erneuert)": [(1765, 1765, "bau"), (1783, 1783, "umbau")],
+                  "vor 1874": [(None, 1874, "bau")]}
+        falsch = [f for f, soll in faelle.items() if [b[:3] for b in regeln.belege_aus_feld(f)] != soll]
+        pruefe(not falsch, f"Feldregel an {len(faelle)} festen Fällen (Umbau nie als Bau): {len(falsch)} falsch")
+        satz = regeln.belege_aus_text("", "Der vorgelagerte Säulengang entstand 1842/43 nach Entwürfen von Persius.")
+        pruefe(all(b[2] != "bau" for b in satz), "Jahr eines Bauteils wird nicht zum Baujahr")
         cur.execute("""SELECT count(*) FROM auswertung.jahr_beleg
                        WHERE NOT nur_pruefung AND (quelle ~* '(wikipedia|openstreetmap|\\mosm\\M|bldam)'
                                                    OR lizenz ~* '(by-sa|odbl|ungeklärt)')""")

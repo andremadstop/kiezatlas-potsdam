@@ -109,6 +109,12 @@ Durchgang 4 im Einzelnen (Urteil: Jahr und Art stimmen mit dem Text überein):
   OSM sind nur Prüfspalte, BLDAM hat keine geklärte Lizenz. Freigegeben für die Kaskade wären nur Wikidata-
   und DDB-Zeilen (`nur_pruefung = false`), die es noch nicht gibt.
 
+- Wikidata-Zeilen (sobald H9 vorliegt): Namen mit Park, Garten, Friedhof, Siedlung, Allee, Platz, Anlage
+  bekommen kein Jahr; teilen sich mehrere Objekte eine Denkmal-ID, gilt nur die eigene Koordinate; hat ein
+  Objekt mehrere Erstellungsjahre, ist keines genau. Offline mit erfundenen Zeilen geprüft (`--trocken`).
+- Rekonstruktionen (zum Beispiel Stadtschloss/Landtag, Garnisonkirche): Wikidata kann dort das Jahr des
+  Originals führen. Andre prüft diese Fälle beim Durchsehen der CSV; das Skript erkennt sie nicht.
+
 ## Abrufe
 
 In diesem Lauf kein Netzabruf. Die Wikipedia-Seiten wurden in einem früheren B2-Lauf am 05.11.2026 abgerufen

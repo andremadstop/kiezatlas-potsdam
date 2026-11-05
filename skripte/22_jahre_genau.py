@@ -73,6 +73,8 @@ WD_QUELLE = "Wikidata"
 WD_LIZENZ = "CC0 1.0"
 DDB_KEY = KIEZ_DATEN / "eingang/ddb-key"
 OSM_ORDNER = KIEZ_DATEN / "eingang/osm"
+WD_ENSEMBLE = re.compile(r"(park|garten|gärten|friedhof|kirchhof|siedlung|allee|platz|ensemble|anlage)\b",
+                         re.IGNORECASE)
 
 # Funktionen aus dem Snapshot, die nie als Hauptgebäude eines Denkmals gelten.
 NEBEN = ("Garage", "Gebäude zum Parken", "Tiefgarage", "Schuppen", "Gartenhaus", "Überdachung",
@@ -358,8 +360,9 @@ def belege_aus_text(bez: str, text: str) -> list[tuple[int | None, int | None, s
 def wikidata_lesen() -> list[dict]:
     """CSV aus der Abfrage in kiezatlas-daten/entwuerfe/2026-11-05-wikidata-abfrage-b2.rq.
 
-    Spalten: item, itemLabel (wird nicht übernommen), inception (ISO-Datum), precision (9 = Jahr,
-    8 = Jahrzehnt, 7 = Jahrhundert), coord ('Point(lon lat)'), denkmal_id (optional, MIDAS).
+    Spalten: item, itemLabel (nur zum Aussortieren von Ensembles, wird nicht gespeichert), inception
+    (ISO-Datum), precision (9 = Jahr, 8 = Jahrzehnt, 7 = Jahrhundert), coord ('Point(lon lat)'),
+    denkmal_id (optional, MIDAS). Hat ein Objekt mehrere inception-Werte, ist keiner davon genau.
     """
     zeilen = []
     with WD_DATEI.open(encoding="utf-8", newline="") as f:
@@ -378,7 +381,12 @@ def wikidata_lesen() -> list[dict]:
             pm = re.match(r"Point\(([-\d.]+) ([-\d.]+)\)", r.get("coord") or "")
             zeilen.append({"item": r["item"].strip(), "von": von, "bis": bis, "genau": genau,
                            "midas": (r.get("denkmal_id") or "").strip(),
+                           "ensemble": bool(WD_ENSEMBLE.search(r.get("itemLabel") or "")),
                            "ew": float(pm.group(1)) if pm else None, "ns": float(pm.group(2)) if pm else None})
+    werte = collections.Counter(z["item"] for z in zeilen)
+    for z in zeilen:
+        if werte[z["item"]] > 1:
+            z["genau"] = False
     return zeilen
 
 
@@ -585,10 +593,16 @@ def lauf_wikidata(conn, trocken: bool, stand: dict) -> None:
     punkte = [(str(i), r["ew"], r["ns"]) for i, r in enumerate(wd) if r["ns"] is not None]
     with conn.transaction(), conn.cursor() as cur:
         per_punkt = punkt_zuordnen(cur, punkte) if punkte else {}
+    # Mehrere Objekte mit derselben Denkmal-ID: nur über die eigene Koordinate (wie bei Wikipedia)
+    paare = {(r["midas"], r["item"]) for r in wd if r["midas"]}
+    mehrfach = {m for m, n in collections.Counter(m for m, _ in paare).items() if n > 1}
     z = collections.Counter(zeilen=len(wd))
     zeilen = []
     for i, r in enumerate(wd):
-        oids = je_midas.get(r["midas"], []) if r["midas"] else []
+        if r["ensemble"]:
+            z["ensemble_ohne_jahr"] += 1  # Park, Friedhof, Siedlung: Jahr der Anlage, kein Gebäude-Baujahr
+            continue
+        oids = je_midas.get(r["midas"], []) if r["midas"] and r["midas"] not in mehrfach else []
         if not oids and per_punkt.get(str(i)):
             oids = [per_punkt[str(i)]]
         if not oids or len(oids) > ENSEMBLE_GRENZE:
