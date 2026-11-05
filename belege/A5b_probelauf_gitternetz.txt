@@ -1,0 +1,59 @@
+Probelauf A5b am 05.11.2026, echte Zellen und Ziele aus der gemeinsamen Datenbank, statt des OSM-Netzes
+ein synthetisches 50-m-Gitternetz in TEMP-Tabellen (pg_temp.netz_*). Alles in einer Transaktion, am Ende ROLLBACK.
+Befehl: A5B_DB_TEST=1 skripte/14b_fussweg.sh test
+
+== Abnahme (pruefen/a5b_pruefen.py im selben Lauf) ==
+[ok] K1 je Zelle und Art eine Fußweg-Zeile: 14 Arten × 3443 Zellen (davon 3411 bewohnt); vollständig; bewohnte Zellen ohne Wert: 0
+[ok] K2 Fußweg ≥ Luftlinie (0 Verstöße): 48202 Zellwerte verglichen, 0 Verstöße
+[ok] K3 Median Fußweg/Luftlinie zwischen 1,1 und 1,6: gesamt 1.338; je Art: bibliothek 1.29 (n=3424), feuerwehr 1.33 (n=3405), foerderschule 1.26 (n=3431), gruen 1.36 (n=1200), grundschule 1.35 (n=3381), gymnasium 1.35 (n=3421), haltestelle 1.41 (n=2876), hort 1.34 (n=3364), kita 1.38 (n=3181), osz 1.29 (n=3436), sek1 1.34 (n=3422), sonstiger_gemeinbedarf 1.36 (n=3233), sonstige_schule 1.33 (n=3438), sport 1.37 (n=3293)
+[ok] K4 methode gesetzt, Fußweg-Zeilen tragen ODbL: zelle_erreichbar 92961 Zeilen, ohne methode 0, Fußweg ohne ODbL 0; zelle_gruen Fußweg 3443 Zeilen, ohne ODbL 0; Tabellenkommentar nennt ODbL: True
+[ok] Hinweis: Vergleich mit A5a-Luftlinie: 44759 Paare, davon Fußweg < A5a-Luftlinie: 0
+
+== Bericht ==
+# A5b: Fußweg je Zelle
+
+Lauf 05.11.2026 11:31 (Trockenlauf, am Ende ROLLBACK), Netz aus `pg_temp.netz_*`, 8,4 s.
+
+Lizenz: Alle Werte sind aus dem OSM-Wegenetz abgeleitet, ODbL 1.0, © OpenStreetMap-Mitwirkende (https://opendatacommons.org/licenses/odbl/1-0/). Veröffentlichung nur in `*_odbl`-Dateien.
+
+## Netz und Zellen
+
+- Knoten 165.086, davon in der größten Komponente 165.086 (100,0 %); Kanten 329.359
+- Potsdamer Zellen 3.443 (wie daten/zellen.js), davon bewohnt 3.411 mit 182.673 Einwohnern (Zensus 2022)
+- Anbindung Zellmittelpunkt → Netzknoten: Median 19,9 m, 95 % ≤ 30,2 m; über 300 m (kein Wert): 0 Zellen
+- Gehgeschwindigkeit 4,8 km/h (config/richtwerte.yaml)
+
+## Je Art
+
+| Art | Ziele | Zugangspunkte | Zellen mit Wert | Fußweg < Luftlinie | Median Fußweg/Luftlinie | 90 % ≤ m |
+|---|---:|---:|---:|---:|---:|---:|
+| bibliothek | 10 | 10 | 3.443 von 3.443 | 0 | 1,29 | 7.136 |
+| feuerwehr | 26 | 26 | 3.443 von 3.443 | 0 | 1,33 | 2.694 |
+| foerderschule | 8 | 8 | 3.443 von 3.443 | 0 | 1,26 | 10.348 |
+| gruen | 2.329 | 73.197 | 3.443 von 3.443 | 0 | 1,36 | 274 |
+| grundschule | 47 | 47 | 3.443 von 3.443 | 0 | 1,35 | 2.590 |
+| gymnasium | 15 | 15 | 3.443 von 3.443 | 0 | 1,35 | 5.386 |
+| haltestelle | 315 | 315 | 3.443 von 3.443 | 0 | 1,41 | 604 |
+| hort | 65 | 65 | 3.443 von 3.443 | 0 | 1,34 | 4.146 |
+| kita | 175 | 175 | 3.443 von 3.443 | 0 | 1,38 | 1.198 |
+| osz | 11 | 11 | 3.443 von 3.443 | 0 | 1,29 | 8.648 |
+| sek1 | 21 | 21 | 3.443 von 3.443 | 0 | 1,34 | 8.240 |
+| sonstiger_gemeinbedarf | 153 | 153 | 3.443 von 3.443 | 0 | 1,36 | 1.651 |
+| sonstige_schule | 4 | 4 | 3.443 von 3.443 | 0 | 1,33 | 9.846 |
+| sport | 144 | 144 | 3.443 von 3.443 | 0 | 1,37 | 1.263 |
+
+Median Fußweg/Luftlinie über alle Arten (Luftlinie ≥ 100 m): **1,34**
+
+## Grün im Fußweg-Umkreis
+
+- Flächen: gruenanlage, park (Quelle der Auswahl: Standard des Skripts (gruen_definition.vorschlag_zaehlt), bis A6 entscheidet)
+- Zugang über Randpunkte im Abstand von 20 m
+- Zellen mit Wert 3.443 von 3.443; ohne erreichbare Fläche in 500 m: 69; Median 33.475 m²
+- `m2_je_ew` bleibt leer: Die Berliner Methode teilt jede Fläche auf alle Einwohner ihres Einzugsbereichs auf. Das rechnet A6 je Raumeinheit, nicht je Zelle.
+
+## Methode
+
+- Graph aus `netz_kante`, ungerichtet; Gewicht = max(`laenge_m`, gerader Abstand der Endknoten).
+- Nur die größte zusammenhängende Komponente. Zelle und Ziel hängen je am nächsten Knoten, beide Anbindungsstrecken zählen mit. Damit ist jeder Fußweg ein Streckenzug von der Zelle zum Ziel und nie kürzer als die Luftlinie.
+- Je Art eine Dijkstra-Suche mit allen Zielen als Quellen (scipy). Ziele außerhalb der Stadtgrenze zählen mit (E7, Brandenburg).
+- Meter auf 0,1 m aufgerundet, Minuten = Meter / (km/h · 1000 / 60).
