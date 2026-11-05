@@ -1,0 +1,40 @@
+{
+ "bldam": {
+  "eintraege": 1660,
+  "ids": 1660,
+  "ohne_adresse": 111,
+  "adressen": 3189,
+  "adresse_nicht_gefunden": 262,
+  "adresse_mehrdeutig": 50,
+  "adresse_nur_nebengebaeude": 3,
+  "adresse_ueber_ort_entschieden": 4,
+  "ids_zugeordnet": 1497,
+  "gebaeude_markiert": 2319,
+  "ids_ensemble_gt4": 43
+ },
+ "wikipedia": {
+  "zeilen": 1822,
+  "zeilen_mit_jahr": 462,
+  "ensemble_ohne_jahr": 14,
+  "zugeordnet_ID": 375,
+  "art_unklar": 35,
+  "regel_nur_jahr": 10,
+  "zugeordnet_Koordinate": 63,
+  "art_umbau": 62,
+  "regel_satz_umbau": 43,
+  "ohne_gebaeude": 10,
+  "art_bau": 366,
+  "regel_satz_bau": 132,
+  "regel_feld": 260,
+  "regel_feld_zusatz": 18
+ },
+ "wikidata": {
+  "blockiert": "H9, fehlt ../kiezatlas-daten/eingang/wikidata_potsdam_baujahr.csv"
+ },
+ "ddb": {
+  "blockiert": "H8, fehlt ../kiezatlas-daten/eingang/ddb-key"
+ },
+ "osm": {
+  "blockiert": "H5, kein *.pbf unter ../kiezatlas-daten/eingang/osm"
+ }
+}
