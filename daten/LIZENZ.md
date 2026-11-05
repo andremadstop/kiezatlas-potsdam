@@ -7,13 +7,14 @@ sie nicht.** Sie sind aus offenen amtlichen Daten berechnet und stehen unter der
 | Datei | Lizenz | Namensnennung |
 |---|---|---|
 | `stadtteile.js` | dl-zero-de/2.0 | © Landeshauptstadt Potsdam |
+| `planungsraeume.js` | dl-de/by-2-0 | © Landeshauptstadt Potsdam, Planungsräume Stand 31.12.2025, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (Grenzen auf 3 m vereinfacht, Koordinaten gerundet, Felder ausgewählt) |
 | `zellen.js`, `kennzahlen.js`, `kennzahlen.json` | dl-de/by-2-0 | © Statistische Ämter des Bundes und der Länder, Zensus 2022; Gebäudezahlen © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung) |
 | `gebaeude/<nr>.js` | dl-de/by-2-0 | © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung) |
 | `erreichbar.js`, `einrichtungen.js` | dl-de/by-2-0 | je Wert über `quellen` in der Datei (Zensus, MBJS, LGB), mit „Daten verändert (eigene Berechnung)“ |
 | `planer.js` | dl-de/by-2-0 und CC BY 4.0 (ÖPNV-Werte aus dem VBB-GTFS) | je Wert über `quellen` in der Datei; VBB: „VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Daten verändert (eigene Berechnung)“ |
 | `jahre_zellen.js`, `jahre/<nr>.js`, `jahre_methode.js` | dl-de/by-2-0 (Zensus, LGB); einzelne Jahre aus CC0-Quellen (Wikidata, DDB) sind gekennzeichnet (derzeit keine) | je Wert über `quellen`; Bauzeiten der Großsiedlungen als Fakten: Landeshauptstadt Potsdam, „Potsdamer Platte“, Juli 2008 |
 | `download/bauzeiten.gpkg` | dl-de/by-2-0 | wie `jahre_zellen.js` (Vermerk in der Datei) |
-| `export/kiezatlas_potsdam.gpkg`, `export/csv/*.csv` | je Ebene: Grenzen dl-zero-de/2.0, Werte, Einrichtungen, Zellen und Grünflächen dl-de/by-2-0, Haltestellen und ÖPNV-Werte CC BY 4.0 | Tabelle `lizenz` in der GPKG bzw. `export/csv/lizenz.csv` und `export/README.md` |
+| `export/kiezatlas_potsdam.gpkg`, `export/csv/*.csv` | je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-zero-de/2.0, Werte, Einrichtungen, Zellen und Grünflächen dl-de/by-2-0, Haltestellen und ÖPNV-Werte CC BY 4.0 | Tabelle `lizenz` in der GPKG bzw. `export/csv/lizenz.csv` und `export/README.md` |
 | `export/steckbriefe/<nr>.html` | wie die Werte (dl-de/by-2-0, CC BY 4.0) | Abschnitt „Quellen und Lizenzen“ je Steckbrief |
 | `export/kiezatlas_potsdam.qgz`, `export/stile/*.qml`, `export/README.md` | Apache-2.0 (Projektdatei, Stile, Beschreibung; keine Daten) | – |
 | `*_odbl.js` (z. B. `einrichtungen_odbl.js`, `erreichbar_fuss_odbl.js`, `planer_fuss_odbl.js`), `export/*_odbl.gpkg`, `export/csv_odbl/` (folgen mit dem OSM-Auszug) | Open Database License 1.0 (ODbL), Inhalte Database Contents License 1.0 | © OpenStreetMap-Mitwirkende, https://opendatacommons.org/licenses/odbl/1-0/ |

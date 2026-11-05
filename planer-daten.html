@@ -78,6 +78,11 @@
       <p class="was">Die amtlichen Stadtteile mit Nummer, Name und Fläche.</p>
       <p class="lizenz">© Landeshauptstadt Potsdam, dl-zero-de/2.0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
     </li>
+    <li data-datei="planungsraeume.js" data-schema="planungsraeume.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planungsraeume.js">planungsraeume.js</a><span class="stand">vorhanden</span>
+      <p class="was">Die 19 Planungsräume der Stadt mit Nummer, Name und Fläche; auf dieser Ebene rechnet die Versorgungstabelle.</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (Grenzen auf 3 m vereinfacht, Koordinaten gerundet, Felder ausgewählt).</p>
+    </li>
     <li data-datei="kennzahlen.js" data-schema="kennzahlen.json" data-da="ja" data-odbl="nein">
       <a class="datei link" href="daten/kennzahlen.js">kennzahlen.js</a><span class="stand">vorhanden</span>
       <p class="was">Kennzahlen und Verteilungen je Stadtteil und für die Stadt; dieselben Werte als <a class="link" href="daten/kennzahlen.json">kennzahlen.json</a>.</p>
@@ -110,21 +115,21 @@
   </ul>
 
   <h2>Für Geoinformationssysteme</h2>
-  <p>Für die Arbeit in QGIS oder ArcGIS stehen dieselben Inhalte als GeoPackage und CSV bereit, Koordinaten in ETRS89 / UTM 33N (EPSG:25833). Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>. Raumebene sind vorerst die 32 Stadtteile; Planungsräume folgen, sobald ihre Grenzen vorliegen.</p>
+  <p>Für die Arbeit in QGIS oder ArcGIS stehen dieselben Inhalte als GeoPackage und CSV bereit, Koordinaten in ETRS89 / UTM 33N (EPSG:25833). Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>. Raumebene sind die 19 Planungsräume der Stadt; die 32 Stadtteile liegen als eigene Ebene zur Orientierung bei.</p>
   <ul class="dateiliste">
     <li data-export="gpkg" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.gpkg" download>kiezatlas_potsdam.gpkg</a><span class="stand">vorhanden</span>
       <p class="was">GeoPackage ohne OpenStreetMap-Anteil: Raumeinheiten mit Versorgungswerten, Versorgungstabelle, Einrichtungen, Zellen mit Entfernungen, Grünflächen, Haltestellen; QGIS-Stile sind eingebettet.</p>
-      <p class="lizenz">Je Ebene: Grenzen dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
+      <p class="lizenz">Je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
     <li data-export="gpkg_odbl" data-da="nein" data-odbl="ja"><span class="datei">kiezatlas_potsdam_odbl.gpkg</span><span class="stand stand--folgt">folgt</span>
       <p class="was">Fußwegwerte und Einrichtungen aus OpenStreetMap, unter der Open Database License; folgt mit dem OpenStreetMap-Auszug.</p></li>
     <li data-export="csv" data-da="ja" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand">vorhanden</span>
-      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
+      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
     <li data-export="readme" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/README.md">README.md</a><span class="stand">vorhanden</span>
       <p class="was">Was in jeder Ebene steht, wie es berechnet ist, Vermerke und Lizenzen.</p></li>
     <li data-export="qgis" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.qgz" download>kiezatlas_potsdam.qgz</a><span class="stand">vorhanden</span>
       <p class="was">QGIS-Projekt mit relativen Pfaden; neben <code>kiezatlas_potsdam.gpkg</code> speichern, dann öffnet es die Ebenen mit denselben Klassen wie die Karte.</p></li>
-    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/steckbriefe/11.html">Steckbrief je Stadtteil</a><span class="stand">vorhanden</span>
-      <p class="was">Die Versorgungstabelle eines Stadtteils als Druckseite (A4, über den Druckdialog als PDF); eine Datei je Stadtteilnummer, der Link zeigt Stadtteil 11.</p></li>
+    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/steckbriefe/403.html">Steckbrief je Planungsraum</a><span class="stand">vorhanden</span>
+      <p class="was">Die Versorgungstabelle eines Planungsraums als Druckseite (A4, über den Druckdialog als PDF); eine Datei je Planungsraumnummer, der Link zeigt 403 Babelsberg Süd.</p></li>
   </ul>
 </main>
 

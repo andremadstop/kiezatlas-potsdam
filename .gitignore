@@ -5,3 +5,5 @@ vorbereitet/
 .venv/
 node_modules/
 .shots/
+__pycache__/
+*.pyc

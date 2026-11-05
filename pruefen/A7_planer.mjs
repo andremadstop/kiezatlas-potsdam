@@ -114,10 +114,22 @@ async function planerEcht(basis, art) {
   await page.check('#zu input[value="kita"]', { force: true }); await warteBereit(page);
   const zl = await page.evaluate(() => ({ sicht: window.KIEZ_KARTE.getLayoutProperty("zellen", "visibility"), n: window.KIEZ_KARTE.querySourceFeatures("zellen").length, ein: (window.KIEZ_EINRICHTUNGEN || {}).features?.length }));
   pruef(zl.sicht === "visible" && zl.n > 0 && zl.ein > 600, `Kita (Luftlinie) mit echten Daten: ${zl.n} Zellen gezeichnet, ${zl.ein} Einrichtungen`);
-  await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page);
+  // Echte Daten rechnen auf Planungsräumen (A6 nach H1): Ebene Planungsräume ist voreingestellt, 403 = Babelsberg Süd
+  const ebene = await page.evaluate(() => ({ wert: document.getElementById("raumebene").value, n: document.querySelectorAll("#raeume .treffer").length, src: window.KIEZ_KARTE.getSource("raum").serialize().data.features.length }));
+  pruef(ebene.wert === "pr" && ebene.n === 19 && ebene.src === 19, `Raumebene Planungsräume voreingestellt: ${ebene.wert}, ${ebene.n} in der Liste, ${ebene.src} Flächen in der Karte`);
+  await page.click('#raeume .treffer[data-nr="403"]'); await warteBereit(page);
   const z = await zahlenPruefen(page);
   pruef(z.zeilen > 5 && z.ohneQuelle === 0 && z.ohneMethode === 0 && z.ewVermerk && z.quellenListe > 0 && z.orientierung === z.orientierungMarkiert,
     `Versorgungstabelle mit echten Daten: ${z.zeilen} Zeilen, ohne Quelle ${z.ohneQuelle}, ohne Methode ${z.ohneMethode}, Orientierung ${z.orientierungMarkiert}/${z.orientierung}`);
+  // Wechsel auf Stadtteile: Hinweis statt Tabelle, keine falsche Zuordnung; zurück auf Planungsräume: Tabelle wieder da
+  await page.selectOption("#raumebene", "st"); await warteBereit(page);
+  await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page);
+  const st = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, hash: location.hash, n: window.KIEZ_KARTE.getSource("raum").serialize().data.features.length }));
+  await page.selectOption("#raumebene", "pr"); await warteBereit(page);
+  await page.click('#raeume .treffer[data-nr="403"]'); await warteBereit(page);
+  const zurueck = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, hash: location.hash }));
+  pruef(st.zeilen === 0 && /Planungsräumen/.test(st.text) && /raum=st&r=13/.test(st.hash) && st.n === 32 && zurueck.zeilen === z.zeilen && /raum=pr&r=403/.test(zurueck.hash),
+    `Ebene Stadtteile: Hinweis statt Tabelle (${st.zeilen} Zeilen, ${st.n} Flächen), zurück auf Planungsräume ${zurueck.zeilen} Zeilen (${zurueck.hash.replace(/&k=.*$/, "")})`);
   const popup = await page.evaluate(() => {
     const m = window.KIEZ_KARTE, f = m.queryRenderedFeatures({ layers: ["ein"] })[0]; if (!f) return null;
     const p = m.project(f.geometry.coordinates); m.fire("click", { point: p, lngLat: m.unproject(p), originalEvent: {} });
@@ -214,14 +226,16 @@ async function rundreise(basis, art) {
     `Hash-Rundreise über ${art}: ${z1.hash}&k=${z1.k} -> neu geladen gleich (${z2.hash}&k=${z2.k})`);
 }
 
-async function raumebeneFremd() {
-  // Versorgungsdatei auf Planungsräumen (nach H1), Karte kennt nur Stadtteile: keine falsche Zuordnung
+async function raumebeneFremd(ohneGrenzen) {
+  // Versorgungsdatei auf Planungsräumen, gewählt ist ein Stadtteil: keine falsche Zuordnung, Hinweis statt Tabelle.
+  // ohneGrenzen: planungsraeume.js fehlt (404), die Karte kennt nur Stadtteile
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
   const page = await ctx.newPage(), fehler = [];
   page.on("pageerror", (e) => fehler.push(e.message));
   await page.route("**/*", async (r) => {
     const u = r.request().url();
     if (!eigen(u)) return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    if (ohneGrenzen && /\/daten\/planungsraeume\.js$/.test(u.split(/[?#]/)[0])) return r.fulfill({ status: 404, body: "" });
     if (/\/daten\/fixtures\/planer\.js$/.test(u.split(/[?#]/)[0])) {
       const t = fs.readFileSync(path.join(WURZEL, "daten", "fixtures", "planer.js"), "utf8").replace(/"raumebene":\s*"stadtteil"/, '"raumebene":"planungsraum"');
       return r.fulfill({ status: 200, contentType: "text/javascript", body: t });
@@ -230,9 +244,11 @@ async function raumebeneFremd() {
   });
   await page.goto(HTTP + "planer.html" + FIX + "#r=13", { waitUntil: "load" });
   await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });
-  const z = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, ebene: window.KIEZ_PLANER && window.KIEZ_PLANER.raumebene }));
-  pruef(z.ebene === "planungsraum" && z.zeilen === 0 && /Planungsräumen/.test(z.text) && fehler.length === 0,
-    `Datei auf Planungsräumen: keine Zuordnung zu Stadtteilen, Hinweis statt Tabelle (${z.zeilen} Zeilen, Fehler ${fehler.length})`);
+  const z = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, ebene: window.KIEZ_PLANER && window.KIEZ_PLANER.raumebene,
+    optionen: [...document.querySelectorAll("#raumebene option")].map((o) => o.value).join(",") }));
+  const erwartet = ohneGrenzen ? /Grenzen fehlen der Karte noch/ : /Ebene „Planungsräume“ wählen/;
+  pruef(z.ebene === "planungsraum" && z.zeilen === 0 && erwartet.test(z.text) && z.optionen === (ohneGrenzen ? "st" : "pr,st") && fehler.length === 0,
+    `Datei auf Planungsräumen, Stadtteil gewählt, ${ohneGrenzen ? "ohne" : "mit"} Grenzen der Planungsräume: Hinweis statt Tabelle (${z.zeilen} Zeilen, Ebenen ${z.optionen}, Fehler ${fehler.length})`);
   await ctx.close();
 }
 
@@ -262,7 +278,7 @@ async function ruhig() {
   // Reduzierte Bewegung: Klick auf Raumeinheit und Frage bewegen die Kamera nicht; Zoomknopf springt (eine Bewegung, keine Fahrt)
   const { ctx, page } = await oeffnen(HTTP, "planer.html", { bewegung: "reduce" });
   await page.evaluate(() => { window.__bew = 0; window.KIEZ_KARTE.on("move", () => window.__bew++); });
-  await page.click('#raeume .treffer[data-nr="13"]'); await page.click('.frage-knopf[data-frage="0"]'); await warteBereit(page);
+  await page.click('#raeume .treffer[data-nr="403"]'); await page.click('.frage-knopf[data-frage="0"]'); await warteBereit(page);
   const nachKlick = await page.evaluate(() => window.__bew);
   await page.click("#zoom-raum"); await page.waitForTimeout(800);
   const nachZoom = await page.evaluate(() => window.__bew);
@@ -277,7 +293,7 @@ async function ruhig() {
 async function handy(basis, art) {
   for (const datei of ["planer.html", "planer-methode.html", "planer-daten.html"]) {
     const { ctx, page, fehler } = await oeffnen(basis, datei, { breite: 375, hoehe: 740, warten: datei !== "planer-daten.html" });
-    if (datei === "planer.html") { await page.click("#seite-griff"); await page.click('#raeume .treffer[data-nr="13"]'); await page.waitForTimeout(500); }
+    if (datei === "planer.html") { await page.click("#seite-griff"); await page.click('#raeume .treffer[data-nr="403"]'); await page.waitForTimeout(500); }
     const w = await page.evaluate(() => ({ s: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth), c: document.documentElement.clientWidth }));
     pruef(w.s <= w.c, `${datei} bei 375 px über ${art}: kein seitliches Scrollen (scrollWidth ${w.s}, Breite ${w.c})`);
     if (datei === "planer.html") { const v = await axe(page); pruef(v.length === 0, `axe bei 375 px mit offener Leiste: ${v.length} ${v.join(", ")}`); }
@@ -297,6 +313,10 @@ async function textseiten(basis, art) {
   await m.ctx.close();
   const d = await oeffnen(basis, "planer-daten.html", { warten: false });
   const liste = await d.page.$$eval("[data-datei]", (l) => l.map((e) => ({ datei: e.dataset.datei, schema: e.dataset.schema, da: e.dataset.da, odbl: e.dataset.odbl, href: (e.querySelector("a.datei") || {}).getAttribute?.("href") || null, text: e.textContent })));
+  // Jeder Link in daten/ (auch die GIS-Exporte und Steckbriefe) führt zu einer Datei
+  const links = await d.page.$$eval('a[href^="daten/"]', (l) => l.map((a) => a.getAttribute("href").split(/[?#]/)[0]));
+  const tot = links.filter((h) => !fs.existsSync(path.join(WURZEL, h)));
+  pruef(links.length > 0 && tot.length === 0, `planer-daten.html über ${art}: ${links.length} Links in daten/, ins Leere ${tot.length}${tot.length ? " (" + tot.join(", ") + ")" : ""}`);
   const v2 = await axe(d.page);
   pruef(v2.length === 0 && d.fehler.length === 0, `planer-daten.html über ${art}: axe ${v2.length}, Fehler ${d.fehler.length}`);
   await d.ctx.close();
@@ -332,7 +352,8 @@ try {
     const liste = await textseiten(basis, art);
     if (art === "HTTP") downloadsPruefen(liste);
   }
-  await raumebeneFremd();
+  await raumebeneFremd(true);
+  await raumebeneFremd(false);
   await fussFehlschlag();
   await ruhig();
 } catch (e) { pruef(false, "Abbruch: " + (e && e.message ? e.message.split("\n")[0] : e)); }

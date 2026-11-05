@@ -3,11 +3,11 @@
    ("daten/"); mit planer.html?daten=fixtures zeigt die Seite die Beispieldateien aus daten/fixtures/ (Prüfung).
    <html data-odbl> nennt die veröffentlichten _odbl-Dateien; fehlt eine, sind Fußweg bzw. OSM-Arten gesperrt
    statt eine fehlende Datei anzufragen. Zustand im Hash, z. B.
-   planer.html#ein=kita,gs&zu=kita&weg=luft&raum=st&r=13&k=12.00/52.40000/13.06000/0/0
+   planer.html#ein=kita,gs&zu=kita&weg=luft&raum=pr&r=403&k=12.00/52.40000/13.06000/0/0
    Keine Kamerabewegung von selbst; Klicks in die Karte bewegen die Kamera nie. */
 (function () {
 "use strict";
-var T = window.KIEZ_THEMEN, ST = window.KIEZ_STADTTEILE, NB = " ";
+var T = window.KIEZ_THEMEN, ST = window.KIEZ_STADTTEILE, PR = window.KIEZ_PLANUNGSRAEUME, NB = " ";
 var FIXTURE = /(?:^|&)daten=fixtures(?:&|$)/.test(location.search.replace(/^\?/, ""));
 var WURZEL = FIXTURE ? "daten/fixtures/" : document.documentElement.getAttribute("data-daten") || "daten/";
 var ODBL = document.documentElement.getAttribute("data-odbl");   // null = keine Angabe: alle vorhanden
@@ -112,7 +112,8 @@ var KL_M = { grenzen: [300, 500, 1000, 2000], min: 0, max: 3000 }, KL_MIN = { gr
 var ZU_START = ["kita", "hort", "grundschule", "gruen"];
 
 // ---------- Zustand aus dem Hash
-var S = { ein: ["kita", "grundschule"], zu: "", weg: "luft", raum: "st", r: "", kam: null };
+// Raumebene: Planungsräume, sobald ihre Grenzen da sind (daten/planungsraeume.js); die Beispieldaten rechnen auf Stadtteilen
+var S = { ein: ["kita", "grundschule"], zu: "", weg: "luft", raum: PR && !FIXTURE ? "pr" : "st", r: "", kam: null };
 (function () {
   var h = {};
   function dek(x) { try { return decodeURIComponent(x); } catch (e) { return ""; } }   // verstümmelte Links nicht tödlich
@@ -122,7 +123,7 @@ var S = { ein: ["kita", "grundschule"], zu: "", weg: "luft", raum: "st", r: "", 
   if (h.zu && CODE[h.zu]) S.zu = CODE[h.zu];
   if (h.weg === "fuss" && FUSS_DA) S.weg = "fuss";
   S.ein = S.ein.filter(erlaubt);
-  if (h.raum === "pr") S.raum = "pr";
+  if (h.raum === "st" || (h.raum === "pr" && PR)) S.raum = h.raum;
   if (h.r) S.r = h.r;
   if (h.k) { var k = h.k.split("/").map(Number); if (k.length >= 3 && k.every(function (x) { return !isNaN(x); }) && k[0] >= 0 && k[0] <= 22 && Math.abs(k[1]) <= 85 && Math.abs(k[2]) <= 180) S.kam = { zoom: k[0], center: [k[2], k[1]], pitch: k[3] || 0, bearing: k[4] || 0 }; }
 })();
@@ -137,12 +138,18 @@ function hashSchreiben() {
   try { history.replaceState(null, "", "#" + teile.join("&")); } catch (e) { /* file:// in manchen Browsern */ }
 }
 
-// ---------- Raumeinheiten: Stadtteile bis die Planungsräume (H1) als Geometrie vorliegen
-var RAUM = {};
-ST.features.forEach(function (f) { RAUM[f.properties.nr] = f; });
-if (!RAUM[S.r]) S.r = "";
-var RAUMEBENE = { st: { name: "Stadtteile" }, pr: { name: "Planungsräume" } };
+// ---------- Raumeinheiten: Planungsräume (H1, Ebene der Kita- und Schulentwicklungsplanung) und Stadtteile
+// datei = Wert von raumebene in planer.js; nur wenn er zur gewählten Ebene passt, zeigt die Seite die Tabelle
+var RAUMEBENE = {
+  pr: { name: "Planungsräume", einzahl: "Planungsraum", datei: "planungsraum", fc: PR,
+    att: 'Planungsräume © Landeshauptstadt Potsdam, <a href="' + DLDE + '">dl-de/by-2-0</a>, Daten verändert' },
+  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" }
+};
 var RAUMEBENE_DATEI = { stadtteil: "Stadtteilen", planungsraum: "Planungsräumen" };
+var RAUM = {};
+function raumIndex() { RAUM = {}; RAUMEBENE[S.raum].fc.features.forEach(function (f) { RAUM[f.properties.nr] = f; }); }
+raumIndex();
+if (!RAUM[S.r]) S.r = "";
 
 // ---------- Karte
 var LEER = { type: "FeatureCollection", features: [] };
@@ -153,7 +160,7 @@ var map = new maplibregl.Map(Object.assign({
       basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
         attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="' + DLDE + '">dl-de/by-2-0</a>' },
       zellen: { type: "geojson", data: LEER },
-      raum: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" },
+      raum: { type: "geojson", data: RAUMEBENE[S.raum].fc, promoteId: "nr", attribution: RAUMEBENE[S.raum].att },
       ein: { type: "geojson", data: LEER },
       ein_odbl: { type: "geojson", data: LEER } },
     layers: [
@@ -353,17 +360,15 @@ function planerDaten() { return window[S.weg === "fuss" ? "KIEZ_PLANER_FUSS" : "
 function raumBauen() {
   var sel = $("raumebene"); sel.innerHTML = "";
   Object.keys(RAUMEBENE).forEach(function (k) {
-    var o = el("option", null, RAUMEBENE[k].name); o.value = k;
-    if (k === "pr") { o.disabled = true; o.textContent += " (folgen mit dem Download der Stadt)"; }
-    sel.appendChild(o);
+    if (!RAUMEBENE[k].fc) return;
+    var o = el("option", null, RAUMEBENE[k].name); o.value = k; sel.appendChild(o);
   });
-  if (S.raum === "pr") S.raum = "st";
   sel.value = S.raum;
   raumHinweis();
   var box = $("raeume"); box.innerHTML = "";
-  ST.features.map(function (f) { return f.properties; }).sort(function (a, b) { return a.nr - b.nr; }).forEach(function (p) {
+  RAUMEBENE[S.raum].fc.features.map(function (f) { return f.properties; }).sort(function (a, b) { return a.nr - b.nr; }).forEach(function (p) {
     var li = el("li"), b = el("button", "treffer"); b.type = "button"; b.dataset.nr = p.nr;
-    var i = el("i"); i.style.background = T.FARBE[p.nr]; b.appendChild(i);
+    var i = el("i"); i.style.background = S.raum === "st" ? T.FARBE[p.nr] : "#cdd1cc"; b.appendChild(i);
     b.appendChild(el("b", null, p.nr)); b.appendChild(el("span", null, p.name));
     b.addEventListener("click", function () { waehle(S.r === p.nr ? "" : p.nr); });
     li.appendChild(b); box.appendChild(li);
@@ -371,10 +376,14 @@ function raumBauen() {
   markieren();
 }
 function raumHinweis() {
-  var P = planerDaten() || window.KIEZ_PLANER || window.KIEZ_PLANER_FUSS;
-  $("raumebene-hinweis").textContent = P && P.raumebene === "planungsraum"
-    ? "Die Versorgungsdatei liegt für Planungsräume vor; deren Grenzen fehlen der Karte noch."
-    : "Die Stadt plant Kita und Schule auf Planungsräumen. Bis deren Grenzen vorliegen, rechnet der Planer je Stadtteil.";
+  var P = planerDaten() || window.KIEZ_PLANER || window.KIEZ_PLANER_FUSS, E = RAUMEBENE[S.raum];
+  $("raumebene-hinweis").textContent = P && P.raumebene !== E.datei
+    ? "Die Versorgungswerte liegen je " + (P.raumebene === "planungsraum" ? "Planungsraum" : "Stadtteil") + " vor. " + E.name + " dienen hier der Orientierung" +
+      (P.raumebene === "planungsraum" && !PR ? "; die Grenzen der Planungsräume fehlen der Karte noch." : "; für die Tabelle die andere Ebene wählen.")
+    : S.raum === "pr"
+      ? "Planungsräume sind die Ebene, auf der die Stadt Kita und Schule plant (19 Räume, Grenzen Stand 31.12.2025)."
+      : PR ? "Die 32 amtlichen Stadtteile der Landeshauptstadt."
+        : "Die Stadt plant Kita und Schule auf Planungsräumen. Bis deren Grenzen vorliegen, rechnet der Planer je Stadtteil.";
 }
 function markieren() { $("raeume").querySelectorAll(".treffer").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.nr === S.r)); }); }
 var gewaehlt = "";
@@ -394,7 +403,7 @@ function versorgung() {
   if (!S.r) { $("vs-name").textContent = "Keine Raumeinheit gewählt"; $("vs-art").textContent = "Raumeinheit in der Liste oder in der Karte wählen. Die Tabelle zeigt je Zeile Wert, Methode, Status und Quelle."; return; }
   var p = RAUM[S.r].properties, P = planerDaten();
   $("vs-name").textContent = p.name;
-  $("vs-art").textContent = "Stadtteil " + p.nr + " der Landeshauptstadt Potsdam, Werte " + (S.weg === "fuss" ? "als Fußweg" : "in Luftlinie");
+  $("vs-art").textContent = RAUMEBENE[S.raum].einzahl + " " + p.nr + " der Landeshauptstadt Potsdam, Werte " + (S.weg === "fuss" ? "als Fußweg" : "in Luftlinie");
   if (!P) {
     var dn = S.weg === "fuss" ? "planer_fuss" : "planer";
     if (planerLaedt[dn] === undefined) {
@@ -408,10 +417,14 @@ function versorgung() {
     }
     box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? "Die Versorgungsdatei ließ sich nicht laden." : "Daten werden geladen.")); return;
   }
-  // Die Karte kennt bisher nur die Stadtteile als Geometrie. Rechnet die Datei auf einer anderen Ebene
-  // (Planungsräume nach H1), passen die Schlüssel nicht: dann nichts zuordnen, sondern das sagen.
-  if (P.raumebene !== "stadtteil") {
-    box.appendChild(el("p", "fuss", "Die Versorgungsdatei rechnet auf " + (RAUMEBENE_DATEI[P.raumebene] || P.raumebene) + ". Deren Grenzen fehlen der Karte noch; die Tabelle erscheint, sobald sie eingebunden sind. Bis dahin lassen sich die Werte nicht einem Stadtteil zuordnen."));
+  // Rechnet die Datei auf einer anderen Ebene als der gewählten, passen die Schlüssel nicht:
+  // dann nichts zuordnen, sondern das sagen.
+  raumHinweis();
+  if (P.raumebene !== RAUMEBENE[S.raum].datei) {
+    var andere = Object.keys(RAUMEBENE).filter(function (k) { return RAUMEBENE[k].datei === P.raumebene && RAUMEBENE[k].fc; })[0];
+    box.appendChild(el("p", "fuss", "Die Versorgungsdatei rechnet auf " + (RAUMEBENE_DATEI[P.raumebene] || P.raumebene) + ". " +
+      (andere ? "Für die Tabelle oben die Ebene „" + RAUMEBENE[andere].name + "“ wählen; " + RAUMEBENE[S.raum].name + " dienen nur der Orientierung."
+              : "Deren Grenzen fehlen der Karte noch; die Tabelle erscheint, sobald sie eingebunden sind. Bis dahin lassen sich die Werte nicht einem " + RAUMEBENE[S.raum].einzahl + " zuordnen.")));
     return;
   }
   var R = P.raeume[S.r];
@@ -455,7 +468,7 @@ var FRAGEN = [
   { titel: "Wie weit ist es zur nächsten Kita?", text: "Färbt jede bewohnte Zelle nach der Entfernung zur nächsten Kita. Klick auf einen Kreis zeigt Plätze und Quelle.", ein: ["kita"], zu: "kita" },
   { titel: "Liegt eine Grundschule in der Nähe?", text: "Entfernung zur nächsten Grundschule. Vorläufig, denn Grundschulen werden über Schulbezirke geplant, die hier noch fehlen.", ein: ["grundschule"], zu: "grundschule" },
   { titel: "Wo ist das nächste Grün?", text: "Entfernung zur nächsten öffentlichen Grünfläche" + (OSM_DA ? ", dazu Spielplätze aus OpenStreetMap." : "; Spielplätze folgen mit dem OpenStreetMap-Auszug."), ein: ["spielplatz"], zu: "gruen" },
-  { titel: "Wie ist ein Stadtteil versorgt?", text: "Stadtteil wählen: Die Tabelle nennt je Zeile Wert, Methode, Status und Quelle.", ein: ["kita", "hort", "grundschule"], zu: "", raum: true }
+  { titel: "Wie ist ein " + (PR && !FIXTURE ? "Planungsraum" : "Stadtteil") + " versorgt?", text: (PR && !FIXTURE ? "Planungsraum" : "Stadtteil") + " wählen: Die Tabelle nennt je Zeile Wert, Methode, Status und Quelle.", ein: ["kita", "hort", "grundschule"], zu: "", raum: true }
 ];
 function fragenBauen() {
   var ul = $("fragen");
@@ -467,7 +480,7 @@ function fragenBauen() {
       S.ein = F.ein.filter(erlaubt); S.zu = F.zu;
       document.querySelectorAll('#ein input').forEach(function (r) { r.checked = S.ein.indexOf(r.value) > -1; });
       einAnwenden(); zuAnwenden();
-      if (F.raum) { var v = $("block-raum"); v.scrollIntoView({ block: "start", behavior: RUHIG ? "auto" : "smooth" }); var f = $("raeume").querySelector(".treffer"); if (f) f.focus({ preventScroll: true }); }
+      if (F.raum) { if (PR && !FIXTURE && S.raum !== "pr") ebeneSetzen("pr"); var v = $("block-raum"); v.scrollIntoView({ block: "start", behavior: RUHIG ? "auto" : "smooth" }); var f = $("raeume").querySelector(".treffer"); if (f) f.focus({ preventScroll: true }); }
       else if (SCHMAL) seite(false);
     });
     li.appendChild(b); ul.appendChild(li);
@@ -475,7 +488,14 @@ function fragenBauen() {
 }
 
 // ---------- Bedienung
-$("raumebene").addEventListener("change", function (e) { S.raum = e.target.value; raumBauen(); hashSchreiben(); });
+function ebeneSetzen(k) {
+  if (!RAUMEBENE[k] || !RAUMEBENE[k].fc) return;
+  if (bereitKarte) map.removeFeatureState({ source: "raum" });
+  gewaehlt = ""; S.raum = k; raumIndex();
+  if (bereitKarte) { var q = map.getSource("raum"); q.setData(RAUMEBENE[k].fc); if (q.setAttribution) q.setAttribution(RAUMEBENE[k].att); }
+  raumBauen(); waehle(RAUM[S.r] ? S.r : "");
+}
+$("raumebene").addEventListener("change", function (e) { ebeneSetzen(e.target.value); });
 $("zoom-raum").addEventListener("click", function () {
   var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5 };
   var b = S.r ? T.umriss(RAUM[S.r]) : T.GANZ;
@@ -556,6 +576,8 @@ function aufbauenKarte() {
   bereitKarte = true;
   map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
   var att = document.querySelector(".maplibregl-ctrl-attrib"); if (att) att.classList.remove("maplibregl-compact-show");
+  // Ebene kann vor dem Laden der Karte gewechselt haben (Auswahl, Frage 4): Quelle nachziehen
+  var rq = map.getSource("raum"); rq.setData(RAUMEBENE[S.raum].fc); if (rq.setAttribution) rq.setAttribution(RAUMEBENE[S.raum].att);
   var E = window.KIEZ_EINRICHTUNGEN;
   if (E) { map.getSource("ein").setData(E); var s = map.getSource("ein"); if (s.setAttribution) s.setAttribution(vermerke(E.quellen).join(" ")); }
   var paint = symbolFarbe();
