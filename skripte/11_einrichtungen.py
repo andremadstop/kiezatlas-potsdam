@@ -136,6 +136,14 @@ GEMEINBEDARF_NUTZUNG = {   # bez in public.alkis_nutzung (Sport-, Freizeit- und 
     "Sportanlage": ("sport", "sportanlage"),
     "Schwimmen": ("sport", "schwimmen"),
 }
+# Feinere Funktionen aus dem NAS-Bestandsdatenauszug (Paket B0, auswertung.alkis_nas_gebaeude), sobald B0 die
+# Tabelle gefüllt hat. Abgleich über den Klartext der Funktion (Muster, Groß-/Kleinschreibung egal); Jugendherberge
+# und Pflegeheime fallen bewusst nicht darunter. Solange die Tabelle leer ist, bleiben diese Arten leer.
+GEMEINBEDARF_NAS = {
+    "jugend": ("jugendfreizeit", "jugendfreizeit|jugendheim|jugendzentrum|jugendclub"),
+    "senioren": ("seniorenfreizeit", "seniorenfreizeit|seniorenbegegnung|seniorentreff"),
+    "buergerhaus": ("buerger_vereinshaus", "bürgerhaus|buergerhaus|vereinsheim|dorfgemeinschaft|gemeindehaus"),
+}
 CLUSTER_M = 50   # Gebäude und Flächen derselben Art in höchstens 50 m Abstand = ein Standort
 
 
@@ -221,9 +229,16 @@ def main() -> int:
 
             # ---------------------------------------------------------- Gemeinbedarf aus ALKIS (Lage)
             cur.execute("CREATE TEMP TABLE gb (oid text, art text, unterart text, geom geometry) ON COMMIT DROP")
+            # zuerst die feinere NAS-Funktion; dieselben Gebäude zählen dann nicht noch einmal als soziale_zwecke
+            for art, (unterart, muster) in GEMEINBEDARF_NAS.items():
+                cur.execute("INSERT INTO gb SELECT DISTINCT g.oid, %s, %s, ST_Transform(g.geom, 25833) "
+                            "FROM auswertung.alkis_nas_gebaeude n "
+                            "JOIN auswertung.gebaeude_stand_20261105 g ON g.oid = n.oid_bezug "
+                            "WHERE n.funktion ~* %s AND g.geom IS NOT NULL", (art, unterart, muster))
             for funktion, (art, unterart) in GEMEINBEDARF_GEBAEUDE.items():
                 cur.execute("INSERT INTO gb SELECT oid, %s, %s, ST_Transform(geom, 25833) "
-                            "FROM auswertung.gebaeude_stand_20261105 WHERE funktion = %s AND geom IS NOT NULL",
+                            "FROM auswertung.gebaeude_stand_20261105 WHERE funktion = %s AND geom IS NOT NULL "
+                            "AND oid NOT IN (SELECT oid FROM gb)",
                             (art, unterart, funktion))
             for bez, (art, unterart) in GEMEINBEDARF_NUTZUNG.items():
                 cur.execute("INSERT INTO gb SELECT oid, %s, %s, ST_Transform(geom, 25833) "
@@ -319,7 +334,8 @@ def bericht(cur) -> None:
              "`<id_kita>#haus<n>` in der Tabelle.")
     t.append(f"- **Horte:** {hort_e} Einrichtungen mit {z(hort_p)} Plätzen ({hort_h} Standorte mit weiteren "
              "Häusern). Hort heißt: Altersstruktur „Kinder im Grundschulalter“ oder Einrichtungsart „Kinderhort …“. "
-             f"Der Bauplan nennt 39 ohne Herleitung; je Einrichtung sind es {hort_e}, je Haus {hort_h}. "
+             f"Der Bauplan nennt 39: das sind die Einträge (Häuser) mit „hort“ in der Einrichtungsart; je Einrichtung "
+             f"mit beiden Merkmalen sind es {hort_e}, je Haus {hort_h}. "
              f"Zusätzlich betreuen {kh_e} Kitas mit {z(kh_p)} Plätzen Kinder bis "
              "einschließlich Grundschulalter (`unterart` endet auf `_hort`); ihre Kapazität lässt sich aus "
              "den Quelldaten nicht auf Kita und Hort aufteilen.")
@@ -417,12 +433,20 @@ def bericht(cur) -> None:
     for b, (a, u) in GEMEINBEDARF_NUTZUNG.items():
         t.append(f"- Nutzung „{b}“ (Sport-, Freizeit- und Erholungsfläche) → `{a}` / `{u}`")
     t.append("")
-    t.append("**Lücke:** ALKIS vereinfacht hat keine eigene Funktion für Jugendfreizeiteinrichtungen, "
-             "Seniorenbegegnung oder Bürgerhäuser. Im Snapshot gibt es dafür keinen Wert; sie stecken in "
+    nas_n, nas_f = q(cur, "SELECT count(*)::int, count(DISTINCT funktion)::int FROM auswertung.alkis_nas_gebaeude")[0]
+    nas_t = q(cur, """SELECT art, count(*)::int FROM auswertung.einrichtung
+                      WHERE art IN ('jugend','senioren','buergerhaus') GROUP BY 1""")
+    for f, (u, m) in GEMEINBEDARF_NAS.items():
+        t.append(f"- NAS-Gebäudefunktion passend zu `{m}` (Paket B0, `auswertung.alkis_nas_gebaeude`) → `{f}` / `{u}`")
+    t.append("")
+    t.append("**Jugend, Senioren, Bürgerhaus:** ALKIS vereinfacht hat dafür keine eigene Funktion; sie stecken in "
              "„Gebäude für soziale Zwecke“ (`soziale_zwecke`) bzw. „Gebäude für kulturelle Zwecke“ (`kultur`) "
-             "zusammen mit Pflegeheimen, Beratungsstellen, Museen und Ähnlichem. Getrennt ausweisen lassen sie sich "
-             "nur mit einer weiteren Quelle (z. B. Einrichtungsliste der Stadt, Handdownload). Die Arten `jugend`, "
-             "`senioren` und `buergerhaus` aus dem Tabellenkommentar bleiben deshalb leer.\n")
+             "zusammen mit Pflegeheimen, Beratungsstellen, Museen und Ähnlichem. Die feinere Funktion steht erst im "
+             f"NAS-Auszug, den Paket B0 nach `auswertung.alkis_nas_gebaeude` lädt. Stand dieses Laufs: {nas_n} Zeilen, "
+             f"{nas_f} verschiedene Funktionen; Treffer: "
+             + (", ".join(f"`{a}` {n}" for a, n in nas_t) if nas_t else "keine")
+             + ". Ist die Tabelle leer oder führt sie Schlüsselzahlen statt Klartext, bleiben die Arten leer "
+             "(blockiert durch B0); nach dem B0-Lauf dieses Skript erneut starten.\n")
 
     # 7. Grünflächen
     t.append("## 7. Grünflächen (`auswertung.gruenflaeche`)\n")

@@ -28,7 +28,7 @@ Erzeugt von `skripte/11_einrichtungen.py` am 2026-11-05. Quellen: MBJS-WFS (Abru
 ## 2. Abgleich mit dem Bauplan
 
 - **Kitas und Horte in Potsdam (MBJS, alle Einrichtungsarten):** 151 Einrichtungen (`id_kita`) mit 20.953 Plätzen laut Betriebserlaubnis; dazu 20 weitere Häuser derselben Einrichtungen, zusammen 171 Standorte. Der Bauplan nennt 171 Kitas mit 24.581 Plätzen: Das sind die Einträge des Dienstes (Häuser), deren Kapazität je Haus wiederholt wird. Je Einrichtung gezählt sind es die Werte hier; die weiteren Häuser stehen als `lage_ohne_kapazitaet` mit der Kennung `<id_kita>#haus<n>` in der Tabelle.
-- **Horte:** 38 Einrichtungen mit 6.196 Plätzen (47 Standorte mit weiteren Häusern). Hort heißt: Altersstruktur „Kinder im Grundschulalter“ oder Einrichtungsart „Kinderhort …“. Der Bauplan nennt 39 ohne Herleitung; je Einrichtung sind es 38, je Haus 47. Zusätzlich betreuen 37 Kitas mit 5.906 Plätzen Kinder bis einschließlich Grundschulalter (`unterart` endet auf `_hort`); ihre Kapazität lässt sich aus den Quelldaten nicht auf Kita und Hort aufteilen.
+- **Horte:** 38 Einrichtungen mit 6.196 Plätzen (47 Standorte mit weiteren Häusern). Hort heißt: Altersstruktur „Kinder im Grundschulalter“ oder Einrichtungsart „Kinderhort …“. Der Bauplan nennt 39: das sind die Einträge (Häuser) mit „hort“ in der Einrichtungsart; je Einrichtung mit beiden Merkmalen sind es 38, je Haus 47. Zusätzlich betreuen 37 Kitas mit 5.906 Plätzen Kinder bis einschließlich Grundschulalter (`unterart` endet auf `_hort`); ihre Kapazität lässt sich aus den Quelldaten nicht auf Kita und Hort aufteilen.
 - **Schulen in Potsdam:** 78, davon 34 Grundschulen (Schulform G). Weitere 3 Schulen haben einen Grundschulteil (Schulform G/S bzw. G/O/OG, `unterart` beginnt mit `G/`).
 
 ## 3. Altersstruktur der Kitas und Horte in Potsdam (Prüfbericht 9)
@@ -92,7 +92,11 @@ Zuordnung der Funktionen:
 - Nutzung „Sportanlage“ (Sport-, Freizeit- und Erholungsfläche) → `sport` / `sportanlage`
 - Nutzung „Schwimmen“ (Sport-, Freizeit- und Erholungsfläche) → `sport` / `schwimmen`
 
-**Lücke:** ALKIS vereinfacht hat keine eigene Funktion für Jugendfreizeiteinrichtungen, Seniorenbegegnung oder Bürgerhäuser. Im Snapshot gibt es dafür keinen Wert; sie stecken in „Gebäude für soziale Zwecke“ (`soziale_zwecke`) bzw. „Gebäude für kulturelle Zwecke“ (`kultur`) zusammen mit Pflegeheimen, Beratungsstellen, Museen und Ähnlichem. Getrennt ausweisen lassen sie sich nur mit einer weiteren Quelle (z. B. Einrichtungsliste der Stadt, Handdownload). Die Arten `jugend`, `senioren` und `buergerhaus` aus dem Tabellenkommentar bleiben deshalb leer.
+- NAS-Gebäudefunktion passend zu `jugendfreizeit|jugendheim|jugendzentrum|jugendclub` (Paket B0, `auswertung.alkis_nas_gebaeude`) → `jugend` / `jugendfreizeit`
+- NAS-Gebäudefunktion passend zu `seniorenfreizeit|seniorenbegegnung|seniorentreff` (Paket B0, `auswertung.alkis_nas_gebaeude`) → `senioren` / `seniorenfreizeit`
+- NAS-Gebäudefunktion passend zu `bürgerhaus|buergerhaus|vereinsheim|dorfgemeinschaft|gemeindehaus` (Paket B0, `auswertung.alkis_nas_gebaeude`) → `buergerhaus` / `buerger_vereinshaus`
+
+**Jugend, Senioren, Bürgerhaus:** ALKIS vereinfacht hat dafür keine eigene Funktion; sie stecken in „Gebäude für soziale Zwecke“ (`soziale_zwecke`) bzw. „Gebäude für kulturelle Zwecke“ (`kultur`) zusammen mit Pflegeheimen, Beratungsstellen, Museen und Ähnlichem. Die feinere Funktion steht erst im NAS-Auszug, den Paket B0 nach `auswertung.alkis_nas_gebaeude` lädt. Stand dieses Laufs: 0 Zeilen, 0 verschiedene Funktionen; Treffer: keine. Ist die Tabelle leer oder führt sie Schlüsselzahlen statt Klartext, bleiben die Arten leer (blockiert durch B0); nach dem B0-Lauf dieses Skript erneut starten.
 
 ## 7. Grünflächen (`auswertung.gruenflaeche`)
 
