@@ -18,7 +18,8 @@ var PALETTE = ["#42194d", "#613878", "#756092", "#8c87a9", "#74a1aa", "#428293",
 var STUFEN = T.STUFEN, GRENZEN = [20, 40, 60, 80];
 var WENIG = 5;            // unter 5 Gebäuden je Zelle: Anteile sehr unsicher, blass gezeichnet
 var MINDEST = 50;         // Gebiete mit weniger Gebäuden bekannter Bauzeit kommen in keine Rangliste
-// Raumebene: heute die 32 Stadtteile. Planungsräume folgen, sobald die Datei der Stadt da ist (Handdownload H1).
+// Raumebene: heute die 32 Stadtteile. Die Grenzen der Planungsräume liegen als daten/planungsraeume.js vor (Planer);
+// die Bauzeiten-Auswertung je Planungsraum ist noch nicht gebaut.
 var RAUM = { id: "stadtteile", einzahl: "Stadtteil", mehrzahl: "Stadtteile", feld: "st" };
 // Gebäude: ab dieser Zoomstufe, Farben für „nicht datiert“ (E5) und „andere Bauzeit“ (ohne Farbton)
 var GEB_ZOOM = 14, GEB_ND = "#bcc0ba", GEB_REST = "#e5e7e2", GEB_LINIE = "#9da39b";
@@ -163,7 +164,8 @@ function karte() {
   var S = { ansicht: "ueberblick", von: 0, bis: 0, d3: false, luft: false, nr: "", blick: null };
   var hashDa = false;
   (function () {
-    var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || ""); });
+    function dek(x) { try { return decodeURIComponent(x); } catch (e) { return ""; } }   // verstümmelte Links nicht tödlich
+    var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[dek(kv[0])] = dek(kv[1] || ""); });
     var max = KL.length - 1, ok = function (x) { return /^\d$/.test(x) && +x <= max; };
     if (h.ansicht === "spanne" || h.ansicht === "ueberblick") { S.ansicht = h.ansicht; hashDa = true; }
     if (ok(h.von) && ok(h.bis) && +h.von <= +h.bis) { S.von = +h.von; S.bis = +h.bis; hashDa = true; }

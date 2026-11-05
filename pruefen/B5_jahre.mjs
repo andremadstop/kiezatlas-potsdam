@@ -423,6 +423,13 @@ console.log("\nHash und Bewegung");
   pruef(s[0] === "spanne" && s[1] === 2 && s[2] === 3 && s[3] === true && s[4] === "52", `Hash wird gelesen und bleibt (${s[5]})`);
   await bild(page, "B5_1440_hash.png");
   await ctx.close();
+  // Verstümmelter Hash (abgeschnittenes %-Escape): Seite muss trotzdem aufgebaut werden
+  {
+    const v = await oeffnen(FILE, "jahre.html", { hash: "#st=%E0&ansicht=spanne" });
+    const s = await v.page.evaluate(() => ({ bereit: window.KIEZ_BEREIT, karte: !!window.KIEZ_KARTE, ansicht: window.KIEZ_JAHRE.S.ansicht }));
+    pruef(s.bereit === true && s.karte && s.ansicht === "spanne" && v.fehler.length === 0, `verstümmelter Hash (#st=%E0) bricht die Seite nicht ab ${v.fehler.slice(0, 2).join(" | ")}`);
+    await v.ctx.close();
+  }
   // Blick aus der Adresse: Gebäude sofort geladen
   for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
     const v = await oeffnen(basis, "jahre.html", { hash: "#ansicht=spanne&von=4&bis=7&blick=13.06010,52.40020,15.50" });
