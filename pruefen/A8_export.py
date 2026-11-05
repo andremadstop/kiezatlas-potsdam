@@ -203,9 +203,12 @@ def gpkg_pruefen(pfad: Path, erwartet_odbl: bool) -> dict:
 def zahl_gleich(a, b) -> bool:
     if a is None or b is None:
         return a is None and b is None
-    if isinstance(b, bool) or isinstance(a, bool):
-        return int(a) == int(b)
-    return abs(float(a) - float(b)) < 1e-9
+    try:
+        if isinstance(b, bool) or isinstance(a, bool):
+            return int(a) == int(b)
+        return abs(float(a) - float(b)) < 1e-9
+    except (TypeError, ValueError):
+        return False
 
 
 def csv_lesen(p: Path) -> tuple[list[str], list[list[str]]]:

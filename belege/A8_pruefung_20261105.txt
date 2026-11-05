@@ -1,4 +1,4 @@
-# Prüfung A8 (GIS-Export), 05.11.2026
+# Prüfung A8 (GIS-Export), 05.11.2026, nach der Gegenprobe (/code-review medium, 10 Funde behoben)
 
 $ skripte/16_export.py (zweimal, MD5 aller Dateien verglichen)
   gleich: 47 Dateien, zweiter Lauf bytegleich
@@ -181,11 +181,13 @@ $ python -I pruefen/A8_test_pfade.py
 [1] Fixtures nie nach daten/export
   ok    Abbruch mit Hinweis auf fixture
   ok    daten/export ohne _odbl-Datei
+  ok    auch kein Unterordner von daten/export (Abbruch, nichts angelegt)
 [2] ODbL-Pfad gegen Fixtures
   ok    Export der Fixtures läuft ()
   ok    kiezatlas_potsdam_odbl.gpkg geschrieben
   ok    csv_odbl/ mit drei Ebenen
   ok    A8_export.py --odbl-erwartet gegen den Fixture-Export: 0 Befunde
+  ok    Lauf ohne ODbL-Daten in denselben Ordner räumt _odbl.gpkg, csv_odbl/ und den ODbL-Stil ab
 [3] Gegenproben: verdorbene Kopie des echten Exports
   ok    Altersklasse je Zelle: gemeldet (FEHLT zelle: Spalten exakt 21 nach Positivliste (fremd: ['i_u3']))
   ok    Adresse im Namen: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['straße 12']); Ausnahme nur die 2 amtlichen Namen [)
@@ -196,6 +198,13 @@ $ python -I pruefen/A8_test_pfade.py
   ok    Wert verändert: gemeldet (FEHLT versorgung: alle 544 Werte mit Status, vorläufig, Maßstab, Unsicherheit wie planer.js)
   ok    falsches SRS: gemeldet (FEHLT zelle: SRS 25833 in gpkg_contents und geometry_columns)
   ok    Orange im Stil: gemeldet (FEHLT keine Orange- oder Gelbtöne in Stilen (Dateien, layer_styles), Projekt und Steckbriefen (['e67814']))
+[4] Gegenproben in CSV und Steckbriefen
+  ok    Adresse in CSV: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['straße 5']); Ausnahme nur die 2 amtlichen Namen [')
+  ok    OSM in CSV: gemeldet (FEHLT csv/: kein OSM-Wert (['gruenflaeche.csv']))
+  ok    Zahl fehlt in CSV: gemeldet (FEHLT csv/zelle.csv: Werte wie GPKG)
+  ok    OSM im Steckbrief: gemeldet (FEHLT steckbriefe/: kein OSM-Wert (['13.html']))
+  ok    Platzhalter im Steckbrief: gemeldet (FEHLT keine Platzhalter, Karte und @page vorhanden (['13.html']))
+  ok    Telefon im Steckbrief: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['0331 2891234']); Ausnahme nur die 2 amtlichen Name)
 
 0 Befunde
 
@@ -214,3 +223,5 @@ $ pdffonts 13.pdf (nur Barlow, keine Ersatzschrift)
   MFLKGA+Barlow-Semi-Condensed,-Semi-Bold-Semi-Condensed CID TrueType      Identity-H       yes yes yes     27  0
   VHAIOC+Barlow                        CID TrueType      Identity-H       yes yes yes     31  0
   OODLLZ+Barlow-Semi-Condensed,-Medium-Semi-Condensed CID TrueType      Identity-H       yes yes yes     35  0
+
+Nicht geprüft: Öffnen in QGIS (kein QGIS auf der Workstation); geprüft sind XML, Pfade, Klassenfelder, Kategorien, layer_styles.

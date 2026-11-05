@@ -40,6 +40,11 @@ def main() -> int:
     r = lauf(str(EXPORT), "--quelle", "daten/fixtures")
     erwarte(r.returncode != 0 and "fixture" in (r.stderr + r.stdout), "Abbruch mit Hinweis auf fixture")
     erwarte(not (WURZEL / "daten" / "export" / "kiezatlas_potsdam_odbl.gpkg").exists(), "daten/export ohne _odbl-Datei")
+    r = lauf(str(EXPORT), "--quelle", "daten/fixtures", "--ziel", "daten/export/probe")
+    erwarte(
+        r.returncode != 0 and not (WURZEL / "daten" / "export" / "probe").exists(),
+        "auch kein Unterordner von daten/export (Abbruch, nichts angelegt)",
+    )
 
     with tempfile.TemporaryDirectory(prefix="a8_") as tmp:
         tmp = Path(tmp)
@@ -59,6 +64,15 @@ def main() -> int:
             + ("" if r.returncode == 0 else " | " + " | ".join(z for z in r.stdout.splitlines() if "FEHLT" in z)[:600]),
         )
 
+        r = lauf(str(EXPORT), "--ziel", str(tmp / "fix"), "--ohne-beleg")
+        fix = tmp / "fix"
+        erwarte(
+            r.returncode == 0
+            and not (fix / "kiezatlas_potsdam_odbl.gpkg").exists()
+            and not (fix / "csv_odbl").exists()
+            and not (fix / "stile" / "einrichtung_odbl.qml").exists(),
+            "Lauf ohne ODbL-Daten in denselben Ordner räumt _odbl.gpkg, csv_odbl/ und den ODbL-Stil ab",
+        )
         print("[3] Gegenproben: verdorbene Kopie des echten Exports")
         faelle = [
             ("Altersklasse je Zelle", 'ALTER TABLE zelle ADD COLUMN "i_u3" INTEGER', "Positivliste"),
@@ -95,6 +109,54 @@ def main() -> int:
             erwarte(
                 r.returncode != 0 and bool(treffer),
                 f"{titel}: gemeldet ({(treffer or ['nicht gemeldet'])[0].strip()[:110]})",
+            )
+        print("[4] Gegenproben in CSV und Steckbriefen")
+        faelle_text = [
+            ("Adresse in CSV", "csv/einrichtung.csv", "Grundschule", "Grundschule Lindenstraße 5", "Hausnummer"),
+            ("OSM in CSV", "csv/gruenflaeche.csv", "dl-de/by-2-0", "© OpenStreetMap", "csv/: kein OSM"),
+            ("Zahl fehlt in CSV", "csv/zelle.csv", ";dl-de/by-2-0", ";dl-de/by-2-0", "Werte wie GPKG"),
+            (
+                "OSM im Steckbrief",
+                "steckbriefe/13.html",
+                "Quellen und Lizenzen",
+                "Quellen, OpenStreetMap",
+                "steckbriefe/",
+            ),
+            (
+                "Platzhalter im Steckbrief",
+                "steckbriefe/13.html",
+                "Lesehilfe</h2>",
+                "Lesehilfe</h2><p>None</p>",
+                "Platzhalter",
+            ),
+            (
+                "Telefon im Steckbrief",
+                "steckbriefe/21.html",
+                "Lesehilfe</h2>",
+                "Lesehilfe</h2><p>0331 2891234</p>",
+                "Telefon",
+            ),
+        ]
+        for titel, datei, alt, neu, erwartet in faelle_text:
+            kopie = tmp / "k"
+            if kopie.exists():
+                shutil.rmtree(kopie)
+            shutil.copytree(WURZEL / "daten" / "export", kopie)
+            p = kopie / datei
+            text = p.read_text(encoding="utf-8-sig" if datei.endswith(".csv") else "utf-8")
+            if titel == "Zahl fehlt in CSV":  # erste Entfernung der ersten Zeile leeren
+                kopf, erste, rest = text.split("\n", 2)
+                felder = erste.split(";")
+                felder[4] = ""
+                text = "\n".join([kopf, ";".join(felder), rest])
+            else:
+                text = text.replace(alt, neu, 1)
+            p.write_text(text, encoding="utf-8-sig" if datei.endswith(".csv") else "utf-8")
+            r = lauf(str(PRUEF), "--ziel", str(kopie))
+            treffer = [zeile for zeile in r.stdout.splitlines() if "FEHLT" in zeile and erwartet in zeile]
+            erwarte(
+                r.returncode != 0 and bool(treffer) and "Traceback" not in r.stderr,
+                f"{titel}: gemeldet ({(treffer or ['nicht gemeldet: ' + r.stderr[-150:]])[0].strip()[:110]})",
             )
     print(f"\n{len(fehler)} Befunde")
     return 1 if fehler else 0

@@ -247,7 +247,7 @@ class GPKG:
         rows = []
         for z in zeilen:
             if geomtyp:
-                wkb, huelle = z[-1]
+                wkb, huelle = z[-1][0], z[-1][1]
                 if huelle is None:  # Punkt
                     x, y = struct.unpack("<dd", wkb[5:21])
                     huelle_akt = (x, x, y, y)
@@ -732,6 +732,19 @@ def csv_schreiben(pfad: Path, felder: list[str], zeilen: list[list]) -> None:
             w.writerow(["" if v is None else (int(v) if isinstance(v, bool) else v) for v in z])
 
 
+def ebenen_csv(ordner: Path, ebenen: list) -> None:
+    """Eine CSV je Ebene: Punkte mit x/y, Flächen mit WKT (aus dem Geometrie-Tupel), Tabellen ohne Geometrie."""
+    for name, _, geom, felder, zeilen in ebenen:
+        namen = [n for n, _ in felder]
+        if geom == "POINT":
+            out = [z[:-1] + list(struct.unpack("<dd", z[-1][0][5:21])) for z in zeilen]
+            csv_schreiben(ordner / f"{name}.csv", namen + ["x", "y"], out)
+        elif geom:
+            csv_schreiben(ordner / f"{name}.csv", namen + ["wkt"], [z[:-1] + [z[-1][2]] for z in zeilen])
+        else:
+            csv_schreiben(ordner / f"{name}.csv", namen, zeilen)
+
+
 # ---------------------------------------------------------------------------------------------- Steckbrief
 STECKBRIEF_CSS = """
 @font-face{font-family:"Barlow";font-weight:400;src:url("../../../fonts/barlow-400-normal.woff2") format("woff2")}
@@ -823,12 +836,12 @@ def svg_karte(
                 f'fill="{farbe}" stroke="#fff" stroke-width="{s * 1.5:.1f}"/>'
             )
     # Maßstabsleiste: runde Länge um ein Fünftel der Breite
-    lang = next(v for v in (100, 200, 250, 500, 1000, 2000, 2500, 5000) if v >= b / 6)
+    lang = next((v for v in (100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000) if v >= b / 6), 50000)
     mx, my = x1 + b * 0.04, -y1 - h * 0.05
     teile.append(f'<rect x="{mx:.0f}" y="{my - s * 4:.0f}" width="{lang}" height="{s * 4:.0f}" fill="{INK}"/>')
     teile.append(
         f'<text x="{mx:.0f}" y="{my - s * 9:.0f}" font-family="Barlow Semi Condensed" font-weight="500" '
-        f'font-size="{s * 22:.0f}" fill="{INK}">{lang if lang < 1000 else lang // 1000} '
+        f'font-size="{s * 22:.0f}" fill="{INK}">{lang if lang < 1000 else f"{lang / 1000:g}".replace(".", ",")} '
         f"{'m' if lang < 1000 else 'km'}</text>"
     )
     teile.append("</svg>")
@@ -858,12 +871,13 @@ def steckbrief(
             wert_html = f'<td class="wert">{escape(zahl(w["wert"]))}{(" " + escape(einheit)) if einheit else ""}</td>'
         zusatz = " · vorläufig, ohne Schulbezirk" if w.get("vorlaeufig") else ""
         q = quellen.get(w.get("q"), {})
+        status = escape(w.get("status") or "")
         zeilen.append(
-            f'<tr><td><b>{escape(titel)}</b><br><span class="status {escape(w["status"])}">{escape(w["status"])}'
+            f'<tr><td><b>{escape(titel)}</b><br><span class="status {status}">{status}'
             f'{zusatz}</span><br><span class="hinweis">{escape(w.get("unsicherheit") or "")}</span></td>'
             f'{wert_html}<td class="hinweis">{escape(richtwert_text(w, quellen))}</td>'
             f'<td class="hinweis">{escape(q.get("quelle", w.get("q", "")))}<br>'
-            f"Stand: {escape(w.get('stand', ''))}</td></tr>"
+            f"Stand: {escape(w.get('stand') or '')}</td></tr>"
         )
     zaehl: dict[str, list] = {}
     for e in ein_liste:
@@ -883,7 +897,7 @@ def steckbrief(
         or '<tr><td colspan="4">Keine Einrichtung in der Raumeinheit.</td></tr>'
     )
     benutzt = sorted(
-        {w.get("q") for w in raum["werte"]} | {(w.get("richtwert") or {}).get("q") for w in raum["werte"]} - {None}
+        ({w.get("q") for w in raum["werte"]} | {(w.get("richtwert") or {}).get("q") for w in raum["werte"]}) - {None}
     )
     q_html = "".join(
         f"<li><b>{escape(quellen[k].get('quelle', k))}</b>. {escape(quellen[k].get('vermerk', ''))}</li>"
@@ -970,7 +984,7 @@ def main() -> int:
     err_fuss = optional(quelle / "erreichbar_fuss_odbl.js")
     planer_fuss = optional(quelle / "planer_fuss_odbl.js")
     fixture = any((x or {}).get("fixture") for x in (planer, ein, err, ein_odbl, err_fuss, planer_fuss))
-    if fixture and ziel == ZIEL_STANDARD.resolve():
+    if fixture and ziel.is_relative_to(ZIEL_STANDARD.resolve()):
         raise SystemExit("Beispieldaten (fixture: true) gehen nie nach daten/export. --ziel außerhalb wählen.")
     ids, zprops = zell_ids(quelle)
     if (err["anzahl"], err["erste_id"], err["letzte_id"]) != (len(ids), ids[0], ids[-1]):
@@ -1003,7 +1017,22 @@ def main() -> int:
     if set(planer["raeume"]) - set(d["raeume"]):
         raise SystemExit(f"Raumeinheiten ohne Geometrie: {sorted(set(planer['raeume']) - set(d['raeume']))}")
 
+    # Keine Adress- oder Kontaktfelder aus den Eingängen übernehmen (Prüfbericht 6)
+    fremd = {k.lower() for x in (ein, ein_odbl or {}) for f in x.get("features", []) for k in f["properties"]}
+    if fremd & ADRESS_SPALTEN:
+        raise SystemExit(f"Adress- oder Kontaktfelder in den Einrichtungen: {sorted(fremd & ADRESS_SPALTEN)}")
     ziel.mkdir(parents=True, exist_ok=True)
+    # Nur eigene Ausgaben entfernen, damit kein Rest eines früheren Laufs (etwa ODbL-CSV) liegen bleibt
+    for alt in ("csv", "csv_odbl", "stile", "steckbriefe"):
+        if (ziel / alt).is_dir():
+            for f in (ziel / alt).iterdir():
+                if f.is_file() and f.suffix in (".csv", ".qml", ".html"):
+                    f.unlink()
+            if not any((ziel / alt).iterdir()):
+                (ziel / alt).rmdir()
+    for alt in ("kiezatlas_potsdam.gpkg", "kiezatlas_potsdam_odbl.gpkg", "kiezatlas_potsdam.qgz", "README.md"):
+        if (ziel / alt).exists():
+            (ziel / alt).unlink()
     stand = planer["stand"]
     meldungen: list[str] = []
 
@@ -1083,7 +1112,7 @@ def main() -> int:
         r_zeilen.append(
             [nr, r["name"], raumebene, r["ew"], geo["km2"], zellen_je_raum.get(nr, 0)]
             + [werte.get(k) for k in spalten_breit]
-            + [stand, raum_vermerk, (geo["wkb"], geo["huelle"])]
+            + [stand, raum_vermerk, (geo["wkb"], geo["huelle"], geo["wkt"])]
         )
     v_felder = [
         ("raum_nr", "TEXT"),
@@ -1160,7 +1189,7 @@ def main() -> int:
         z_zeilen.append(
             [g, p.get("st"), dz["raum"], p.get("ew")]
             + [err["werte"][art][i] for art in arten]
-            + [err["stand"], "dl-de/by-2-0", (dz["wkb"], dz["huelle"])]
+            + [err["stand"], "dl-de/by-2-0", (dz["wkb"], dz["huelle"], dz["wkt"])]
         )
     abweichend = [g for g in ids if raumebene == "stadtteil" and d["zelle"][g]["raum"] != zprops[g].get("st")]
     meldungen.append(
@@ -1188,7 +1217,7 @@ def main() -> int:
             g["quelle"],
             stand,
             "dl-de/by-2-0",
-            (g["wkb"], g["huelle"]),
+            (g["wkb"], g["huelle"], g["wkt"]),
         ]
         for g in d["gruen"]
     ]
@@ -1270,22 +1299,7 @@ def main() -> int:
     )
     gp.stile(stile, {n: g is not None for n, _, g, _, _ in ebenen})
     gp.schliessen()
-    # CSV
-    for name, _, geom, felder, zeilen in ebenen:
-        namen = [n for n, _ in felder]
-        if geom == "POINT":
-            out = [z[:-1] + list(struct.unpack("<dd", z[-1][0][5:21])) for z in zeilen]
-            csv_schreiben(ziel / "csv" / f"{name}.csv", namen + ["x", "y"], out)
-        elif geom:
-            if name == "raumeinheit":
-                wkt = [d["raeume"][z[0]]["wkt"] for z in zeilen]
-            elif name == "zelle":
-                wkt = [d["zelle"][z[0]]["wkt"] for z in zeilen]
-            else:
-                wkt = [g["wkt"] for g in d["gruen"]]
-            csv_schreiben(ziel / "csv" / f"{name}.csv", namen + ["wkt"], [z[:-1] + [w] for z, w in zip(zeilen, wkt)])
-        else:
-            csv_schreiben(ziel / "csv" / f"{name}.csv", namen, zeilen)
+    ebenen_csv(ziel / "csv", ebenen)
     # Stile als Dateien
     (ziel / "stile").mkdir(exist_ok=True)
     for name, qml in stile.items():
@@ -1332,7 +1346,7 @@ def main() -> int:
         zeilen = [
             [g, d["zelle"][g]["raum"], zprops[g].get("ew")]
             + [err_fuss["werte"][art][i] for art in fa]
-            + [err_fuss["stand"], "ODbL 1.0", (d["zelle"][g]["wkb"], d["zelle"][g]["huelle"])]
+            + [err_fuss["stand"], "ODbL 1.0", (d["zelle"][g]["wkb"], d["zelle"][g]["huelle"], d["zelle"][g]["wkt"])]
             for i, g in enumerate(ids)
         ]
         odbl_ebenen.append(("zelle_fuss_odbl", "Zellen: Fußweg zum nächsten Standort", "POLYGON", felder, zeilen))
@@ -1366,19 +1380,7 @@ def main() -> int:
             }
         go.stile(odbl_stile, {n: g is not None for n, _, g, _, _ in odbl_ebenen})
         go.schliessen()
-        for name, _, geom, felder, zeilen in odbl_ebenen:
-            namen = [n for n, _ in felder]
-            if geom == "POINT":
-                out = [z[:-1] + list(struct.unpack("<dd", z[-1][0][5:21])) for z in zeilen]
-                csv_schreiben(ziel / "csv_odbl" / f"{name}.csv", namen + ["x", "y"], out)
-            elif geom:
-                csv_schreiben(
-                    ziel / "csv_odbl" / f"{name}.csv",
-                    namen + ["wkt"],
-                    [z[:-1] + [d["zelle"][z[0]]["wkt"]] for z in zeilen],
-                )
-            else:
-                csv_schreiben(ziel / "csv_odbl" / f"{name}.csv", namen, zeilen)
+        ebenen_csv(ziel / "csv_odbl", odbl_ebenen)
         for name, qml in odbl_stile.items():
             (ziel / "stile" / f"{name}.qml").write_text(qml, encoding="utf-8")
         meldungen.append(f"ODbL: {', '.join(n for n, *_ in odbl_ebenen)} geschrieben")
