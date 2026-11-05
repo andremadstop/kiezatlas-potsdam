@@ -21,8 +21,10 @@ Liest:
   $KIEZ_DATEN/eingang/prognose_planungsraum.csv (H11, falls vorhanden)
 
 Regeln (Bauplan A6 und Prüfbericht 4, 8, 9, 13, 15):
-  - Raumeinheit = Planungsraum, wenn public.planungsraum Zeilen hat, sonst Stadtteil (Feld raumebene).
+  - Raumeinheit = Planungsraum (H1), sonst Stadtteil (Feld raumebene). Quelle der Planungsräume: public.planungsraum,
+    solange die leer ist vorbereitet/planungsraeume.csv aus skripte/03_planungsraeume.py (siehe raumquelle).
     Zuordnung über den Zellmittelpunkt wie in skripte/02_auswerten.py.
+  - ÖPNV auf Planungsräumen: Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt für Ortsteile).
   - Feine Zensusklassen nur je Raumeinheit mit mindestens geheimhaltung.min_ew_raumeinheit Einwohnern; je Zelle
     nur Entfernungen. Einwohner auf rundung_ew gerundet, Anteile ganzzahlig, jeder Wert mit Unsicherheitshinweis.
   - Fußweg-Kennzahlen nie in planer.js (Korrektur 4), sondern in planer_fuss_odbl.js.
@@ -31,6 +33,8 @@ Regeln (Bauplan A6 und Prüfbericht 4, 8, 9, 13, 15):
     ohne Primärbeleg oder ohne gelesene Fundstelle: orientierung.
 
 Aufruf (aus dem Worktree; Passwort nur aus der .env):
+    KIEZ_DATEN=../kiezatlas-daten ../kiezatlas-potsdam-west/.venv/bin/python -I skripte/03_planungsraeume.py \
+        --datei planungsraume-in-potsdam.geojson --nr-feld pr --name-feld bez      # einmal, solange die Tabelle leer
     set -a; . ../kiezatlas-potsdam/.env; set +a
     PGHOST=127.0.0.1 PGPORT=55461 PGDATABASE=kiezatlas PGUSER=mosidi_lesen PGPASSWORD="$LESE_PASSWORD" \\
     KIEZ_DATEN=../kiezatlas-daten \\
@@ -53,6 +57,8 @@ from pathlib import Path
 WURZEL = Path(__file__).resolve().parent.parent
 DATEN = WURZEL / "daten"
 BELEGE = WURZEL / "belege"
+PR_CSV = WURZEL / "vorbereitet" / "planungsraeume.csv"
+H1_DATEI = "planungsraume-in-potsdam.geojson"
 
 DLDE = "https://www.govdata.de/dl-de/by-2-0"
 ODBL = "https://opendatacommons.org/licenses/odbl/1-0/"
@@ -93,6 +99,13 @@ QUELLEN = {
         "vermerk": f"VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 ({CCBY}), {VERAENDERT}",
         "url": "https://www.vbb.de/gtfs",
         "stand": "2026-11-05",
+    },
+    "planungsraum": {
+        "quelle": "Planungsräume der Landeshauptstadt Potsdam (19 Flächen), Open-Data-Portal, Stand 31.12.2025",
+        "lizenz": "dl-de/by-2-0",
+        "vermerk": f"© Landeshauptstadt Potsdam, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
+        "url": "https://opendata.potsdam.de/explore/dataset/planungsraume-in-potsdam/",
+        "stand": "2025-12-31",
     },
     "osm": {
         "quelle": "OpenStreetMap",
@@ -164,7 +177,10 @@ ABSCHNITT_DOKUMENT = {
     "grundschule": "orientierung",
     "spielplatz": "orientierung",
 }
-NEUBAU_RAEUME = {"stadtteil": {"13": "Bornstedter Feld", "17": "Golm", "84": "Krampnitz"}}
+NEUBAU_RAEUME = {
+    "stadtteil": {"13": "Bornstedter Feld", "17": "Golm", "84": "Krampnitz"},
+    "planungsraum": {"103": "Krampnitz", "201": "Bornstedter Feld", "202": "Golm"},
+}
 KLASSEN_RANG = {"I": 3, "II": 2, "III": 1, "unter III": 0}
 ZELL_ID = re.compile(r'"id":"(CRS3035RES100m[^"]+)"')
 
@@ -238,21 +254,73 @@ def js_schreiben(pfad: Path, variable: str, inhalt: dict, kopf: str = "") -> Non
 
 
 # ---------------------------------------------------------------------------------------------- Lesen
+def raumquelle(cur) -> tuple[str, str, dict, str]:
+    """Raumebene, Tabellenausdruck für FROM/JOIN, Parameter und Herkunft.
+
+    1. public.planungsraum, sobald der Ladekoordinator H1 geladen hat.
+    2. Sonst vorbereitet/planungsraeume.csv aus skripte/03_planungsraeume.py (P0) als reiner SELECT über
+       unnest(); die Leserolle legt keine Tabelle an, auch keine TEMP-Tabelle (read_only).
+    3. Sonst die 32 Stadtteile.
+    """
+    cur.execute("SELECT count(*) FROM public.planungsraum")
+    if cur.fetchone()[0] > 0:
+        return "planungsraum", "public.planungsraum", {}, "public.planungsraum"
+    h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten")) / "eingang" / H1_DATEI
+    aufruf = f"  python -I skripte/03_planungsraeume.py --datei {H1_DATEI} --nr-feld pr --name-feld bez"
+    if PR_CSV.exists():
+        with PR_CSV.open(encoding="utf-8") as f:
+            zeilen = list(csv.DictReader(f, delimiter=";"))
+        if h1.exists():
+            # CSV muss zum aktuellen Handdownload passen (gleiche Nummern, nicht älter)
+            nrn = {str((ft.get("properties") or {}).get("pr")) for ft in json.loads(h1.read_text(encoding="utf-8"))[
+                "features"]}
+            if {z["nr"] for z in zeilen} != nrn or PR_CSV.stat().st_mtime < h1.stat().st_mtime:
+                raise SystemExit(f"{PR_CSV} passt nicht zu {h1} (Nummern oder älter). Neu vorbereiten:\n{aufruf}")
+        if zeilen:
+            tab = """(SELECT t.nr, t.name, ST_Multi(ST_GeomFromText(t.wkt, 4326)) AS geom
+                      FROM unnest(%(pr_nr)s::text[], %(pr_name)s::text[], %(pr_wkt)s::text[]) AS t(nr, name, wkt))"""
+            par = {
+                "pr_nr": [z["nr"] for z in zeilen],
+                "pr_name": [z["name"] for z in zeilen],
+                "pr_wkt": [z["wkt"] for z in zeilen],
+            }
+            return "planungsraum", tab, par, f"vorbereitet/{PR_CSV.name} (public.planungsraum noch leer)"
+    if h1.exists():
+        # Kein stiller Rückfall auf Stadtteile, wenn die Planungsräume vorliegen, aber nicht vorbereitet sind
+        raise SystemExit(
+            f"{h1} liegt vor, aber public.planungsraum ist leer und {PR_CSV} fehlt oder ist leer. "
+            f"Erst vorbereiten:\n{aufruf}"
+        )
+    return "stadtteil", "public.stadtteil", {}, "public.stadtteil"
+
+
 def lesen(cur) -> dict:
     d: dict = {}
-    cur.execute("SELECT count(*) FROM public.planungsraum")
-    d["raumebene"] = "planungsraum" if cur.fetchone()[0] > 0 else "stadtteil"
-    tab = "public.planungsraum" if d["raumebene"] == "planungsraum" else "public.stadtteil"
-    cur.execute(f"SELECT nr, name FROM {tab} ORDER BY nr")
+    d["raumebene"], tab, par, d["raum_herkunft"] = raumquelle(cur)
+    cur.execute(f"SELECT nr, name FROM {tab} r ORDER BY nr", par or None)
     d["raeume"] = {str(nr): name for nr, name in cur.fetchall()}
     # Zellen: Mittelpunkt in der Raumeinheit (Menge wie daten/zellen.js bei Stadtteilen)
-    cur.execute(f"""SELECT z.gitter_id, r.nr, z.ew, ST_X(ST_Transform(z.geom, 25833)), ST_Y(ST_Transform(z.geom, 25833))
-                    FROM public.zensus_zelle z JOIN {tab} r ON ST_Contains(r.geom, z.geom)
-                    WHERE z.ew IS NOT NULL""")
+    cur.execute(
+        f"""SELECT z.gitter_id, r.nr, z.ew, ST_X(ST_Transform(z.geom, 25833)), ST_Y(ST_Transform(z.geom, 25833))
+            FROM public.zensus_zelle z JOIN {tab} r ON ST_Contains(r.geom, z.geom)
+            WHERE z.ew IS NOT NULL""",
+        par or None,
+    )
     d["zellen"] = {g: {"raum": str(nr), "ew": ew, "x": x, "y": y} for g, nr, ew, x, y in cur.fetchall()}
+    # Stadtteil je Zelle: die NVP-Gebietsklasse hängt am Ortsteil (A4), auch wenn die Raumeinheit ein Planungsraum ist
+    cur.execute("""SELECT z.gitter_id, s.nr, z.ew FROM public.zensus_zelle z
+                   JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom) WHERE z.ew IS NOT NULL""")
+    st = cur.fetchall()
+    d["zelle_stadtteil"] = {g: str(nr) for g, nr, _ in st}
+    # Bewohnte Zellen im Stadtgebiet ohne Raumeinheit (Mittelpunkt außerhalb aller Flächen) für den Beleg
+    ohne = [ew or 0 for g, _, ew in st if g not in d["zellen"]]
+    d["ohne_raum"] = (len(ohne), sum(ohne))
     # Struktur über die eigene Geometrie zuordnen (kein INNER JOIN an zensus_zelle, Hinweis A1)
-    cur.execute(f"""SELECT s.gitter_id, r.nr, s.i_u3, s.i_3_5, s.i_6_9, s.i_10_15
-                    FROM public.zensus_struktur s JOIN {tab} r ON ST_Contains(r.geom, s.geom)""")
+    cur.execute(
+        f"""SELECT s.gitter_id, r.nr, s.i_u3, s.i_3_5, s.i_6_9, s.i_10_15
+            FROM public.zensus_struktur s JOIN {tab} r ON ST_Contains(r.geom, s.geom)""",
+        par or None,
+    )
     d["struktur"] = {
         g: {"raum": str(nr), "i_u3": a or 0, "i_3_5": b or 0, "i_6_9": c or 0, "i_10_15": e or 0}
         for g, nr, a, b, c, e in cur.fetchall()
@@ -270,7 +338,7 @@ def lesen(cur) -> dict:
                            r.nr
                     FROM auswertung.einrichtung e
                     LEFT JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
-                    ORDER BY e.id""")
+                    ORDER BY e.id""", par or None)
     spalten = (
         "id",
         "art",
@@ -696,27 +764,69 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
     zellen = [(g, z) for g, z in r.d["zellen"].items() if z["raum"] == raum and z["ew"]]
     hs = r.d["haltestellen"]
 
-    def anteil(klasse: str, mit_takt: bool) -> float | None:
+    def erschlossen(z: dict, klasse: str, mit_takt: bool) -> bool:
         radien = {vm: o["einzugsradius_m"][vm].get(klasse) for vm in vm_rad}
-        nenner = zaehler = 0
-        for _, z in zellen:
-            nenner += z["ew"]
-            for h in hs:
-                if mit_takt and KLASSEN_RANG.get(h["klasse"], 0) < KLASSEN_RANG[klasse]:
-                    continue
-                d2 = (h["x"] - z["x"]) ** 2 + (h["y"] - z["y"]) ** 2
-                if any(radien[vm] and vm in h["vm"] and d2 <= radien[vm] ** 2 for vm in vm_rad):
-                    zaehler += z["ew"]
-                    break
+        for h in hs:
+            if mit_takt and KLASSEN_RANG.get(h["klasse"], 0) < KLASSEN_RANG[klasse]:
+                continue
+            d2 = (h["x"] - z["x"]) ** 2 + (h["y"] - z["y"]) ** 2
+            if any(radien[vm] and vm in h["vm"] and d2 <= radien[vm] ** 2 for vm in vm_rad):
+                return True
+        return False
+
+    def anteil(klasse: str, mit_takt: bool) -> float | None:
+        nenner = sum(z["ew"] for _, z in zellen)
+        zaehler = sum(z["ew"] for _, z in zellen if erschlossen(z, klasse, mit_takt))
         return None if not nenner else 100.0 * zaehler / nenner
 
-    gk = (o["gebietsklassen"]["stadtteile"].get(raum) if ebene == "stadtteil" else None) or {}
+    st_klassen = o["gebietsklassen"]["stadtteile"]
+    if ebene != "stadtteil":
+        return oepnv_je_zelle(r, raum, zellen, st_klassen, erschlossen)
+    gk = st_klassen.get(raum) or {}
     klasse = gk.get("klasse")
     # Klassen der Bestandteile; Freitext wie „II laut Tab. 4.1, I laut Text und Anlage 4“ (Waldstadt I) liefert beide
     teile_kl = sorted(
         {k for v in (gk.get("teile") or {}).values() if v for k in re.findall(r"\b(I{1,3})\b", str(v))},
         key=lambda k: -KLASSEN_RANG[k],
     )
+    rwobj, basis = oepnv_rahmen(r, raum)
+    aus = []
+    for kennzahl, mit_takt, zusatz in OEPNV_KENNZAHLEN:
+        w = oepnv_wert(r, kennzahl, rwobj)
+        if klasse in KLASSEN_RANG:
+            w["wert"] = rund(anteil(klasse, mit_takt), 1)
+            txt = f"Gebietsklasse {klasse} laut NVP Tab. 4.1 ({gk.get('zuordnung')}). "
+        elif teile_kl:
+            spanne = [x for x in (rund(anteil(k, mit_takt), 1) for k in teile_kl) if x is not None] or ["k. A."]
+            w["wert"] = None
+            txt = (
+                f"Gebietsklasse gemischt ({', '.join(f'{n}: {k}' for n, k in gk['teile'].items())}); ohne Grenzen der "
+                f"NVP-Ortsteile keine eindeutige Klasse. Spanne: {min(spanne)} bis {max(spanne)} % je nach Klasse "
+                f"({', '.join(teile_kl)}). "
+            )
+        else:
+            w["wert"] = None
+            txt = "Keine Gebietsklasse zugeordnet (" + (gk.get("hinweis") or "offen") + "). "
+        w["unsicherheit"] = (
+            txt + basis + zusatz + " NVP-Geltung 2019 bis 2023, Nachfolger ungeprüft." + r.neubau(raum, ebene)
+        ).strip()
+        aus.append(w)
+    return aus
+
+
+OEPNV_KENNZAHLEN = (
+    ("oepnv_erschliessung", False, ""),
+    (
+        "oepnv_takt",
+        True,
+        " Zusätzlich muss die Haltestelle den Soll-Takt der Gebietsklasse in der Hauptverkehrszeit "
+        "erreichen (NVP Tab. 4.3, Taktklasse je Haltestelle aus A4, Stichtag 10.11.2026).",
+    ),
+)
+
+
+def oepnv_rahmen(r: Rechner, raum: str) -> tuple[dict, str]:
+    o = r.rw["oepnv"]
     rwobj = {
         "wert": o["erschliessung"]["anteil_ew_prozent"],
         "einheit": "%",
@@ -737,47 +847,90 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
             f" Raumeinheit mit höchstens {o['erschliessung']['teilflaeche_min_ew']} EW: "
             "der NVP fordert hier keine Erschließung."
         )
+    return rwobj, basis
+
+
+def oepnv_wert(r: Rechner, kennzahl: str, rwobj: dict) -> dict:
+    return {
+        "kennzahl": kennzahl,
+        "art": "oepnv",
+        "zielgruppe": "Einwohner",
+        "einheit": "%",
+        "methode": "luftlinie",
+        "status": "amtlich",
+        "richtwert": rwobj,
+        "q": "vbb",
+        "stand": f"Einwohner: {r.stand_zensus}; Fahrplan Stichtag 10.11.2026",
+    }
+
+
+def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschlossen) -> list[dict]:
+    """Raumeinheit ist kein Stadtteil (Planungsraum): Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt
+    für Ortsteile, Zuordnung A4). Zellen in Stadtteilen mit gemischter oder offener Klasse zählen nicht; ihr Anteil an
+    den Einwohnern steht im Hinweis. Liegt er über planer.oepnv_max_ohne_klasse_prozent, kein Wert, aber bei
+    gemischten Stadtteilen eine Spanne: Untergrenze = Zelle erschlossen nach jeder ihrer möglichen Klassen,
+    Obergrenze = nach mindestens einer."""
+    grenze = r.rw["planer"]["oepnv_max_ohne_klasse_prozent"]
+    ew_ges = sum(z["ew"] for _, z in zellen)
+    mit, gemischt, ohne, ohne_st, je_klasse = [], [], 0, 0, defaultdict(int)
+    for g, z in zellen:
+        if g not in r.d["zelle_stadtteil"]:
+            ohne += z["ew"]
+            ohne_st += z["ew"]
+            continue
+        gk = st_klassen.get(r.d["zelle_stadtteil"][g]) or {}
+        k = gk.get("klasse")
+        if k in KLASSEN_RANG:
+            mit.append((z, k))
+            je_klasse[k] += z["ew"]
+            continue
+        ohne += z["ew"]
+        moegl = {x for v in (gk.get("teile") or {}).values() if v for x in re.findall(r"\b(I{1,3})\b", str(v))}
+        if moegl:
+            gemischt.append((z, moegl))
+    rwobj, basis = oepnv_rahmen(r, raum)
+    klassen_txt = ", ".join(
+        f"{k}: {prozent(n, ew_ges)} %" for k, n in sorted(je_klasse.items(), key=lambda kv: -KLASSEN_RANG[kv[0]])
+    )
+    txt = (
+        "Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt für Ortsteile; Zuordnung A4), Anteil der "
+        f"Einwohner mit eindeutiger Klasse: {klassen_txt or 'keine'}. "
+    )
+    if ohne - ohne_st:
+        txt += (
+            f"{prozent(ohne - ohne_st, ew_ges)} % der Einwohner wohnen in Stadtteilen mit gemischter oder offener "
+            "Gebietsklasse und zählen nicht mit. "
+        )
+    if ohne_st:
+        txt += f"{prozent(ohne_st, ew_ges)} % der Einwohner liegen in keinem Stadtteil und zählen nicht mit. "
     aus = []
-    for kennzahl, mit_takt, zusatz in (
-        ("oepnv_erschliessung", False, ""),
-        (
-            "oepnv_takt",
-            True,
-            " Zusätzlich muss die Haltestelle den Soll-Takt der Gebietsklasse in der Hauptverkehrszeit "
-            "erreichen (NVP Tab. 4.3, Taktklasse je Haltestelle aus A4, Stichtag 10.11.2026).",
-        ),
-    ):
-        w = {
-            "kennzahl": kennzahl,
-            "art": "oepnv",
-            "zielgruppe": "Einwohner",
-            "einheit": "%",
-            "methode": "luftlinie",
-            "status": "amtlich",
-            "richtwert": rwobj,
-            "q": "vbb",
-            "stand": f"Einwohner: {r.stand_zensus}; Fahrplan Stichtag 10.11.2026",
-        }
-        if klasse in KLASSEN_RANG:
-            w["wert"] = rund(anteil(klasse, mit_takt), 1)
-            txt = f"Gebietsklasse {klasse} laut NVP Tab. 4.1 ({gk.get('zuordnung')}). "
-        elif teile_kl:
-            spanne = [x for x in (rund(anteil(k, mit_takt), 1) for k in teile_kl) if x is not None] or ["k. A."]
-            w["wert"] = None
-            txt = (
-                f"Gebietsklasse gemischt ({', '.join(f'{n}: {k}' for n, k in gk['teile'].items())}); ohne Grenzen der "
-                f"NVP-Ortsteile keine eindeutige Klasse. Spanne: {min(spanne)} bis {max(spanne)} % je nach Klasse "
-                f"({', '.join(teile_kl)}). "
-            )
+    for kennzahl, mit_takt, zusatz in OEPNV_KENNZAHLEN:
+        w = oepnv_wert(r, kennzahl, rwobj)
+        nenner = sum(z["ew"] for z, _ in mit)
+        zaehler = sum(z["ew"] for z, k in mit if erschlossen(z, k, mit_takt))
+        if nenner and 100.0 * ohne / ew_ges <= grenze:
+            w["wert"] = rund(100.0 * zaehler / nenner, 1)
+            grund = ""
         else:
             w["wert"] = None
-            txt = (
-                "Keine Gebietsklasse zugeordnet ("
-                + (gk.get("hinweis") or ("Planungsraum" if ebene != "stadtteil" else "offen"))
-                + "). "
+            grund = (
+                f"Mehr als {grenze} % der Einwohner ohne eindeutige Gebietsklasse: kein Wert. "
+                if nenner
+                else "Keine Zelle mit eindeutiger Gebietsklasse: kein Wert. "
             )
+            if gemischt:
+                n2 = nenner + sum(z["ew"] for z, _ in gemischt)
+                unten = zaehler + sum(
+                    z["ew"] for z, m in gemischt if all(erschlossen(z, k, mit_takt) for k in m)
+                )
+                oben = zaehler + sum(z["ew"] for z, m in gemischt if any(erschlossen(z, k, mit_takt) for k in m))
+                grund += (
+                    f"Spanne über die möglichen Klassen der gemischten Stadtteile ({prozent(n2, ew_ges)} % der "
+                    f"Einwohner): {prozent(unten, n2)} bis {prozent(oben, n2)} %. "
+                )
         w["unsicherheit"] = (
-            txt + basis + zusatz + " NVP-Geltung 2019 bis 2023, Nachfolger ungeprüft." + r.neubau(raum, ebene)
+            txt + grund + basis + zusatz + " NVP-Geltung 2019 bis 2023, Nachfolger ungeprüft."
+            + r.neubau(raum, "planungsraum")
         ).strip()
         aus.append(w)
     return aus
@@ -977,11 +1130,18 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         f"{r.geheim_null} Werte wegen Geheimhaltung null"
     )
     benutzt = {w["q"] for x in raeume.values() for w in x["werte"]} | {"zensus"}
+    if ebene == "planungsraum":
+        benutzt.add("planungsraum")
     benutzt_rw = {w["richtwert"]["q"] for x in raeume.values() for w in x["werte"] if "richtwert" in w}
     quellen = {k: QUELLEN[k] for k in sorted(benutzt)}
     quellen.update({k: DOKUMENTE[k] for k in sorted(benutzt_rw)})
     hinweis = (
-        f"Je {'Planungsraum' if ebene == 'planungsraum' else 'Stadtteil (Planungsräume fehlen noch)'}. "
+        (
+            "Je Planungsraum der Landeshauptstadt (Ebene der Kita- und Schulentwicklungsplanung). "
+            if ebene == "planungsraum"
+            else "Je Stadtteil (Planungsräume fehlen noch). "
+        )
+        + "Zellen gehören über ihren Mittelpunkt zu einer Raumeinheit. "
         "Kinder und Einwohner: Zensus 2022, Stichtag 15.05.2022; Neubaugebiete danach (u. a. Krampnitz, "
         "Bornstedter Feld, Golm) fehlen. Einwohner auf "
         f"{rw['geheimhaltung']['rundung_ew']} gerundet; Werte aus feinen Altersklassen nur bei Raumeinheiten ab "
@@ -1016,7 +1176,10 @@ def main() -> int:
             raise SystemExit(f"Erwartet die Leserolle mosidi_lesen, verbunden als {rolle}")
         d = lesen(cur)
     ids = zellen_reihenfolge()
-    meldungen: list[str] = [f"Raumebene: {d['raumebene']} ({len(d['raeume'])} Raumeinheiten)"]
+    meldungen: list[str] = [
+        f"Raumebene: {d['raumebene']} ({len(d['raeume'])} Raumeinheiten, aus {d['raum_herkunft']})",
+        f"bewohnte Zellen im Stadtgebiet ohne Raumeinheit: {d['ohne_raum'][0]} mit {d['ohne_raum'][1]} EW",
+    ]
     rand = rand_unsicher()  # gilt nur für Luftlinie (A5a); der Fußweg hat keine Randliste
     prog = prognose_lesen(rw, d["raumebene"], meldungen)
     geschrieben, fehlt = [], []

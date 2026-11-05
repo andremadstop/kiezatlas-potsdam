@@ -1,9 +1,13 @@
-# A6 Prüfprotokoll, 2026-11-05T11:37Z (nach den Funden der Gegenprobe)
+# A6 Prüfprotokoll, 2026-11-05T15:21Z (Nachlauf: Planungsräume aus H1, nach der Gegenprobe)
+
+$ python -I skripte/03_planungsraeume.py --datei planungsraume-in-potsdam.geojson --nr-feld pr --name-feld bez
+19 Planungsräume -> vorbereitet/planungsraeume.csv
 
 $ python -I skripte/15_planer.py
-Raumebene: stadtteil (32 Raumeinheiten)
+Raumebene: planungsraum (19 Raumeinheiten, aus vorbereitet/planungsraeume.csv (public.planungsraum noch leer))
+bewohnte Zellen im Stadtgebiet ohne Raumeinheit: 0 mit 0 EW
 Prognose (H11): ../kiezatlas-daten/eingang/prognose_planungsraum.csv fehlt, Spalte prognose nicht ausgegeben
-luftlinie: 32 Raumeinheiten, 544 Werte, 0 Werte wegen Geheimhaltung null
+luftlinie: 19 Raumeinheiten, 323 Werte, 0 Werte wegen Geheimhaltung null
 geschrieben: planer.js, erreichbar.js, einrichtungen.js
 nicht geschrieben (Quelle leer: auswertung.zelle_erreichbar/zelle_gruen methode fussweg bzw. auswertung.osm_poi, wartet auf A3/A5b): planer_fuss_odbl.js, erreichbar_fuss_odbl.js, einrichtungen_odbl.js
 
@@ -17,7 +21,7 @@ A6-2 keine feine Altersklasse je gitter_id in daten/
 A6-3 Status orientierung, wo der Maßstab keine gelesene Potsdamer Fundstelle hat
   ok    Status passt zum Dokument des Richtwerts (0 Abweichungen [])
   ok    Orientierungswerte aus richtwerte.yaml tragen status orientierung (0 ohne)
-  ok    160 Werte mit status orientierung in planer.js
+  ok    95 Werte mit status orientierung in planer.js
 A6-4 ODbL-Grenze: planer.js, erreichbar.js, einrichtungen.js ohne OSM (Korrektur 4)
   ok    planer.js: keine OSM-Spur, kein methode fussweg
   ok    erreichbar.js: keine OSM-Spur, kein methode fussweg
@@ -26,9 +30,9 @@ A6-4 ODbL-Grenze: planer.js, erreichbar.js, einrichtungen.js ohne OSM (Korrektur
   ok    erreichbar.js: methode luftlinie
   ok    einrichtungen.js: Quellen ['lgb', 'mbjs']
 A6-5 Gewicht
-  ok    zusammen 79.0 KB gz ≤ 250 KB ({'planer.js': 10912, 'erreichbar.js': 53771, 'einrichtungen.js': 16208})
+  ok    zusammen 76.9 KB gz ≤ 250 KB ({'planer.js': 8720, 'erreichbar.js': 53771, 'einrichtungen.js': 16208})
 A6-6 Grundschulwerte vorläufig ohne Schulbezirke (H2)
-  ok    128 Grundschulwerte, alle vorlaeufig: true (H2 fehlt)
+  ok    76 Grundschulwerte, alle vorlaeufig: true (H2 im Eingang, nicht verwendet)
 A6-7 Rundung und Unsicherheit (Korrektur 15)
   ok    Einwohner je Raumeinheit auf 10 gerundet
   ok    Anteile ganzzahlig
@@ -36,14 +40,19 @@ A6-7 Rundung und Unsicherheit (Korrektur 15)
   ok    jeder Wert mit Unsicherheitshinweis
   ok    Werte aus Altersklassen nennen das Cell-Key-Verfahren
 A6-8 Raumebene und Geheimhaltung
-  ok    raumebene stadtteil (public.planungsraum leer)
-  ok    alle 32 Raumeinheiten in planer.js
-        kleinste Raumeinheit 14 mit 155 EW (Grenze 100)
+  ok    raumebene planungsraum (Raumeinheiten aus vorbereitet/planungsraeume.csv (public.planungsraum noch leer); H1 da)
+  ok    alle 19 Raumeinheiten in planer.js
+        kleinste Raumeinheit 103 mit 124 EW (Grenze 100)
   ok    keine Altersklassen-Werte in Raumeinheiten unter der Mindestgröße (keine)
-  ok    gerundete Einwohner = kennzahlen.json je Stadtteil (alle)
+  ok    H1-GeoJSON in Längen/Breiten (ohne crs)
+  ok    jede Zelle im Stadtgebiet in genau einem Planungsraum (ohne: 0 mit 0 EW, mehrfach: 0)
+  ok    EW je Planungsraum: Strahlverfahren = PostGIS (alle 19 gleich)
+  ok    gerundete Einwohner in planer.js = Strahlverfahren (alle)
+  ok    EW-Summe 19 Planungsräume 182673 = 32 Stadtteile 182673
 A6-9 Lizenzvermerke (Korrektur 26)
   ok    planer.js lgb: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
   ok    planer.js mbjs: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    planer.js planungsraum: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
   ok    planer.js vbb: CC BY mit Link und Bearbeitungshinweis
   ok    planer.js zensus: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
   ok    planer.js: jede Quelle q steht in quellen
@@ -58,11 +67,14 @@ A6-10 Ärzte, Pflege, Apotheken ohne Versorgungsaussage (Korrektur 13)
   ok    planer.js: nur Entfernung bei ['apotheke', 'arzt', 'pflege', 'spielplatz', 'supermarkt']
         planer_fuss_odbl.js nicht vorhanden (Quelle leer)
 A6-11 Nachrechnung auf zweitem Weg (SQL)
-  ok    Kita-Anteil in 500 m, 32 Raumeinheiten: SQL = Datei (alle)
-  ok    Plätze je Bedarfsplatz, 32 Raumeinheiten: SQL = Datei (alle)
+  ok    Kita-Anteil in 500 m, 19 Raumeinheiten: SQL = Datei (alle)
+  ok    Plätze je Bedarfsplatz, 19 Raumeinheiten: SQL = Datei (alle)
+  ok    oepnv_erschliessung: SQL = Datei in allen 19 Planungsräumen, 8 ohne Wert (über 50 % ohne Klasse) (alle gleich)
+  ok    oepnv_takt: SQL = Datei in allen 19 Planungsräumen, 8 ohne Wert (über 50 % ohne Klasse) (alle gleich)
   ok    erreichbar.js: 44343 Werte gegen die Tabelle, 0 Abweichungen
 
 0 Befunde
+Rückgabe 0
 
 $ python -I pruefen/A6_test_pfade.py
   ok    Prognose gelesen, Zeile anderer Raumebene nicht addiert
@@ -95,20 +107,34 @@ $ python -I pruefen/A6_test_pfade.py
   ok    alle Testdateien bestehen Vertrag und Lizenzgrenze aus daten.py
   ok    leere OSM-Quelle: keine Fußweg- und OSM-Dateien
   ok    Raumebene planungsraum wird übernommen
+  ok    Planungsraum: Klasse je Zelle aus dem Stadtteil, gemischte Zellen (50 %) zählen nicht
+  ok    Planungsraum nur mit gemischter Klasse: kein Wert, Spanne über die möglichen Klassen
+  ok    ohne H1, Tabelle und CSV: Stadtteile
+  ok    H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile
+  ok    leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest
+  ok    CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen
 
 alle Tests bestanden
+Rückgabe 0
+
+$ python -I pruefen/daten.py
+  ok    Fixture planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+
+0 Abweichungen
 
 $ python -I pruefen/A2_einrichtungen.py und pruefen/A5a_erreichbarkeit.py (Rolle kiezatlas_rechnen, nur lesen) gegen die geänderte richtwerte.yaml
+
 0 Befund(e)
+[ok] 9b kein Netzmodul in Skript und Prüfung: keins
 Ergebnis: 0 Befunde
 
 $ ruff check --select E,F,W --line-length 120 (A6-Dateien)
 All checks passed!
 
 $ md5sum (zwei Läufe hintereinander gleich)
-1f2adf1ecf8af3eff36afe34a56b7f09  daten/planer.js
+e44ea4efd9d1c65e77ac66e7dc07ff8b  daten/planer.js
 8082832ba9b03c503d9a6690e30835f4  daten/erreichbar.js
 71f2842a7fcacd0d63086f100f3dbe3e  daten/einrichtungen.js
-1f2adf1ecf8af3eff36afe34a56b7f09  daten/planer.js
+e44ea4efd9d1c65e77ac66e7dc07ff8b  daten/planer.js
 8082832ba9b03c503d9a6690e30835f4  daten/erreichbar.js
 71f2842a7fcacd0d63086f100f3dbe3e  daten/einrichtungen.js
