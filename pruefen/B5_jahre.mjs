@@ -299,6 +299,19 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const vb2 = verboteneToene(await gerenderteFarben(page));
       pruef(vb2.length === 0, `Gebäudeansicht: Farben ohne Farbton ${HUE_VON}°–${HUE_BIS}° ${vb2.slice(0, 4).join(" ")}`);
       pruef(await page.evaluate(() => document.getAnimations().length === 0), "Gebäudeansicht: reduzierte Bewegung ohne Animation");
+      // Breiter Blick bei Zoom 14: mehr Stadtteile im Bild als geladen werden; Zellen blenden nur dort ab, wo Gebäude da sind
+      await page.evaluate(() => window.KIEZ_KARTE.jumpTo({ center: [13.055, 52.395], zoom: 14 }));
+      await page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 20000 }).catch(() => {});
+      await page.waitForTimeout(300);
+      const w = await page.evaluate(() => {
+        const m = window.KIEZ_KARTE, g = window.KIEZ_JAHRE.geb(), deck = JSON.stringify(m.getPaintProperty("zellen-2d", "fill-opacity"));
+        const lit = (deck.match(/\["literal",(\[[^\]]*\])\]/) || [])[1];
+        const st = [...new Set(m.queryRenderedFeatures({ layers: ["zellen-2d"] }).map((f) => f.properties.st))].sort();
+        return { g, lit: lit ? JSON.parse(lit).sort() : null, st };
+      });
+      const ohne = w.st.filter((n) => !w.g.im_bild.includes(n));
+      pruef(w.lit && JSON.stringify(w.lit) === JSON.stringify(w.g.im_bild.slice().sort()) && w.g.im_bild.length <= 4 && (ohne.length === 0 || /weitere Stadtteile beim Heranzoomen/.test(w.g.text)),
+        `breiter Blick Zoom 14: Gebäude aus ${w.g.im_bild.join(", ")}, Zellen abgeblendet nur dort (${(w.lit || []).join(", ")}), Zellen voll in ${ohne.join(", ") || "keinem"}; Hinweis „${w.g.text.slice(-40)}“`);
     }
     if (seite === "jahre-methode.html") {
       const M = await page.evaluate(() => window.KIEZ_JAHRE_METHODE);

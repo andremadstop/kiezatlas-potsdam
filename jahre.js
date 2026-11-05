@@ -241,8 +241,13 @@ function karte() {
   // Gebäude: Farbe der Klasse k, Zeitfilter über k (kein neues Laden); k null = nicht datiert
   function gebFarbe() { var e = ["match", ["coalesce", ["get", "k"], -1]]; PALETTE.forEach(function (c, k) { e.push(k, c); }); e.push(GEB_ND); return e; }
   function gebFilter() { var k = ["coalesce", ["get", "k"], -1]; return S.ansicht === "spanne" ? ["all", [">=", k, S.von], ["<=", k, S.bis]] : [">=", k, 0]; }
-  // Zellen treten ab Zoom 14 zurück, damit Gebäude und Zellen nicht doppelt färben
-  function abZoom(nah, fern) { return ["interpolate", ["linear"], ["zoom"], GEB_ZOOM - 0.4, fern, GEB_ZOOM + 0.2, nah]; }
+  // Zellen treten ab Zoom 14 zurück, damit Gebäude und Zellen nicht doppelt färben, aber nur in Stadtteilen, deren
+  // Gebäude geladen sind (sonst sähe ein nicht geladener Stadtteil aus wie unbebaut)
+  function abZoom(nah, fern) { return ["interpolate", ["linear"], ["zoom"], GEB_ZOOM - 0.4, fern, GEB_ZOOM + 0.2, ["case", ["in", ["get", "st"], ["literal", gebNrs]], nah, fern]]; }
+  function zellDeck() {
+    map.setPaintProperty("zellen-2d", "fill-opacity", abZoom(["case", ["==", ["get", "j_w"], 1], 0.1, 0.16], ["case", ["==", ["get", "j_w"], 1], 0.38, 0.9]));
+    map.setPaintProperty("zellen-muster", "fill-opacity", abZoom(0.15, 0.95));
+  }
   function hoeheAus(anz) { return ["interpolate", ["linear"], ["zoom"], 10, ["*", anz, 42], 12, ["*", anz, 15], 14, ["*", anz, 5], 16, ["*", anz, 2]]; }
 
   function anwenden() {
@@ -250,14 +255,12 @@ function karte() {
     var sp = S.ansicht === "spanne";
     var farbe = sp ? farbeSpanne() : farbeUeberblick();
     var filt = sp ? [">=", ["get", "j_s"], 2] : ["==", ["get", "j_s"], 3];
-    var deck = abZoom(["case", ["==", ["get", "j_w"], 1], 0.1, 0.16], ["case", ["==", ["get", "j_w"], 1], 0.38, 0.9]);
     map.setFilter("zellen-2d", filt); map.setFilter("zellen-3d", filt);
-    map.setPaintProperty("zellen-2d", "fill-color", farbe); map.setPaintProperty("zellen-2d", "fill-opacity", deck);
+    map.setPaintProperty("zellen-2d", "fill-color", farbe); zellDeck();
     map.setPaintProperty("zellen-3d", "fill-extrusion-color", farbe);
     map.setPaintProperty("zellen-3d", "fill-extrusion-height", hoeheAus(sp ? ["*", ["get", "j_g"], ["/", summe(), 100]] : ["get", "j_g"]));
     map.setFilter("zellen-muster", sp ? ["==", ["get", "j_s"], 1] : ["any", ["==", ["get", "j_s"], 1], ["==", ["get", "j_s"], 2]]);
     map.setPaintProperty("zellen-muster", "fill-pattern", ["match", ["get", "j_s"], 2, "j-punkte", "j-schraffur"]);
-    map.setPaintProperty("zellen-muster", "fill-opacity", abZoom(0.15, 0.95));
     map.setFilter("geb-farbe", gebFilter()); map.setFilter("geb-belegt", ["all", gebFilter(), ["==", ["get", "g"], "belegt"]]);
     map.setPaintProperty("geb-farbe", "fill-color", gebFarbe());
     map.setLayoutProperty("zellen-3d", "visibility", S.d3 ? "visible" : "none");
@@ -333,7 +336,7 @@ function karte() {
     setze("spanne-name", name);
     var st = document.getElementById("j-status");
     var nah = map.getZoom() >= GEB_ZOOM;
-    if (nah) st.textContent = sp ? "Gebäude mit geschätzter Bauzeit " + name + " in Farbe" : "Gebäude nach geschätzter Bauzeit";
+    if (nah) st.textContent = (sp ? "Gebäude mit geschätzter Bauzeit " + name + " in Farbe" : "Gebäude nach geschätzter Bauzeit") + (gebMehr ? "; weitere Stadtteile beim Heranzoomen" : "");
     else st.textContent = sp ? "Anteil " + name + " je Zelle" + (S.d3 ? ", Höhe: Zahl dieser Gebäude" : "") : "Bauzeit mit den meisten Gebäuden je Zelle" + (S.d3 ? ", Höhe: Zahl der Gebäude" : "");
     document.getElementById("kartenstatus").textContent = "Karte zeigt: " + st.textContent + (S.nr ? ", ausgewählt " + S.nr + " " + T.name(S.nr) : "") + (nah ? ", " + gebSichtText() : "") + ".";
     var L = document.getElementById("j-legende"); L.innerHTML = "";
@@ -371,7 +374,7 @@ function karte() {
 
   // ---------- Gebäude ab Zoom 14: je Stadtteil im Bild eine Datei, per <script> (T.laden), nie beim Seitenstart
   var GEB = ["geb-farbe", "geb-nd", "geb-rest"], ZELL = ["zellen-2d", "zellen-3d", "zellen-muster"];
-  var gebDaten = {}, gebFehl = {}, gebImBild = [], gebSchluessel = "", gebBelegt = 0, QUELLEN = {}, BOX = {};
+  var gebDaten = {}, gebFehl = {}, gebNrs = [], gebImBild = [], gebSchluessel = "", gebBelegt = 0, QUELLEN = {}, BOX = {};
   // Stadtteil an einem Punkt (Strahlverfahren, Löcher beachtet)
   function inRing(r, x, y) { var c = false; for (var i = 0, j = r.length - 1; i < r.length; j = i++) { var a = r[i], b = r[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
   function teilAn(x, y) {
@@ -388,7 +391,8 @@ function karte() {
   function teileImBild() {
     var b = map.getBounds(), w = b.getWest(), o = b.getEast(), s = b.getSouth(), n = b.getNorth(), l = {};
     for (var i = 0; i < 5; i++) for (var j = 0; j < 5; j++) { var nr = teilAn(w + (o - w) * (i + 0.5) / 5, s + (n - s) * (j + 0.5) / 5); if (nr) l[nr] = (l[nr] || 0) + 1; }
-    var nrs = Object.keys(l).sort(function (a, c) { return l[c] - l[a] || a - c; });
+    // der gewählte Stadtteil zuerst, wenn er im Bild liegt; dann nach Anteil am Bild
+    var nrs = Object.keys(l).sort(function (a, c) { return (c === S.nr) - (a === S.nr) || l[c] - l[a] || a - c; });
     gebMehr = nrs.length > GEB_MAX;
     return nrs.slice(0, GEB_MAX).sort();
   }
@@ -401,11 +405,11 @@ function karte() {
   function gebSetzen() {
     var da = gebImBild.filter(function (nr) { return gebDaten[nr]; }), sch = da.join(",");
     if (sch === gebSchluessel) return;
-    gebSchluessel = sch; gebBelegt = 0;
+    gebSchluessel = sch; gebBelegt = 0; gebNrs = da;
     var fc = { type: "FeatureCollection", features: [] };
     da.forEach(function (nr) { var d = gebDaten[nr]; fc.features = fc.features.concat(d.features); d.features.forEach(function (f) { if (f.properties.g === "belegt") gebBelegt++; }); });
     map.getSource("gebaeude").setData(fc);
-    leisteZeigen();
+    zellDeck(); leisteZeigen();
   }
   function gebSicht() {
     if (!bereit) return;
