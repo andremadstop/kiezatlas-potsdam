@@ -28,7 +28,7 @@ sie nicht.** Sie sind aus offenen amtlichen Daten berechnet und stehen unter der
   Fußweg-Kennzahl, Prüfbericht 4). Wer eine `_odbl`-Datei veröffentlicht, bietet sie auf der Download-Seite
   an (Share-Alike, Pflicht zum Angebot der abgeleiteten Datenbank).
 - **Keine Wikipedia-Werte** (CC BY-SA 4.0) und keine OSM-Jahre in den Gebäudejahren; beide nur zur Prüfung.
-- **Keine Personendaten, keine Adressen.** Feine Zensusklassen nur je Raumeinheit mit mindestens 100 Einwohnern.
+- **Keine Personendaten, keine Adressen.** Feine Zensusklassen (feiner als die fünf Altersklassen des Hauptatlas, etwa die infrastrukturellen Altersgruppen) nur je Raumeinheit mit mindestens 100 Einwohnern. Je 100-m-Zelle stehen nur die Anteile, die der Zensus selbst je Gitterzelle veröffentlicht (fünf Altersklassen, Baujahr, Heizung; geschützt durch sein Cell-Key-Verfahren), dazu Einwohner und Entfernungen.
 - `pruefen/daten.py` prüft die ODbL-Grenze, Adress- und Kontaktfelder und feine Klassen in jeder Datei.
 
 Vor dem ersten Push neuer Datendateien auf GitHub die aktuellen Nutzungsbedingungen der Plattform lesen
