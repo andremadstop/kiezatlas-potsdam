@@ -1,0 +1,98 @@
+
+== de:12054:900230037 Potsdam, Spindelstr.  (2026-11-10, 06:00–09:00)
+  06:09  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  06:13  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  06:17  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  06:29  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  06:33  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  06:36  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  06:49  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  06:50  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  06:56  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  06:57  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  07:10  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  07:11  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  07:16  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  07:17  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  07:30  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  07:31  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  07:36  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  07:37  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  07:50  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  07:51  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  07:56  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  07:57  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  08:10  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  08:11  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  08:16  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  08:17  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  08:30  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  08:31  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  08:36  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  08:37  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+  08:50  694  0  Potsdam, Stern-Center/Gerlachstr.  de:12054:900230037::1    
+  08:51  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    
+  08:56  616  0  Potsdam, Fontanestr.  de:12054:900230037::1    
+  08:57  616  1  S Babelsberg/Schulstr.  de:12054:900230037::2    
+
+== de:12054:900230100 Potsdam, Falkenhorst  (2026-11-10, 06:00–09:00)
+  06:01  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  06:03  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  06:15  602  0  Teltow Feuerwehr  de:12054:900230100::1    
+  06:21  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  06:23  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  06:41  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  06:43  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  06:58  693  1  Potsdam, Rathaus Babelsberg  de:12054:900230100::2    
+  07:01  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  07:03  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  07:18  693  1  Potsdam, Rathaus Babelsberg  de:12054:900230100::2    
+  07:21  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  07:23  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  07:41  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  07:43  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  08:01  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  08:03  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  08:21  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  08:23  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+  08:41  693  0  Potsdam, Rehbrücke Bhf  de:12054:900230100::1    
+  08:43  693  1  S Babelsberg/Lutherplatz  de:12054:900230100::2    
+
+== de:12054:900220387 Potsdam, Theodor-Fontane-Str.  (2026-11-10, 06:00–09:00)
+  06:15  604  1  S Potsdam Hauptbahnhof  de:12054:900220387::2    
+  06:39  604  0  Dallgow-Döberitz, Havelpark  de:12054:900220387::1    
+  06:57  604  1  S Potsdam Hauptbahnhof  de:12054:900220387::2    
+  06:58  638  1  Potsdam, Kirche Groß Glienicke  de:12054:900220387::1    
+  07:09  604  0  Dallgow-Döberitz, Havelpark  de:12054:900220387::1    
+  07:17  604  1  S Potsdam Hauptbahnhof  de:12054:900220387::2    
+  07:55  604  0  Dallgow-Döberitz, Havelpark  de:12054:900220387::1    
+  08:30  604  1  S Potsdam Hauptbahnhof  de:12054:900220387::2    
+  08:32  604  0  Dallgow-Döberitz, Havelpark  de:12054:900220387::1    
+
+== de:12054:900220326 Potsdam, Kienheide  (2026-11-10, 06:00–09:00)
+  07:13  609  0  Potsdam, Platz der Einheit/West  de:12054:900220326::2    
+  07:32  609  1  Potsdam, Schule Marquardt  de:12054:900220326::1    
+
+== de:12054:900230015 Potsdam, Platz der Einheit/Nord  (2026-11-10, 06:00–09:00)
+  06:00  96  1  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  06:06  96  0  Potsdam, Marie-Juchacz-Str.  de:12054:900230015::0    
+  06:50  98  1  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  06:54  98  0  Potsdam, Rehbrücke Bhf  de:12054:900230015::0    
+  06:55  93  1  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  06:58  93  0  Potsdam, Rehbrücke Bhf  de:12054:900230015::0    
+  07:05  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  07:06  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    
+  07:25  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  07:26  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    
+  07:40  98  1  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  07:44  98  0  Potsdam, Rehbrücke Bhf  de:12054:900230015::0    
+  07:45  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  07:46  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    
+  08:05  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  08:06  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    
+  08:25  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  08:26  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    
+  08:30  98  1  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  08:34  98  0  Potsdam, Bisamkiez  de:12054:900230015::0    
+  08:45  99  0  Potsdam, Platz der Einheit/Nord  de:12054:900230015::0  Endhalt  
+  08:46  99  1  Potsdam, Fontanestr.  de:12054:900230015::0    

@@ -34,21 +34,101 @@ raumebene:
 # ---------------------------------------------------------------------------------- ÖPNV
 # A4 Anfang
 oepnv:
-  quelle: "Nahverkehrsplan Landeshauptstadt Potsdam 2019, Kap. 4.1.3, Tab. 4.2/4.3"
+  # Gelesen am 05.11.2026 im NVP 2019 (PDF, sha256 3e9a83e1…, $KIEZ_DATEN/nvp_potsdam/2019/), Protokoll: pruefen/a4_nvp_lesung.md.
+  # Seitenzahlen = Druckseiten des NVP. Der NVP misst in Luftlinie.
+  quelle: "Nahverkehrsplan 2019 für die Landeshauptstadt Potsdam (VerkehrsConsult Dresden-Berlin), Kap. 4.1.1–4.1.3, Anlage 4"
   url: https://www.potsdam.de/system/files/documents/2020-09-29_nvp_potsdam_mit_anlagen.pdf
-  seite: "S. 58–59"
-  geprueft: null
+  geprueft: 2026-11-05
   methode: luftlinie
+  aktualitaet:
+    gilt_fuer: "2019 bis 2023 (Kap. 4.1, S. 54)"
+    befund: "formal abgelaufen; Nachfolger in zwei Websuchen am 05.11.2026 nicht gefunden, bei der Stadt nicht nachgefragt"
+    status: offen
+  # Kernbefund (Prüfbericht Korrektur 11): Die Klasse I/II/III ist eine Eigenschaft des Ortsteils (Nutzungsdichte,
+  # Tab. 4.1), nicht der Haltestelle. Einzugsradius und Soll-Takt folgen aus der Ortsteilklasse.
   einzugsradius_m:
-    # Zuordnung zu Bedienungsklasse bzw. Raumtyp laut NVP vor A4 nachlesen (Prüfbericht 11)
-    bus: {werte: [300, 400, 500], status: amtlich}
-    tram: {werte: [350, 450], status: amtlich}
-  erschliessung_anteil_prozent: {wert: 80, status: amtlich, gilt_fuer: "Teilflächen mit mehr als 200 EW"}
+    seite: "Tab. 4.2, S. 59"
+    status: amtlich
+    # Schlüssel: Verkehrsmittel → Ortsteilklasse (gebietsklasse), nicht Taktklasse
+    tram: {I: 350, II: 450, III: null}
+    bus: {I: 300, II: 400, III: 500}
+    spnv: {I: null, II: null, III: null, hinweis: "Tab. 4.2 nennt keinen Wert; Abb. 4.2 (S. 61) zeichnet SPNV ohne Radiusangabe. Nicht erfinden; A5 kennzeichnet SPNV getrennt."}
+    faehre: {I: null, II: null, III: null, hinweis: "nicht in Tab. 4.2"}
+  erschliessung:
+    seite: "Kap. 4.1.3, S. 58"
+    status: amtlich
+    teilflaeche_min_ew: 200        # Teilflächen mit mehr als 200 EW sollen erschlossen sein
+    anteil_ew_prozent: 80          # erschlossen, wenn 80 % der EW im Einzugsbereich liegen
+    hinweis: "„Teilfläche“ ist im NVP nicht als Geometrie definiert; Abb. 4.2 bewertet auf Ortsteilen. A6 rechnet auf Planungsraum bzw. Stadtteil und benennt die Abweichung."
   taktklassen:
-    # Grenzen (Fahrten je Richtung in der Hauptverkehrszeit) aus Tab. 4.2/4.3 übernehmen
-    I: {fahrten_hvz_je_richtung_min: null, status: offen}
-    II: {fahrten_hvz_je_richtung_min: null, status: offen}
-    III: {fahrten_hvz_je_richtung_min: null, status: offen}
+    # Tab. 4.3, S. 59: Soll-Fahrten je Stunde und Richtung in der HVZ, je Ortsteilklasse. A4 leitet daraus eine
+    # Taktklasse je Haltestelle ab (erreichter Takt gemessen an den Untergrenzen). Das ist eine eigene Lesart:
+    # Werte zwischen 3 und 6 Fahrten zählt der NVP keiner Klasse zu, hier gelten sie als II.
+    seite: "Tab. 4.3, S. 59"
+    status: amtlich
+    eigene_festlegung: "Zuordnung nach Untergrenzen; > 3 und < 6 Fahrten = II; unter 1 Fahrt = „unter III“"
+    I: {fahrten_hvz_je_richtung_min: 6, soll_hvz: "6 bis 12"}
+    II: {fahrten_hvz_je_richtung_min: 2, soll_hvz: "2 bis 3"}
+    III: {fahrten_hvz_je_richtung_min: 1, soll_hvz: "1"}
+  messung:
+    # Wie 13_oepnv.py den Takt misst (eigene Festlegung, im Lese-Protokoll begründet)
+    stichtag: 2026-11-10        # Dienstag, Schultag (Herbstferien Brandenburg 19.–30.10.2026)
+    hvz_fenster: ["06:00", "09:00"]   # morgendliche HVZ Mo–Fr Klasse I und II (Abb. 4.1, S. 57); Mittel je Stunde
+    hvz_fenster_nvp_anlage4: {I: ["06:00", "08:00"], II: ["07:00", "09:00"], III: ["07:00", "09:00"]}
+    richtung: "Abfahrten (pickup_type ≠ 1, ohne Endhalt der Fahrt), alle Linien zusammen, je direction_id gezählt; Wert = größere der beiden Richtungen"
+    randpuffer_m: 1000          # Haltestellen bis 1 km außerhalb der Stadtgrenze (Brandenburg, E7), Berlin nicht
+  gebietsklassen:
+    # Tab. 4.1, S. 55–56, wörtlich (NVP-Ortsteile). we = Klasse am Wochenende.
+    nvp_ortsteile:
+      I: [Bornstedter Feld, Golm Ost, Golm West, Brandenburger Vorstadt, Potsdam West, Nördliche Innenstadt,
+          Südliche Innenstadt, Babelsberg Süd, Babelsberg Zentrum, Teltower Vorstadt, Schlaatz, Waldstadt II,
+          Am Stern, Drewitz, Kirchsteigfeld]
+      II: [Bornim, Bornstedter Ortslage, Eiche, Jägervorstadt, Berliner Vorstadt, Babelsberg Nord, Templiner Vorstadt,
+           Hermannswerder, Waldstadt I, Industriegelände, Fahrland, Kaserne Krampnitz, Neu Fahrland, Groß Glienicke,
+           Campus Jungfernsee]
+      III: [Institut Bornim, Nedlitz, Sacrow, Grube, Nauener Vorstadt, Forststraße, Klein Glienicke, Alt Drewitz,
+            Uetz-Paaren, Marquardt, Friedrichspark, Satzkorn, Kartzow, Krampnitz Ort, Waldsiedlung Groß Glienicke,
+            Das kurze Feld]
+      ohne_klasse: [Forst Potsdam Süd, Wildpark]
+      we: {Bornstedter Feld: II, Babelsberg Süd: II, Am Stern: II, Golm Ost: III, Golm West: III, Industriegelände: III}
+    widerspruch: "Waldstadt I steht in Tab. 4.1 unter Klasse II, im Text S. 56 im Klasse-I-Korridor und in Anlage 4 unter Klasse I."
+    # Abbildung auf die 32 Stadtteile (public.stadtteil.nr). Genau geht es nur mit den Geometrien der NVP-Ortsteile bzw.
+    # statistischen Bezirke (Anlage 2 nennt deren Nummern) → wartet auf H1 (statistische-bezirke-in-potsdam).
+    # zuordnung: eindeutig = gleichnamig; zusammengesetzt = alle Bestandteile gleiche Klasse (Bestandteile aus dem Namen
+    # abgeleitet); gemischt = Bestandteile mit verschiedenen Klassen; offen = kein gleichnamiger Eintrag.
+    stadtteile:
+      "11": {klasse: null, zuordnung: gemischt, teile: {Bornim: II, Institut Bornim: III}}
+      "12": {klasse: III, zuordnung: eindeutig}
+      "13": {klasse: null, zuordnung: gemischt, teile: {Bornstedter Feld: I, Bornstedter Ortslage: II, Das kurze Feld: III}}
+      "14": {klasse: III, zuordnung: eindeutig}
+      "15": {klasse: II, zuordnung: eindeutig}
+      "16": {klasse: III, zuordnung: eindeutig}
+      "17": {klasse: I, zuordnung: zusammengesetzt, teile: {Golm Ost: I, Golm West: I}}
+      "21": {klasse: III, zuordnung: eindeutig}
+      "22": {klasse: II, zuordnung: eindeutig}
+      "23": {klasse: II, zuordnung: eindeutig}
+      "31": {klasse: I, zuordnung: eindeutig}
+      "32": {klasse: null, zuordnung: gemischt, teile: {Potsdam West: I, Forststraße: III, Wildpark: null}}
+      "41": {klasse: I, zuordnung: zusammengesetzt, teile: {Nördliche Innenstadt: I, Südliche Innenstadt: I}}
+      "43": {klasse: null, zuordnung: offen, hinweis: "Zentrum Ost/Nuthepark ohne gleichnamigen NVP-Ortsteil"}
+      "44": {klasse: null, zuordnung: offen, hinweis: "Hauptbahnhof/Brauhausberg Nord ohne gleichnamigen NVP-Ortsteil"}
+      "51": {klasse: III, zuordnung: eindeutig}
+      "52": {klasse: II, zuordnung: eindeutig}
+      "53": {klasse: I, zuordnung: zusammengesetzt, teile: {Babelsberg Süd: I, Babelsberg Zentrum: I}}
+      "61": {klasse: II, zuordnung: zusammengesetzt, teile: {Templiner Vorstadt: II, Hermannswerder: II}}
+      "62": {klasse: I, zuordnung: eindeutig}
+      "63": {klasse: I, zuordnung: eindeutig}
+      "64": {klasse: null, zuordnung: gemischt, teile: {Waldstadt I: "II laut Tab. 4.1, I laut Text und Anlage 4", Industriegelände: II}}
+      "65": {klasse: I, zuordnung: eindeutig}
+      "71": {klasse: I, zuordnung: eindeutig, hinweis: "NVP: Am Stern"}
+      "72": {klasse: null, zuordnung: gemischt, teile: {Drewitz: I, Alt Drewitz: III}}
+      "73": {klasse: I, zuordnung: eindeutig}
+      "81": {klasse: III, zuordnung: eindeutig}
+      "82": {klasse: III, zuordnung: eindeutig}
+      "83": {klasse: III, zuordnung: zusammengesetzt, teile: {Satzkorn: III, Friedrichspark: III}, hinweis: "Lage Friedrichspark nicht geprüft"}
+      "84": {klasse: null, zuordnung: gemischt, teile: {Fahrland: II, Kaserne Krampnitz: II, Krampnitz Ort: III, Kartzow: III}}
+      "85": {klasse: II, zuordnung: eindeutig, hinweis: "Campus Jungfernsee (II) vermutlich hier oder in Nedlitz, nicht geprüft"}
+      "86": {klasse: null, zuordnung: gemischt, teile: {Groß Glienicke: II, Waldsiedlung Groß Glienicke: III}}
 # A4 Ende
 
 # ---------------------------------------------------------------------------------- Nahversorgung
