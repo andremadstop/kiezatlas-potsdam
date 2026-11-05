@@ -23,17 +23,19 @@ sys.path.insert(0, str(WURZEL / "skripte"))
 fw = importlib.import_module("14b_fussweg")
 
 
-def vorbereiten(cur) -> tuple[list[str], set[str]]:
-    """TEMP-Tabellen a5b_zelle und a5b_ziel wie im Rechenskript; gibt Zell-IDs und bewohnte Zell-IDs zurück."""
+def vorbereiten(cur) -> tuple[list[str], set[str], dict]:
+    """TEMP-Tabellen a5b_zelle und a5b_ziel wie im Rechenskript (mit Landesfilter E7).
+
+    Gibt Zell-IDs, bewohnte Zell-IDs und den Befund des Landesfilters zurück."""
     rw = fw.richtwerte()
     ids, xy, ew = fw.zellen_laden(cur)
     fw.zellen_temp(cur, ids, xy)
-    fw.ziele_anlegen(cur, rw["gruen_arten"])
-    return ids, {i for i, e in zip(ids, ew.tolist()) if e > 0}
+    land = fw.ziele_anlegen(cur, rw["gruen_arten"])
+    return ids, {i for i, e in zip(ids, ew.tolist()) if e > 0}, land
 
 
 def pruefen(cur) -> list[tuple[str, bool, str]]:
-    ids, bewohnt = vorbereiten(cur)
+    ids, bewohnt, land = vorbereiten(cur)
     n = len(ids)
     erg: list[tuple[str, bool, str]] = []
 
@@ -104,6 +106,17 @@ def pruefen(cur) -> list[tuple[str, bool, str]]:
                 and kommentar,
                 (f"zelle_erreichbar {z_all} Zeilen, ohne methode {z_ohne}, Fußweg ohne ODbL {z_odbl}; "
                 f"zelle_gruen Fußweg {g_fuss} Zeilen, ohne ODbL {g_odbl}; Tabellenkommentar nennt ODbL: {kommentar}")))
+
+    # E7, Berlin nein: jedes Ziel einer Fußweg-Zeile steht im gefilterten Zielbestand, keine Berliner Haltestelle
+    cur.execute("""SELECT count(*) FILTER (WHERE z.ziel_id IS NULL),
+                          count(*) FILTER (WHERE e.ziel_id LIKE %s)
+                   FROM auswertung.zelle_erreichbar e
+                   LEFT JOIN a5b_ziel z ON z.art = e.art AND z.ziel_id = e.ziel_id
+                   WHERE e.methode = 'fussweg' AND e.ziel_id IS NOT NULL""", (f"de:{fw.LAND_BERLIN}%",))
+    ausserhalb, berlin_halt = cur.fetchone()
+    erg.append(("E7 keine Berliner Ziele", ausserhalb == 0 and berlin_halt == 0,
+                (f"Ziele außerhalb des gefilterten Bestands: {ausserhalb}, Berliner Haltestellen: {berlin_halt}; "
+                 f"als Berlin ausgelassen: {land['berlin_ausgelassen'] or 'keine'} ({land['land_quelle']})")))
 
     # E7: Ziele außerhalb der Stadtgrenze (Brandenburg) werden mitgerechnet
     cur.execute("""SELECT e.art, count(*) FROM auswertung.zelle_erreichbar e

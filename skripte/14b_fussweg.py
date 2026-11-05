@@ -7,6 +7,8 @@ Eingang (nur lesen):
                                            und Menge wie daten/zellen.js aus skripte/02_auswerten.py und wie A5a;
                                            darunter die bewohnten mit ew > 0)
 - config/richtwerte.yaml                   geschwindigkeit_fuss_kmh, gruen.radius_m, gruen_definition.arten
+- $KIEZ_DATEN/vbb_gtfs/<stand>/GTFS.zip    nur stops.txt: Land je Haltestelle aus dem DHID (de:11… Berlin,
+                                           de:12… Brandenburg), für den Landesfilter E7 (CC BY 4.0 VBB)
 
 Ausgang (Rolle kiezatlas_rechnen, nur Zeilen mit methode = 'fussweg'; die Luftlinie-Zeilen von A5a bleiben):
 - auswertung.zelle_erreichbar   je Zelle und Art: Meter, Minuten, nächstes Ziel
@@ -23,6 +25,15 @@ Rechnung (Python offline, E4: kein pgRouting, kein Netzabruf):
   Streckenzug und damit nie kürzer als die Luftlinie (Dreiecksungleichung).
 - Flächen (Grün) werden über Punkte auf ihrem Rand erreicht (ST_Segmentize, Abstand ZUGANG_ABSTAND_M).
 - Minuten = Meter / (geschwindigkeit_fuss_kmh · 1000 / 60).
+
+E7 (Andre, 05.11.): Ziele außerhalb der Stadtgrenze zählen mit, aber nur in Brandenburg, nicht in Berlin.
+- Einrichtungen und Grün (A2) sind nur Brandenburger bzw. Potsdamer Daten, kein Filter nötig.
+- Haltestellen (A4): DHID mit Kreisschlüssel 11 (Berlin) fallen heraus.
+- OSM-Ziele (A3, Puffer Stadt + 2 km, reicht nach Berlin): In der Datenbank gibt es keine Landesgrenze. Näherung:
+  Land der nächsten VBB-Haltestelle (Kreisschlüssel im DHID). Kreuzvalidierung am 05.11.2026 mit den 1.800 Halten um
+  Potsdam (eigene Station ausgelassen): 15 falsch, alle höchstens rund 1 km vom nächsten Halt des anderen Landes
+  (pruefen/a5b_landfilter_kreuzprobe.py). Ersetzt wird das durch eine echte Grenze, sobald eine vorliegt (z. B.
+  boundary=administrative aus der PBF, A3).
 
 Lizenz: Jede Fußweg-Zeile ist aus dem OSM-Netz abgeleitet und steht unter ODbL 1.0 (CHECK in sql/002_ausbau.sql).
 Veröffentlicht wird sie nur in Dateien mit _odbl im Namen (A6: daten/erreichbar_fuss_odbl.js,
@@ -63,6 +74,8 @@ ZENSUS = ("Zellmittelpunkt: © Statistische Ämter des Bundes und der Länder, Z
           "(https://www.govdata.de/dl-de/by-2-0)")
 VBB = ("VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), "
        "Daten verändert (eigene Berechnung)")
+LAND_BERLIN, LAND_BRANDENBURG = "11", "12"
+STOPS_MAX_BYTE = 64 * 1024 * 1024   # stops.txt im VBB-GTFS: rund 4 MB; größer = falsche Datei
 
 
 # ------------------------------------------------------------------------------- Netz (rein)
@@ -262,26 +275,106 @@ def netz_laden(cur, schema: str = "auswertung") -> Netz:
     return netz_bauen(k[:, 0].astype(np.int64), k[:, 1:], e[:, 0].astype(np.int64), e[:, 1].astype(np.int64), e[:, 2])
 
 
-def ziele_anlegen(cur, gruen_arten: tuple[str, ...]) -> None:
+def gtfs_pfad(kiez_daten: str | None = None) -> Path | None:
+    """Neuester Stand $KIEZ_DATEN/vbb_gtfs/<stand>/GTFS.zip (Ordnernamen sind Daten, also sortierbar)."""
+    basis = Path(kiez_daten or os.environ.get("KIEZ_DATEN") or WURZEL.parent / "kiezatlas-daten") / "vbb_gtfs"
+    staende = sorted(p for p in basis.glob("*/GTFS.zip") if p.is_file()) if basis.is_dir() else []
+    return staende[-1] if staende else None
+
+
+def halte_land(pfad: Path) -> list[tuple[float, float, str]]:
+    """(lon, lat, land) je Haltepunkt aus stops.txt; nur DHIDs mit Kreisschlüssel 11 oder 12, nur Punkte.
+
+    Liest aus dem Zip nur stops.txt (Fremddaten: Größe begrenzt, nichts entpackt, nichts ausgeführt).
+    """
+    import csv
+    import io
+    import zipfile
+    erg = []
+    with zipfile.ZipFile(pfad) as z:
+        info = z.getinfo("stops.txt")
+        if info.file_size > STOPS_MAX_BYTE:
+            raise SystemExit(f"{pfad}: stops.txt hat {info.file_size} Byte, erwartet unter {STOPS_MAX_BYTE}")
+        with z.open(info) as f:
+            for row in csv.DictReader(io.TextIOWrapper(f, encoding="utf-8-sig", newline="")):
+                teile = (row.get("stop_id") or "").split(":")
+                if len(teile) < 3 or teile[0] != "de" or (row.get("location_type") or "0") != "0":
+                    continue
+                land = teile[1][:2]
+                if land not in (LAND_BERLIN, LAND_BRANDENBURG):
+                    continue
+                try:
+                    lon, lat = float(row["stop_lon"]), float(row["stop_lat"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if math.isfinite(lon) and math.isfinite(lat):
+                    erg.append((lon, lat, land))
+    return erg
+
+
+def laender_anlegen(cur, halte: list[tuple[float, float, str]]) -> None:
+    """TEMP-Tabelle a5b_land (land, geom 25833) mit GiST-Index aus den VBB-Haltepunkten."""
+    cur.execute("DROP TABLE IF EXISTS pg_temp.a5b_land")    # nur die eigene TEMP-Tabelle (zweiter Aufruf)
+    cur.execute("CREATE TEMP TABLE a5b_land_roh (land char(2), lonlat geometry(Point, 4326)) ON COMMIT DROP")
+    with cur.copy("COPY a5b_land_roh (land, lonlat) FROM STDIN") as cp:
+        for lon, lat, land in halte:
+            cp.write_row((land, f"SRID=4326;POINT({lon!r} {lat!r})"))
+    cur.execute("CREATE TEMP TABLE a5b_land ON COMMIT DROP AS "
+                "SELECT land, ST_Transform(lonlat, 25833)::geometry(Point, 25833) AS geom FROM a5b_land_roh")
+    cur.execute("DROP TABLE pg_temp.a5b_land_roh")
+    cur.execute("CREATE INDEX ON a5b_land USING gist (geom)")
+    cur.execute("ANALYZE a5b_land")
+
+
+def ziele_anlegen(cur, gruen_arten: tuple[str, ...], gtfs: Path | None = None,
+                  poi_schema: str = "auswertung") -> dict:
     """TEMP-Tabelle a5b_ziel (art, ziel_id, lizenz, geom 25833) mit allen Zielen und GiST-Index.
 
-    Einrichtungen innerhalb und außerhalb der Stadtgrenze (E7: Brandenburg ja; A2 liefert nur Brandenburger Daten).
-    OSM-Ziele: alles, was A3 im Puffer Stadt + 2 km geladen hat (auch der Berliner Teil, offen für Andre).
+    E7: Ziele außerhalb der Stadtgrenze zählen mit, Berliner Ziele nicht (siehe Kopf). Gibt die Zahl der als Berlin
+    ausgelassenen Ziele je Art zurück und wie das Land bestimmt wurde. poi_schema: nur für Tests (pg_temp).
     """
+    from psycopg import sql
     cur.execute("DROP TABLE IF EXISTS pg_temp.a5b_ziel")    # nur die eigene TEMP-Tabelle (zweiter Aufruf)
-    cur.execute("""
+    cur.execute(sql.SQL("""
       CREATE TEMP TABLE a5b_ziel ON COMMIT DROP AS
-        SELECT art, id AS ziel_id, lizenz, geom::geometry(Geometry, 25833) AS geom FROM auswertung.einrichtung
+        SELECT art, id AS ziel_id, lizenz, geom::geometry(Geometry, 25833) AS geom, 'amtlich'::text AS herkunft
+          FROM auswertung.einrichtung
         UNION ALL
-        SELECT 'gruen', id, lizenz, geom FROM auswertung.gruenflaeche WHERE art = ANY(%s)
+        SELECT 'gruen', id, lizenz, geom, 'amtlich' FROM auswertung.gruenflaeche WHERE art = ANY(%s)
         UNION ALL
-        SELECT art, osm_id, %s, geom FROM auswertung.osm_poi
+        SELECT art, osm_id, %s, geom, 'osm' FROM {}.osm_poi
         UNION ALL
-        SELECT 'haltestelle', stop_id, %s, geom FROM auswertung.haltestelle""",
-                (list(gruen_arten), ODBL, VBB))
+        SELECT 'haltestelle', stop_id, %s, geom, 'vbb' FROM auswertung.haltestelle""").format(
+                sql.Identifier(poi_schema)), (list(gruen_arten), ODBL, VBB))
+    berlin: dict[str, int] = {}
+
+    def auslassen(bedingung: str, parameter: tuple) -> None:
+        # nur in der eigenen TEMP-Tabelle a5b_ziel
+        cur.execute(f"DELETE FROM pg_temp.a5b_ziel z WHERE {bedingung} RETURNING z.art", parameter)
+        for (art,) in cur.fetchall():
+            berlin[art] = berlin.get(art, 0) + 1
+
+    # Haltestellen: das Land steht im DHID
+    auslassen("z.herkunft = 'vbb' AND z.ziel_id LIKE %s", (f"de:{LAND_BERLIN}%",))
+    cur.execute("SELECT count(*) FROM a5b_ziel WHERE herkunft = 'osm'")
+    land_quelle = "keine OSM-Ziele; Haltestellen nach DHID"
+    if cur.fetchone()[0]:
+        pfad = gtfs or gtfs_pfad()
+        if pfad is None:
+            raise SystemExit("Landesfilter E7: kein $KIEZ_DATEN/vbb_gtfs/<stand>/GTFS.zip gefunden; "
+                             "ohne ihn würden Berliner OSM-Ziele mitgerechnet")
+        halte = halte_land(pfad)
+        if not any(land == LAND_BERLIN for _, _, land in halte):
+            raise SystemExit(f"Landesfilter E7: {pfad} enthält keine Berliner Haltestelle (DHID de:11…)")
+        laender_anlegen(cur, halte)
+        auslassen("z.herkunft = 'osm' AND (SELECT l.land FROM a5b_land l "
+                  "ORDER BY l.geom <-> ST_PointOnSurface(z.geom) LIMIT 1) = %s", (LAND_BERLIN,))
+        land_quelle = (f"OSM-Ziele nach dem Land der nächsten VBB-Haltestelle ({pfad.parent.name}/{pfad.name}, "
+                       f"{len(halte)} Haltepunkte); Haltestellen nach DHID")
     cur.execute("CREATE INDEX ON a5b_ziel USING gist (geom)")
     cur.execute("CREATE INDEX ON a5b_ziel (art)")
     cur.execute("ANALYZE a5b_ziel")
+    return {"berlin_ausgelassen": dict(sorted(berlin.items())), "land_quelle": land_quelle}
 
 
 def zugaenge_laden(cur, art: str) -> tuple[list[str], np.ndarray, np.ndarray]:
@@ -339,7 +432,7 @@ class ArtErgebnis:
 
 
 def rechnen(cur, *, netz_schema: str = "auswertung", rw: dict | None = None,
-            arten: list[str] | None = None) -> dict:
+            arten: list[str] | None = None, gtfs: Path | None = None) -> dict:
     """Ganze Rechnung in der offenen Transaktion. Schreibt nur methode = 'fussweg'. Gibt Kennzahlen zurück."""
     rw = rw or richtwerte()
     t0 = time.monotonic()
@@ -348,7 +441,7 @@ def rechnen(cur, *, netz_schema: str = "auswertung", rw: dict | None = None,
         raise SystemExit(f"{netz_schema}.netz_knoten ist leer: erst A3 mit der OSM-PBF laufen lassen (H5)")
     ids, xy, ew = zellen_laden(cur)
     zellen_temp(cur, ids, xy)
-    ziele_anlegen(cur, rw["gruen_arten"])
+    land = ziele_anlegen(cur, rw["gruen_arten"], gtfs)
     if arten is None:
         cur.execute("SELECT DISTINCT art FROM a5b_ziel ORDER BY art")
         arten = [r[0] for r in cur.fetchall()]
@@ -420,6 +513,7 @@ def rechnen(cur, *, netz_schema: str = "auswertung", rw: dict | None = None,
         "median_gesamt": float(np.median(alle)) if len(alle) else None,
         "kmh": rw["kmh"], "gruen_radius": rw["gruen_radius"], "gruen_arten": rw["gruen_arten"],
         "gruen_arten_quelle": rw["gruen_arten_quelle"], "netz_schema": netz_schema,
+        "berlin_ausgelassen": land["berlin_ausgelassen"], "land_quelle": land["land_quelle"],
         "sekunden": round(time.monotonic() - t0, 1),
     }
 
@@ -486,7 +580,14 @@ def bericht(k: dict, *, trockenlauf: bool) -> str:
           "Anbindungsstrecken zählen mit. Damit ist jeder Fußweg ein Streckenzug von der Zelle zum Ziel und nie "
           "kürzer als die Luftlinie."),
           ("- Je Art eine Dijkstra-Suche mit allen Zielen als Quellen (scipy). Ziele außerhalb der Stadtgrenze "
-          "zählen mit (E7, Brandenburg)."),
+          "zählen mit, wenn sie in Brandenburg liegen; Berliner Ziele nicht (E7)."),
+          (f"- Land der Ziele: {k.get('land_quelle', '–')}. Als Berlin ausgelassen: "
+           + (", ".join(f"{a} {n}" for a, n in k.get("berlin_ausgelassen", {}).items()) or "keine")
+           + "."
+           + (" Die Zuordnung über die nächste Haltestelle ist eine Näherung (pruefen/a5b_landfilter_kreuzprobe.py, "
+              "05.11.2026: 15 von 1.800 Halten um Potsdam falsch zugeordnet, alle höchstens rund 1 km vom nächsten "
+              "Halt des anderen Landes)."
+              if "nächsten VBB-Haltestelle" in k.get("land_quelle", "") else "")),
           "- Meter auf 0,1 m aufgerundet, Minuten = Meter / (km/h · 1000 / 60).",
           ""]
     return "\n".join(z)
@@ -496,9 +597,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--trockenlauf", action="store_true", help="alles rechnen, am Ende ROLLBACK")
     ap.add_argument("--bericht", type=Path, default=WURZEL / "berichte" / "A5b_fussweg.md")
+    ap.add_argument("--gtfs", type=Path, default=None,
+                    help="VBB-GTFS für den Landesfilter E7 (Standard: neuester $KIEZ_DATEN/vbb_gtfs/<stand>/GTFS.zip)")
     args = ap.parse_args()
     with verbinden() as conn, conn.cursor() as cur:
-        k = rechnen(cur)
+        k = rechnen(cur, gtfs=args.gtfs)
         text = bericht(k, trockenlauf=args.trockenlauf)
         if args.trockenlauf:
             conn.rollback()

@@ -7,6 +7,7 @@
 #   skripte/14b_fussweg.sh pruefen                   Abnahme A5b gegen die Datenbank (pruefen/a5b_pruefen.py)
 #   skripte/14b_fussweg.sh test                      Tests ohne Datenbank (pruefen/a5b_test_fussweg.py)
 #   A5B_DB_TEST=1 skripte/14b_fussweg.sh test        dazu Probelauf mit Gitternetz in TEMP-Tabellen (ROLLBACK)
+#   skripte/14b_fussweg.sh kreuzprobe                Güte des Landesfilters E7 (VBB-Haltestellen, ohne Datenbank)
 #
 # KIEZ_ENV: Datei mit RECHNEN_PASSWORD (chmod 600), Standard ./.env, in Worktrees ../kiezatlas-potsdam/.env.
 set -eu
@@ -31,8 +32,9 @@ schritt="${1:-}"
 case "$schritt" in
   rechnen) lade_umgebung; $UV python -I skripte/14b_fussweg.py "$@" ;;
   pruefen) lade_umgebung; $UV python -I pruefen/a5b_pruefen.py "$@" ;;
+  kreuzprobe) $UV python -I pruefen/a5b_landfilter_kreuzprobe.py "$@" ;;
   test)
     if [ "${A5B_DB_TEST:-0}" = 1 ]; then lade_umgebung; fi
     $UV --with pytest python -I -m pytest -q -p no:cacheprovider pruefen/a5b_test_fussweg.py "$@" ;;
-  *) echo "Aufruf: skripte/14b_fussweg.sh rechnen [--trockenlauf] | pruefen | test" >&2; exit 2 ;;
+  *) echo "Aufruf: skripte/14b_fussweg.sh rechnen [--trockenlauf] | pruefen | test | kreuzprobe" >&2; exit 2 ;;
 esac

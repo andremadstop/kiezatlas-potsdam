@@ -1,0 +1,4 @@
+GTFS: /home/andre/Workspace/Code/kiezatlas-daten/vbb_gtfs/2026-11-05/GTFS.zip
+Haltepunkte im Rechteck: 1800 (Berlin 473, Brandenburg 1327)
+falsch zugeordnet: 15 (0.8 %): Berlin als Brandenburg 6, Brandenburg als Berlin 9
+Fehltreffer: Abstand zum nächsten Haltepunkt des anderen Landes 200 bis 988 m (Median 355 m)

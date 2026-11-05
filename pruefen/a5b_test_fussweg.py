@@ -174,9 +174,95 @@ def test_keine_verbotenen_abrufe_im_code():
             "https://creativecommons.org", ""), verboten
 
 
+# ------------------------------------------------------------------------------- Landesfilter E7 (ohne Datenbank)
+
+def _gtfs_zip(pfad: Path, zeilen: list[str]) -> Path:
+    import zipfile
+    pfad.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(pfad, "w") as z:
+        z.writestr("stops.txt", "﻿stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
+                   + "\n".join(zeilen) + "\n")
+        z.writestr("routes.txt", "route_id\n1\n")
+    return pfad
+
+
+def test_halte_land_nur_berlin_und_brandenburg_nur_punkte(tmp_path):
+    p = _gtfs_zip(tmp_path / "GTFS.zip", [
+        "de:11000:900100001::1,Berlin A,52.52,13.40,0,",
+        "de:12054:900230999::2,Potsdam B,52.39,13.06,,",
+        "de:12069:900220009,Werder Station,52.37,12.94,1,",      # Station, kein Haltepunkt
+        "de:13003:1,Rostock,54.09,12.13,0,",                     # anderes Land
+        "900000123,ohne DHID,52.5,13.3,0,",
+        "de:11000:9,kaputt,x,13.3,0,",
+        'de:12054:5,"Name, mit Komma",52.40,13.10,0,',
+    ])
+    h = fw.halte_land(p)
+    assert h == [(13.40, 52.52, "11"), (13.06, 52.39, "12"), (13.10, 52.40, "12")]
+
+
+def test_gtfs_pfad_nimmt_den_neuesten_stand(tmp_path):
+    _gtfs_zip(tmp_path / "vbb_gtfs" / "2026-11-05" / "GTFS.zip", [])
+    _gtfs_zip(tmp_path / "vbb_gtfs" / "2027-01-10" / "GTFS.zip", [])
+    (tmp_path / "vbb_gtfs" / "2027-02-01").mkdir()                 # Ordner ohne Zip zählt nicht
+    assert fw.gtfs_pfad(str(tmp_path)) == tmp_path / "vbb_gtfs" / "2027-01-10" / "GTFS.zip"
+    assert fw.gtfs_pfad(str(tmp_path / "fehlt")) is None
+
+
 # ------------------------------------------------------------------------------- Datenbank (Probelauf)
 
 DB = os.environ.get("A5B_DB_TEST") == "1"
+
+
+@pytest.mark.skipif(not DB, reason="nur mit A5B_DB_TEST=1")
+def test_landesfilter_bekannte_orte_echtes_gtfs():
+    """Land der nächsten VBB-Haltestelle an Orten beiderseits der Grenze (Koordinaten von Hand, WGS84)."""
+    pfad = fw.gtfs_pfad()
+    assert pfad is not None, "VBB-GTFS fehlt unter $KIEZ_DATEN/vbb_gtfs/"
+    orte = {
+        "Potsdam Hauptbahnhof": (13.0669, 52.3916, "12"),
+        "Potsdam Babelsberg, Griebnitzsee-Ufer": (13.1215, 52.3940, "12"),
+        "Kleinmachnow Zentrum": (13.2250, 52.4075, "12"),
+        "Groß Glienicke (Potsdam)": (13.1060, 52.4680, "12"),
+        "Berlin-Wannsee Bahnhof": (13.1795, 52.4213, "11"),
+        "Berlin-Steinstücken (Exklave)": (13.1335, 52.3905, "11"),
+        "Berlin-Kladow": (13.1450, 52.4540, "11"),
+        "Berlin-Zehlendorf": (13.2590, 52.4310, "11"),
+    }
+    with fw.verbinden() as conn, conn.cursor() as cur:
+        fw.laender_anlegen(cur, fw.halte_land(pfad))
+        for name, (lon, lat, land) in orte.items():
+            cur.execute("""SELECT l.land FROM a5b_land l
+                           ORDER BY l.geom <-> ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 25833)
+                           LIMIT 1""", (lon, lat))
+            assert cur.fetchone()[0] == land, name
+        conn.rollback()
+
+
+@pytest.mark.skipif(not DB, reason="nur mit A5B_DB_TEST=1")
+def test_ziele_anlegen_laesst_berliner_osm_ziele_aus():
+    """OSM-Ziele aus einer TEMP-osm_poi (A3s Tabelle bleibt unberührt): Berliner fallen heraus, Brandenburger bleiben."""
+    rw = fw.richtwerte()
+    with fw.verbinden() as conn, conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM auswertung.osm_poi")
+        vorher = cur.fetchone()[0]
+        cur.execute("CREATE TEMP TABLE osm_poi (osm_id text, art text, unterart text, geom geometry(Point, 25833)) "
+                    "ON COMMIT DROP")
+        punkte = [("n1", "supermarkt", 13.0669, 52.3916), ("n2", "supermarkt", 13.1795, 52.4213),
+                  ("n3", "apotheke", 13.1335, 52.3905), ("w4", "apotheke", 13.2250, 52.4075),
+                  ("n5", "spielplatz", 13.1450, 52.4540)]
+        for oid, art, lon, lat in punkte:
+            cur.execute("INSERT INTO pg_temp.osm_poi VALUES (%s, %s, NULL, "
+                        "ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 25833))", (oid, art, lon, lat))
+        land = fw.ziele_anlegen(cur, rw["gruen_arten"], poi_schema="pg_temp")
+        cur.execute("SELECT ziel_id FROM a5b_ziel WHERE herkunft = 'osm' ORDER BY 1")
+        assert [r[0] for r in cur.fetchall()] == ["n1", "w4"]
+        assert land["berlin_ausgelassen"] == {"apotheke": 1, "spielplatz": 1, "supermarkt": 1}
+        assert "nächsten VBB-Haltestelle" in land["land_quelle"]
+        cur.execute("SELECT count(*) FROM a5b_ziel WHERE herkunft = 'vbb' AND ziel_id LIKE 'de:11%'")
+        assert cur.fetchone()[0] == 0
+        cur.execute("SELECT count(*) FROM auswertung.osm_poi")
+        assert cur.fetchone()[0] == vorher     # A3s Tabelle nicht angefasst
+        conn.rollback()
 
 
 @pytest.mark.skipif(not DB, reason="nur mit A5B_DB_TEST=1")
@@ -214,6 +300,7 @@ def test_probelauf_gitternetz_rollback():
         assert 1.15 < k["median_gesamt"] < 1.4
         text = fw.bericht(k, trockenlauf=True)
         assert "ODbL" in text
+        assert "Berliner Ziele nicht (E7)" in text and "Land der Ziele" in text
         (WURZEL / "berichte").mkdir(exist_ok=True)
         (WURZEL / "berichte" / "A5b_probelauf_gitternetz.md").write_text(
             "<!-- Probelauf mit synthetischem 50-m-Gitternetz statt OSM, ROLLBACK -->\n" + text, encoding="utf-8")

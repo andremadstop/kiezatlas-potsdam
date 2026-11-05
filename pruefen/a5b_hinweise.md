@@ -12,7 +12,8 @@ skripte/14b_fussweg.sh test                          # Tests ohne Datenbank
 A5B_DB_TEST=1 skripte/14b_fussweg.sh test            # dazu Probelauf mit 50-m-Gitternetz in TEMP-Tabellen (ROLLBACK)
 skripte/14b_fussweg.sh rechnen --trockenlauf         # echtes Netz, am Ende ROLLBACK, Bericht berichte/A5b_fussweg.md
 skripte/14b_fussweg.sh rechnen                       # schreibt (nur methode = 'fussweg')
-skripte/14b_fussweg.sh pruefen                       # vier Abnahmekriterien, Ausgang 0 = alle erfüllt
+skripte/14b_fussweg.sh pruefen                       # vier Abnahmekriterien + E7, Ausgang 0 = alle erfüllt
+skripte/14b_fussweg.sh kreuzprobe                    # Güte des Landesfilters E7 (ohne Datenbank)
 ```
 
 `14b_fussweg.sh` arbeitet wie `12_osm.sh` mit `uv --offline` (numpy, scipy, psycopg, pyyaml aus dem lokalen
@@ -27,7 +28,8 @@ Zwischenspeicher) und der Rolle `kiezatlas_rechnen`. Kein Netzabruf, kein pgRout
   vom Netz.
 - Arten: alle aus `auswertung.einrichtung` (A2, dieselben Namen wie A5a), `gruen` (A2-Grünflächen `gruenanlage`
   und `park`, wie A5a), alle aus `auswertung.osm_poi` (A3: arzt, apotheke, supermarkt, pflege, spielplatz) und
-  `haltestelle` (A4, alle 315 Halte; Zusatz zur Luftlinie nach NVP, nicht deren Ersatz).
+  `haltestelle` (A4, alle 315 Halte; Zusatz zur Luftlinie nach NVP, nicht deren Ersatz). Berliner Ziele fallen
+  heraus (E7, siehe Offen 2).
 - `auswertung.zelle_gruen`, `methode = 'fussweg'`, `radius_m = 500`: Fläche der Grünanlagen, deren Rand in 500 m
   Fußweg erreichbar ist. `m2_je_ew` bleibt leer (Berliner Methode teilt je Raumeinheit, das rechnet A6).
 - Ein Lauf löscht nur die eigenen Fußweg-Zeilen und schreibt sie neu (eine Transaktion). Die Luftlinie-Zeilen von
@@ -46,9 +48,14 @@ abgeleiteten Datenbank).
 
 1. **H5 (Andre):** OSM-PBF unter `$KIEZ_DATEN/osm/<stand>/`, danach A3, danach dieser Ablauf. Erst dann gelten die
    Abnahmekriterien als auf echten Daten erfüllt.
-2. **E7 für OSM-Ziele und Halte (Andre):** `osm_poi` enthält auch den Berliner Teil des Puffers (A3), `haltestelle`
-   hat 32 Halte außerhalb Potsdams. A5b rechnet sie mit, weil es in der Datenbank keine Berliner Grenze gibt.
-   Gilt „Berlin vorerst nicht“ auch hier, braucht es eine Grenze (z. B. `boundary=administrative` aus der PBF).
+2. **E7 umgesetzt (Brandenburg ja, Berlin nein), für OSM-Ziele als Näherung:** In der Datenbank gibt es keine
+   Landesgrenze. Haltestellen fallen nach DHID heraus (`de:11…`; heute keine, A4 liefert nur 12054/12063/12069).
+   OSM-Ziele bekommen das Land der nächsten VBB-Haltestelle (`stops.txt` aus `$KIEZ_DATEN/vbb_gtfs/<stand>/`,
+   TEMP-Tabelle, KNN). Kreuzprobe (`skripte/14b_fussweg.sh kreuzprobe`, `belege/A5b_landfilter_kreuzprobe.txt`):
+   15 von 1.800 Halten um Potsdam falsch, alle höchstens rund 1 km vom nächsten Halt des anderen Landes. Bekannte
+   Orte beiderseits der Grenze (auch die Exklave Steinstücken) im DB-Test richtig. Besser wäre eine echte Grenze
+   (`boundary=administrative`, `admin_level=4` aus der PBF): Das kann A3 mit H5 liefern, dann `ziele_anlegen`
+   darauf umstellen. Fehlt das GTFS, bricht `rechnen` ab, statt Berliner Ziele mitzurechnen.
 3. **Median Fußweg/Luftlinie:** Im Gitternetz 1,34 (Manhattan-Gitter, erwartbar um 4/π ≈ 1,27 plus
    Anbindungsstrecken). Auf dem echten Netz soll er zwischen 1,1 und 1,6 liegen; sonst steht die Ursache im Bericht.
 4. **Grün-Definition:** `gruen_definition` in `richtwerte.yaml` ist noch `offen` (A6). Bis dahin `gruenanlage` und
