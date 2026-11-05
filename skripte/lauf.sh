@@ -24,6 +24,7 @@ KIEZ_DATEN="${KIEZ_DATEN:-$(cd .. && pwd)/kiezatlas-daten}"
 if [ -z "${KIEZ_ENV:-}" ]; then
   if [ -f ./.env ]; then KIEZ_ENV=./.env; else KIEZ_ENV=../kiezatlas-potsdam/.env; fi
 fi
+case "$KIEZ_ENV" in */*) ;; *) KIEZ_ENV="./$KIEZ_ENV" ;; esac   # „.“ sucht sonst im PATH
 set -a; . "$KIEZ_ENV"; set +a
 export KIEZ_DATEN PGHOST=127.0.0.1 PGPORT="${PG_PORT:-55461}" PGDATABASE=kiezatlas PYTHONPATH="$PIPELINE"
 export PIPELINE_KENNUNG="kiezatlas-potsdam (+https://github.com/andremadstop/kiezatlas-potsdam)"

@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS auswertung.zelle_gruen (
     PRIMARY KEY (gitter_id, methode, radius_m),
     CHECK (methode <> 'fussweg' OR quelle_lizenz ILIKE '%ODbL%')
 );
-COMMENT ON TABLE auswertung.zelle_gruen IS 'A5 (skripte/14_erreichbarkeit.py). Grünfläche im Umkreis je Zelle (Definition: config/richtwerte.yaml).';
+COMMENT ON TABLE auswertung.zelle_gruen IS 'A5 (skripte/14_erreichbarkeit.py). Grünfläche im Umkreis je Zelle (Definition: config/richtwerte.yaml). Luftlinie: dl-de/by-2-0. Fußweg: ODbL 1.0 (OSM-Netz).';
 
 -- B0: Gebäudeform aus ALKIS-NAS (alkis_p.zip), zugeordnet über die größte Überlappung mit dem Snapshot
 CREATE TABLE IF NOT EXISTS auswertung.alkis_nas_gebaeude (
@@ -284,7 +284,7 @@ CREATE TABLE IF NOT EXISTS auswertung.jahr_beleg (
     CHECK (nur_pruefung OR (quelle !~* '(openstreetmap|wikipedia|\mosm\M)' AND lizenz !~* '(odbl|by-sa)'))
 );
 CREATE INDEX IF NOT EXISTS jahr_beleg_oid_idx ON auswertung.jahr_beleg (oid_bezug);
-COMMENT ON TABLE auswertung.jahr_beleg IS 'B2 (skripte/22_jahre_genau.py). Jede Zeile mit quelle, lizenz, beleg_url. OSM/Wikipedia nur mit nur_pruefung = true.';
+COMMENT ON TABLE auswertung.jahr_beleg IS 'B2 (skripte/22_jahre_genau.py). Jede Zeile mit quelle, lizenz, beleg_url. OSM-Zeilen (ODbL 1.0, © OpenStreetMap-Mitwirkende) und Wikipedia-Zeilen (CC BY-SA 4.0) nur mit nur_pruefung = true.';
 
 -- B3: Luftbild- und Kartenklammern (Pilot)
 CREATE TABLE IF NOT EXISTS auswertung.jahr_klammer (

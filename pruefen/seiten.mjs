@@ -35,7 +35,7 @@ function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if
 // ---------- eigener Prüfserver, nur 127.0.0.1, nur Dateien unter WURZEL
 const server = http.createServer((q, a) => {
   const p = path.normalize(path.join(WURZEL, decodeURIComponent(new URL(q.url, "http://x").pathname)));
-  if (!p.startsWith(WURZEL)) { a.writeHead(403); a.end(); return; }
+  if (p !== WURZEL && !p.startsWith(WURZEL + path.sep)) { a.writeHead(403); a.end(); return; }
   fs.readFile(p.endsWith(path.sep) ? path.join(p, "index.html") : p, (f, d) => {
     if (f) { a.writeHead(404); a.end(); return; }
     a.writeHead(200, { "content-type": TYP[path.extname(p)] || "application/octet-stream" }); a.end(d);

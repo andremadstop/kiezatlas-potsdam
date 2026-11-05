@@ -56,6 +56,9 @@ quellen:
     # in 1-km-Kacheln mit 1 s Pause zwischen den Abrufen. Der Dienst hat keine robots.txt; die
     # Bedingungen stehen in den AccessConstraints der Capabilities.
     titel: "Gebäude ALKIS vereinfacht, Potsdam"
+    # Seit 05.11.2026 ruhend (Korrektur 16): Teil B bezieht sich auf auswertung.gebaeude_stand_20261105.
+    # Ein neuer Lauf könnte oid löschen; erst nach Teil B wieder auf aktiv setzen (auch --nur lädt nicht).
+    aktiv: false
     typ: wfs
     url: https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs
     typename: ave:GebaeudeBauwerk

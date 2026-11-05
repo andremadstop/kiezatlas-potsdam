@@ -67,7 +67,8 @@ Regeln:
 1. **Jeder Lauf nur mit `--nur <quelle>`.** `skripte/lauf.sh laden` bricht ohne `--nur` ab. Ein Lauf ohne `--nur` lädt jede
    fällige Quelle, auch `gebaeude_alkis` (die Pipeline löscht dann Gebäude, die der Dienst nicht mehr liefert, und die `oid`
    von Teil B wären weg).
-2. **Kein `--nur gebaeude_alkis`, solange Teil B läuft.** Teil B nutzt den Snapshot.
+2. **Kein Gebäude-Lauf, solange Teil B läuft.** Teil B nutzt den Snapshot. `gebaeude_alkis` steht deshalb in der YAML auf
+   `aktiv: false`; die Pipeline lädt sie dann auch mit `--nur` nicht (Rechte bleiben).
 3. **`einrichten` startet nur P0 bzw. der Ladekoordinator** (`skripte/lauf.sh einrichten`). Eine neue Quelle braucht einen
    YAML-Eintrag und ein Ziel in `sql/002` und danach genau einen Lauf von `einrichten`.
 4. **Seriell.** Pipeline-Läufe nie parallel; die Pipeline sperrt selbst (`LaufLaeuftNoch`), trotzdem nacheinander starten.

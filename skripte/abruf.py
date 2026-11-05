@@ -8,13 +8,16 @@ außer mit --gleicher-rechner auf denselben Rechner (dann mit erneutem Abstand).
 
 Aufruf (Python aus der Projektumgebung, ohne Fremdpakete):
     python -I skripte/abruf.py --abstand 30 URL ZIELDATEI [--max-mb 100] [--gleicher-rechner]
-Rückgabe: 0 gespeichert, 3 Weiterleitung nicht verfolgt, 4 HTTP-Fehler, 5 zu groß.
+Rückgabe: 0 gespeichert, 3 Weiterleitung nicht verfolgt, 4 HTTP- oder Netzfehler, 5 zu groß.
+Gleichzeitige Aufrufe warten aufeinander (Sperre auf abrufprotokoll.lock), damit der Abstand auch
+bei langen Downloads hält; jeder Versuch steht im Protokoll, auch ein abgebrochener.
 
 Verbotene Rechner (Abrufregeln des Ausbaus, siehe QUELLEN.md) lehnt das Werkzeug ab.
 """
 from __future__ import annotations
 
 import argparse
+import fcntl
 import hashlib
 import os
 import sys
@@ -104,6 +107,14 @@ def holen(url: str, ziel: Path, abstand: float, max_mb: float, protokoll: Path) 
             return 3, ort
         eintragen(protokoll, zeit, rechner, url, e.code, 0, "", "")
         return 4, None
+    except (OSError, KeyboardInterrupt) as e:  # URLError, Zeitüberschreitung, TLS, Abbruch: zählt als Abruf
+        if teil.exists():
+            teil.unlink()
+        eintragen(protokoll, zeit, rechner, url, f"Fehler {type(e).__name__}", n, "", "")
+        if isinstance(e, KeyboardInterrupt):
+            raise
+        print(f"Fehler: {e}", file=sys.stderr)
+        return 4, None
     teil.replace(ziel)
     eintragen(protokoll, zeit, rechner, url, status, n, h.hexdigest(), str(ziel))
     print(f"{status} {n} Bytes sha256={h.hexdigest()} -> {ziel}")
@@ -120,15 +131,18 @@ def main() -> int:
                     help="Weiterleitung verfolgen, wenn sie auf denselben Rechner zeigt")
     a = ap.parse_args()
     protokoll = daten_ordner() / "abrufprotokoll.tsv"
+    protokoll.parent.mkdir(parents=True, exist_ok=True)
     url = a.url
-    for _ in range(3):
-        code, ort = holen(url, a.ziel, a.abstand, a.max_mb, protokoll)
-        if code != 3:
-            return code
-        print(f"Weiterleitung auf {ort}", file=sys.stderr)
-        if not (a.gleicher_rechner and urlsplit(ort).hostname == urlsplit(url).hostname):
-            return 3
-        url = ort
+    with (protokoll.parent / "abrufprotokoll.lock").open("w") as sperre:
+        fcntl.flock(sperre, fcntl.LOCK_EX)
+        for _ in range(3):
+            code, ort = holen(url, a.ziel, a.abstand, a.max_mb, protokoll)
+            if code != 3:
+                return code
+            print(f"Weiterleitung auf {ort}", file=sys.stderr)
+            if not (a.gleicher_rechner and urlsplit(ort).hostname == urlsplit(url).hostname):
+                return 3
+            url = ort
     return 3
 
 

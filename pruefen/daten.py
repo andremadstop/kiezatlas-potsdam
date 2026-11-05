@@ -36,7 +36,8 @@ FEINE_KLASSEN = {f"i_{s}" for s in ("u3", "3_5", "6_9", "10_15", "16_18", "19_24
     "kf_nel_ohne", "kf_nel_u18", "kf_nel_ab18", "kf_vater_u18", "kf_vater_ab18", "kf_mutter_u18",
     "kf_mutter_ab18", "sen_nur", "sen_mit", "sen_ohne", "st_de", "st_ausland", "st_eu27", "st_europa",
     "st_welt", "st_sonst"}
-OSM_SPUR = re.compile(r"OpenStreetMap|ODbL|\"methode\":\"fussweg\"|\"osm_id\"", re.I)
+# Groß- und Kleinschreibung zählt: „ODbL“ als Wort, nicht der Dateiname „…_odbl.js“ in einem Hinweis
+OSM_SPUR = re.compile(r"OpenStreetMap|\bODbL\b|\"methode\":\s*\"fussweg\"|\"osm_id\"")
 
 befunde: list[str] = []
 
@@ -49,9 +50,9 @@ def pruef(ok: bool, text: str) -> bool:
 
 
 # ---------------------------------------------------------------- JS-Datei lesen
-def js_lesen(pfad: Path) -> tuple[str, str, object]:
+def js_lesen(pfad: Path, text: str | None = None) -> tuple[str, str, object]:
     """window.NAME=<JSON>; mit optionalem Kommentar davor. Rückgabe: Kopf, Name, Inhalt."""
-    text = pfad.read_text(encoding="utf-8")
+    text = pfad.read_text(encoding="utf-8") if text is None else text
     m = re.search(r"window\.([A-Za-z0-9_]+)\s*=\s*", text)
     if not m:
         raise ValueError("keine Zuweisung window.NAME=")
@@ -167,8 +168,9 @@ def datei_pruefen(pfad: Path, rel: str, liste, kontext: dict, fixture: bool) -> 
         pruef(False, f"{'Fixture ' if fixture else ''}{rel}: {grund}")
         return
     sp, s = passend[0]
+    text = pfad.read_text(encoding="utf-8")
     try:
-        kopf, name, inhalt = js_lesen(pfad)
+        kopf, name, inhalt = js_lesen(pfad, text)
     except (ValueError, json.JSONDecodeError) as e:
         pruef(False, f"{rel}: nicht lesbar ({e})"[:200])
         return
@@ -184,7 +186,6 @@ def datei_pruefen(pfad: Path, rel: str, liste, kontext: dict, fixture: bool) -> 
         fehler.append("Fixture ohne fixture: true")
     if not fixture and isinstance(inhalt, dict) and "fixture" in inhalt:
         fehler.append("echte Datei mit Feld fixture")
-    text = pfad.read_text(encoding="utf-8")
     if "_odbl" in pfad.name:
         if not (s.get("x-odbl") and "ODbL" in kopf and "OpenStreetMap" in kopf):
             fehler.append("_odbl-Datei ohne ODbL-Vermerk im Kopf oder Schema ohne x-odbl")

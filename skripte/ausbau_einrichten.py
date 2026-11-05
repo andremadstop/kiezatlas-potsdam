@@ -19,6 +19,7 @@ from psycopg import sql
 
 WURZEL = Path(__file__).resolve().parent.parent
 ROLLE = "kiezatlas_rechnen"
+SNAPSHOT_ERWARTET = 85046   # public.gebaeude am 05.11.2026 (Lauf 20261104T132333Z)
 
 
 def main() -> int:
@@ -33,7 +34,15 @@ def main() -> int:
             sql.Identifier(ROLLE), sql.Literal(geheim.decode("ascii"))))
         cur.execute("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'auswertung'")
         n = cur.fetchone()[0]
-    print(f"sql/002_ausbau.sql eingespielt, {n} Tabellen in auswertung, Rolle {ROLLE} mit Anmeldung.")
+        # Der Snapshot entsteht nur beim ersten Einspielen (IF NOT EXISTS). Leer oder abweichend heißt:
+        # public.gebaeude war zu dem Zeitpunkt nicht der Stand vom 05.11.2026; dann nicht weiterbauen.
+        cur.execute("SELECT count(*) FROM auswertung.gebaeude_stand_20261105")
+        snap = cur.fetchone()[0]
+        if snap != SNAPSHOT_ERWARTET:
+            raise SystemExit(f"auswertung.gebaeude_stand_20261105 hat {snap} Zeilen, erwartet {SNAPSHOT_ERWARTET} "
+                             "(Stand 05.11.2026); Teil B nicht starten, Snapshot prüfen")
+    print(f"sql/002_ausbau.sql eingespielt, {n} Tabellen in auswertung, Snapshot {snap} Gebäude, "
+          f"Rolle {ROLLE} mit Anmeldung.")
     return 0
 
 

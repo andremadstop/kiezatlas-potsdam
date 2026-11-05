@@ -24,8 +24,10 @@ HINWEIS = "Beispieldaten mit unechten Werten, nur zum Bauen der Seiten."
 
 
 def lies(name: str):
+    """Wie js_lesen in pruefen/daten.py: Kommentar vor window.NAME= ist erlaubt."""
     text = (DATEN / name).read_text(encoding="utf-8")
-    return json.loads(re.sub(r"^window\.[A-Z_0-9]+=", "", text).rstrip().rstrip(";"))
+    m = re.search(r"window\.[A-Za-z0-9_]+\s*=\s*", text)
+    return json.loads(text[m.end():].rstrip().rstrip(";"))
 
 
 def schreib(rel: str, variable: str, inhalt, kopf: str = "") -> None:
@@ -122,15 +124,31 @@ def main() -> None:
         "quellen": {"bsp": Q_BEISPIEL}, **reihe, "gebaeude": geb, "anteile": anteile,
         "vorherrschend": [None if a is None else a.index(max(a)) for a in anteile]})
 
-    g52 = lies("gebaeude/52.js")["features"][:40]
+    # Synthetische Quadrate (rund 15 m) im Raster um den Beschriftungspunkt von Stadtteil 52, keine
+    # echten Gebäudeumrisse: erfundene Jahre an echten Gebäuden wären genau die Fehldeutung, die die
+    # Klassenregel für kleine Wohngebäude verhindern soll.
+    t52 = next(f for f in lies("stadtteile.js")["features"] if f["properties"]["nr"] == "52")["properties"]
+    g52 = []
+    for i in range(40):
+        x, y = t52["lx"] + 0.0004 * (i % 8), t52["ly"] + 0.0003 * (i // 8)
+        ring = [[round(x, 6), round(y, 6)], [round(x + 0.0002, 6), round(y, 6)], [round(x + 0.0002, 6), round(y + 0.00014, 6)],
+                [round(x, 6), round(y + 0.00014, 6)], [round(x, 6), round(y, 6)]]
+        g52.append({"geometry": {"type": "Polygon", "coordinates": [ring]}})
     arten_g = ["belegt", "geschaetzt", "nicht_datiert"]
+    grenzen = [1919, 1949, 1979, 1991, 2001, 2011, 2020]   # Beginn der Klassen 2 bis 8
+
+    def jahr(i: int) -> int:
+        return 1880 + (i * 37) % 145                       # 1880 bis 2024, über alle Klassen verteilt
+
+    def klasse_von(j: int) -> int:
+        return sum(1 for g in grenzen if j >= g)
     schreib("jahre/52.js", "KIEZ_JAHR_52", {
         "fixture": True, "type": "FeatureCollection", "stand": STAND, "klassen": klassen,
         "hinweis": HINWEIS + " Schätzung, keine Aussage über einzelne Grundstücke.",
         "quellen": {"bsp": Q_BEISPIEL},
         "features": [{"type": "Feature", "geometry": f["geometry"], "properties": {
-            "j": 1900 + i if arten_g[i % 3] == "belegt" else None,
-            "k": None if arten_g[i % 3] == "nicht_datiert" else i % 8, "g": arten_g[i % 3], "d": i % 3 == 0,
+            "j": jahr(i) if arten_g[i % 3] == "belegt" else None,
+            "k": None if arten_g[i % 3] == "nicht_datiert" else klasse_von(jahr(i)), "g": arten_g[i % 3], "d": i % 3 == 0,
             "q": None if arten_g[i % 3] == "nicht_datiert" else "bsp", "s": [1, 4, 6][i % 3]}}
             for i, f in enumerate(g52)]})
 
