@@ -310,10 +310,23 @@ def main() -> int:
             def fetchone(self):
                 return (0,)
 
-        alt = p.PR_CSV
+        alt, alt_daten = p.PR_CSV, os.environ.get("KIEZ_DATEN")
         try:
             p.PR_CSV = tmp / "planungsraeume.csv"
-            ok(p.raumquelle(Cur())[0] == "stadtteil", "ohne Tabelle und ohne CSV: Stadtteile")
+            os.environ["KIEZ_DATEN"] = str(tmp / "leer")
+            ok(p.raumquelle(Cur())[0] == "stadtteil", "ohne H1, Tabelle und CSV: Stadtteile")
+            (tmp / "h1" / "eingang").mkdir(parents=True)
+            (tmp / "h1" / "eingang" / p.H1_DATEI).write_text("{}")
+            os.environ["KIEZ_DATEN"] = str(tmp / "h1")
+            try:
+                p.raumquelle(Cur())
+                abbruch = ""
+            except SystemExit as e:
+                abbruch = str(e)
+            ok(
+                "03_planungsraeume.py" in abbruch and "--nr-feld pr" in abbruch,
+                "H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile",
+            )
             p.PR_CSV.write_text("nr;name;wkt\n101;Beispiel;POLYGON((13 52.4,13.1 52.4,13.1 52.5,13 52.4))\n")
             ebene, tab, par, _ = p.raumquelle(Cur())
             ok(
@@ -322,6 +335,10 @@ def main() -> int:
             )
         finally:
             p.PR_CSV = alt
+            if alt_daten is None:
+                os.environ.pop("KIEZ_DATEN", None)
+            else:
+                os.environ["KIEZ_DATEN"] = alt_daten
     print(f"\n{len(fehler)} Fehler" if fehler else "\nalle Tests bestanden")
     return 1 if fehler else 0
 

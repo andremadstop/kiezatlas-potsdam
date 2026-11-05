@@ -317,29 +317,53 @@ def main() -> int:
         st = {nr: v["klasse"] for nr, v in o["gebietsklassen"]["stadtteile"].items() if v.get("klasse")}
         rad = [(k, vm, m) for vm in rw["planer"]["oepnv_verkehrsmittel_mit_radius"]
                for k, m in o["einzugsradius_m"][vm].items() if k in ("I", "II", "III") and m]
+        rang = "CASE {} WHEN 'I' THEN 3 WHEN 'II' THEN 2 WHEN 'III' THEN 1 ELSE 0 END"
         cur.execute(
             f"""WITH k AS (SELECT * FROM unnest(%(st)s::text[], %(kl)s::text[]) AS t(st, klasse)),
                      rad AS (SELECT * FROM unnest(%(rk)s::text[], %(rv)s::text[], %(rm)s::int[]) AS t(klasse, vm, m)),
                      z AS (SELECT r.nr raum, z.ew, ST_Transform(z.geom, 25833) g, k.klasse
                            FROM public.zensus_zelle z JOIN {tab} r ON ST_Contains(r.geom, z.geom)
                            JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
-                           JOIN k ON k.st = s.nr::text WHERE z.ew > 0)
-                SELECT raum, 100.0 * coalesce(sum(ew) FILTER (WHERE EXISTS (
-                           SELECT 1 FROM auswertung.haltestelle h JOIN rad ON rad.klasse = z.klasse
-                           WHERE rad.vm = ANY (string_to_array(h.verkehrsmittel, '+'))
-                             AND ST_DWithin(h.geom, z.g, rad.m))), 0) / sum(ew)
-                FROM z GROUP BY raum""",
+                           LEFT JOIN k ON k.st = s.nr::text WHERE z.ew > 0),
+                     e AS (SELECT z.*,
+                             EXISTS (SELECT 1 FROM auswertung.haltestelle h JOIN rad ON rad.klasse = z.klasse
+                                     WHERE rad.vm = ANY (string_to_array(h.verkehrsmittel, '+'))
+                                       AND ST_DWithin(h.geom, z.g, rad.m)) AS ersch,
+                             EXISTS (SELECT 1 FROM auswertung.haltestelle h JOIN rad ON rad.klasse = z.klasse
+                                     WHERE rad.vm = ANY (string_to_array(h.verkehrsmittel, '+'))
+                                       AND ST_DWithin(h.geom, z.g, rad.m)
+                                       AND {rang.format("h.klasse")} >= {rang.format("z.klasse")}) AS takt
+                           FROM z)
+                SELECT raum,
+                       100.0 * coalesce(sum(ew) FILTER (WHERE klasse IS NOT NULL AND ersch), 0)
+                             / nullif(sum(ew) FILTER (WHERE klasse IS NOT NULL), 0),
+                       100.0 * coalesce(sum(ew) FILTER (WHERE klasse IS NOT NULL AND takt), 0)
+                             / nullif(sum(ew) FILTER (WHERE klasse IS NOT NULL), 0),
+                       100.0 * coalesce(sum(ew) FILTER (WHERE klasse IS NULL), 0) / sum(ew)
+                FROM e GROUP BY raum""",
             {**(par or {}), "st": list(st), "kl": list(st.values()),
              "rk": [a for a, _, _ in rad], "rv": [b for _, b, _ in rad], "rm": [c for _, _, c in rad]},
         )
-        sql = {str(a): float(b) for a, b in cur.fetchall()}
-        datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == "oepnv_erschliessung"}
-        mit = {nr: v for nr, v in datei.items() if v is not None}
-        abw = [(nr, v, round(sql.get(nr, -1), 1)) for nr, v in mit.items() if abs(v - sql.get(nr, -1)) > 0.51]
-        pruef(
-            not abw and mit,
-            f"ÖPNV-Erschließung, {len(mit)} Planungsräume mit Wert: SQL = Datei ({abw[:3] or 'alle'})",
-        )
+        sql = {str(a): (b, c, float(d)) for a, b, c, d in cur.fetchall()}
+        grenze = rw["planer"]["oepnv_max_ohne_klasse_prozent"]
+        for kz, i in (("oepnv_erschliessung", 0), ("oepnv_takt", 1)):
+            datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == kz}
+            soll = {
+                nr: (None if v[i] is None or round(v[2]) > grenze else round(float(v[i])))
+                for nr, v in sql.items()
+            }
+            abw = [
+                (nr, datei.get(nr), soll[nr])
+                for nr in soll
+                if (datei.get(nr) is None) != (soll[nr] is None)
+                or (soll[nr] is not None and abs(datei[nr] - float(sql[nr][i])) > 0.51)
+            ]
+            pruef(
+                not abw and len(datei) == len(soll) == len(P["raeume"]),
+                f"{kz}: SQL = Datei in allen {len(soll)} Planungsräumen, "
+                f"{sum(v is None for v in soll.values())} ohne Wert (über {grenze} % ohne Klasse) "
+                f"({abw[:3] or 'alle gleich'})",
+            )
     cur.execute("""SELECT gitter_id, art, meter FROM auswertung.zelle_erreichbar WHERE methode = 'luftlinie'""")
     db = {(g, a): float(m) for g, a, m in cur.fetchall() if m is not None}
     ids = re.findall(r'"id":"(CRS3035RES100m[^"]+)"', (DATEN / "zellen.js").read_text(encoding="utf-8"))

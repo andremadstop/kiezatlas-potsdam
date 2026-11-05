@@ -58,6 +58,7 @@ WURZEL = Path(__file__).resolve().parent.parent
 DATEN = WURZEL / "daten"
 BELEGE = WURZEL / "belege"
 PR_CSV = WURZEL / "vorbereitet" / "planungsraeume.csv"
+H1_DATEI = "planungsraume-in-potsdam.geojson"
 
 DLDE = "https://www.govdata.de/dl-de/by-2-0"
 ODBL = "https://opendatacommons.org/licenses/odbl/1-0/"
@@ -276,6 +277,13 @@ def raumquelle(cur) -> tuple[str, str, dict, str]:
                 "pr_wkt": [z["wkt"] for z in zeilen],
             }
             return "planungsraum", tab, par, f"vorbereitet/{PR_CSV.name} (public.planungsraum noch leer)"
+    h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten")) / "eingang" / H1_DATEI
+    if h1.exists():
+        # Kein stiller Rückfall auf Stadtteile, wenn die Planungsräume vorliegen, aber nicht vorbereitet sind
+        raise SystemExit(
+            f"{h1} liegt vor, aber public.planungsraum ist leer und {PR_CSV} fehlt. Erst vorbereiten:\n"
+            f"  python -I skripte/03_planungsraeume.py --datei {H1_DATEI} --nr-feld pr --name-feld bez"
+        )
     return "stadtteil", "public.stadtteil", {}, "public.stadtteil"
 
 
