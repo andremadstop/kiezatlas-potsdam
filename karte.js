@@ -16,7 +16,8 @@ var hoehe = T.hoehe, farbe = T.farbe, umriss = T.umriss, GANZ = T.GANZ;
 // ---------- Zustand aus dem Hash
 var S = { thema: "stadtteile", nr: "", d3: false, luft: false, geb: false, kam: null };
 (function () {
-  var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || ""); });
+  function dek(x) { try { return decodeURIComponent(x); } catch (e) { return ""; } }   // verstümmelte Links nicht tödlich
+  var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[dek(kv[0])] = dek(kv[1] || ""); });
   if (HASHTHEMA[h.thema]) S.thema = HASHTHEMA[h.thema];
   if (h.st && K.stadtteile[h.st]) S.nr = h.st;
   S.d3 = h["3d"] === "1"; S.luft = h.luft === "1"; S.geb = h.geb === "1";
