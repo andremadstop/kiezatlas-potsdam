@@ -111,27 +111,30 @@ def main() -> int:
                 f"{titel}: gemeldet ({(treffer or ['nicht gemeldet'])[0].strip()[:110]})",
             )
         print("[4] Gegenproben in CSV und Steckbriefen")
+        # Steckbriefe je Raumeinheit (Stadtteile oder Planungsräume): die ersten beiden vorhandenen nehmen
+        sb = sorted(p.name for p in (WURZEL / "daten" / "export" / "steckbriefe").glob("*.html"))
+        erst, zweit = f"steckbriefe/{sb[0]}", f"steckbriefe/{sb[1]}"
         faelle_text = [
             ("Adresse in CSV", "csv/einrichtung.csv", "Grundschule", "Grundschule Lindenstraße 5", "Hausnummer"),
             ("OSM in CSV", "csv/gruenflaeche.csv", "dl-de/by-2-0", "© OpenStreetMap", "csv/: kein OSM"),
             ("Zahl fehlt in CSV", "csv/zelle.csv", ";dl-de/by-2-0", ";dl-de/by-2-0", "Werte wie GPKG"),
             (
                 "OSM im Steckbrief",
-                "steckbriefe/13.html",
+                erst,
                 "Quellen und Lizenzen",
                 "Quellen, OpenStreetMap",
                 "steckbriefe/",
             ),
             (
                 "Platzhalter im Steckbrief",
-                "steckbriefe/13.html",
+                erst,
                 "Lesehilfe</h2>",
                 "Lesehilfe</h2><p>None</p>",
                 "Platzhalter",
             ),
             (
                 "Telefon im Steckbrief",
-                "steckbriefe/21.html",
+                zweit,
                 "Lesehilfe</h2>",
                 "Lesehilfe</h2><p>0331 2891234</p>",
                 "Telefon",
