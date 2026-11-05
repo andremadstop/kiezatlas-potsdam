@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bauzeiten Potsdam: Kiezatlas Potsdam</title>
+<meta name="description" content="Wann wurde gebaut, wo in Potsdam heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum im 100-Meter-Gitter des Zensus 2022, aus der Nähe Haus für Haus geschätzt, mit Quelle bei jeder Angabe.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="jahre.css">
+</head>
+<body class="jahreseite" data-seite="karte">
+<a class="sprung" href="#zeitleiste">Zur Bauzeit-Leiste springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="jahre.html" aria-current="true"><span>Bauzeiten</span></a></li>
+      <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
+      <li><a class="nav" href="jahre-methode.html"><span>Methode</span></a></li>
+      <li><a class="nav" href="jahre-daten.html"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt">
+<section class="erzaehlung j-erzaehlung" id="oben" aria-labelledby="titel">
+  <div class="auftakt frage j-auftakt" data-schritt="0">
+    <p class="j-vorzeile">Kiezatlas Potsdam, Teil Gebäude</p>
+    <h1 class="titel" id="titel"><span class="titel__z"><span>Bauzeiten</span></span><span class="titel__z"><span>Potsdam</span></span></h1>
+    <p class="lede">Wann wurde gebaut, wo heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum, Zelle für Zelle im 100-Meter-Gitter des Zensus 2022, und aus der Nähe Haus für Haus geschätzt.</p>
+    <div class="j-profil" aria-labelledby="j-profil-titel">
+      <p class="j-profil__titel" id="j-profil-titel">Ganz Potsdam nach Bauzeit, genähert</p>
+      <div class="j-schicht" id="j-stadtschicht" role="img" aria-label="Anteile der acht Bauzeiten an allen Gebäuden mit Wohnraum in Potsdam"></div>
+      <ol class="j-schicht__marken" id="j-stadtmarken" aria-hidden="true"></ol>
+    </div>
+    <dl class="stadtzahlen j-zahlen" id="j-zahlen" aria-label="Gebäude mit Wohnraum in Potsdam"></dl>
+    <p class="stadtzahlen__quelle" id="j-zahlen-quelle"></p>
+    <p class="j-fixture" id="j-fixture" hidden></p>
+  </div>
+
+  <div class="buehne j-buehne" id="buehne">
+    <div id="karte" role="region" aria-label="Karte der Bauzeiten. Mit Pfeiltasten verschieben, Plus und Minus zoomen."></div>
+    <div class="werkzeug" role="toolbar" aria-label="Ansicht der Karte">
+      <fieldset class="themen" id="j-ansicht"><legend class="nur-sr">Was die Farbe zeigt</legend>
+        <label class="chip"><input type="radio" name="ansicht" value="ueberblick"><span>Größte Klasse</span></label>
+        <label class="chip"><input type="radio" name="ansicht" value="spanne"><span>Gewählte Bauzeit</span></label>
+      </fieldset>
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="j-dreid"><span>3D</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="j-luft"><span>Luftbild</span></label>
+      </div>
+    </div>
+    <div class="schild" id="schild" aria-hidden="true"></div>
+
+    <div class="j-leiste" id="zeitleiste" tabindex="-1" role="group" aria-labelledby="j-leiste-titel">
+      <div class="j-leiste__kopf">
+        <p class="j-leiste__titel" id="j-leiste-titel">Bauzeit</p>
+        <p class="j-leiste__status" id="j-status" aria-live="polite"></p>
+        <button class="j-abspielen" type="button" id="j-abspielen" hidden><span aria-hidden="true" class="j-abspielen__zeichen"></span><span class="j-abspielen__text">Nacheinander</span></button>
+      </div>
+      <div class="j-leiste__klassen" id="j-klassen"></div>
+      <div class="j-regler" id="j-regler">
+        <span class="j-regler__spanne" aria-hidden="true"></span>
+        <label class="nur-sr" for="j-von">Bauzeit von</label>
+        <input type="range" id="j-von" min="0" max="7" step="1" value="0">
+        <label class="nur-sr" for="j-bis">Bauzeit bis</label>
+        <input type="range" id="j-bis" min="0" max="7" step="1" value="0">
+      </div>
+      <div class="j-leiste__fuss" id="j-legende"></div>
+    </div>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  <ol class="fragen" id="fragen" aria-label="Fragen an die Karte">
+    <li class="frage" id="frage-1" data-schritt="1">
+      <p class="frage__nr">Frage 1</p>
+      <h2 class="frage__titel">Was steht noch aus der Zeit vor 1919?</h2>
+      <p>Hochgerechnet stammen rund <b data-j="f1-n">…</b> Gebäude mit Wohnraum aus der Zeit vor 1919, etwa <b data-j="f1-p">…</b> aller Gebäude, deren Bauzeit bekannt ist. Die höchsten Anteile haben <span data-j="f1-top">…</span>.</p>
+      <p class="fuss">Die Zahlen in den Fragen sind aus den Zellen hochgerechnet und gerundet. Weil der Zensus kleine Werte leicht verändert, sind sie nur ungefähr; mehr dazu in Frage 6.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Leiste unten auf der Karte wählt die Bauzeit. Ein Feld antippen zeigt nur diese Klasse; die beiden Regler darunter spannen einen Zeitraum auf, auch mit den Pfeiltasten.</p>
+    </li>
+    <li class="frage" id="frage-2" data-schritt="2">
+      <p class="frage__nr">Frage 2</p>
+      <h2 class="frage__titel">Wo wurde zwischen 1949 und 1990 gebaut?</h2>
+      <p>Aus diesen gut vier Jahrzehnten stammen hochgerechnet rund <b data-j="f2-n">…</b> Gebäude, etwa <b data-j="f2-p">…</b>. Die höchsten Anteile haben <span data-j="f2-top">…</span>.</p>
+      <p>Gezählt werden Gebäude, nicht Wohnungen. Ein Block mit sechzig Wohnungen zählt so viel wie ein Einfamilienhaus; deshalb wirken Großsiedlungen hier kleiner, als sie für die Zahl der Bewohner sind.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Ein Klick auf eine Zelle zeigt alle acht Bauzeiten dieser Zelle mit Quelle und Stichtag.</p>
+    </li>
+    <li class="frage" id="frage-3" data-schritt="3">
+      <p class="frage__nr">Frage 3</p>
+      <h2 class="frage__titel">Wo wuchs Potsdam nach 1990?</h2>
+      <p>Seit 1991 sind hochgerechnet rund <b data-j="f3-n">…</b> Gebäude mit Wohnraum entstanden, etwa <b data-j="f3-p">…</b> des Bestands von 2022. Die höchsten Anteile haben <span data-j="f3-top">…</span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> 3D stellt die Zellen als Säulen auf. Die Höhe zeigt, wie viele Gebäude der gewählten Bauzeit ungefähr in der Zelle stehen, die Farbe ihren Anteil.</p>
+    </li>
+    <li class="frage" id="frage-4" data-schritt="4">
+      <p class="frage__nr">Frage 4</p>
+      <h2 class="frage__titel">Was ist seit 2011 dazugekommen?</h2>
+      <p>Hochgerechnet rund <b data-j="f4-n">…</b> Gebäude, etwa <b data-j="f4-p">…</b>. Die höchsten Anteile haben <span data-j="f4-top">…</span>.</p>
+      <p>Die Zählung endet am 15. Mai 2022. Was danach fertig wurde, fehlt hier ganz; in Neubaugebieten ist der Bestand heute größer als auf der Karte.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Adresse der Seite merkt sich Bauzeit und Ansicht. Wer sie kopiert, teilt genau diese Karte.</p>
+    </li>
+    <li class="frage" id="frage-5" data-schritt="5">
+      <p class="frage__nr">Frage 5</p>
+      <h2 class="frage__titel">Wo mischen sich die Bauzeiten?</h2>
+      <p>In <b data-j="f5-m">…</b> von <b data-j="f5-z">…</b> Zellen mit bekannten Klassen stellt keine Bauzeit die Hälfte der Gebäude. Dort stehen Häuser aus mehreren Zeiten nebeneinander.</p>
+      <p class="frage__kann"><b>So geht’s:</b> „Größte Klasse“ färbt jede Zelle nach der Bauzeit mit den meisten Gebäuden. Gepunktet sind Zellen, in denen zwei Klassen gleichauf liegen.</p>
+    </li>
+    <li class="frage" id="frage-6" data-schritt="6">
+      <p class="frage__nr">Frage 6</p>
+      <h2 class="frage__titel">Wie genau ist das?</h2>
+      <p>Der Zensus verändert kleine Werte leicht oder setzt sie auf Null, damit niemand erkennbar wird. In <b data-j="f6-geheim">…</b> Zellen ist deshalb nur die Gesamtzahl bekannt, die Klassen fehlen: Sie sind schraffiert. In <b data-j="f6-wenig">…</b> Zellen stehen weniger als 5 Gebäude; ihre Anteile sind sehr unsicher und blass gezeichnet.</p>
+      <p>Die Karte sagt nichts über ein einzelnes Haus oder Grundstück. Sie zeigt, wie sich die Bauzeiten über die Stadt verteilen.</p>
+      <p class="frage__kann"><b>Nachlesen:</b> <a class="link" href="jahre-methode.html">Methode</a> mit Quelle, Klassen, Geheimhaltung und Näherung.</p>
+    </li>
+    <li class="frage" id="frage-7" data-schritt="7">
+      <p class="frage__nr">Frage 7</p>
+      <h2 class="frage__titel">Und Haus für Haus?</h2>
+      <p>Aus der Nähe zeichnet die Karte die Gebäudeumrisse der Landesvermessung, jedes mit einer Bauzeit. Von <b data-j="g-alle">…</b> Gebäuden in Potsdam tragen <b data-j="g-geschaetzt">…</b> (<span data-j="g-geschaetzt-p">…</span>) eine geschätzte Bauzeit, <b data-j="g-nd">…</b> sind nicht datiert, die meisten davon Garagen, Lauben und Schuppen. Mit einer belegten Bauzeit aus einer Quelle: <b data-j="g-belegt">…</b>.</p>
+      <p>Geschätzt heißt: Die Zensuszahlen jeder Zelle werden nach der Gebäudeform auf die Häuser verteilt; dazu kommen die belegten Bauzeiten der Großsiedlungen und, wo beides fehlt, die Bauzeit der Nachbargebäude. Über die ganze Stadt zeigt die Gebäudekarte dadurch mehr Häuser aus der Zeit <span data-j="g-sf-alt-k">…</span> als der Zensus (<span data-j="g-sf-alt">…</span>) und weniger aus <span data-j="g-sf-ddr-k">…</span> (<span data-j="g-sf-ddr">…</span>).</p>
+      <p class="fuss">Eine Schätzung je Haus, keine Aussage über einzelne Grundstücke. Wohngebäude tragen kein Einzeljahr, nur eine Bauzeitklasse.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Ab Zoom 14 erscheinen die Gebäude. Ein Klick auf eines zeigt Bauzeit, „geschätzt“ oder „belegt“, den Weg der Schätzung und die Quelle. Die Leiste filtert auch die Gebäude. Wie oft die Schätzung trifft, steht in der <a class="link" href="jahre-methode.html#m-gebaeude">Methode</a>.</p>
+    </li>
+    <li class="frage frage--frei" id="frage-8" data-schritt="8">
+      <p class="frage__nr">Selbst erkunden</p>
+      <h2 class="frage__titel">Jetzt selbst suchen.</h2>
+      <p>Bauzeit wählen, Zellen und Gebäude anklicken, Stadtteile vergleichen. Die Zellwerte gibt es als Tabelle und als Geodaten zum Herunterladen.</p>
+      <div class="frage__knoepfe j-knoepfe">
+        <a class="knopf knopf--voll" href="#stadtteile"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Stadtteile vergleichen</span></a>
+        <a class="knopf knopf--rand" href="jahre-daten.html"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Daten herunterladen</span></a>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section class="j-register" id="stadtteile" aria-labelledby="h-teile">
+  <div class="j-register__kopf">
+    <h2 id="h-teile" class="abschnitt">Bauzeiten je <span data-j="raum-name">Stadtteil</span></h2>
+    <p class="abschnitt__unter">Jede Zeile zeigt die genäherte Mischung der acht Bauzeiten. Die Zahl rechts ist der Anteil der oben gewählten Bauzeit: <b data-j="spanne-name">…</b>.</p>
+    <fieldset class="j-sortierung"><legend>Sortieren nach</legend>
+      <label class="chip"><input type="radio" name="sortierung" value="nr" checked><span>Nummer</span></label>
+      <label class="chip"><input type="radio" name="sortierung" value="anteil"><span>Anteil der Bauzeit</span></label>
+    </fieldset>
+  </div>
+  <div class="j-register__koerper">
+    <ul class="j-liste" id="j-liste" aria-label="Stadtteile"></ul>
+    <aside class="j-steckbrief" id="j-steckbrief" aria-labelledby="j-sb-name" aria-live="polite">
+      <p class="j-steckbrief__art" id="j-sb-art">Ganze Stadt</p>
+      <h3 class="j-steckbrief__name" id="j-sb-name">Potsdam</h3>
+      <p class="j-steckbrief__g" id="j-sb-g"></p>
+      <table class="j-tabelle" id="j-sb-tabelle">
+        <caption class="nur-sr">Gebäude mit Wohnraum nach Bauzeit, genähert</caption>
+        <thead><tr><th scope="col">Bauzeit</th><th scope="col">Gebäude, rund</th><th scope="col">Anteil</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="fuss" id="j-sb-hinweis"></p>
+      <div class="j-steckbrief__aktion">
+        <button class="knopf knopf--rand" type="button" id="j-sb-karte"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__marke" aria-hidden="true">Bauzeiten</p>
+  <p id="j-vermerk"></p>
+  <p>Gebäude: Umrisse © GeoBasis-DE/LGB, <a class="link" href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung); Bauzeiten der Großsiedlungen nach Landeshauptstadt Potsdam, „Potsdamer Platte“ (2008). Bauzeit je Gebäude geschätzt, keine Aussage über einzelne Grundstücke.</p>
+  <p>Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Hintergrundkarte © basemap.de / BKG, <a class="link" href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>; Luftbild © GeoBasis-DE/LGB, <a class="link" href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>.</p>
+  <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Alle Zahlen im Text rechnet die Seite beim Laden aus den Daten aus; keine ist von Hand eingesetzt.</p>
+  <p><b>Datenschutz:</b> Keine Cookies, keine Zählung. Die Karte lädt Kacheln von basemap.de und, wenn eingeschaltet, Luftbilder der LGB; diese Server sehen die IP-Adresse.</p>
+  <p class="fuss-seite__links"><a class="link" href="index.html">Kiezatlas Potsdam</a> <a class="link" href="jahre-methode.html">Methode</a> <a class="link" href="jahre-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+</footer>
+
+<script defer src="daten/kennzahlen.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/jahre_methode.js"></script>
+<script defer src="themen.js"></script>
+<script defer src="jahre.js"></script>
+</body>
+</html>

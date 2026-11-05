@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daten der Bauzeiten: Kiezatlas Potsdam</title>
+<meta name="description" content="Bauzeiten Potsdam zum Weiterverwenden: Gebäude mit Wohnraum nach Bauzeit je 100-m-Zelle und je Stadtteil als CSV, GeoJSON und GeoPackage, mit Lizenzvermerk.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="jahre.css">
+</head>
+<body class="jahreseite" data-seite="daten">
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      <li><a class="nav" href="jahre.html#stadtteile"><span>Stadtteile</span></a></li>
+      <li><a class="nav" href="jahre-methode.html"><span>Methode</span></a></li>
+      <li><a class="nav" href="jahre-daten.html" aria-current="true"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="j-blatt" id="inhalt">
+  <div class="j-blatt__kopf">
+    <h1 class="j-blatt__titel">Daten</h1>
+    <p class="j-blatt__lede">Dieselben Werte wie auf der Karte, zum Weiterrechnen in Tabellenkalkulation oder GIS. CSV, GeoJSON und Liesmich entstehen beim Klick in Ihrem Browser aus den Daten der Seite; das GeoPackage liegt als fertige Datei daneben.</p>
+    <p class="j-fixture" id="j-fixture" hidden></p>
+  </div>
+
+  <section class="j-teil" aria-labelledby="d-dateien">
+    <h2 id="d-dateien">Dateien</h2>
+    <div class="j-teil__text">
+      <ul class="j-dateien">
+        <li>
+          <div><h3>Zellen als Tabelle (CSV)</h3><p>Eine Zeile je 100-m-Zelle mit Gebäuden mit Wohnraum: <span data-j="zellen">…</span> Zeilen, Komma als Trenner, Punkt als Dezimalzeichen, UTF-8.</p></div>
+          <button class="knopf knopf--voll" type="button" id="j-d-zellen-csv" disabled><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">CSV speichern</span></button>
+        </li>
+        <li>
+          <div><h3>Zellen als Geodaten (GeoJSON)</h3><p>Dieselben Zellen mit ihrer Fläche, Koordinaten in WGS 84 (EPSG:4326). Lässt sich in QGIS direkt öffnen.</p></div>
+          <button class="knopf knopf--rand" type="button" id="j-d-zellen-geojson" disabled><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">GeoJSON speichern</span></button>
+        </li>
+        <li>
+          <div><h3>Zellen und Stadtteile als GeoPackage</h3><p>Eine Datei für QGIS oder ArcGIS mit zwei Ebenen, <code>zellen</code> und <code>stadtteile</code>, und der Tabelle <code>hinweis</code> mit Quelle und Lizenz. Koordinaten in ETRS89 / UTM Zone 33N (EPSG:25833); die Zellen sind exakt aus der Gitterkennung berechnet. Werte wie in den beiden CSV-Dateien.</p></div>
+          <a class="knopf knopf--rand" href="daten/download/bauzeiten.gpkg" download="kiezatlas-bauzeiten.gpkg" id="j-d-gpkg"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">GeoPackage speichern</span></a>
+        </li>
+        <li>
+          <div><h3>Je <span data-j="raum-name">Stadtteil</span> (CSV)</h3><p>Genäherte Mischung der Bauzeiten je <span data-j="raum-name">Stadtteil</span>, Anteile in ganzen Prozent, Gebäudezahlen auf 10 gerundet.</p></div>
+          <button class="knopf knopf--rand" type="button" id="j-d-raum-csv" disabled><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">CSV speichern</span></button>
+        </li>
+        <li>
+          <div><h3>Liesmich (Text)</h3><p>Quelle, Lizenz, Namensnennung und Erklärung der Spalten. Gehört zu jeder Weitergabe der Dateien.</p></div>
+          <button class="knopf knopf--rand" type="button" id="j-d-liesmich" disabled><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Text speichern</span></button>
+        </li>
+      </ul>
+      <p class="j-status" id="j-d-status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="j-teil" aria-labelledby="d-lizenz">
+    <h2 id="d-lizenz">Lizenz und Namensnennung</h2>
+    <div class="j-teil__text">
+      <p>Die Daten stehen unter der <a class="link" href="https://www.govdata.de/dl-de/by-2-0">Datenlizenz Deutschland, Namensnennung, Version 2.0</a>. Bei jeder Weitergabe oder Veröffentlichung gehört dieser Vermerk dazu:</p>
+      <p class="j-zitat" data-j="vermerk">…</p>
+      <p>Die Dateien enthalten keine Daten aus OpenStreetMap und damit keinen Anteil unter ODbL. Sie enthalten keine Adressen und keine Angaben zu einzelnen Gebäuden, nur Werte je Zelle und je Gebiet.</p>
+    </div>
+  </section>
+
+  <section class="j-teil" aria-labelledby="d-spalten">
+    <h2 id="d-spalten">Spalten</h2>
+    <div class="j-teil__text">
+      <table class="j-tabelle j-tabelle--links">
+        <caption class="nur-sr">Spalten der Zelldateien</caption>
+        <thead><tr><th scope="col">Spalte</th><th scope="col">Inhalt</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>gitter_id</code></th><td>Kennung der Zelle im Zensus-Gitter (EPSG:3035, 100 m)</td></tr>
+          <tr><th scope="row"><code>stadtteil</code></th><td>Nummer des Stadtteils, in dem der Zellmittelpunkt liegt</td></tr>
+          <tr><th scope="row"><code>gebaeude</code></th><td>Gebäude mit Wohnraum, Gesamtwert der Zelle</td></tr>
+          <tr><th scope="row"><code>anteil_…</code></th><td>Prozent je Bauzeit an der Summe der Klassen, auf 0,1 gerundet; leer, wenn alle Klassen geheim gehalten sind. Spalten: <span data-j="spalten">…</span></td></tr>
+          <tr><th scope="row"><code>vorherrschend</code></th><td>Bauzeit mit den meisten Gebäuden; leer bei Gleichstand oder geheimen Klassen</td></tr>
+          <tr><th scope="row"><code>klassen_geheim</code></th><td>1, wenn alle Klassen auf Null geändert sind</td></tr>
+        </tbody>
+      </table>
+      <p class="fuss">Stand der Auswertung <span data-j="stand">…</span>, Zensus-Stichtag 15. Mai 2022. Wie die Werte entstehen und wo sie unsicher sind, steht in der <a class="link" href="jahre-methode.html">Methode</a>.</p>
+    </div>
+  </section>
+
+  <section class="j-teil" aria-labelledby="d-fehlt">
+    <h2 id="d-fehlt">Noch nicht hier</h2>
+    <div class="j-teil__text">
+      <p>Eine Auswertung je Planungsraum gibt es noch nicht. Sie kommt dazu, sobald die Grenzen der Planungsräume als Datei vorliegen. Bis dahin lassen sich die Zellen aus dem GeoPackage in QGIS über ihre Mittelpunkte jeder eigenen Raumebene zuordnen.</p>
+      <p>Die geschätzte Bauzeit je Gebäude zeigt nur die Karte, als Datei gibt es sie hier nicht. Für ein einzelnes Haus ist sie zu unsicher (siehe <a class="link" href="jahre-methode.html#m-ruecktest">Rücktest</a>), und eine Tabelle je Gebäude lädt zu Aussagen über einzelne Grundstücke ein. Für Summen gelten die Zellen.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="fuss-seite">
+  <p id="j-vermerk"></p>
+  <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Keine Cookies, keine Zählung; diese Seite lädt nichts von fremden Servern.</p>
+  <p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+</footer>
+
+<script defer src="daten/kennzahlen.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="daten/jahre_methode.js"></script>
+<script defer src="themen.js"></script>
+<script defer src="jahre.js"></script>
+</body>
+</html>
