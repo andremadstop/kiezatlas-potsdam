@@ -1,4 +1,4 @@
-# A6 Prüfprotokoll, 2026-11-05T11:27Z
+# A6 Prüfprotokoll, 2026-11-05T11:37Z (nach den Funden der Gegenprobe)
 
 $ python -I skripte/15_planer.py
 Raumebene: stadtteil (32 Raumeinheiten)
@@ -26,7 +26,7 @@ A6-4 ODbL-Grenze: planer.js, erreichbar.js, einrichtungen.js ohne OSM (Korrektur
   ok    erreichbar.js: methode luftlinie
   ok    einrichtungen.js: Quellen ['lgb', 'mbjs']
 A6-5 Gewicht
-  ok    zusammen 79.1 KB gz ≤ 250 KB ({'planer.js': 10946, 'erreichbar.js': 53820, 'einrichtungen.js': 16220})
+  ok    zusammen 79.0 KB gz ≤ 250 KB ({'planer.js': 10912, 'erreichbar.js': 53771, 'einrichtungen.js': 16208})
 A6-6 Grundschulwerte vorläufig ohne Schulbezirke (H2)
   ok    128 Grundschulwerte, alle vorlaeufig: true (H2 fehlt)
 A6-7 Rundung und Unsicherheit (Korrektur 15)
@@ -65,8 +65,12 @@ A6-11 Nachrechnung auf zweitem Weg (SQL)
 0 Befunde
 
 $ python -I pruefen/A6_test_pfade.py
-  ok    Prognose gelesen
-  ok    unbekannte Altersgruppe gemeldet
+  ok    Prognose gelesen, Zeile anderer Raumebene nicht addiert
+  ok    Tausenderpunkt gelesen, zwei Zeilen addiert (1.200 + 34)
+  ok    unbekannte Altersgruppe gemeldet (Zeile ohne quelle)
+  ok    Zeile mit anderer Raumebene gemeldet
+  ok    Randhinweis an der Luftlinie
+  ok    kein Luftlinien-Randhinweis am Fußweg
   ok    Fußweg- und OSM-Dateien entstehen, wenn Daten da sind
   ok    Raum B (50 EW): 7 Altersklassen-Werte null
   ok    Grund der Leerstelle im Hinweis
@@ -79,6 +83,7 @@ $ python -I pruefen/A6_test_pfade.py
   ok    ÖPNV Klasse II: beide Zellen im 400-m-Radius
   ok    gemischte Gebietsklasse: wert null mit Spanne
   ok    Prognose 2030/2035 an Kinder-unter-6-Werten
+  ok    Prognose 6 bis unter 12 an der Grundschul-Relation
   ok    Fußweg: Arzt nur als Entfernung (Korrektur 13)
   ok    Fußweg-Datei nur methode fussweg
   ok    OSM-Quelle nur in der Fußweg-Datei
@@ -93,10 +98,17 @@ $ python -I pruefen/A6_test_pfade.py
 
 alle Tests bestanden
 
+$ python -I pruefen/A2_einrichtungen.py und pruefen/A5a_erreichbarkeit.py (Rolle kiezatlas_rechnen, nur lesen) gegen die geänderte richtwerte.yaml
+0 Befund(e)
+Ergebnis: 0 Befunde
+
 $ ruff check --select E,F,W --line-length 120 (A6-Dateien)
 All checks passed!
 
-$ md5sum
-ef8d3c14352edd30321e35715cfcdcd3  daten/planer.js
-a313595241d68d8adec3500eb7d20497  daten/erreichbar.js
-397968074bbc359c673c4a51ce8880a0  daten/einrichtungen.js
+$ md5sum (zwei Läufe hintereinander gleich)
+1f2adf1ecf8af3eff36afe34a56b7f09  daten/planer.js
+8082832ba9b03c503d9a6690e30835f4  daten/erreichbar.js
+71f2842a7fcacd0d63086f100f3dbe3e  daten/einrichtungen.js
+1f2adf1ecf8af3eff36afe34a56b7f09  daten/planer.js
+8082832ba9b03c503d9a6690e30835f4  daten/erreichbar.js
+71f2842a7fcacd0d63086f100f3dbe3e  daten/einrichtungen.js

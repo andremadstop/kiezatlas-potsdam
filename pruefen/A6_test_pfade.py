@@ -151,16 +151,35 @@ def main() -> int:
         # Prognose-Datei (H11) im Format aus richtwerte.yaml
         (tmp / "eingang").mkdir()
         (tmp / "eingang" / "prognose_planungsraum.csv").write_text(
-            "raum;jahr;altersgruppe;personen;quelle\nA;2030;u3;12;Beispielprognose "
-            "(unecht)\nA;2030;3_5;14;Beispielprognose (unecht)\n"
-            "A;2035;u3;11;Beispielprognose (unecht)\nA;2035;3_5;13;Beispielprognose (unecht)\nA;2030;9_12;5;x\n",
+            "raum;raumebene;jahr;altersgruppe;personen;quelle\n"
+            "A;stadtteil;2030;u3;12;Beispielprognose (unecht)\n"
+            "A;stadtteil;2030;3_5;14;Beispielprognose (unecht)\n"
+            "A;stadtteil;2035;u3;11;Beispielprognose (unecht)\n"
+            "A;stadtteil;2035;3_5;13;Beispielprognose (unecht)\n"
+            "A;stadtteil;2030;6_11;1.200;Beispielprognose (unecht)\n"
+            "A;stadtteil;2030;6_11;34;Beispielprognose (unecht)\n"
+            "A;planungsraum;2030;u3;999;Beispielprognose (unecht)\n"
+            "A;stadtteil;2030;9_12;5\n",
             encoding="utf-8",
         )
         os.environ["KIEZ_DATEN"] = str(tmp)
         meld: list[str] = []
         prog = p.prognose_lesen(rw, "stadtteil", meld)
-        ok(prog and prog["werte"]["A"]["u3"][2030] == 12, "Prognose gelesen")
-        ok(any("9_12" in m for m in meld), "unbekannte Altersgruppe gemeldet")
+        ok(prog and prog["werte"]["A"]["u3"][2030] == 12, "Prognose gelesen, Zeile anderer Raumebene nicht addiert")
+        ok(prog["werte"]["A"]["6_11"][2030] == 1234, "Tausenderpunkt gelesen, zwei Zeilen addiert (1.200 + 34)")
+        ok(any("9_12" in m for m in meld), "unbekannte Altersgruppe gemeldet (Zeile ohne quelle)")
+        ok(any("anderer raumebene" in m for m in meld), "Zeile mit anderer Raumebene gemeldet")
+        # Randliste (A5a, nur Luftlinie): Zelle 3 von Raum A mit Kita-Wert über 500 m
+        rand = {(ids[1], "kita"): "berlin"}
+        dr = beispiel()
+        dr["erreichbar"]["luftlinie"]["kita"][ids[1]] = 650.0  # über 500 m: Wert ist nur Obergrenze
+        dr["erreichbar"]["fussweg"]["kita"][ids[1]] = 700.0
+        RL = p.planer_datei(dr, rw, "luftlinie", rand, prog, meld)
+        RF = p.planer_datei(dr, rw, "fussweg", rand, prog, meld)
+        kl = next(w for w in RL["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
+        kf = next(w for w in RF["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
+        ok("Obergrenze" in kl["unsicherheit"], "Randhinweis an der Luftlinie")
+        ok("Obergrenze" not in kf["unsicherheit"], "kein Luftlinien-Randhinweis am Fußweg")
 
         PL = p.planer_datei(d, rw, "luftlinie", {}, prog, meld)
         PF = p.planer_datei(d, rw, "fussweg", {}, prog, meld)
@@ -213,6 +232,8 @@ def main() -> int:
             pk and pk[0]["prognose"]["personen"] == {"2030": 26, "2035": 24},
             "Prognose 2030/2035 an Kinder-unter-6-Werten",
         )
+        pg = [w for w in PL["raeume"]["A"]["werte"] if w.get("zielgruppe", "").startswith("Kinder 6 bis unter 12")]
+        ok(pg and pg[0]["prognose"]["personen"] == {"2030": 1234}, "Prognose 6 bis unter 12 an der Grundschul-Relation")
         # Fußweg: Ärzte nur Entfernung
         arten_f = {(w["kennzahl"], w["art"]) for w in PF["raeume"]["A"]["werte"]}
         ok(

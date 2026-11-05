@@ -69,14 +69,13 @@ QUELLEN = {
         "quelle": "Zensus 2022, 100-m-Gitter, Stichtag 15.05.2022 (Bevölkerung, infrastrukturelle Altersgruppen)",
         "lizenz": "dl-de/by-2-0",
         "vermerk": f"© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
-        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html",
+        "url": "https://www.destatis.de/static/DE/zensus/gitterdaten/",
         "stand": "2022-05-15",
     },
     "mbjs": {
         "quelle": "Ministerium für Bildung, Jugend und Sport Brandenburg, WFS Kita- und Schulstandorte",
         "lizenz": "dl-de/by-2-0",
         "vermerk": f"© Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
-        "url": "https://schullandschaft.brandenburg.de/edugis/wfs/schulen",
         "stand": "2026-11-05",
     },
     "lgb": {
@@ -85,7 +84,7 @@ QUELLEN = {
         ),
         "lizenz": "dl-de/by-2-0",
         "vermerk": f"© GeoBasis-DE/LGB, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
-        "url": "https://geobasis-bb.de",
+        "url": "https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs",
         "stand": "2026-11-05",
     },
     "vbb": {
@@ -318,18 +317,30 @@ def prognose_lesen(rw: dict, raumebene: str, meldungen: list) -> dict:
         return {}
     gruppen = {"u3", "3_5", "6_9", "6_11", "ges"}
     jahre = {int(j) for j in rw["prognose"]["jahre"]}
-    aus: dict = defaultdict(lambda: defaultdict(dict))
+    aus: dict = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     quellen = set()
+    andere_ebene = 0
     with pfad.open(encoding="utf-8") as f:
-        for z in csv.DictReader(f, delimiter=";"):
+        for n, z in enumerate(csv.DictReader(f, delimiter=";"), start=2):
+            if (z.get("raumebene") or "").strip() != raumebene:
+                andere_ebene += 1  # Prognose auf Stadtteilen passt nicht auf Planungsräume und umgekehrt
+                continue
             if z.get("altersgruppe") not in gruppen:
-                meldungen.append(f"Prognose: Altersgruppe {z.get('altersgruppe')!r} ignoriert")
+                meldungen.append(f"Prognose Zeile {n}: Altersgruppe {z.get('altersgruppe')!r} ignoriert")
                 continue
             if int(z["jahr"]) not in jahre:
                 continue
-            aus[str(z["raum"]).strip()][z["altersgruppe"]][int(z["jahr"])] = int(float(z["personen"]))
-            quellen.add(z.get("quelle", "").strip())
-    meldungen.append(f"Prognose (H11): {len(aus)} Raumeinheiten aus {pfad.name}, Quelle {sorted(quellen)}")
+            roh = (z.get("personen") or "").strip().replace(".", "").replace(" ", "")
+            if not roh.isdigit():
+                raise SystemExit(f"{pfad} Zeile {n}: personen {z.get('personen')!r} ist keine ganze Zahl")
+            # mehrere Zeilen je Raum, Gruppe und Jahr (z. B. Teilgebiete) werden addiert
+            aus[str(z["raum"]).strip()][z["altersgruppe"]][int(z["jahr"])] += int(roh)
+            quellen.add((z.get("quelle") or "").strip())
+    if andere_ebene:
+        meldungen.append(f"Prognose: {andere_ebene} Zeilen mit anderer raumebene als {raumebene} ignoriert")
+    meldungen.append(
+        f"Prognose (H11): {len(aus)} Raumeinheiten ({raumebene}) aus {pfad.name}, Quelle {sorted(quellen)}"
+    )
     return {"werte": aus, "quelle": "; ".join(sorted(q for q in quellen if q)), "raumebene": raumebene}
 
 
@@ -351,7 +362,9 @@ def raum_von(d: dict, g: str) -> str | None:
 
 class Rechner:
     def __init__(self, d: dict, rw: dict, methode: str, rand: dict):
-        self.d, self.rw, self.methode, self.rand = d, rw, methode, rand
+        self.d, self.rw, self.methode = d, rw, methode
+        # Die Randliste stammt aus der Luftlinie (A5a) und gilt nicht für Netzentfernungen
+        self.rand = rand if methode == "luftlinie" else {}
         g = rw["geheimhaltung"]
         self.min_ew, self.rd_ew = g["min_ew_raumeinheit"], g["rundung_ew"]
         self.min_zg = rw["planer"]["min_zielgruppe"]
@@ -367,9 +380,6 @@ class Rechner:
         if name not in self.zg_cache:
             self.zg_cache[name] = zielgruppe_je_zelle(self.d, self.rw, name)
         return self.zg_cache[name]
-
-    def zg_summe(self, name, raum):
-        return sum(v for g, v in self.zg(name).items() if raum_von(self.d, g) == raum)
 
     def q_art(self, art: str) -> str:
         """Quelle der Standorte: OSM beim Fußweg, ALKIS bei Grün und Gemeinbedarf, sonst MBJS."""
@@ -480,13 +490,19 @@ class Rechner:
         }
 
 
-def kennzahlen_luftlinie(r: Rechner, raum: str, ebene: str) -> list[dict]:
-    d, rw = r.d, r.rw
-    werte: list[dict] = []
-    for e in rw["planer"]["anteil_in_radius"]:
+def anteile(r: Rechner, raum: str, ebene: str) -> list[dict]:
+    """Anteile der Zielgruppe im Radius laut richtwerte.yaml (planer.anteil_in_radius), je Methode."""
+    werte = []
+    for e in r.rw["planer"]["anteil_in_radius"]:
         w = r.anteil_in_radius(raum, e["art"], e["zielgruppe"], e["richtwert"], ebene)
         if w:
             werte.append(w)
+    return werte
+
+
+def kennzahlen_luftlinie(r: Rechner, raum: str, ebene: str) -> list[dict]:
+    d = r.d
+    werte = anteile(r, raum, ebene)
     ein = [e for e in d["einrichtungen"] if e["raum"] == raum]
     werte += plaetze(r, raum, ein, ebene)
     werte += ew_je(r, raum, ein, ebene)
@@ -696,8 +712,10 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
 
     gk = (o["gebietsklassen"]["stadtteile"].get(raum) if ebene == "stadtteil" else None) or {}
     klasse = gk.get("klasse")
+    # Klassen der Bestandteile; Freitext wie „II laut Tab. 4.1, I laut Text und Anlage 4“ (Waldstadt I) liefert beide
     teile_kl = sorted(
-        {v for v in (gk.get("teile") or {}).values() if v in KLASSEN_RANG}, key=lambda k: -KLASSEN_RANG[k]
+        {k for v in (gk.get("teile") or {}).values() if v for k in re.findall(r"\b(I{1,3})\b", str(v))},
+        key=lambda k: -KLASSEN_RANG[k],
     )
     rwobj = {
         "wert": o["erschliessung"]["anteil_ew_prozent"],
@@ -812,11 +830,7 @@ def gruen(r: Rechner, raum: str, ebene: str) -> dict | None:
 
 def kennzahlen_fussweg(r: Rechner, raum: str, ebene: str) -> list[dict]:
     rw = r.rw
-    werte = []
-    for e in rw["planer"]["anteil_in_radius"]:
-        w = r.anteil_in_radius(raum, e["art"], e["zielgruppe"], e["richtwert"], ebene)
-        if w:
-            werte.append(w)
+    werte = anteile(r, raum, ebene)
     for art in sorted(r.d["erreichbar"]["fussweg"]):
         if art in rw["gesundheit"]["arten_nur_lage"] or art in ("supermarkt", "spielplatz"):
             w = r.entfernung_median(raum, art, ebene)
@@ -835,7 +849,12 @@ def prognose_anhaengen(werte: list[dict], raum: str, prog: dict) -> None:
     p = prog["werte"].get(raum)
     if not p:
         return
-    zuordnung = {"Kinder unter 6": ("u3", "3_5"), "Kinder 6 bis 9": ("6_9",), "Einwohner": ("ges",)}
+    zuordnung = {
+        "Kinder unter 6": ("u3", "3_5"),
+        "Kinder 6 bis 9": ("6_9",),
+        "Kinder 6 bis unter 12": ("6_11",),
+        "Einwohner": ("ges",),
+    }
     for w in werte:
         for text, gruppen in zuordnung.items():
             if (w.get("zielgruppe") or "").startswith(text) and all(g in p for g in gruppen):
@@ -998,16 +1017,14 @@ def main() -> int:
         d = lesen(cur)
     ids = zellen_reihenfolge()
     meldungen: list[str] = [f"Raumebene: {d['raumebene']} ({len(d['raeume'])} Raumeinheiten)"]
-    if d["raumebene"] == "planungsraum":
-        rw["oepnv"]["gebietsklassen"]["stadtteile"] = {}
-    rand = rand_unsicher()
+    rand = rand_unsicher()  # gilt nur für Luftlinie (A5a); der Fußweg hat keine Randliste
     prog = prognose_lesen(rw, d["raumebene"], meldungen)
     geschrieben, fehlt = [], []
     for name, var, inhalt, kopf in (
         ("planer.js", "KIEZ_PLANER", planer_datei(d, rw, "luftlinie", rand, prog, meldungen), ""),
         ("erreichbar.js", "KIEZ_ERREICHBAR", erreichbar_datei(d, rw, "luftlinie", ids), ""),
         ("einrichtungen.js", "KIEZ_EINRICHTUNGEN", einrichtungen_datei(d), ""),
-        ("planer_fuss_odbl.js", "KIEZ_PLANER_FUSS", planer_datei(d, rw, "fussweg", rand, prog, meldungen), ODBL_KOPF),
+        ("planer_fuss_odbl.js", "KIEZ_PLANER_FUSS", planer_datei(d, rw, "fussweg", {}, prog, meldungen), ODBL_KOPF),
         ("erreichbar_fuss_odbl.js", "KIEZ_ERREICHBAR_FUSS", erreichbar_datei(d, rw, "fussweg", ids), ODBL_KOPF),
         ("einrichtungen_odbl.js", "KIEZ_EINRICHTUNGEN_ODBL", einrichtungen_odbl_datei(d), ODBL_KOPF),
     ):

@@ -9,6 +9,7 @@ Aufruf wie skripte/15_planer.py, mit pruefen/A6_planer.py. Rückgabe 0 = alle Kr
 from __future__ import annotations
 
 import gzip
+import importlib.util
 import json
 import os
 import re
@@ -24,6 +25,10 @@ OSM_SPUR = re.compile(r"OpenStreetMap|\bODbL\b|\"methode\":\s*\"fussweg\"|\"osm_
 NUR_LAGE = {"arzt", "apotheke", "pflege", "supermarkt", "spielplatz"}
 FEINE_ZIELGRUPPEN = ("Kinder", "rechnerischer Bedarf")
 befunde: list[str] = []
+sys.dont_write_bytecode = True
+_spec = importlib.util.spec_from_file_location("daten_pruefen", WURZEL / "pruefen" / "daten.py")
+DATEN_PRUEFEN = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(DATEN_PRUEFEN)
 
 
 def pruef(ok: bool, text: str) -> bool:
@@ -34,12 +39,12 @@ def pruef(ok: bool, text: str) -> bool:
 
 
 def js(name: str):
+    """Datei lesen wie pruefen/daten.py (js_lesen); fehlt sie, (None, "")."""
     p = DATEN / name
     if not p.exists():
         return None, ""
     t = p.read_text(encoding="utf-8")
-    m = re.search(r"window\.[A-Za-z0-9_]+\s*=\s*", t)
-    return json.loads(t[m.end() :].rstrip().rstrip(";")), t
+    return DATEN_PRUEFEN.js_lesen(p, t)[2], t
 
 
 def werte(P):

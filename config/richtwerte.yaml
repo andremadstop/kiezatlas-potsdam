@@ -238,8 +238,10 @@ prognose:
   # Prüfbericht 8, H11: Bevölkerungsprognose je Planungsraum (Handdownload von Andre). skripte/15_planer.py liest die
   # Datei, sobald sie da ist, und hängt an die Kennzahlen mit Zielgruppe ein Feld `prognose` an.
   # Erwartete Datei: $KIEZ_DATEN/eingang/prognose_planungsraum.csv, UTF-8, Trennzeichen ;, Kopfzeile
-  #   raum;jahr;altersgruppe;personen;quelle
-  #   raum = Planungsraum-Nr. wie in public.planungsraum (bzw. Stadtteil-Nr., solange H1 fehlt)
+  #   raum;raumebene;jahr;altersgruppe;personen;quelle
+  #   raum = Planungsraum-Nr. wie in public.planungsraum bzw. Stadtteil-Nr.; raumebene = planungsraum | stadtteil
+  #   (nur Zeilen der aktuellen Raumebene zählen, die anderen werden gemeldet); personen = ganze Zahl,
+  #   mehrere Zeilen je raum/jahr/altersgruppe werden addiert
   #   altersgruppe = u3 | 3_5 | 6_9 | 6_11 | ges (andere Werte werden ignoriert und gemeldet)
   datei: eingang/prognose_planungsraum.csv
   quelle: null
