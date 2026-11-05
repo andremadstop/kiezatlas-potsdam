@@ -90,7 +90,7 @@ def konfiguration() -> dict:
         "rechteck_mbjs": rechteck(RECHTECK_MBJS),
         "rechteck_lgb": rechteck(RECHTECK_LGB),
         "lizenz_zensus": f"Zellmittelpunkt und Einwohner: © Statistische Ämter des Bundes und der Länder, Zensus 2022, "
-                         f"dl-de/by-2-0 ({DLDE_LINK})",
+                         f"dl-de/by-2-0 ({DLDE_LINK}), {VERAENDERT}",
         "lizenz_lgb": f"© GeoBasis-DE/LGB, dl-de/by-2-0 ({DLDE_LINK})",
     }
 
@@ -229,6 +229,7 @@ def rand_gruen(cur, k: dict) -> list[tuple]:
                    AS d_b
         FROM auswertung.zelle_gruen zg JOIN t_zelle z USING (gitter_id), t_rechteck r
         WHERE zg.methode = 'luftlinie' AND r.herkunft = 'lgb'
+        ORDER BY zg.radius_m, zg.gitter_id
     """, (HALBE_DIAGONALE,))
     aus = []
     for gid, rad, ew, st, d_r, d_b in cur.fetchall():
@@ -313,9 +314,8 @@ def bericht(cur, k: dict, randliste: list[tuple], fuss_vorher: tuple, fuss_nachh
         e[1] += ew_ or 0
         e[2] += "rechteck" in grund
         e[3] += "berlin" in grund
-    t.append("„berlin“ ist bei Kita und Schule gewollt: E7 schließt Berlin aus, geplant wird dort im Land "
-             "Brandenburg. Bei Bibliothek, Sport, Feuerwehr, sonstigem Gemeinbedarf und Grün ist es eine "
-             "Datenlücke. „rechteck“ ist immer eine Datenlücke (Abruf endete dort).")
+    t.append("„berlin“: nach E7 vorerst nicht gerechnet; eine Berliner Einrichtung könnte näher liegen. "
+             "„rechteck“: der Abruf der Quelle endete dort.")
     t.append("")
     t.append("Zellen, deren Wert nur eine Obergrenze ist (die nächste Einrichtung liegt weiter weg als der Rand "
              "des Datengebiets; jenseits davon könnte eine nähere liegen). Liste: "

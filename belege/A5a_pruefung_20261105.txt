@@ -1,4 +1,4 @@
-Prüfung A5a, 2026-11-05T10:30:06Z
+Prüfung A5a, 2026-11-05T10:32:07Z
 Zellen mit Mittelpunkt in Potsdam: 3443, davon bewohnt: 3411; Arten: ['bibliothek', 'feuerwehr', 'foerderschule', 'grundschule', 'gymnasium', 'hort', 'kita', 'osz', 'sek1', 'sonstige_schule', 'sonstiger_gemeinbedarf', 'sport'] + gruen
 [ok] 1a Abdeckung bewohnte Zellen × Arten: 3411 Zellen × 13 Arten = 44343 erwartet, fehlend 0
 [ok] 1b Abdeckung Zellen von zellen.js: 3443 Zellen, fehlend 0, Luftlinie-Zeilen 44759
@@ -11,7 +11,7 @@ Zellen mit Mittelpunkt in Potsdam: 3443, davon bewohnt: 3411; Arten: ['bibliothe
 [ok] 5a methode in jeder Zeile gesetzt: 0 Zeilen ohne methode
 [ok] 5b minuten bei Luftlinie leer: 0 Zeilen mit minuten
      Fußweg-Zeilen (A5b, nicht von A5a): zelle_erreichbar 0, zelle_gruen 0
-[ok] 6 Lizenzvermerk je Zeile (dl-de mit Link, verändert, Zensus; kein OSM/ODbL): 3 verschiedene Vermerke, davon fehlerhaft 0
+[ok] 6 Lizenzvermerk je Zeile und Teil (dl-de mit Link, verändert, Zensus; kein OSM/ODbL): 3 verschiedene Vermerke, davon fehlerhaft 0
 [ok] 6b jede ziel_id existiert: 0 ohne Ziel
 [ok] 7a zelle_gruen r=500: eine Zeile je Zelle: 3443 Zeilen
 [ok] 7b 0 ≤ m2_gruen ≤ Kreisfläche (r=500): 0 außerhalb

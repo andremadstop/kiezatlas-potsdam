@@ -1,4 +1,4 @@
-# A5a Erreichbarkeit in Luftlinie: Lauf 20261105T102949Z
+# A5a Erreichbarkeit in Luftlinie: Lauf 20261105T103151Z
 
 Erzeugt von `skripte/14_erreichbarkeit.py` (Rolle `kiezatlas_rechnen`, kein Netzabruf). Gerechnet in EPSG:25833 vom Mittelpunkt der Zensus-Zelle aus. Der Mittelpunkt kann bis zu 71 m vom tatsächlichen Wohnort abweichen; Meterwerte sind auf 0,1 m gespeichert, aussagekräftig sind sie auf rund 50 m.
 
@@ -32,7 +32,7 @@ Abrufrechtecke laut `config/potsdam.yaml` (EPSG:25833): MBJS [353000, 5798000, 3
 
 Berlin-Ersatz: 935 bewohnte Zellen außerhalb Potsdams ohne LGB-Gebäude im LGB-Rechteck, davon 882 mit mindestens 3 solchen Nachbarn in 150 m (24.582 EW; x 371.639–375.916, y 5.805.827–5.819.346). Das ist das Berliner Gebiet östlich der Stadt.
 
-„berlin“ ist bei Kita und Schule gewollt: E7 schließt Berlin aus, geplant wird dort im Land Brandenburg. Bei Bibliothek, Sport, Feuerwehr, sonstigem Gemeinbedarf und Grün ist es eine Datenlücke. „rechteck“ ist immer eine Datenlücke (Abruf endete dort).
+„berlin“: nach E7 vorerst nicht gerechnet; eine Berliner Einrichtung könnte näher liegen. „rechteck“: der Abruf der Quelle endete dort.
 
 Zellen, deren Wert nur eine Obergrenze ist (die nächste Einrichtung liegt weiter weg als der Rand des Datengebiets; jenseits davon könnte eine nähere liegen). Liste: `belege/A5a_rand_unsicher_20261105.csv`.
 

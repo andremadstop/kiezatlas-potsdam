@@ -159,11 +159,12 @@ def main() -> int:
         gr = q("SELECT gitter_id, radius_m, m2_gruen::float8, m2_je_ew::float8, quelle_lizenz "
                "FROM auswertung.zelle_gruen WHERE methode = 'luftlinie'")
         lizenzen = [r[6] for r in zeilen] + [r[4] for r in gr]
+        # jeder Teilvermerk (getrennt durch „; “) braucht Link und Bearbeitungshinweis (Korrektur 26)
         schlecht = [t for t in set(lizenzen)
-                    if not ("dl-de/by-2-0" in t and DLDE_LINK in t and "Daten verändert (eigene Berechnung)" in t
-                            and "Zensus 2022" in t)
-                    or re.search(r"openstreetmap|odbl|\bosm\b", t, re.I)]
-        pruefe(not schlecht, "6 Lizenzvermerk je Zeile (dl-de mit Link, verändert, Zensus; kein OSM/ODbL)",
+                    if "Zensus 2022" not in t or re.search(r"openstreetmap|odbl|\bosm\b", t, re.I)
+                    or not all("dl-de/by-2-0" in teil and DLDE_LINK in teil
+                               and "Daten verändert (eigene Berechnung)" in teil for teil in t.split("; "))]
+        pruefe(not schlecht, "6 Lizenzvermerk je Zeile und Teil (dl-de mit Link, verändert, Zensus; kein OSM/ODbL)",
                f"{len(set(lizenzen))} verschiedene Vermerke, davon fehlerhaft {len(schlecht)}")
         gruen_ids = {i for (i,) in q("SELECT id FROM auswertung.gruenflaeche")}
         ohne_ziel = [(g, a, zid) for g, a, _, _, _, zid, _ in zeilen
