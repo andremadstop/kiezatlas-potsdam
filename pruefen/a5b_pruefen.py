@@ -105,6 +105,13 @@ def pruefen(cur) -> list[tuple[str, bool, str]]:
                 (f"zelle_erreichbar {z_all} Zeilen, ohne methode {z_ohne}, Fußweg ohne ODbL {z_odbl}; "
                 f"zelle_gruen Fußweg {g_fuss} Zeilen, ohne ODbL {g_odbl}; Tabellenkommentar nennt ODbL: {kommentar}")))
 
+    # E7: Ziele außerhalb der Stadtgrenze (Brandenburg) werden mitgerechnet
+    cur.execute("""SELECT e.art, count(*) FROM auswertung.zelle_erreichbar e
+                   JOIN auswertung.einrichtung i ON i.id = e.ziel_id AND i.art = e.art AND NOT i.in_potsdam
+                   WHERE e.methode = 'fussweg' GROUP BY e.art ORDER BY e.art""")
+    aussen = cur.fetchall()
+    erg.append(("Hinweis E7: nächstes Ziel außerhalb der Stadtgrenze", True,
+                ", ".join(f"{a} {c} Zellen" for a, c in aussen) if aussen else "keine Zelle"))
     erg.append(("Hinweis: Vergleich mit A5a-Luftlinie", True,
                 f"{a5a_n} Paare, davon Fußweg < A5a-Luftlinie: {a5a_v}" if a5a_n else "noch keine Luftlinie-Zeilen"))
     return erg

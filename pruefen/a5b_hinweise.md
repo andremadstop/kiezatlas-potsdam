@@ -32,6 +32,8 @@ Zwischenspeicher) und der Rolle `kiezatlas_rechnen`. Kein Netzabruf, kein pgRout
   Fußweg erreichbar ist. `m2_je_ew` bleibt leer (Berliner Methode teilt je Raumeinheit, das rechnet A6).
 - Ein Lauf löscht nur die eigenen Fußweg-Zeilen und schreibt sie neu (eine Transaktion). Die Luftlinie-Zeilen von
   A5a bleiben unberührt (im Probelauf geprüft).
+  Umgekehrt löscht A5a (`14_erreichbarkeit.py`, Stand 05.11.) nur `WHERE methode = 'luftlinie'`; die Reihenfolge der
+  beiden Läufe ist damit egal (geprüft per grep am 05.11.2026).
 
 ## Lizenz (0.5, Korrektur 4)
 
