@@ -265,9 +265,17 @@ def raumquelle(cur) -> tuple[str, str, dict, str]:
     cur.execute("SELECT count(*) FROM public.planungsraum")
     if cur.fetchone()[0] > 0:
         return "planungsraum", "public.planungsraum", {}, "public.planungsraum"
+    h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten")) / "eingang" / H1_DATEI
+    aufruf = f"  python -I skripte/03_planungsraeume.py --datei {H1_DATEI} --nr-feld pr --name-feld bez"
     if PR_CSV.exists():
         with PR_CSV.open(encoding="utf-8") as f:
             zeilen = list(csv.DictReader(f, delimiter=";"))
+        if h1.exists():
+            # CSV muss zum aktuellen Handdownload passen (gleiche Nummern, nicht älter)
+            nrn = {str((ft.get("properties") or {}).get("pr")) for ft in json.loads(h1.read_text(encoding="utf-8"))[
+                "features"]}
+            if {z["nr"] for z in zeilen} != nrn or PR_CSV.stat().st_mtime < h1.stat().st_mtime:
+                raise SystemExit(f"{PR_CSV} passt nicht zu {h1} (Nummern oder älter). Neu vorbereiten:\n{aufruf}")
         if zeilen:
             tab = """(SELECT t.nr, t.name, ST_Multi(ST_GeomFromText(t.wkt, 4326)) AS geom
                       FROM unnest(%(pr_nr)s::text[], %(pr_name)s::text[], %(pr_wkt)s::text[]) AS t(nr, name, wkt))"""
@@ -277,12 +285,11 @@ def raumquelle(cur) -> tuple[str, str, dict, str]:
                 "pr_wkt": [z["wkt"] for z in zeilen],
             }
             return "planungsraum", tab, par, f"vorbereitet/{PR_CSV.name} (public.planungsraum noch leer)"
-    h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten")) / "eingang" / H1_DATEI
     if h1.exists():
         # Kein stiller Rückfall auf Stadtteile, wenn die Planungsräume vorliegen, aber nicht vorbereitet sind
         raise SystemExit(
-            f"{h1} liegt vor, aber public.planungsraum ist leer und {PR_CSV} fehlt. Erst vorbereiten:\n"
-            f"  python -I skripte/03_planungsraeume.py --datei {H1_DATEI} --nr-feld pr --name-feld bez"
+            f"{h1} liegt vor, aber public.planungsraum ist leer und {PR_CSV} fehlt oder ist leer. "
+            f"Erst vorbereiten:\n{aufruf}"
         )
     return "stadtteil", "public.stadtteil", {}, "public.stadtteil"
 
@@ -301,17 +308,13 @@ def lesen(cur) -> dict:
     )
     d["zellen"] = {g: {"raum": str(nr), "ew": ew, "x": x, "y": y} for g, nr, ew, x, y in cur.fetchall()}
     # Stadtteil je Zelle: die NVP-Gebietsklasse hängt am Ortsteil (A4), auch wenn die Raumeinheit ein Planungsraum ist
-    cur.execute("""SELECT z.gitter_id, s.nr FROM public.zensus_zelle z
+    cur.execute("""SELECT z.gitter_id, s.nr, z.ew FROM public.zensus_zelle z
                    JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom) WHERE z.ew IS NOT NULL""")
-    d["zelle_stadtteil"] = {g: str(nr) for g, nr in cur.fetchall()}
-    # Bewohnte Zellen ohne Raumeinheit (Mittelpunkt außerhalb aller Flächen) für den Beleg
-    cur.execute(
-        f"""SELECT count(*), coalesce(sum(z.ew), 0) FROM public.zensus_zelle z
-            JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
-            WHERE z.ew IS NOT NULL AND NOT EXISTS (SELECT 1 FROM {tab} r WHERE ST_Contains(r.geom, z.geom))""",
-        par or None,
-    )
-    d["ohne_raum"] = tuple(cur.fetchone())
+    st = cur.fetchall()
+    d["zelle_stadtteil"] = {g: str(nr) for g, nr, _ in st}
+    # Bewohnte Zellen im Stadtgebiet ohne Raumeinheit (Mittelpunkt außerhalb aller Flächen) für den Beleg
+    ohne = [ew or 0 for g, _, ew in st if g not in d["zellen"]]
+    d["ohne_raum"] = (len(ohne), sum(ohne))
     # Struktur über die eigene Geometrie zuordnen (kein INNER JOIN an zensus_zelle, Hinweis A1)
     cur.execute(
         f"""SELECT s.gitter_id, r.nr, s.i_u3, s.i_3_5, s.i_6_9, s.i_10_15
@@ -869,9 +872,13 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
     Obergrenze = nach mindestens einer."""
     grenze = r.rw["planer"]["oepnv_max_ohne_klasse_prozent"]
     ew_ges = sum(z["ew"] for _, z in zellen)
-    mit, gemischt, ohne, je_klasse = [], [], 0, defaultdict(int)
+    mit, gemischt, ohne, ohne_st, je_klasse = [], [], 0, 0, defaultdict(int)
     for g, z in zellen:
-        gk = st_klassen.get(r.d["zelle_stadtteil"].get(g)) or {}
+        if g not in r.d["zelle_stadtteil"]:
+            ohne += z["ew"]
+            ohne_st += z["ew"]
+            continue
+        gk = st_klassen.get(r.d["zelle_stadtteil"][g]) or {}
         k = gk.get("klasse")
         if k in KLASSEN_RANG:
             mit.append((z, k))
@@ -882,7 +889,6 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
         if moegl:
             gemischt.append((z, moegl))
     rwobj, basis = oepnv_rahmen(r, raum)
-    anteil_ohne = prozent(ohne, ew_ges) if ew_ges else None
     klassen_txt = ", ".join(
         f"{k}: {prozent(n, ew_ges)} %" for k, n in sorted(je_klasse.items(), key=lambda kv: -KLASSEN_RANG[kv[0]])
     )
@@ -890,17 +896,19 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
         "Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt für Ortsteile; Zuordnung A4), Anteil der "
         f"Einwohner mit eindeutiger Klasse: {klassen_txt or 'keine'}. "
     )
-    if ohne:
+    if ohne - ohne_st:
         txt += (
-            f"{anteil_ohne} % der Einwohner wohnen in Stadtteilen mit gemischter oder offener Gebietsklasse und "
-            "zählen nicht mit. "
+            f"{prozent(ohne - ohne_st, ew_ges)} % der Einwohner wohnen in Stadtteilen mit gemischter oder offener "
+            "Gebietsklasse und zählen nicht mit. "
         )
+    if ohne_st:
+        txt += f"{prozent(ohne_st, ew_ges)} % der Einwohner liegen in keinem Stadtteil und zählen nicht mit. "
     aus = []
     for kennzahl, mit_takt, zusatz in OEPNV_KENNZAHLEN:
         w = oepnv_wert(r, kennzahl, rwobj)
         nenner = sum(z["ew"] for z, _ in mit)
         zaehler = sum(z["ew"] for z, k in mit if erschlossen(z, k, mit_takt))
-        if nenner and (anteil_ohne or 0) <= grenze:
+        if nenner and 100.0 * ohne / ew_ges <= grenze:
             w["wert"] = rund(100.0 * zaehler / nenner, 1)
             grund = ""
         else:

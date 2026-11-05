@@ -1,4 +1,4 @@
-# A6 Prüfprotokoll, 2026-11-05T15:13Z (Nachlauf: Planungsräume aus H1)
+# A6 Prüfprotokoll, 2026-11-05T15:21Z (Nachlauf: Planungsräume aus H1, nach der Gegenprobe)
 
 $ python -I skripte/03_planungsraeume.py --datei planungsraume-in-potsdam.geojson --nr-feld pr --name-feld bez
 19 Planungsräume -> vorbereitet/planungsraeume.csv
@@ -44,6 +44,7 @@ A6-8 Raumebene und Geheimhaltung
   ok    alle 19 Raumeinheiten in planer.js
         kleinste Raumeinheit 103 mit 124 EW (Grenze 100)
   ok    keine Altersklassen-Werte in Raumeinheiten unter der Mindestgröße (keine)
+  ok    H1-GeoJSON in Längen/Breiten (ohne crs)
   ok    jede Zelle im Stadtgebiet in genau einem Planungsraum (ohne: 0 mit 0 EW, mehrfach: 0)
   ok    EW je Planungsraum: Strahlverfahren = PostGIS (alle 19 gleich)
   ok    gerundete Einwohner in planer.js = Strahlverfahren (alle)
@@ -68,7 +69,8 @@ A6-10 Ärzte, Pflege, Apotheken ohne Versorgungsaussage (Korrektur 13)
 A6-11 Nachrechnung auf zweitem Weg (SQL)
   ok    Kita-Anteil in 500 m, 19 Raumeinheiten: SQL = Datei (alle)
   ok    Plätze je Bedarfsplatz, 19 Raumeinheiten: SQL = Datei (alle)
-  ok    ÖPNV-Erschließung, 11 Planungsräume mit Wert: SQL = Datei (alle)
+  ok    oepnv_erschliessung: SQL = Datei in allen 19 Planungsräumen, 8 ohne Wert (über 50 % ohne Klasse) (alle gleich)
+  ok    oepnv_takt: SQL = Datei in allen 19 Planungsräumen, 8 ohne Wert (über 50 % ohne Klasse) (alle gleich)
   ok    erreichbar.js: 44343 Werte gegen die Tabelle, 0 Abweichungen
 
 0 Befunde
@@ -107,8 +109,10 @@ $ python -I pruefen/A6_test_pfade.py
   ok    Raumebene planungsraum wird übernommen
   ok    Planungsraum: Klasse je Zelle aus dem Stadtteil, gemischte Zellen (50 %) zählen nicht
   ok    Planungsraum nur mit gemischter Klasse: kein Wert, Spanne über die möglichen Klassen
-  ok    ohne Tabelle und ohne CSV: Stadtteile
+  ok    ohne H1, Tabelle und CSV: Stadtteile
+  ok    H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile
   ok    leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest
+  ok    CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen
 
 alle Tests bestanden
 Rückgabe 0

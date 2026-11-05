@@ -32,7 +32,7 @@ _spec.loader.exec_module(DATEN_PRUEFEN)
 _spec = importlib.util.spec_from_file_location("planer15", WURZEL / "skripte" / "15_planer.py")
 PLANER = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(PLANER)
-H1_DATEI = "planungsraume-in-potsdam.geojson"
+H1_DATEI = PLANER.H1_DATEI
 
 
 def im_ring(x: float, y: float, ring: list) -> bool:
@@ -173,11 +173,16 @@ def main() -> int:
     )
 
     print("A6-8 Raumebene und Geheimhaltung")
-    soll, tab, par, herkunft = PLANER.raumquelle(cur)
-    par = par or None
     h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten"), "eingang", H1_DATEI)
+    try:
+        soll, tab, par, herkunft = PLANER.raumquelle(cur)
+    except SystemExit as e:
+        pruef(False, f"Raumquelle nicht lesbar: {e}")
+        print(f"\n{len(befunde)} Befund(e), Abbruch bei A6-8")
+        return 1
+    par = par or None
     pruef(
-        P["raumebene"] == soll and (soll == "planungsraum") == h1.exists(),
+        P["raumebene"] == soll and (soll == "planungsraum" or not h1.exists()),
         f"raumebene {P['raumebene']} (Raumeinheiten aus {herkunft}; H1 {'da' if h1.exists() else 'fehlt'})",
     )
     cur.execute(
@@ -211,7 +216,10 @@ def main() -> int:
     else:
         # Zweiter Weg für die Zuordnung: GeoJSON aus dem Eingang direkt, Strahlverfahren in Python statt
         # 03_planungsraeume.py + PostGIS ST_Contains
-        feats = json.loads(h1.read_text(encoding="utf-8"))["features"]
+        gj = json.loads(h1.read_text(encoding="utf-8"))
+        crs = str(((gj.get("crs") or {}).get("properties") or {}).get("name") or "")
+        pruef(not crs or crs.endswith(("4326", "CRS84")), f"H1-GeoJSON in Längen/Breiten ({crs or 'ohne crs'})")
+        feats = gj["features"]
         cur.execute("""SELECT z.gitter_id, z.ew, ST_X(z.geom), ST_Y(z.geom) FROM public.zensus_zelle z
                        JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom) WHERE z.ew IS NOT NULL""")
         ew_py, ohne, mehrfach = {}, [], []
@@ -323,7 +331,7 @@ def main() -> int:
                      rad AS (SELECT * FROM unnest(%(rk)s::text[], %(rv)s::text[], %(rm)s::int[]) AS t(klasse, vm, m)),
                      z AS (SELECT r.nr raum, z.ew, ST_Transform(z.geom, 25833) g, k.klasse
                            FROM public.zensus_zelle z JOIN {tab} r ON ST_Contains(r.geom, z.geom)
-                           JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
+                           LEFT JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
                            LEFT JOIN k ON k.st = s.nr::text WHERE z.ew > 0),
                      e AS (SELECT z.*,
                              EXISTS (SELECT 1 FROM auswertung.haltestelle h JOIN rad ON rad.klasse = z.klasse
@@ -348,20 +356,17 @@ def main() -> int:
         grenze = rw["planer"]["oepnv_max_ohne_klasse_prozent"]
         for kz, i in (("oepnv_erschliessung", 0), ("oepnv_takt", 1)):
             datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == kz}
-            soll = {
-                nr: (None if v[i] is None or round(v[2]) > grenze else round(float(v[i])))
-                for nr, v in sql.items()
-            }
+            erwartet = {nr: (None if v[i] is None or v[2] > grenze else float(v[i])) for nr, v in sql.items()}
             abw = [
-                (nr, datei.get(nr), soll[nr])
-                for nr in soll
-                if (datei.get(nr) is None) != (soll[nr] is None)
-                or (soll[nr] is not None and abs(datei[nr] - float(sql[nr][i])) > 0.51)
+                (nr, datei.get(nr), erwartet[nr])
+                for nr in erwartet
+                if (datei.get(nr) is None) != (erwartet[nr] is None)
+                or (erwartet[nr] is not None and abs(datei[nr] - erwartet[nr]) > 0.51)
             ]
             pruef(
-                not abw and len(datei) == len(soll) == len(P["raeume"]),
-                f"{kz}: SQL = Datei in allen {len(soll)} Planungsräumen, "
-                f"{sum(v is None for v in soll.values())} ohne Wert (über {grenze} % ohne Klasse) "
+                not abw and len(datei) == len(erwartet) == len(P["raeume"]),
+                f"{kz}: SQL = Datei in allen {len(erwartet)} Planungsräumen, "
+                f"{sum(v is None for v in erwartet.values())} ohne Wert (über {grenze} % ohne Klasse) "
                 f"({abw[:3] or 'alle gleich'})",
             )
     cur.execute("""SELECT gitter_id, art, meter FROM auswertung.zelle_erreichbar WHERE methode = 'luftlinie'""")

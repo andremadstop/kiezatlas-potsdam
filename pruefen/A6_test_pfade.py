@@ -316,7 +316,7 @@ def main() -> int:
             os.environ["KIEZ_DATEN"] = str(tmp / "leer")
             ok(p.raumquelle(Cur())[0] == "stadtteil", "ohne H1, Tabelle und CSV: Stadtteile")
             (tmp / "h1" / "eingang").mkdir(parents=True)
-            (tmp / "h1" / "eingang" / p.H1_DATEI).write_text("{}")
+            (tmp / "h1" / "eingang" / p.H1_DATEI).write_text('{"features":[{"properties":{"pr":"101"}}]}')
             os.environ["KIEZ_DATEN"] = str(tmp / "h1")
             try:
                 p.raumquelle(Cur())
@@ -333,6 +333,13 @@ def main() -> int:
                 ebene == "planungsraum" and "unnest" in tab and par["pr_nr"] == ["101"],
                 "leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest",
             )
+            p.PR_CSV.write_text("nr;name;wkt\n999;Alt;POLYGON((13 52.4,13.1 52.4,13.1 52.5,13 52.4))\n")
+            try:
+                p.raumquelle(Cur())
+                abbruch = ""
+            except SystemExit as e:
+                abbruch = str(e)
+            ok("passt nicht" in abbruch, "CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen")
         finally:
             p.PR_CSV = alt
             if alt_daten is None:
