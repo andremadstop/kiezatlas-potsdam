@@ -114,8 +114,10 @@ async function planer(basis, art) {
   pruef(z.legende && z.legende.vermerk && z.legende.methode, `Legende der Entfernung mit Methode und sichtbarem Vermerk`);
   // Klick auf eine Zelle: Entfernung mit Methode und vollständigem dl-de-Vermerk (Bearbeitungshinweis + Link)
   const zelle = await page.evaluate(() => {
-    const m = window.KIEZ_KARTE, f = m.queryRenderedFeatures({ layers: ["zellen"] })[0]; if (!f) return null;
-    const r = f.geometry.coordinates[0], c = [(r[0][0] + r[2][0]) / 2, (r[0][1] + r[2][1]) / 2], p = m.project(c);
+    // eine Zelle im gewählten Stadtteil 13: der Klick darf die Wahl nicht aufheben
+    const m = window.KIEZ_KARTE, mitte = (f) => { const r = f.geometry.coordinates[0]; return m.project([(r[0][0] + r[2][0]) / 2, (r[0][1] + r[2][1]) / 2]); };
+    const f = m.queryRenderedFeatures({ layers: ["zellen"] }).find((z) => m.queryRenderedFeatures(mitte(z), { layers: ["raum-flaeche"] }).some((x) => x.properties.nr === "13")); if (!f) return null;
+    const p = mitte(f);
     m.fire("click", { point: p, lngLat: m.unproject(p), originalEvent: {} });
     const box = [...document.querySelectorAll(".maplibregl-popup-content")].find((x) => /Gitterzelle/.test(x.textContent));
     const t = box ? { text: box.textContent, link: !!box.querySelector('a[href*="govdata.de/dl-de/by-2-0"]') } : null;
@@ -123,8 +125,10 @@ async function planer(basis, art) {
   });
   pruef(!!zelle && /Luftlinie/.test(zelle.text) && /Daten verändert \(eigene Berechnung\)/.test(zelle.text) && zelle.link,
     `Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (${zelle ? "gefunden" : "kein Popup"})`);
-  // Der Klick in die Karte wählt auch die Raumeinheit darunter (oder hebt die Wahl auf): wieder 13 wählen
-  if (!(await page.$('#raeume .treffer[data-nr="13"][aria-pressed="true"]'))) { await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page); }
+  // Ein Klick auf eine Zelle hebt die Wahl der Raumeinheit nicht auf (die Zelle kann in einer anderen liegen)
+  const gewaehlt = await page.$eval('#raeume .treffer[aria-pressed="true"]', (b) => b.dataset.nr).catch(() => null);
+  pruef(gewaehlt === "13", `Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: ${gewaehlt})`);
+  if (gewaehlt !== "13") { await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page); }
   await page.check('#weg input[value="fuss"]', { force: true }); await warteBereit(page);
   z = await zahlenPruefen(page);
   const odbl = await page.evaluate(() => !document.getElementById("fuss-odbl").hidden && /ODbL/.test(document.getElementById("legende").textContent + document.querySelector(".vs-quellen").textContent));
@@ -185,6 +189,28 @@ async function raumebeneFremd() {
   const z = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, ebene: window.KIEZ_PLANER && window.KIEZ_PLANER.raumebene }));
   pruef(z.ebene === "planungsraum" && z.zeilen === 0 && /Planungsräumen/.test(z.text) && fehler.length === 0,
     `Datei auf Planungsräumen: keine Zuordnung zu Stadtteilen, Hinweis statt Tabelle (${z.zeilen} Zeilen, Fehler ${fehler.length})`);
+  await ctx.close();
+}
+
+async function fussFehlschlag() {
+  // planer_fuss_odbl.js scheitert beim ersten Mal: Rückfall auf Luftlinie mit Meldung, beim nächsten Wechsel neuer Versuch
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+  const page = await ctx.newPage(), fehler = []; let versuche = 0;
+  page.on("pageerror", (e) => fehler.push(e.message));
+  await page.route("**/*", (r) => {
+    const u = r.request().url();
+    if (!eigen(u)) return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    if (/\/daten\/fixtures\/planer_fuss_odbl\.js$/.test(u.split(/[?#]/)[0]) && ++versuche === 1) return r.fulfill({ status: 404, body: "" });
+    return r.continue();
+  });
+  await page.goto(HTTP + "planer.html#r=13", { waitUntil: "load" });
+  await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });
+  await page.check('#weg input[value="fuss"]', { force: true }); await warteBereit(page);
+  const a = await page.evaluate(() => ({ weg: document.querySelector('#weg input:checked').value, meldung: document.getElementById("kartenstatus").textContent + document.getElementById("teilen-hinweis").textContent, zeilen: document.querySelectorAll(".vs-zeile").length }));
+  await page.check('#weg input[value="fuss"]', { force: true }); await warteBereit(page);
+  const b = await page.evaluate(() => ({ weg: document.querySelector('#weg input:checked').value, fuss: [...document.querySelectorAll(".vs-zeile .marke-weg")].filter((m) => m.textContent === "Fußweg").length }));
+  pruef(a.weg === "luft" && /Fußweg-Tabelle/.test(a.meldung) && a.zeilen > 0 && b.weg === "fuss" && b.fuss > 0 && versuche === 2 && fehler.length === 0,
+    `Fußweg-Tabelle scheitert einmal: Rückfall auf Luftlinie mit Meldung (${a.weg}, ${a.zeilen} Zeilen), zweiter Versuch lädt (${b.weg}, ${b.fuss} Zeilen, ${versuche} Abrufe)`);
   await ctx.close();
 }
 
@@ -262,6 +288,7 @@ try {
     if (art === "HTTP") downloadsPruefen(liste);
   }
   await raumebeneFremd();
+  await fussFehlschlag();
   await ruhig();
 } catch (e) { pruef(false, "Abbruch: " + (e && e.message ? e.message.split("\n")[0] : e)); }
 await browser.close(); server.close();

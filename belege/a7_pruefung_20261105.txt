@@ -1,0 +1,62 @@
+planer.html über file://
+  ok   Startgewicht 271 KB gz JS (Grenze 300); geladen: daten/stadtteile.js, vendor/maplibre-gl.js, kiezatlas-wt-A7/themen.js, kiezatlas-wt-A7/planer.js, fixtures/einrichtungen.js
+  ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+  ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+  ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+  ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+  ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+  ok   Orientierungswerte gekennzeichnet: 1 von 1
+  ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+  ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+  ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+  ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+  ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+  ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 24)
+  ok   Hash-Rundreise über file://: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+  ok   planer.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   axe bei 375 px mit offener Leiste: 0 
+  ok   planer.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-daten.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html über file://: 3 Maßstäbe aus der Datei, 1 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+  ok   planer-daten.html über file://: axe 0, Fehler 0
+planer.html über HTTP
+  ok   Startgewicht 271 KB gz JS (Grenze 300); geladen: daten/stadtteile.js, vendor/maplibre-gl.js, 127.0.0.1:33793/themen.js, 127.0.0.1:33793/planer.js, fixtures/einrichtungen.js
+  ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+  ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+  ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+  ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+  ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+  ok   Orientierungswerte gekennzeichnet: 1 von 1
+  ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+  ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+  ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+  ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+  ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+  ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 24)
+  ok   Hash-Rundreise über HTTP: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+  ok   planer.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   axe bei 375 px mit offener Leiste: 0 
+  ok   planer.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-daten.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html über HTTP: 3 Maßstäbe aus der Datei, 1 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+  ok   planer-daten.html über HTTP: axe 0, Fehler 0
+  ok   Download-Liste deckt alle 12 Verträge ab
+  ok   Download-Liste: Lizenzgrenze, Stand und Links stimmen mit daten/ überein
+  ok   Datei auf Planungsräumen: keine Zuordnung zu Stadtteilen, Hinweis statt Tabelle (0 Zeilen, Fehler 0)
+  ok   Fußweg-Tabelle scheitert einmal: Rückfall auf Luftlinie mit Meldung (luft, 3 Zeilen), zweiter Versuch lädt (fuss, 2 Zeilen, 2 Abrufe)
+  ok   reduzierte Bewegung: Klicks bewegen die Kamera nicht (0), Zoom springt (1 Bewegung)
+  ok   ohne reduzierte Bewegung fehlerfrei (0)
+
+A7 grün.
