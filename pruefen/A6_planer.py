@@ -29,6 +29,25 @@ sys.dont_write_bytecode = True
 _spec = importlib.util.spec_from_file_location("daten_pruefen", WURZEL / "pruefen" / "daten.py")
 DATEN_PRUEFEN = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(DATEN_PRUEFEN)
+_spec = importlib.util.spec_from_file_location("planer15", WURZEL / "skripte" / "15_planer.py")
+PLANER = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(PLANER)
+H1_DATEI = "planungsraume-in-potsdam.geojson"
+
+
+def im_ring(x: float, y: float, ring: list) -> bool:
+    """Strahlverfahren (gerade-ungerade) für einen Ring aus [lon, lat]-Paaren."""
+    drin = False
+    for (x1, y1), (x2, y2) in zip(ring, ring[1:] + ring[:1]):
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            drin = not drin
+    return drin
+
+
+def in_flaeche(x: float, y: float, geom: dict) -> bool:
+    polys = [geom["coordinates"]] if geom["type"] == "Polygon" else geom["coordinates"]
+    # gerade-ungerade über alle Ringe eines Polygons: Löcher heben sich auf
+    return any(sum(im_ring(x, y, [c[:2] for c in ring]) for ring in poly) % 2 == 1 for poly in polys)
 
 
 def pruef(ok: bool, text: str) -> bool:
@@ -124,9 +143,12 @@ def main() -> int:
     print("A6-6 Grundschulwerte vorläufig ohne Schulbezirke (H2)")
     h2 = list(Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten"), "eingang").glob("*grundschul*"))
     gs = [w for _, _, w in werte(P) if w["art"] == "grundschule"]
+    # H2 (grundschuleinzugsgebiete) liegt seit 05.11. 16:08 im Eingang, ist aber nicht verwendbar: nur eine Nummer je
+    # Bezirk ohne Schulzuordnung, Stand 2018, Lizenz „Nutzungsbedingungen der LHP“ (nicht dl-de). Solange
+    # 15_planer.py keine Schulbezirke rechnet, bleibt jeder Grundschulwert vorläufig.
     pruef(
-        bool(gs) and (h2 or all(w.get("vorlaeufig") is True for w in gs)),
-        f"{len(gs)} Grundschulwerte, alle vorlaeufig: true (H2 {'da' if h2 else 'fehlt'})",
+        bool(gs) and all(w.get("vorlaeufig") is True for w in gs),
+        f"{len(gs)} Grundschulwerte, alle vorlaeufig: true (H2 {'im Eingang, nicht verwendet' if h2 else 'fehlt'})",
     )
 
     print("A6-7 Rundung und Unsicherheit (Korrektur 15)")
@@ -151,15 +173,18 @@ def main() -> int:
     )
 
     print("A6-8 Raumebene und Geheimhaltung")
-    cur.execute("SELECT count(*) FROM public.planungsraum")
-    soll = "planungsraum" if cur.fetchone()[0] else "stadtteil"
+    soll, tab, par, herkunft = PLANER.raumquelle(cur)
+    par = par or None
+    h1 = Path(os.environ.get("KIEZ_DATEN", WURZEL.parent / "kiezatlas-daten"), "eingang", H1_DATEI)
     pruef(
-        P["raumebene"] == soll,
-        f"raumebene {P['raumebene']} (public.planungsraum {'gefüllt' if soll == 'planungsraum' else 'leer'})",
+        P["raumebene"] == soll and (soll == "planungsraum") == h1.exists(),
+        f"raumebene {P['raumebene']} (Raumeinheiten aus {herkunft}; H1 {'da' if h1.exists() else 'fehlt'})",
     )
-    tab = "public.planungsraum" if soll == "planungsraum" else "public.stadtteil"
-    cur.execute(f"""SELECT r.nr, coalesce(sum(z.ew), 0) FROM {tab} r
-                    LEFT JOIN public.zensus_zelle z ON ST_Contains(r.geom, z.geom) GROUP BY r.nr""")
+    cur.execute(
+        f"""SELECT r.nr, coalesce(sum(z.ew), 0) FROM {tab} r
+            LEFT JOIN public.zensus_zelle z ON ST_Contains(r.geom, z.geom) GROUP BY r.nr""",
+        par,
+    )
     ew_db = {str(a): int(b) for a, b in cur.fetchall()}
     pruef(set(ew_db) == set(P["raeume"]), f"alle {len(ew_db)} Raumeinheiten in planer.js")
     klein = min(ew_db, key=ew_db.get)
@@ -183,6 +208,34 @@ def main() -> int:
             if abs(r["ew"] - next(k["wert"] for k in K[nr]["kacheln"] if k["id"] == "einwohner")) > rd / 2
         ]
         pruef(not abw, f"gerundete Einwohner = kennzahlen.json je Stadtteil ({abw or 'alle'})")
+    else:
+        # Zweiter Weg für die Zuordnung: GeoJSON aus dem Eingang direkt, Strahlverfahren in Python statt
+        # 03_planungsraeume.py + PostGIS ST_Contains
+        feats = json.loads(h1.read_text(encoding="utf-8"))["features"]
+        cur.execute("""SELECT z.gitter_id, z.ew, ST_X(z.geom), ST_Y(z.geom) FROM public.zensus_zelle z
+                       JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom) WHERE z.ew IS NOT NULL""")
+        ew_py, ohne, mehrfach = {}, [], []
+        for g, ew, x, y in cur.fetchall():
+            treffer = [str(ft["properties"]["pr"]) for ft in feats if in_flaeche(x, y, ft["geometry"])]
+            if not treffer:
+                ohne.append((g, ew))
+            elif len(treffer) > 1:
+                mehrfach.append(g)
+            for nr in treffer[:1]:
+                ew_py[nr] = ew_py.get(nr, 0) + (ew or 0)
+        pruef(not ohne and not mehrfach, f"jede Zelle im Stadtgebiet in genau einem Planungsraum "
+              f"(ohne: {len(ohne)} mit {sum(e or 0 for _, e in ohne)} EW, mehrfach: {len(mehrfach)})")
+        abw = [(nr, ew_py.get(nr), ew_db[nr]) for nr in ew_db if ew_py.get(nr, 0) != ew_db[nr]]
+        pruef(not abw, f"EW je Planungsraum: Strahlverfahren = PostGIS ({abw[:3] or 'alle 19 gleich'})")
+        abw = [nr for nr, r in P["raeume"].items() if abs(r["ew"] - ew_py.get(nr, 0)) > rd / 2]
+        pruef(not abw, f"gerundete Einwohner in planer.js = Strahlverfahren ({abw or 'alle'})")
+        cur.execute("""SELECT coalesce(sum(z.ew), 0) FROM public.zensus_zelle z
+                       JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)""")
+        st_sum = int(cur.fetchone()[0])
+        pruef(
+            sum(ew_db.values()) == st_sum,
+            f"EW-Summe {len(ew_db)} Planungsräume {sum(ew_db.values())} = 32 Stadtteile {st_sum}",
+        )
 
     print("A6-9 Lizenzvermerke (Korrektur 26)")
     for datei, Q in (("planer.js", P["quellen"]), ("erreichbar.js", E["quellen"]), ("einrichtungen.js", N["quellen"])):
@@ -217,13 +270,13 @@ def main() -> int:
     print("A6-11 Nachrechnung auf zweitem Weg (SQL)")
     radius = rw["kita"]["radius_orientierung_m"]["wert"]
     cur.execute(
-        f"""SELECT r.nr, 100.0 * coalesce(sum(s.i_u3 + s.i_3_5) FILTER (WHERE e.meter <= %s), 0)
+        f"""SELECT r.nr, 100.0 * coalesce(sum(s.i_u3 + s.i_3_5) FILTER (WHERE e.meter <= %(radius)s), 0)
                            / nullif(sum(s.i_u3 + s.i_3_5), 0)
                     FROM public.zensus_struktur s JOIN {tab} r ON ST_Contains(r.geom, s.geom)
                     JOIN auswertung.zelle_erreichbar e
                       ON e.gitter_id = s.gitter_id AND e.art = 'kita' AND e.methode = 'luftlinie'
                     GROUP BY r.nr""",
-        (radius,),
+        {**(par or {}), "radius": radius},
     )
     sql = {str(a): (None if b is None else float(b)) for a, b in cur.fetchall()}
     datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita"}
@@ -242,20 +295,51 @@ def main() -> int:
                          p AS (SELECT r.nr, sum(e.plaetze) pl FROM auswertung.einrichtung e
                                JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
                                WHERE e.art IN ('kita', 'hort') AND e.status = 'kapazitaet' GROUP BY r.nr)
-                    SELECT k.nr, coalesce(p.pl, 0) / nullif(%s * u3 + %s * k35 + %s * (k69 * %s + k1015 * %s), 0)
+                    SELECT k.nr, coalesce(p.pl, 0) / nullif(%(q1)s * u3 + %(q2)s * k35
+                                                          + %(q3)s * (k69 * %(f1)s + k1015 * %(f2)s), 0)
                     FROM k LEFT JOIN p USING (nr)""",
-        (
-            q["krippe"]["quote_prozent"] / 100,
-            q["kindergarten"]["quote_prozent"] / 100,
-            q["hort"]["quote_prozent"] / 100,
-            f["i_6_9"],
-            f["i_10_15"],
-        ),
+        {
+            **(par or {}),
+            "q1": q["krippe"]["quote_prozent"] / 100,
+            "q2": q["kindergarten"]["quote_prozent"] / 100,
+            "q3": q["hort"]["quote_prozent"] / 100,
+            "f1": f["i_6_9"],
+            "f2": f["i_10_15"],
+        },
     )
     sql = {str(a): (None if b is None else float(b)) for a, b in cur.fetchall()}
     datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == "plaetze_je_bedarf"}
     abw = [(nr, datei[nr], sql.get(nr)) for nr in datei if datei[nr] is not None and abs(datei[nr] - sql[nr]) > 0.006]
     pruef(not abw and datei, f"Plätze je Bedarfsplatz, {len(datei)} Raumeinheiten: SQL = Datei ({abw[:3] or 'alle'})")
+    if soll == "planungsraum":
+        # ÖPNV je Planungsraum: Gebietsklasse je Zelle aus dem Stadtteil, Radius je Klasse, ganz in SQL (ST_DWithin)
+        o = rw["oepnv"]
+        st = {nr: v["klasse"] for nr, v in o["gebietsklassen"]["stadtteile"].items() if v.get("klasse")}
+        rad = [(k, vm, m) for vm in rw["planer"]["oepnv_verkehrsmittel_mit_radius"]
+               for k, m in o["einzugsradius_m"][vm].items() if k in ("I", "II", "III") and m]
+        cur.execute(
+            f"""WITH k AS (SELECT * FROM unnest(%(st)s::text[], %(kl)s::text[]) AS t(st, klasse)),
+                     rad AS (SELECT * FROM unnest(%(rk)s::text[], %(rv)s::text[], %(rm)s::int[]) AS t(klasse, vm, m)),
+                     z AS (SELECT r.nr raum, z.ew, ST_Transform(z.geom, 25833) g, k.klasse
+                           FROM public.zensus_zelle z JOIN {tab} r ON ST_Contains(r.geom, z.geom)
+                           JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
+                           JOIN k ON k.st = s.nr::text WHERE z.ew > 0)
+                SELECT raum, 100.0 * coalesce(sum(ew) FILTER (WHERE EXISTS (
+                           SELECT 1 FROM auswertung.haltestelle h JOIN rad ON rad.klasse = z.klasse
+                           WHERE rad.vm = ANY (string_to_array(h.verkehrsmittel, '+'))
+                             AND ST_DWithin(h.geom, z.g, rad.m))), 0) / sum(ew)
+                FROM z GROUP BY raum""",
+            {**(par or {}), "st": list(st), "kl": list(st.values()),
+             "rk": [a for a, _, _ in rad], "rv": [b for _, b, _ in rad], "rm": [c for _, _, c in rad]},
+        )
+        sql = {str(a): float(b) for a, b in cur.fetchall()}
+        datei = {nr: w["wert"] for nr, _, w in werte(P) if w["kennzahl"] == "oepnv_erschliessung"}
+        mit = {nr: v for nr, v in datei.items() if v is not None}
+        abw = [(nr, v, round(sql.get(nr, -1), 1)) for nr, v in mit.items() if abs(v - sql.get(nr, -1)) > 0.51]
+        pruef(
+            not abw and mit,
+            f"ÖPNV-Erschließung, {len(mit)} Planungsräume mit Wert: SQL = Datei ({abw[:3] or 'alle'})",
+        )
     cur.execute("""SELECT gitter_id, art, meter FROM auswertung.zelle_erreichbar WHERE methode = 'luftlinie'""")
     db = {(g, a): float(m) for g, a, m in cur.fetchall() if m is not None}
     ids = re.findall(r'"id":"(CRS3035RES100m[^"]+)"', (DATEN / "zellen.js").read_text(encoding="utf-8"))
