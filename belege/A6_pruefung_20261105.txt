@@ -1,0 +1,102 @@
+# A6 Prüfprotokoll, 2026-11-05T11:27Z
+
+$ python -I skripte/15_planer.py
+Raumebene: stadtteil (32 Raumeinheiten)
+Prognose (H11): ../kiezatlas-daten/eingang/prognose_planungsraum.csv fehlt, Spalte prognose nicht ausgegeben
+luftlinie: 32 Raumeinheiten, 544 Werte, 0 Werte wegen Geheimhaltung null
+geschrieben: planer.js, erreichbar.js, einrichtungen.js
+nicht geschrieben (Quelle leer: auswertung.zelle_erreichbar/zelle_gruen methode fussweg bzw. auswertung.osm_poi, wartet auf A3/A5b): planer_fuss_odbl.js, erreichbar_fuss_odbl.js, einrichtungen_odbl.js
+
+$ python -I pruefen/A6_planer.py
+A6-1 pruefen/daten.py gegen die Verträge (planer.json, erreichbar.json, einrichtungen.json)
+  ok    daten.py: 0 Abweichungen
+A6-2 keine feine Altersklasse je gitter_id in daten/
+  ok    Zellkennungen nur als erste_id/letzte_id in erreichbar.js: {'planer.js': 0, 'erreichbar.js': 2, 'einrichtungen.js': 0}
+  ok    keine Zensus-Feldnamen der Zielgruppen in daten/*.js (keine)
+  ok    erreichbar.js: Werte nur je Einrichtungsart, keine Strukturfelder
+A6-3 Status orientierung, wo der Maßstab keine gelesene Potsdamer Fundstelle hat
+  ok    Status passt zum Dokument des Richtwerts (0 Abweichungen [])
+  ok    Orientierungswerte aus richtwerte.yaml tragen status orientierung (0 ohne)
+  ok    160 Werte mit status orientierung in planer.js
+A6-4 ODbL-Grenze: planer.js, erreichbar.js, einrichtungen.js ohne OSM (Korrektur 4)
+  ok    planer.js: keine OSM-Spur, kein methode fussweg
+  ok    erreichbar.js: keine OSM-Spur, kein methode fussweg
+  ok    einrichtungen.js: keine OSM-Spur, kein methode fussweg
+  ok    planer.js: jede Zeile methode luftlinie
+  ok    erreichbar.js: methode luftlinie
+  ok    einrichtungen.js: Quellen ['lgb', 'mbjs']
+A6-5 Gewicht
+  ok    zusammen 79.1 KB gz ≤ 250 KB ({'planer.js': 10946, 'erreichbar.js': 53820, 'einrichtungen.js': 16220})
+A6-6 Grundschulwerte vorläufig ohne Schulbezirke (H2)
+  ok    128 Grundschulwerte, alle vorlaeufig: true (H2 fehlt)
+A6-7 Rundung und Unsicherheit (Korrektur 15)
+  ok    Einwohner je Raumeinheit auf 10 gerundet
+  ok    Anteile ganzzahlig
+  ok    Einwohner je Standort auf 10 gerundet
+  ok    jeder Wert mit Unsicherheitshinweis
+  ok    Werte aus Altersklassen nennen das Cell-Key-Verfahren
+A6-8 Raumebene und Geheimhaltung
+  ok    raumebene stadtteil (public.planungsraum leer)
+  ok    alle 32 Raumeinheiten in planer.js
+        kleinste Raumeinheit 14 mit 155 EW (Grenze 100)
+  ok    keine Altersklassen-Werte in Raumeinheiten unter der Mindestgröße (keine)
+  ok    gerundete Einwohner = kennzahlen.json je Stadtteil (alle)
+A6-9 Lizenzvermerke (Korrektur 26)
+  ok    planer.js lgb: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    planer.js mbjs: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    planer.js vbb: CC BY mit Link und Bearbeitungshinweis
+  ok    planer.js zensus: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    planer.js: jede Quelle q steht in quellen
+  ok    erreichbar.js zensus: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    erreichbar.js mbjs: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    erreichbar.js lgb: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    erreichbar.js: jede Quelle q steht in quellen
+  ok    einrichtungen.js mbjs: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    einrichtungen.js lgb: Link zum Lizenztext und „Daten verändert (eigene Berechnung)“
+  ok    einrichtungen.js: jede Quelle q steht in quellen
+A6-10 Ärzte, Pflege, Apotheken ohne Versorgungsaussage (Korrektur 13)
+  ok    planer.js: nur Entfernung bei ['apotheke', 'arzt', 'pflege', 'spielplatz', 'supermarkt']
+        planer_fuss_odbl.js nicht vorhanden (Quelle leer)
+A6-11 Nachrechnung auf zweitem Weg (SQL)
+  ok    Kita-Anteil in 500 m, 32 Raumeinheiten: SQL = Datei (alle)
+  ok    Plätze je Bedarfsplatz, 32 Raumeinheiten: SQL = Datei (alle)
+  ok    erreichbar.js: 44343 Werte gegen die Tabelle, 0 Abweichungen
+
+0 Befunde
+
+$ python -I pruefen/A6_test_pfade.py
+  ok    Prognose gelesen
+  ok    unbekannte Altersgruppe gemeldet
+  ok    Fußweg- und OSM-Dateien entstehen, wenn Daten da sind
+  ok    Raum B (50 EW): 7 Altersklassen-Werte null
+  ok    Grund der Leerstelle im Hinweis
+  ok    Einwohner-Anteile bleiben auch in kleinen Raumeinheiten
+  ok    Kita ohne Hortanteil: 30 Plätze / 30 Kinder unter 6
+  ok    kombinierte Einrichtung benannt
+  ok    kein reiner Hort, nur kombinierte: Hortrelation null
+  ok    Bedarf nach Baulandmodell: 70 Plätze / 47.95
+  ok    Grundschule vorläufig
+  ok    ÖPNV Klasse II: beide Zellen im 400-m-Radius
+  ok    gemischte Gebietsklasse: wert null mit Spanne
+  ok    Prognose 2030/2035 an Kinder-unter-6-Werten
+  ok    Fußweg: Arzt nur als Entfernung (Korrektur 13)
+  ok    Fußweg-Datei nur methode fussweg
+  ok    OSM-Quelle nur in der Fußweg-Datei
+  ok    planer.js: Vertrag planer.json
+  ok    planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+  ok    erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+  ok    einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+  ok    erreichbar.js: Vertrag erreichbar.json
+  ok    alle Testdateien bestehen Vertrag und Lizenzgrenze aus daten.py
+  ok    leere OSM-Quelle: keine Fußweg- und OSM-Dateien
+  ok    Raumebene planungsraum wird übernommen
+
+alle Tests bestanden
+
+$ ruff check --select E,F,W --line-length 120 (A6-Dateien)
+All checks passed!
+
+$ md5sum
+ef8d3c14352edd30321e35715cfcdcd3  daten/planer.js
+a313595241d68d8adec3500eb7d20497  daten/erreichbar.js
+397968074bbc359c673c4a51ce8880a0  daten/einrichtungen.js
