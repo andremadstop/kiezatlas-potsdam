@@ -193,7 +193,7 @@ def blocktypen_ziehen() -> None:
                            JOIN {NAS_BESTE} n ON n.oid_bezug = s.oid
                            WHERE {bed}),
                      c AS (SELECT g, ST_ClusterDBSCAN(g, eps := 40, minpoints := 1) OVER () AS cl FROM k),
-                     h AS (SELECT cl, count(*) AS n, ST_Buffer(ST_ConcaveHull(ST_Collect(g), 0.3), 15) AS hg
+                     h AS (SELECT cl, count(*) AS n, ST_Buffer(ST_Union(ST_ConcaveHull(ST_Collect(g), 0.3), ST_Union(g)), 15) AS hg
                            FROM c GROUP BY cl HAVING count(*) >= 4),
                      u AS (SELECT ST_Intersection(ST_Union(hg),
                                   (SELECT ST_Transform(ST_Union(geom), 25833) FROM public.stadtteil WHERE nr = ANY(%s))) AS ug,
@@ -698,6 +698,13 @@ def ruecktest() -> None:
              "und keine Adressen. Zensuswerte je Stadtteil sind auf 10 gerundet; sie sind durch das "
              "Geheimhaltungsverfahren (Cell-Key) verändert, Summen aus vielen Zellen sind absolut ungenauer als "
              "jede einzelne Zelle.\n")
+    L.append("**Korrekturen nach Lauf 1** (Codefehler, Regeln unverändert; Lauf 1 liegt als "
+             "`berichte/B4_holdout_lauf1.md` bei):\n")
+    L.append("1. Die Gebietshülle der Blocktypen enthielt nicht alle Gebäude ihres Clusters (`ST_ConcaveHull` über "
+             "Umrisse); jetzt Hülle vereinigt mit den Umrissen, dann 15 m Rand. Lauf 1: Am Stern 133 statt 148 "
+             "Gebäude.")
+    L.append("2. Die Jahrzehnte-Gegenprobe zählte „Waldstadt II“ bei „Waldstadt I“ mit (Teilwortsuche); jetzt "
+             "genauer Gebietsname.\n")
     L.append("## Abdeckung der Kaskade\n")
     namen_st = {1: "1 genaues Jahr (B2, freigegeben)", 2: "2 Luftbildklammer (B3, ausgerollt)",
                 3: "3 Blocktyp Großsiedlung", 4: "4 Zensus-Verteilung", 5: "5 Nachbarn", 6: "6 nicht datiert"}
@@ -766,6 +773,15 @@ def ruecktest() -> None:
     L.append("\nZum Vergleich Berlin (visinage, Methodenvorbild): 61,4 % Treffer über alle Schätzungen, Zensus "
              "46,7 %, Blocktyp 37,6 %, Nachbarn 23,8 %. Potsdam hat kein Gegenstück zur Berliner "
              "Gebäudealterskarte 1992/93 und keine ausgerollte Luftbildklammer.\n")
+    L.append("**Lesart.** Die Quoten sind nicht mit Berlin vergleichbar und gelten nicht für die ganze Stadt:")
+    L.append("- Die Wikipedia-Prüfgebäude sind Denkmale, fast alle vor 1919, meist in Altbau-Zellen, in denen der "
+             "Zensus selbst fast nur „vor 1919“ zeigt. Dort ist die Klasse leicht zu treffen.")
+    L.append("- Die Bornstedter Referenz deckt nur einen Stadtteil ab; viele ihrer Spannen liegen über einer "
+             "Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.")
+    L.append("- Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude (1919–1948: wenige Wikipedia-Einträge, "
+             "1949–1990: keine). Dort bleibt nur die Gegenprobe Zensus gegen Blocktyp.")
+    L.append("- Für die Seite heißt das: Jede Angabe bleibt „geschätzt“, und die Methodenseite nennt die Quoten "
+             "zusammen mit n und Prüfsatz, nie als eine Zahl.\n")
 
     # Summenprüfung
     L.append("## Summenprüfung gegen den Zensus (Korrektur 7)\n")
@@ -813,8 +829,9 @@ def ruecktest() -> None:
     rows = []
     for f in gebiete:
         p = f["properties"]
-        zellen = {geb[o]["zelle"] for o, zl in zeilen.items() if zl[4] == 3 and p["gebiet"] in zl[3]}
-        n_geb = sum(1 for o, zl in zeilen.items() if zl[4] == 3 and p["gebiet"] in zl[3])
+        im_gebiet = [o for o, zl in zeilen.items() if zl[4] == 3 and zl[3].endswith(f"({p['gebiet']})")]
+        zellen = {geb[o]["zelle"] for o in im_gebiet}
+        n_geb = len(im_gebiet)
         ges = sum(jz[c].get("insgesamt", 0) for c in zellen if c in jz)
         passend = [k for k, (a, b) in jz_klassen.items()
                    if (a is None or p["bis"] >= a) and (b is None or p["von"] <= b)]
