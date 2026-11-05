@@ -124,6 +124,7 @@ def beispiel(ebene: str = "stadtteil") -> dict:
         "raumebene": ebene,
         "raeume": {"A": "Raum A (unecht)", "B": "Raum B (unecht)"},
         "zellen": zellen,
+        "zelle_stadtteil": {g: z["raum"] for g, z in zellen.items()},
         "struktur": struktur,
         "erreichbar": err,
         "gruen": gruen,
@@ -284,6 +285,67 @@ def main() -> int:
             P3["raumebene"] == "planungsraum" and "Planungsraum" in P3["hinweis"],
             "Raumebene planungsraum wird übernommen",
         )
+        # ÖPNV auf Planungsräumen: Gebietsklasse je Zelle aus ihrem Stadtteil
+        d3["zelle_stadtteil"] = {ids[0]: "A", ids[1]: "B", ids[2]: "B", ids[3]: "A"}
+        P3 = p.planer_datei(d3, rw, "luftlinie", {}, {}, [])
+        oe = {nr: {w["kennzahl"]: w for w in r["werte"] if w["art"] == "oepnv"} for nr, r in P3["raeume"].items()}
+        ok(
+            oe["A"]["oepnv_erschliessung"]["wert"] == 100 and "50 % der Einwohner" in oe["A"]["oepnv_erschliessung"][
+                "unsicherheit"],
+            "Planungsraum: Klasse je Zelle aus dem Stadtteil, gemischte Zellen (50 %) zählen nicht",
+        )
+        ub = oe["B"]["oepnv_erschliessung"]
+        ut = oe["B"]["oepnv_takt"]
+        ok(
+            ub["wert"] is None and "100 bis 100 %" in ub["unsicherheit"] and ut["wert"] is None
+            and "0 bis 100 %" in ut["unsicherheit"],
+            "Planungsraum nur mit gemischter Klasse: kein Wert, Spanne über die möglichen Klassen",
+        )
+        # Quelle der Planungsräume: CSV aus 03_planungsraeume.py, solange public.planungsraum leer ist
+
+        class Cur:
+            def execute(self, *a):
+                pass
+
+            def fetchone(self):
+                return (0,)
+
+        alt, alt_daten = p.PR_CSV, os.environ.get("KIEZ_DATEN")
+        try:
+            p.PR_CSV = tmp / "planungsraeume.csv"
+            os.environ["KIEZ_DATEN"] = str(tmp / "leer")
+            ok(p.raumquelle(Cur())[0] == "stadtteil", "ohne H1, Tabelle und CSV: Stadtteile")
+            (tmp / "h1" / "eingang").mkdir(parents=True)
+            (tmp / "h1" / "eingang" / p.H1_DATEI).write_text('{"features":[{"properties":{"pr":"101"}}]}')
+            os.environ["KIEZ_DATEN"] = str(tmp / "h1")
+            try:
+                p.raumquelle(Cur())
+                abbruch = ""
+            except SystemExit as e:
+                abbruch = str(e)
+            ok(
+                "03_planungsraeume.py" in abbruch and "--nr-feld pr" in abbruch,
+                "H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile",
+            )
+            p.PR_CSV.write_text("nr;name;wkt\n101;Beispiel;POLYGON((13 52.4,13.1 52.4,13.1 52.5,13 52.4))\n")
+            ebene, tab, par, _ = p.raumquelle(Cur())
+            ok(
+                ebene == "planungsraum" and "unnest" in tab and par["pr_nr"] == ["101"],
+                "leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest",
+            )
+            p.PR_CSV.write_text("nr;name;wkt\n999;Alt;POLYGON((13 52.4,13.1 52.4,13.1 52.5,13 52.4))\n")
+            try:
+                p.raumquelle(Cur())
+                abbruch = ""
+            except SystemExit as e:
+                abbruch = str(e)
+            ok("passt nicht" in abbruch, "CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen")
+        finally:
+            p.PR_CSV = alt
+            if alt_daten is None:
+                os.environ.pop("KIEZ_DATEN", None)
+            else:
+                os.environ["KIEZ_DATEN"] = alt_daten
     print(f"\n{len(fehler)} Fehler" if fehler else "\nalle Tests bestanden")
     return 1 if fehler else 0
 

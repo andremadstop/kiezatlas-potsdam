@@ -270,6 +270,10 @@ planer:
   # ist eine Zelle, wenn einer der beiden Radien greift. SPNV und Fähre haben im NVP keinen Radius und zählen nicht.
   # Eigene Festlegung A6, steht im Hinweis des Werts.
   oepnv_verkehrsmittel_mit_radius: [bus, tram]
+  # Planungsräume: Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt für Ortsteile). Wohnen mehr als
+  # so viele Prozent der Einwohner in Stadtteilen mit gemischter oder offener Klasse, gibt es keinen Wert.
+  # Eigene Festlegung A6, 05.11.2026.
+  oepnv_max_ohne_klasse_prozent: 50
   # Werte gelten erst ab dieser Größe der Zielgruppe in der Raumeinheit als aussagefähig (sonst wert null)
   min_zielgruppe: 20
   # Erreichbarkeit je Zelle in erreichbar.js auf so viele Meter runden (aussagekräftig rund 50 m, A5a)
