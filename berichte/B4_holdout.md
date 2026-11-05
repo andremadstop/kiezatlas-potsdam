@@ -80,7 +80,8 @@ Zum Vergleich Berlin (visinage, Methodenvorbild): 61,4 % Treffer über alle Sch�
 **Lesart.** Die Quoten sind nicht mit Berlin vergleichbar und gelten nicht für die ganze Stadt:
 - Die Wikipedia-Prüfgebäude sind Denkmale, fast alle vor 1919, meist in Altbau-Zellen, in denen der Zensus selbst fast nur „vor 1919“ zeigt. Dort ist die Klasse leicht zu treffen.
 - Die Bornstedter Referenz deckt nur einen Stadtteil ab; viele ihrer Spannen liegen über einer Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.
-- Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude (1919–1948: wenige Wikipedia-Einträge, 1949–1990: keine). Dort bleibt nur die Gegenprobe Zensus gegen Blocktyp.
+- Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude (1919–1948: wenige Wikipedia-Einträge, 1949–1990: höchstens einzelne). Dort bleibt nur die Gegenprobe Zensus gegen Blocktyp.
+- Das Maß selbst ist großzügiger als in Berlin: acht Mikrozensus-Klassen statt Jahrzehnten, eine davon 30 Jahre breit (1949–1978), und eine Spanne über eine Klassengrenze zählt als Treffer, wenn eine der beiden Klassen stimmt. Ob Potsdam unter Berlins 61,4 % liegt (Erwartung im Bauplan), lässt sich mit diesem Maß nicht prüfen; die Quoten hier sind nicht „besser als Berlin“.
 - Für die Seite heißt das: Jede Angabe bleibt „geschätzt“, und die Methodenseite nennt die Quoten zusammen mit n und Prüfsatz, nie als eine Zahl.
 
 ## Summenprüfung gegen den Zensus (Korrektur 7)
@@ -119,16 +120,18 @@ Je Gebiet: Zensus-Gebäude (Jahrzehnte) in den 100-m-Zellen, in denen Blocktyp-G
 
 Die Polygonfläche umfasst nur die Cluster der Bauform, die Belegfläche das ganze Neubaugebiet.
 
-### Zur Information: alle Stufen gegen den Zensus, Stadt (tautologisch für Stufe 4)
+### Kaskade gesamt gegen den Zensus, Stadt (Gebäude mit Wohnraum)
 
-| Klasse | Zensus, Gebäude mit Wohnraum (gerundet) | Kaskade, Gebäude mit Wohnraum |
-|---|---:|---:|
-| vor 1919 | 3.250 | 4.574 |
-| 1919–1948 | 3.970 | 4.153 |
-| 1949–1978 | 2.570 | 1.965 |
-| 1979–1990 | 1.710 | 1.109 |
-| 1991–2000 | 3.350 | 3.453 |
-| 2001–2010 | 3.060 | 3.072 |
-| 2011–2019 | 2.800 | 2.766 |
-| ab 2020 | 360 | 425 |
+Stufe 4 trifft die Zensuszahlen je Zelle nach Bauart, das ist für sie keine Prüfung. Die Summe über alle Stufen weicht trotzdem ab, aus zwei Gründen: Stufe 5 (Nachbarn) datiert Wohngebäude über der Zensuszahl ihrer Zelle, vor allem in der Altstadt, wo ein Block in viele ALKIS-Umrisse zerfällt; und ein Plattenbau-Riegel ist oft ein Umriss, aber mehrere Zensus-Gebäude, das verkleinert die Zahl der zu verteilenden Plätze. Folge für die Karte: Bauten vor 1919 erscheinen häufiger, DDR-Bauten seltener als im Zensus.
+
+| Klasse | Zensus (gerundet) | Kaskade gesamt | Abweichung | davon Stufe 3 | Stufe 4 | Stufe 5 |
+|---|---:|---:|---:|---:|---:|---:|
+| vor 1919 | 3.250 | 4.574 | +41 % | 0 | 3.311 | 1.263 |
+| 1919–1948 | 3.970 | 4.153 | +5 % | 0 | 3.538 | 615 |
+| 1949–1978 | 2.570 | 1.965 | -23 % | 288 | 1.456 | 221 |
+| 1979–1990 | 1.710 | 1.109 | -35 % | 318 | 710 | 81 |
+| 1991–2000 | 3.350 | 3.453 | +3 % | 210 | 2.854 | 389 |
+| 2001–2010 | 3.060 | 3.072 | +0 % | 0 | 2.704 | 368 |
+| 2011–2019 | 2.800 | 2.766 | -1 % | 0 | 2.428 | 338 |
+| ab 2020 | 360 | 425 | +18 % | 0 | 336 | 89 |
 

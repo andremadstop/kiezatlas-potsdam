@@ -782,7 +782,11 @@ def ruecktest() -> None:
     L.append("- Die Bornstedter Referenz deckt nur einen Stadtteil ab; viele ihrer Spannen liegen über einer "
              "Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.")
     L.append("- Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude (1919–1948: wenige Wikipedia-Einträge, "
-             "1949–1990: keine). Dort bleibt nur die Gegenprobe Zensus gegen Blocktyp.")
+             "1949–1990: höchstens einzelne). Dort bleibt nur die Gegenprobe Zensus gegen Blocktyp.")
+    L.append("- Das Maß selbst ist großzügiger als in Berlin: acht Mikrozensus-Klassen statt Jahrzehnten, eine davon "
+             "30 Jahre breit (1949–1978), und eine Spanne über eine Klassengrenze zählt als Treffer, wenn eine der "
+             "beiden Klassen stimmt. Ob Potsdam unter Berlins 61,4 % liegt (Erwartung im Bauplan), lässt sich mit "
+             "diesem Maß nicht prüfen; die Quoten hier sind nicht „besser als Berlin“.")
     L.append("- Für die Seite heißt das: Jede Angabe bleibt „geschätzt“, und die Methodenseite nennt die Quoten "
              "zusammen mit n und Prüfsatz, nie als eine Zahl.\n")
 
@@ -849,15 +853,29 @@ def ruecktest() -> None:
     L.append("\nDie Polygonfläche umfasst nur die Cluster der Bauform, die Belegfläche das ganze Neubaugebiet.\n")
 
     # Stufe 4 zur Information
-    L.append("### Zur Information: alle Stufen gegen den Zensus, Stadt (tautologisch für Stufe 4)\n")
+    L.append("### Kaskade gesamt gegen den Zensus, Stadt (Gebäude mit Wohnraum)\n")
+    L.append("Stufe 4 trifft die Zensuszahlen je Zelle nach Bauart, das ist für sie keine Prüfung. Die Summe über alle "
+             "Stufen weicht trotzdem ab, aus zwei Gründen: Stufe 5 (Nachbarn) datiert Wohngebäude über der Zensuszahl "
+             "ihrer Zelle, vor allem in der Altstadt, wo ein Block in viele ALKIS-Umrisse zerfällt; und ein "
+             "Plattenbau-Riegel ist oft ein Umriss, aber mehrere Zensus-Gebäude, das verkleinert die Zahl der zu "
+             "verteilenden Plätze. Folge für die Karte: Bauten vor 1919 erscheinen häufiger, DDR-Bauten seltener als "
+             "im Zensus.\n")
     zs = Counter()
     for (nr, merkmal), z in zst.items():
         if merkmal == "mz_klassen":
             for k in KLASSEN_DB:
                 zs[k] += z.get(k, 0)
     alle_k = Counter(zl[1] for o, zl in zeilen.items() if zl[1] is not None and geb[o]["wohnraum"])
-    L.append(tabelle([[KLASSEN[i], runden10(zs[KLASSEN_DB[i]]), f"{alle_k[i]:,}".replace(",", ".")] for i in range(8)],
-                     ["Klasse", "Zensus, Gebäude mit Wohnraum (gerundet)", "Kaskade, Gebäude mit Wohnraum"]))
+    je_stufe = {st: Counter(zl[1] for o, zl in zeilen.items() if zl[4] == st and geb[o]["wohnraum"]) for st in (3, 4, 5)}
+
+    def zahl(v: int) -> str:
+        return f"{v:,}".replace(",", ".")
+
+    L.append(tabelle([[KLASSEN[i], runden10(zs[KLASSEN_DB[i]]), zahl(alle_k[i]),
+                       f"{100 * (alle_k[i] - zs[KLASSEN_DB[i]]) / zs[KLASSEN_DB[i]]:+.0f} %" if zs[KLASSEN_DB[i]] else "–",
+                       zahl(je_stufe[3][i]), zahl(je_stufe[4][i]), zahl(je_stufe[5][i])] for i in range(8)],
+                     ["Klasse", "Zensus (gerundet)", "Kaskade gesamt", "Abweichung", "davon Stufe 3", "Stufe 4",
+                      "Stufe 5"]))
     L.append("")
     BERICHT.parent.mkdir(parents=True, exist_ok=True)
     BERICHT.write_text("\n".join(L) + "\n", encoding="utf-8")
