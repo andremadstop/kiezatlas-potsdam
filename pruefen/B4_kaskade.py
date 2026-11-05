@@ -62,6 +62,11 @@ def main() -> int:
         cur.execute("""SELECT count(*) FROM auswertung.gebaeude_jahr g JOIN auswertung.gebaeude_stand_20261105 s
                        ON s.oid = g.oid WHERE g.j IS NOT NULL AND (s.funktion ~* 'wohn' OR s.funktion = 'Forsthaus')""")
         jahr_wohn = cur.fetchone()[0]
+        # Denkmale aus freigegebener Quelle dürfen ein Jahr tragen (Korrektur 6); dieselbe Regel wie im Skript
+        cur.execute("""SELECT count(DISTINCT oid_bezug) FROM auswertung.jahr_beleg
+                       WHERE NOT nur_pruefung AND quelle ~* '(denkmal|bldam|ddb)'
+                         AND lizenz !~* '(ungeklärt|by-sa|odbl)'""")
+        denkmal_frei = cur.fetchone()[0]
         cur.execute("SELECT count(*) FROM auswertung.gebaeude_jahr WHERE j IS NOT NULL")
         jahr_db = cur.fetchone()[0]
 
@@ -90,7 +95,8 @@ def main() -> int:
     pruef(fremd == 0, f"Zeilen mit OSM/Wikipedia/BLDAM als Quelle: {fremd}")
 
     print("K6 Einzeljahre")
-    pruef(jahr_wohn == 0, f"Gebäude mit Wohnraum mit Einzeljahr in der Datenbank: {jahr_wohn} (Denkmal-Freigabe: keine)")
+    pruef(jahr_wohn <= denkmal_frei,
+          f"Gebäude mit Wohnraum mit Einzeljahr: {jahr_wohn}, höchstens freigegebene Denkmale: {denkmal_frei}")
 
     print("A6 und Daten je Stadtteil")
     teile = sorted(JAHRE.glob("*.js"))

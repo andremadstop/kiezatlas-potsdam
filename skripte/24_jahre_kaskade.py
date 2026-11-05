@@ -487,7 +487,8 @@ def stufen_1_2(cur, geb: dict) -> tuple[dict, dict, set]:
     """Stufe 1 (freigegebene genaue Jahre) und 2 (ausgerollte Klammern). Denkmal nur aus freigegebener Quelle."""
     cur.execute("""SELECT oid_bezug, jahr_von, jahr_bis, quelle FROM auswertung.jahr_beleg
                    WHERE NOT nur_pruefung AND genau AND art = 'bau' AND oid_bezug IS NOT NULL
-                     AND quelle !~* '(openstreetmap|wikipedia|\\mosm\\M)' AND lizenz !~* '(odbl|by-sa|ungeklärt)'""")
+                     AND quelle !~* '(openstreetmap|wikipedia|\\mosm\\M|bldam|denkmalliste)'
+                     AND lizenz !~* '(odbl|by-sa|ungeklärt)'""")
     stufe1 = {}
     for oid, von, bis, quelle in cur.fetchall():
         if oid in geb and von is not None:
@@ -630,6 +631,8 @@ def referenzen(cur, geb: dict) -> list[dict]:
                 if r["unklar"] == "1" or r["oid"] not in geb:
                     continue
                 k = int(r["k_ref"])
+                if not 0 <= k < len(FLUEGE):
+                    continue
                 von = None if (k == 0 or r["frueher_moeglich"] == "1") else FLUEGE[k - 1]
                 ref.append({"oid": r["oid"], "von": von, "bis": FLUEGE[k],
                             "satz": "Sichtprüfung Luftbilder Bornstedt (B3-Referenz)"})
