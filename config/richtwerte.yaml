@@ -121,6 +121,19 @@ gruen_definition:
   vorschlag_getrennt: {bez: ["Kleingarten", "Friedhof"], nutzart: ["Wald"]}
   mindestflaeche_m2: null
   offen: "SPSG-Parks (Sanssouci, Neuer Garten, Babelsberg) zählen mit oder getrennt? Straßengrün? Spielplätze stehen nicht in bez (Abfrage 05.11.2026)."
+  # Ergänzt von A2 (05.11.2026): Zuordnung ALKIS-Nutzung → auswertung.gruenflaeche.art. skripte/11_einrichtungen.py
+  # liest nur `arten`. `zaehlt_vorschlag` ist ein Vorschlag von A2 nach vorschlag_zaehlt/vorschlag_getrennt oben;
+  # was in die Versorgungskennzahl eingeht, entscheidet A6 (status bleibt offen). bez fehlt = alle bez der nutzart.
+  # Befunde: ALKIS vereinfacht führt bei Parks keinen Namen (SPSG-Parks nicht kennzeichenbar); größte Park-Objekte
+  # 90 und 85 ha; Straßengrün steckt in „Straßenverkehr / Begleitfläche Straßenverkehr“ und ist nicht aufgenommen.
+  arten:
+    gruenanlage: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Grünanlage", zaehlt_vorschlag: true}
+    park: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Park", zaehlt_vorschlag: true}
+    freizeit: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: ["Erholungsfläche", "Freizeitanlage"],
+               zaehlt_vorschlag: offen}
+    kleingarten: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Kleingarten", zaehlt_vorschlag: false}
+    friedhof: {nutzart: "Friedhof", zaehlt_vorschlag: false}
+    wald: {nutzart: "Wald", zaehlt_vorschlag: false}
 
 # ---------------------------------------------------------------------------------- Ärzte, Pflege
 gesundheit:
