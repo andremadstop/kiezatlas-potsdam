@@ -89,6 +89,33 @@ async function probe(basis, art) {
     o.text = [T.fmt.format(182673), T.fmt1.format(17.94), T.rundEw(182673), T.rundEw(456), T.proz(null), T.proz(20.15), T.name(""), T.name("13"), T.esc('<a "b">&')];
     o.geometrie = { ganz: T.GANZ.length === 2, teile: Object.keys(T.TEIL).length, umriss: T.umriss(T.TEIL["13"]).length, polys: T.polys(T.TEIL["13"]).length >= 1,
       farbe: Object.keys(T.FARBE).length, bezirk: Object.keys(T.BEZIRKFARBE).length, stufen: T.STUFEN.filter(Boolean).length, grau: T.GRAU };
+    // Ebenen-Thema ohne eigene Klassen: vor dem Einmischen einfarbig und nicht gemerkt, danach Quintile
+    T.ebenen.registrieren({ id: "erreichbar_fuss", datei: "daten/fixtures/erreichbar_fuss_odbl.js", global: "KIEZ_ERREICHBAR_FUSS", art: "zellwert", odbl: true,
+      themen: [{ id: "f_hort", h: "fhort", kurz: "Hort zu Fuß", name: "Fußweg zum nächsten Hort", einheit: "min" }] });
+    const th = T.THEMA.f_hort, vorher = T.farbe(th), map = window.KIEZ_KARTE;
+    let mapFehler = null;
+    try { map.setPaintProperty("zellen-2d", "fill-color", vorher); } catch (x) { mapFehler = x.message; }
+    o.leer = { ausdruck: vorher, gemerkt: "f_hort" in T.KLASSEN, mapFehler };
+    o.fuss = await new Promise((ok) => T.laden("daten/fixtures/erreichbar_fuss_odbl.js", "KIEZ_ERREICHBAR_FUSS", ok)) && T.ebenen.zellwerte("erreichbar_fuss", "hort");
+    if (o.fuss) window.KIEZ_ZELLEN.features.forEach((f, i) => { f.properties.f_hort = o.fuss[i]; });
+    map.getSource("zellen").setData(window.KIEZ_ZELLEN);
+    const nachher = T.farbe(th);
+    try { map.setPaintProperty("zellen-2d", "fill-color", nachher); } catch (x) { mapFehler = x.message; }
+    o.gemischt = { ausdruck: nachher, klassen: T.KLASSEN.f_hort, mapFehler };
+    o.fuss = o.fuss && o.fuss.length;
+    // jahre_zellen.js: Listen stehen oben (gebaeude, anteile, vorherrschend), nicht unter werte
+    T.ebenen.registrieren({ id: "jahre", datei: "daten/fixtures/jahre_zellen.js", global: "KIEZ_JAHRE_ZELLEN", art: "zellwert", themen: [] });
+    await new Promise((ok) => T.laden("daten/fixtures/jahre_zellen.js", "KIEZ_JAHRE_ZELLEN", ok));
+    o.jahre = ["gebaeude", "vorherrschend", "anteile"].map((k) => (T.ebenen.zellwerte("jahre", k) || []).length);
+    o.jahreKeinArray = T.ebenen.zellwerte("jahre", "anzahl");
+    // vergebene id oder h: altes Thema bleibt, nichts doppelt
+    const n0 = T.THEMEN.length;
+    T.ebenen.registrieren({ id: "kollision", themen: [{ id: "ew", h: "neu1" }, { id: "neu2", h: "alter" }] });
+    o.kollision = { neu: T.THEMEN.length - n0, ew: T.THEMA.ew.ebene === undefined, alter: T.HASH.alter === "d_alter", neu2: !T.THEMA.neu2 };
+    // gleiche Datei, anderes Global: jeder Aufruf bekommt sein eigenes Global
+    const [g1, g2] = await Promise.all([["KIEZ_ERREICHBAR_X", "x"], ["KIEZ_ERREICHBAR", "y"]].map(([g]) =>
+      new Promise((ok) => { delete window.KIEZ_ERREICHBAR; T.laden("daten/fixtures/erreichbar.js?zwei", g, ok); })));
+    o.zweiGlobals = [g1, g2 && g2.methode];
     return o;
   });
 
@@ -115,6 +142,14 @@ async function probe(basis, art) {
   pruef(r.text.join("|") === "182.673|17,9|182.700|460|k. A.|20,2 %|Potsdam|" + r.text[7] + "|&lt;a &quot;b&quot;&gt;&amp;" && r.text[7] !== "Potsdam",
     `Texthelfer: ${r.text.join(" | ")}`);
   pruef(S.ganz && S.teile === 32 && S.umriss === 2 && S.polys && S.farbe === 32 && S.bezirk >= 7 && S.stufen === 5 && S.grau === "#d5d8d3", `Geometrie und Farben: ${JSON.stringify(S)}`);
+  pruef(typeof r.leer.ausdruck === "string" && /^#/.test(r.leer.ausdruck) && !r.leer.gemerkt && !r.leer.mapFehler,
+    `Ebenen-Thema ohne Werte: einfarbig ${JSON.stringify(r.leer.ausdruck)}, nicht gemerkt, MapLibre nimmt es an`);
+  pruef(r.fuss === 3443 && r.gemischt.klassen && r.gemischt.klassen.grenzen.length >= 1 && r.gemischt.klassen.grenzen.every((g) => typeof g === "number") && !r.gemischt.mapFehler,
+    `nach dem Einmischen (erreichbar_fuss_odbl.js, hort): ${JSON.stringify(r.gemischt.klassen)}, MapLibre nimmt es an`);
+  pruef(r.jahreKeinArray === null, "ebenen.zellwerte nimmt nur Listen (anzahl → null)");
+  pruef(r.kollision.neu === 0 && r.kollision.ew && r.kollision.alter && r.kollision.neu2, `registrieren mit vergebener id oder h: ${JSON.stringify(r.kollision)}`);
+  pruef(r.zweiGlobals[0] === null && r.zweiGlobals[1] === "luftlinie", `laden: gleiche Datei, verschiedene Globals getrennt (${JSON.stringify(r.zweiGlobals)})`);
+  pruef(r.jahre.join() === "3443,3443,3443", `ebenen.zellwerte auf jahre_zellen.js (gebaeude, vorherrschend, anteile): ${r.jahre.join(", ")}`);
   pruef(seitenfehler.length === 0, `keine Seitenfehler (${seitenfehler.length})`);
   const fremd = konsole.filter((t) => !/ERR_FILE_NOT_FOUND|404/.test(t));
   pruef(fremd.length === 0, `Konsole: ${konsole.length} Fehler, davon ${konsole.length - fremd.length} nur von der absichtlich fehlenden Datei (${konsole.join(" | ") || "keine"})`);

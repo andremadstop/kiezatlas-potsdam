@@ -10,7 +10,7 @@ function name(nr) { return nr ? window.KIEZ_KENNZAHLEN.stadtteile[nr].name : "Po
 function kachel(G, id) { return (G.kacheln || []).filter(function (k) { return k.id === id; })[0]; }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
-// ---------- Themen: Reihenfolge = Reihenfolge der Chips; h = Hash-Schlüssel (geteilte Links, bleibt stabil)
+// ---------- Themen in Chip-Reihenfolge; h = Hash-Schlüssel, bleibt stabil
 var THEMEN = [
   { id: "stadtteile", h: "stadtteile", kurz: "Stadtteile", name: "Stadtteile" },
   { id: "ew", h: "ew", kurz: "Einwohner", name: "Einwohner je Zelle", einheit: "Personen", quelle: "Zensus 2022, Bevölkerungszahl" },
@@ -35,25 +35,27 @@ function klassen(t, features) {
   var g = [];
   [0.2, 0.4, 0.6, 0.8].map(function (p) { return w[Math.min(w.length - 1, Math.floor(p * w.length))]; })
     .forEach(function (v) { if (!g.length || v > g[g.length - 1]) g.push(v); });
-  return { grenzen: g, min: w[0], max: w[w.length - 1] };
+  return w.length ? { grenzen: g, min: w[0], max: w[w.length - 1] } : { grenzen: [], min: 0, max: 0, leer: true };
 }
 var KLASSEN = {};
 if (Z) THEMEN.slice(1).forEach(function (t) { KLASSEN[t.id] = klassen(t); });
-function kl(t, k) { return k || KLASSEN[t.id] || (KLASSEN[t.id] = klassen(t)); }
+// ohne Werte (Ebene noch nicht eingemischt): einfarbig, nicht gemerkt
+function kl(t, k) { if (k || KLASSEN[t.id]) return k || KLASSEN[t.id]; var s = klassen(t); if (!s.leer) KLASSEN[t.id] = s; return s; }
 function klasse(t, v, k) { var s = kl(t, k), i = 0; while (i < s.grenzen.length && v >= s.grenzen[i]) i++; return Math.min(i, 4); }
 function unscharf(t, p) { return t.nenner ? (p[t.nenner] == null || p[t.nenner] < 10) : false; }
 function farbe(t, k) {
   var s = kl(t, k), e = ["step", ["get", t.id], STUFEN[0]];
   s.grenzen.forEach(function (g, i) { e.push(g, STUFEN[Math.min(i + 1, 4)]); });
+  if (!s.grenzen.length) e = STUFEN[0];
   return t.nenner ? ["case", ["<", ["coalesce", ["get", t.nenner], 0], 10], GRAU, e] : e;
 }
-// Säulenhöhe passt sich dem Maßstab an; opt.faktor (animiert, Standard 1), opt.hoch (Standard 1100 m), opt.klassen
+// opt: faktor (Standard 1), hoch (1100 m), klassen
 function hoehe(t, opt) {
   opt = opt || {};
   var v = ["get", t.id], s = kl(t, opt.klassen), H0 = opt.hoch || 1100, f = opt.faktor == null ? 1 : opt.faktor, rel;
-  if (t.id === "ew") rel = ["sqrt", ["/", v, s.max]];
+  if (t.id === "ew") rel = ["sqrt", ["/", v, s.max || 1]];
   else if (t.einheit === "%") rel = ["/", ["min", 100, v], 100];
-  else rel = ["max", 0, ["/", ["-", v, s.min], s.max - s.min]];
+  else rel = ["max", 0, ["/", ["-", v, s.min], s.max - s.min || 1]];
   var flach = t.nenner ? ["<", ["coalesce", ["get", t.nenner], 0], 10] : false;
   function bei(H) { var h = ["*", f * H, rel]; return flach ? ["case", flach, 3, h] : h; }
   return ["interpolate", ["linear"], ["zoom"], 10, bei(H0 * 1.3), 12, bei(H0 * 0.45), 13, bei(H0 * 0.18), 14, bei(H0 * 0.075), 16, bei(H0 * 0.03)];
@@ -63,7 +65,7 @@ function hoehe(t, opt) {
 function polys(f) { return f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates; }
 function umriss(f) { var a = [180, 90, -180, -90]; polys(f).forEach(function (p) { p[0].forEach(function (c) { a[0] = Math.min(a[0], c[0]); a[1] = Math.min(a[1], c[1]); a[2] = Math.max(a[2], c[0]); a[3] = Math.max(a[3], c[1]); }); }); return [[a[0], a[1]], [a[2], a[3]]]; }
 
-// ---------- Stadtteile: ein Farbton je Stadtbezirk (erste Ziffer), heller und dunkler je Stadtteil
+// ---------- Stadtteile: ein Farbton je Bezirk, heller und dunkler je Stadtteil
 var TOENE = { 1: 28, 2: 205, 3: 150, 4: 350, 5: 265, 6: 95, 7: 185, 8: 45 };
 var proBezirk = {}, FARBE = {}, BEZIRKFARBE = {}, TEIL = {}, GANZ = null;
 if (ST) {
@@ -85,33 +87,36 @@ function melden(text) {
   m.textContent = text;
 }
 function laden(src, global, fertig) {
+  var w = src + " " + global;
   if (window[global] != null) { fertig(window[global]); return; }
-  if (wartend[src]) { wartend[src].push(fertig); return; }
-  var l = wartend[src] = [fertig], s = document.createElement("script");
-  function ende(wert) { delete wartend[src]; l.forEach(function (f) { f(wert); }); }
+  if (wartend[w]) { wartend[w].push(fertig); return; }
+  var l = wartend[w] = [fertig], s = document.createElement("script");
+  function ende(wert) { delete wartend[w]; l.forEach(function (f) { f(wert); }); }
   s.src = src; s.async = true;
-  s.onload = function () { if (window[global] == null) melden("Daten aus " + src + " sind unvollständig."); ende(window[global] == null ? null : window[global]); };
+  s.onload = function () { var d = window[global]; if (d == null) melden("Daten aus " + src + " sind unvollständig."); ende(d == null ? null : d); };
   s.onerror = function () { melden("Daten aus " + src + " ließen sich nicht laden."); ende(null); };
   document.head.appendChild(s);
 }
 
-// ---------- Ebenen-Register: weitere Datendateien mit eigenen Themen
+// ---------- Ebenen-Register
 var EBENEN = [], EBENE = {};
 var ebenen = {
   registrieren: function (e) {
     if (EBENE[e.id]) return EBENE[e.id];
     EBENE[e.id] = e; EBENEN.push(e);
-    (e.themen || []).forEach(function (t) { t.ebene = e.id; THEMEN.push(t); aufnehmen(t); });
+    // vergebene id oder h bleiben beim alten Thema (geteilte Links)
+    (e.themen || []).forEach(function (t) { if (THEMA[t.id] || HASH[t.h]) return; t.ebene = e.id; THEMEN.push(t); aufnehmen(t); });
     return e;
   },
   liste: function () { return EBENEN.slice(); },
-  // Werte einer Art in der Reihenfolge von KIEZ_ZELLEN.features, geprüft gegen anzahl, erste_id, letzte_id
+  // art: Schlüssel in werte (erreichbar: kita …) oder Liste oben (jahre_zellen: gebaeude …)
   zellwerte: function (id, art) {
     var e = EBENE[id], d = e && window[e.global], f = Z ? Z.features : [];
-    var ok = d && d.werte && d.werte[art] && d.anzahl === f.length && d.werte[art].length === f.length &&
+    var l = d && (d.werte && d.werte[art] || d[art]);
+    var ok = Array.isArray(l) && d.anzahl === f.length && l.length === f.length &&
       f.length && d.erste_id === f[0].properties.id && d.letzte_id === f[f.length - 1].properties.id;
     if (!ok) { melden("Die Werte der Ebene " + id + " passen nicht zu den Zellen der Karte."); return null; }
-    return d.werte[art];
+    return l;
   }
 };
 
