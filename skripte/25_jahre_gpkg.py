@@ -33,13 +33,16 @@ from shapely.geometry import MultiPolygon, Polygon, shape
 
 WURZEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ZIEL = os.path.join(WURZEL, "daten", "download", "bauzeiten.gpkg")
-WENIG_MINDEST = 50  # wie MINDEST in jahre.js: weniger Gebäude bekannter Bauzeit -> vergleichbar = 0
+# Muss zu jahre.js passen (MINDEST, rechnen/anteil, Math.round, slug). pruefen/B5_jahre.mjs vergleicht das
+# GeoPackage Wert für Wert mit den CSV-Dateien, die der Browser erzeugt; eine Abweichung fällt dort auf.
+MINDEST = 50  # weniger Gebäude bekannter Bauzeit im Gebiet -> vergleichbar = 0
 LIZENZTEXT = "https://www.govdata.de/dl-de/by-2-0"
 SRS = 25833
 
 
 def lies_js(name):
-    t = open(os.path.join(WURZEL, "daten", name), encoding="utf-8").read()
+    with open(os.path.join(WURZEL, "daten", name), encoding="utf-8") as f:
+        t = f.read()
     t = re.sub(r"^\s*/\*.*?\*/\s*", "", t, flags=re.S)
     return json.loads(t[t.index("=") + 1:].strip().rstrip(";"))
 
@@ -98,6 +101,8 @@ def main():
             "geom": shapely.transform(quadrat, nach25833), "gitter_id": p["id"], "stadtteil": p["st"], "gebaeude": g,
             "anteile": a, "vorherrschend": None if v is None else KL[v], "klassen_geheim": 1 if a is None else 0,
         })
+        if not p.get("st"):
+            continue  # wie jahre.js: Zellen ohne Stadtteil zählen in kein Gebiet
         r = raum.setdefault(p["st"], {"g": 0, "gk": 0, "z": 0, "c": [0.0] * len(KL)})
         r["g"] += g
         r["z"] += 1
@@ -120,7 +125,7 @@ def main():
             "geom": geo, "nr": nr, "name": teile[nr]["properties"]["name"],
             "gebaeude_rund": rund_halb(r["g"] / 10) * 10, "zellen": r["z"],
             "gebaeude_ohne_klassen_rund": rund_halb((r["g"] - r["gk"]) / 10) * 10,
-            "anteile": anteile, "vergleichbar": 1 if r["gk"] >= WENIG_MINDEST else 0,
+            "anteile": anteile, "vergleichbar": 1 if r["gk"] >= MINDEST else 0,
         })
 
     # ---------- Schreiben (erst in eine Nachbardatei, dann umbenennen)
@@ -153,27 +158,29 @@ def main():
     stand = J["stand"] + "T00:00:00.000Z"
     vermerk = q["vermerk"]
 
-    def tabelle(name, ident, beschreibung, spalten_sql, zeilen, werte):
-        db.execute(f"CREATE TABLE {name} (fid INTEGER PRIMARY KEY AUTOINCREMENT, geom {'MULTIPOLYGON' if name == 'stadtteile' else 'POLYGON'}, {spalten_sql})")
-        platz = ",".join("?" * (1 + len(werte(zeilen[0]))))
-        db.executemany(f"INSERT INTO {name} (geom, {', '.join(c.split()[0] for c in spalten_sql.split(', '))}) VALUES ({platz})",
+    def tabelle(name, geotyp, ident, beschreibung, spalten, zeilen, werte):
+        """spalten: Liste (Name, SQL-Typ); werte(z) liefert die Werte in derselben Reihenfolge"""
+        db.execute(f"CREATE TABLE {name} (fid INTEGER PRIMARY KEY AUTOINCREMENT, geom {geotyp}, "
+                   + ", ".join(f"{s} {typ}" for s, typ in spalten) + ")")
+        platz = ",".join("?" * (1 + len(spalten)))
+        db.executemany(f"INSERT INTO {name} (geom, {', '.join(s for s, _ in spalten)}) VALUES ({platz})",
                        [(gp_blob(z["geom"]),) + tuple(werte(z)) for z in zeilen])
         b = [min(z["geom"].bounds[0] for z in zeilen), min(z["geom"].bounds[1] for z in zeilen),
              max(z["geom"].bounds[2] for z in zeilen), max(z["geom"].bounds[3] for z in zeilen)]
         db.execute("INSERT INTO gpkg_contents VALUES (?,?,?,?,?,?,?,?,?,?)", (name, "features", ident, beschreibung, stand, *b, SRS))
-        db.execute("INSERT INTO gpkg_geometry_columns VALUES (?,?,?,?,0,0)", (name, "geom", "MULTIPOLYGON" if name == "stadtteile" else "POLYGON", SRS))
+        db.execute("INSERT INTO gpkg_geometry_columns VALUES (?,?,?,?,0,0)", (name, "geom", geotyp, SRS))
 
-    anteil_sql = ", ".join(s + " REAL" for s in spalten)
-    tabelle("zellen", "Bauzeiten je 100-m-Zelle",
+    tabelle("zellen", "POLYGON", "Bauzeiten je 100-m-Zelle",
             J["beschriftung"] + ". " + q["quelle"] + ". " + vermerk + ".",
-            "gitter_id TEXT, stadtteil TEXT, gebaeude INTEGER, " + anteil_sql + ", vorherrschend TEXT, klassen_geheim INTEGER",
+            [("gitter_id", "TEXT"), ("stadtteil", "TEXT"), ("gebaeude", "INTEGER")] + [(s, "REAL") for s in spalten]
+            + [("vorherrschend", "TEXT"), ("klassen_geheim", "INTEGER")],
             zellen,
             lambda z: [z["gitter_id"], z["stadtteil"], z["gebaeude"]] + (z["anteile"] or [None] * len(KL)) + [z["vorherrschend"], z["klassen_geheim"]])
-    tabelle("stadtteile", "Bauzeiten je Stadtteil, genähert",
+    tabelle("stadtteile", "MULTIPOLYGON", "Bauzeiten je Stadtteil, genähert",
             "Genäherte Mischung je Stadtteil (Zellanteile mit der Gebäudezahl gewichtet), Anteile ganze Prozent, Gebäudezahlen auf 10 gerundet; "
-            "vergleichbar = 0: weniger als %d Gebäude mit bekannter Bauzeit. Stadtteilgrenzen © Landeshauptstadt Potsdam, dl-zero-de/2.0. %s." % (WENIG_MINDEST, vermerk),
-            "nr TEXT, name TEXT, gebaeude_rund INTEGER, zellen INTEGER, gebaeude_ohne_klassen_rund INTEGER, "
-            + ", ".join(s + " INTEGER" for s in spalten) + ", vergleichbar INTEGER",
+            "vergleichbar = 0: weniger als %d Gebäude mit bekannter Bauzeit. Stadtteilgrenzen © Landeshauptstadt Potsdam, dl-zero-de/2.0. %s." % (MINDEST, vermerk),
+            [("nr", "TEXT"), ("name", "TEXT"), ("gebaeude_rund", "INTEGER"), ("zellen", "INTEGER"), ("gebaeude_ohne_klassen_rund", "INTEGER")]
+            + [(s, "INTEGER") for s in spalten] + [("vergleichbar", "INTEGER")],
             stadtteile,
             lambda z: [z["nr"], z["name"], z["gebaeude_rund"], z["zellen"], z["gebaeude_ohne_klassen_rund"]] + z["anteile"] + [z["vergleichbar"]])
     db.execute("CREATE TABLE hinweis (id INTEGER PRIMARY KEY, schluessel TEXT, wert TEXT)")

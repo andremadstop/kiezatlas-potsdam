@@ -237,6 +237,8 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const spaltenGp = alle("select name from pragma_table_info('zellen') union all select name from pragma_table_info('stadtteile')").map((r) => r.name).join(" ");
       pruef(/Daten verändert \(eigene Berechnung\)/.test(hin.vermerk) && hin.lizenztext === "https://www.govdata.de/dl-de/by-2-0" && !/strasse|hausnr|adress|eigentu/i.test(spaltenGp),
         "GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten");
+      const standJs = await page.evaluate(() => window.KIEZ_JAHRE_ZELLEN.stand);
+      pruef(hin.stand === standJs, `GeoPackage-Stand ${hin.stand} = Stand von jahre_zellen.js ${standJs} (sonst skripte/25_jahre_gpkg.py neu laufen lassen)`);
       db.close();
       const alles = csv.text + gj.text + rc.text;
       pruef(!/strasse|straße|hausnr|adresse|eigentuemer|eigentümer/i.test(alles.replace(/keine Adressen/g, "")), "Downloads ohne Adress- oder Eigentümerfelder");

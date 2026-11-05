@@ -7,7 +7,7 @@
 var T = window.KIEZ_THEMEN, K = window.KIEZ_KENNZAHLEN, Z = window.KIEZ_ZELLEN, ST = window.KIEZ_STADTTEILE;
 var SEITE = document.body.getAttribute("data-seite");
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches;
-var SCHMAL = matchMedia("(max-width:860px)").matches;
+var SCHMAL = matchMedia("(max-width:860px)").matches;   // nur Startwert; Kamera und Auslöseband fragen bei Bedarf neu
 var FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
 var fmt = T.fmt, esc = T.esc, NB = " ";
 
@@ -138,7 +138,7 @@ function karte() {
     if (h.ansicht === "spanne" || h.ansicht === "ueberblick") { S.ansicht = h.ansicht; hashDa = true; }
     if (ok(h.von) && ok(h.bis) && +h.von <= +h.bis) { S.von = +h.von; S.bis = +h.bis; hashDa = true; }
     S.d3 = h["3d"] === "1"; S.luft = h.luft === "1";
-    if (h.st && T.TEIL[h.st]) S.nr = h.st;
+    if (h.st && T.TEIL[h.st] && STAT.raum[h.st]) S.nr = h.st;   // nur Gebiete mit Gebäuden haben einen Steckbrief
   })();
 
   // Eigenschaften an die Zellen: j_g Gebäude, j_s Zustand (0 keine, 1 Klassen geheim, 2 Gleichstand, 3 Klasse), j_a0…7, j_v, j_w
@@ -230,10 +230,12 @@ function karte() {
     try { history.replaceState(null, "", "#" + t.join("&")); } catch (e) { /* file:// in manchen Browsern */ }
   }
   function kamera(b, neigen) {
-    var o = { padding: SCHMAL ? { top: 60, bottom: 150, left: 12, right: 12 } : { top: 90, bottom: 210, left: 40, right: 70 }, pitch: neigen ? 50 : 0, bearing: 0 };
+    // Leiste liegt unter der Karte (eigene Zeile), oben schwebt die Werkzeugleiste; auf dem Handy dazu die Kopfleiste
+    var o = { padding: matchMedia("(max-width:860px)").matches ? { top: 100, bottom: 16, left: 12, right: 12 } : { top: 60, bottom: 30, left: 40, right: 70 }, pitch: neigen ? 50 : 0, bearing: 0 };
     if (RUHIG) { o.animate = false; map.fitBounds(b, o); } else { o.duration = 1400; o.easing = function (t) { return 1 - Math.pow(1 - t, 4); }; map.fitBounds(b, o); }
   }
   function huelle(nrs) {
+    if (!nrs.length) return T.GANZ;   // kein Gebiet erreicht MINDEST: ganze Stadt statt leerer Hülle
     var a = [180, 90, -180, -90];
     nrs.forEach(function (nr) { var u = T.umriss(T.TEIL[nr]); a[0] = Math.min(a[0], u[0][0]); a[1] = Math.min(a[1], u[0][1]); a[2] = Math.max(a[2], u[1][0]); a[3] = Math.max(a[3], u[1][1]); });
     return [[a[0], a[1]], [a[2], a[3]]];
@@ -360,7 +362,7 @@ function karte() {
   window.addEventListener("scroll", function () { geblaettert = true; }, { once: true, passive: true });
   // Auslöseband: am Desktop die Bildschirmmitte; auf dem Handy liegt die Bühne oben über dem Text,
   // dort zählt nur der sichtbare Lesebereich darunter (sonst stellt sich die Karte um, bevor die Frage lesbar ist)
-  var beob = null, beobZeit = 0;
+  var beob = null, beobZeit = 0, beobBreite = innerWidth;
   function beobachten() {
     if (beob) beob.disconnect();
     var rm = "-45% 0px -45% 0px", schmal = matchMedia("(max-width:860px)").matches;
@@ -374,7 +376,8 @@ function karte() {
     // Handy: der Titel der Frage löst aus, nicht ihr Kasten (dessen Oberkante liegt eine Zeile über dem Titel)
     document.querySelectorAll("[data-schritt]").forEach(function (f) { beob.observe(schmal ? f.querySelector(".frage__titel, h1") || f : f); });
   }
-  window.addEventListener("resize", function () { clearTimeout(beobZeit); beobZeit = setTimeout(beobachten, 200); }, { passive: true });
+  // nur bei echter Breitenänderung neu aufbauen (Handy-Adressleiste ändert beim Scrollen ständig die Höhe)
+  window.addEventListener("resize", function () { if (innerWidth === beobBreite) return; beobBreite = innerWidth; clearTimeout(beobZeit); beobZeit = setTimeout(beobachten, 200); }, { passive: true });
 
   // ---------- Vergleich der Gebiete
   var sortierung = "nr", liste = document.getElementById("j-liste"), zeilen = {};
@@ -464,6 +467,10 @@ function methode() {
 // Seite „Daten“: Dateien entstehen im Browser aus jahre_zellen.js (+ zellen.js), ohne Netz
 // =====================================================================================
 function daten() {
+  var gp = document.getElementById("j-d-gpkg");
+  // Das GeoPackage ist eine fertige Datei mit echten Werten; zu Beispieldaten passt es nicht
+  if (gp && D.fixture) { gp.removeAttribute("href"); gp.setAttribute("aria-disabled", "true"); gp.hidden = true; }
+  if (!Z) { meldung("Die Zellen (daten/zellen.js) ließen sich nicht laden; die Dateien lassen sich nicht erzeugen."); return; }
   var q = D.quellen[Object.keys(D.quellen)[0]], tag = D.stand;
   var spalten = KL.map(function (n) { return "anteil_" + slug(n); });
   setze("spalten", spalten.join(", "));
