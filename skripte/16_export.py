@@ -312,11 +312,33 @@ class GPKG:
 
 
 # ---------------------------------------------------------------------------------------------- Datenbank
-def db_lesen(cur, raumebene: str, ein_ids: list[str], zellen: list[str]) -> dict:
-    tab = "public.planungsraum" if raumebene == "planungsraum" else "public.stadtteil"
+def raumquelle_a6(cur) -> tuple[str, str, str, dict]:
+    """Raumebene, SQL-Ausdruck der Raumeinheiten und Herkunft, in derselben Reihenfolge wie A6 (15_planer.raumquelle):
+    public.planungsraum, sonst vorbereitet/planungsraeume.csv als unnest(), sonst Stadtteile; Abbruch, wenn H1 vorliegt,
+    aber nicht vorbereitet ist. Die Parameter von A6 werden als Literale eingesetzt (von psycopg maskiert), damit der
+    Ausdruck in den Abfragen mit Positionsparametern unverändert als {tab} stehen kann.
+    """
+    import importlib.util
+
+    from psycopg import sql
+
+    sys.dont_write_bytecode = True  # kein __pycache__ im Worktree
+    spec = importlib.util.spec_from_file_location("planer_a6", WURZEL / "skripte" / "15_planer.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    raumebene, tab, par, herkunft = mod.raumquelle(cur)
+    for k, v in (par or {}).items():
+        lit = sql.Literal(v).as_string(cur)
+        if "%" in lit:  # die Abfragen nutzen Positionsparameter; ein % in Name oder WKT wäre ein Platzhalter
+            raise SystemExit(f"Raumquelle: Zeichen % in {k}, bitte Namen in vorbereitet/planungsraeume.csv prüfen")
+        tab = tab.replace(f"%({k})s", lit)
+    if "%(" in tab:
+        raise SystemExit(f"Raumquelle von A6 mit unbekanntem Parameter: {tab[:200]}")
+    return raumebene, tab, herkunft, mod.QUELLEN.get("planungsraum") or {}
+
+
+def db_lesen(cur, tab: str, ein_ids: list[str], zellen: list[str]) -> dict:
     d: dict = {"tab": tab}
-    cur.execute("SELECT count(*) FROM public.planungsraum")
-    d["planungsraum_zeilen"] = cur.fetchone()[0]
     cur.execute("SELECT srid, srtext FROM spatial_ref_sys WHERE srid IN (4326, 25833)")
     d["srs"] = dict(cur.fetchall())
     cur.execute(
@@ -392,6 +414,16 @@ def db_lesen(cur, raumebene: str, ein_ids: list[str], zellen: list[str]) -> dict
         }
         for s, n, v, f, k, p, x, y, nr in cur.fetchall()
     ]
+    # Stadtteile als Orientierungsebene (die Seite rechnet auf ihnen, der Planer auf Planungsräumen)
+    cur.execute(
+        f"""SELECT nr, name, ST_AsBinary(g, 'NDR'), ST_XMin(g), ST_XMax(g), ST_YMin(g), ST_YMax(g),
+                   round((ST_Area(g) / 1e6)::numeric, 3), ST_AsText(g, 2)
+            FROM (SELECT nr, name, ST_Multi(ST_Transform(geom, {SRID})) g FROM public.stadtteil) s ORDER BY nr"""
+    )
+    d["stadtteil"] = [
+        {"nr": str(nr), "name": name, "wkb": bytes(w), "huelle": (a, b, c, e), "km2": float(km2), "wkt": wkt}
+        for nr, name, w, a, b, c, e, km2, wkt in cur.fetchall()
+    ]
     return d
 
 
@@ -412,7 +444,7 @@ def punkte_umrechnen(cur, tab: str, lonlat: list[tuple[float, float]]) -> list[t
 def karte_lesen(cur, tab: str, nr: str) -> dict:
     """Bausteine der Steckbrief-Karte: Ausschnitt, Nachbarn, Grünflächen, alles in EPSG:25833 als SVG-Pfad."""
     cur.execute(
-        f"""WITH r AS (SELECT ST_Transform(geom, {SRID}) g FROM {tab} WHERE nr = %s),
+        f"""WITH r AS (SELECT ST_Transform(geom, {SRID}) g FROM {tab} rr WHERE rr.nr = %s),
                  b AS (SELECT ST_Expand(ST_Envelope(g),
                                         GREATEST(ST_XMax(g) - ST_XMin(g), ST_YMax(g) - ST_YMin(g)) * 0.06) h FROM r)
             SELECT ST_XMin(h), ST_YMin(h), ST_XMax(h), ST_YMax(h),
@@ -427,7 +459,7 @@ def karte_lesen(cur, tab: str, nr: str) -> dict:
         f"""WITH b AS (SELECT ST_Expand(ST_Envelope(ST_Transform(geom, {SRID})),
                          GREATEST(ST_XMax(ST_Transform(geom, {SRID})) - ST_XMin(ST_Transform(geom, {SRID})),
                                   ST_YMax(ST_Transform(geom, {SRID})) - ST_YMin(ST_Transform(geom, {SRID}))) * 0.06) h
-                       FROM {tab} WHERE nr = %s)
+                       FROM {tab} rr WHERE rr.nr = %s)
             SELECT g.art, ST_AsSVG(ST_SimplifyPreserveTopology(ST_Intersection(g.geom, b.h), 2), 0, 0)
             FROM auswertung.gruenflaeche g, b WHERE ST_Intersects(g.geom, b.h) ORDER BY g.id""",
         (nr,),
@@ -591,6 +623,13 @@ def stile_bauen(gruen_zaehlt: set[str], ein_arten: list[str], odbl_arten: list[s
         + _flaeche("0", None, AKZENT, 0.4)
         + "</symbols></renderer-v2>",
         _beschriftung('"nr" || \' \' || "name"', 8.5, ausdruck=True),
+    )
+    # Stadtteile leise in Nebenschrift-Grau; das Grenzviolett bleibt den Raumeinheiten
+    st["stadtteil"] = _qml(
+        '<renderer-v2 type="singleSymbol" symbollevels="0" forceraster="0" enableorderby="0"><symbols>'
+        + _flaeche("0", None, MUTED, 0.2)
+        + "</symbols></renderer-v2>",
+        _beschriftung("name", 7.5),
     )
     rng = "".join(
         f'<range lower="{lo}" upper="{hi}" label="{escape(t)}" symbol="{i}" render="true"/>'
@@ -971,7 +1010,7 @@ def main() -> int:
     ap.add_argument(
         "--raum-lizenz",
         default=None,
-        help="Vermerk der Planungsraum-Grenzen (Pflicht, sobald planer.js je Planungsraum rechnet)",
+        help="Vermerk der Planungsraum-Grenzen (Standard: quellen.planungsraum aus planer.js bzw. 15_planer.py)",
     )
     ap.add_argument("--ohne-beleg", action="store_true", help="keinen Beleg unter belege/ schreiben")
     a = ap.parse_args()
@@ -998,12 +1037,27 @@ def main() -> int:
     with psycopg.connect() as con:
         con.read_only = True
         with con.cursor() as cur:
-            d = db_lesen(cur, raumebene, [f["properties"]["id"] for f in ein["features"]], ids)
-            if (d["planungsraum_zeilen"] > 0) != (raumebene == "planungsraum"):
-                raise SystemExit("public.planungsraum und planer.js passen nicht zusammen; erst A6 neu laufen lassen.")
-            if raumebene == "planungsraum" and not a.raum_lizenz:
-                raise SystemExit("Planungsräume: --raum-lizenz mit dem Vermerk aus dem Handdownload (H1) angeben.")
-            raum_vermerk = a.raum_lizenz or VERMERK["stadtteil"]
+            if fixture and raumebene == "stadtteil":
+                # Beispieldaten rechnen auf Stadtteilen; nur für die Prüfung des Pfads, nie nach daten/export
+                ebene_db, tab, raum_herkunft, pr_quelle = "stadtteil", "public.stadtteil", "public.stadtteil", {}
+            else:
+                ebene_db, tab, raum_herkunft, pr_quelle = raumquelle_a6(cur)
+            if ebene_db != raumebene:
+                raise SystemExit(
+                    f"Raumquelle ({ebene_db}, {raum_herkunft}) und planer.js ({raumebene}) passen nicht zusammen; "
+                    "erst A6 neu laufen lassen."
+                )
+            d = db_lesen(cur, tab, [f["properties"]["id"] for f in ein["features"]], ids)
+            # Lizenz und Vermerk der Grenzen aus derselben Quelle: planer.js, sonst A6 (QUELLEN in 15_planer.py)
+            pr_quelle = planer["quellen"].get("planungsraum") or pr_quelle
+            if raumebene == "planungsraum":
+                if not (a.raum_lizenz or pr_quelle.get("vermerk")):
+                    raise SystemExit("Planungsräume ohne Vermerk: --raum-lizenz angeben")
+                raum_vermerk = a.raum_lizenz or pr_quelle["vermerk"]
+                raum_lizenz = "siehe Vermerk" if a.raum_lizenz else pr_quelle.get("lizenz", "")
+            else:
+                raum_vermerk, raum_lizenz = VERMERK["stadtteil"], "dl-zero-de/2.0"
+            raum_link = {"dl-de/by-2-0": DLDE, "dl-zero-de/2.0": DLZERO}.get(raum_lizenz, "")
             fehlend = [f for f in ein["features"] if f["properties"]["id"] not in d["einrichtung"]]
             if fehlend and not fixture:
                 raise SystemExit(f"{len(fehlend)} Einrichtungen aus einrichtungen.js fehlen in auswertung.einrichtung")
@@ -1191,11 +1245,35 @@ def main() -> int:
             + [err["werte"][art][i] for art in arten]
             + [err["stand"], "dl-de/by-2-0", (dz["wkb"], dz["huelle"], dz["wkt"])]
         )
-    abweichend = [g for g in ids if raumebene == "stadtteil" and d["zelle"][g]["raum"] != zprops[g].get("st")]
-    meldungen.append(
-        f"Zellen: Raum aus der Datenbank weicht bei {len(abweichend)} von {len(ids)} Zellen von "
-        f"zellen.js ab{(' (' + ', '.join(abweichend[:5]) + ')') if abweichend else ''}"
-    )
+    meldungen.append(f"Raumeinheiten: {len(planer['raeume'])} je {raumebene}, Grenzen aus {raum_herkunft}")
+    if raumebene == "stadtteil":
+        abweichend = [g for g in ids if d["zelle"][g]["raum"] != zprops[g].get("st")]
+        meldungen.append(
+            f"Zellen: Raum aus der Datenbank weicht bei {len(abweichend)} von {len(ids)} Zellen von "
+            f"zellen.js ab{(' (' + ', '.join(abweichend[:5]) + ')') if abweichend else ''}"
+        )
+    else:
+        # Gegenprobe zur Zuordnung von A6: jede bewohnte Zelle hat einen Raum, Summen je Raum wie in planer.js
+        ohne = [g for g in ids if zprops[g].get("ew") and not d["zelle"][g]["raum"]]
+        summe: dict[str, int] = {}
+        for g in ids:
+            if zprops[g].get("ew") and d["zelle"][g]["raum"]:
+                summe[d["zelle"][g]["raum"]] = summe.get(d["zelle"][g]["raum"], 0) + zprops[g]["ew"]
+        toleranz = int(planer["rundung"]["ew"])
+        abw = {
+            nr: (summe.get(nr, 0), r["ew"])
+            for nr, r in planer["raeume"].items()
+            if r.get("ew") is not None and abs(summe.get(nr, 0) - r["ew"]) > toleranz / 2
+        }
+        meldungen.append(
+            f"Zellen: {len(ohne)} bewohnte Zellen ohne Raum; Einwohner je Raum weichen bei {len(abw)} von "
+            f"{len(planer['raeume'])} Räumen um mehr als die halbe Rundung ({toleranz} EW) von planer.js ab"
+            f"{(' ' + str(abw)) if abw else ''}; Summe {sum(summe.values()):,} EW".replace(",", ".")
+        )
+        # Abbruch nur, wenn die Zuordnung der Geometrie andere Einwohner je Raum ergibt als die veröffentlichten
+        # Werte; Zellen ohne Raum führt A6 selbst nur als Meldung (ohne_raum), hier ebenso
+        if abw and not fixture:
+            raise SystemExit(meldungen[-1])
     # gruenflaeche
     g_felder = [
         ("id", "TEXT"),
@@ -1248,15 +1326,22 @@ def main() -> int:
         ]
         for h in d["haltestelle"]
     ]
+    # stadtteil (Orientierung; nur Grenze, Name, Fläche)
+    s_felder = [("nr", "TEXT"), ("name", "TEXT"), ("flaeche_km2", "REAL"), ("vermerk_grenze", "TEXT")]
+    s_zeilen = [
+        [s_["nr"], s_["name"], s_["km2"], VERMERK["stadtteil"], (s_["wkb"], s_["huelle"], s_["wkt"])]
+        for s_ in d["stadtteil"]
+    ]
     # lizenz
     l_felder = [("ebene", "TEXT"), ("lizenz", "TEXT"), ("vermerk", "TEXT"), ("lizenztext", "TEXT")]
     l_zeilen = [
         [
             "raumeinheit (Grenzen)",
-            "dl-zero-de/2.0" if raumebene == "stadtteil" else "laut Handdownload H1",
+            raum_lizenz,
             raum_vermerk,
-            DLZERO if raumebene == "stadtteil" else "",
+            raum_link,
         ],
+        ["stadtteil", "dl-zero-de/2.0", VERMERK["stadtteil"], DLZERO],
         [
             "raumeinheit, versorgung (Werte)",
             "dl-de/by-2-0; ÖPNV-Werte CC BY 4.0",
@@ -1276,6 +1361,7 @@ def main() -> int:
         ("zelle", "Zensus-Zellen 100 m: Einwohner und Luftlinie", "POLYGON", z_felder, z_zeilen),
         ("gruenflaeche", "Grünflächen (ALKIS-Nutzung)", "MULTIPOLYGON", g_felder, g_zeilen),
         ("haltestelle", "Haltestellen (VBB-GTFS)", "POINT", h_felder, h_zeilen),
+        ("stadtteil", "Stadtteile (Orientierung)", "MULTIPOLYGON", s_felder, s_zeilen),
         ("lizenz", "Lizenzen und Vermerke je Ebene", None, l_felder, l_zeilen),
     ]
     beschreibung = {
@@ -1286,6 +1372,7 @@ def main() -> int:
         "(Meter, auf 10 m gerundet). " + err["hinweis"],
         "gruenflaeche": "ALKIS-Nutzung. zaehlt_gruenversorgung = Grünanlage oder Park (config/richtwerte.yaml).",
         "haltestelle": "Haltestellen mit Taktklasse nach NVP 2019 (A4).",
+        "stadtteil": "Die 32 Stadtteile der Landeshauptstadt zur Orientierung, ohne Werte.",
         "lizenz": "Lizenz und Vermerk je Ebene.",
     }
     gpkg_pfad = ziel / "kiezatlas_potsdam.gpkg"
@@ -1387,7 +1474,9 @@ def main() -> int:
     else:
         if odbl_pfad.exists():
             odbl_pfad.unlink()
-        meldungen.append("ODbL: keine *_odbl.js in der Quelle (A3/A5b leer, H5 fehlt), keine _odbl-Datei")
+        meldungen.append(
+            "ODbL: keine *_odbl.js in der Quelle (A3/A5b noch ohne Ergebnis, A6 ohne _odbl-Dateien), keine _odbl-Datei"
+        )
 
     # ------------------------------------------------------------------ QGIS-Projekt
     pe = [
@@ -1426,6 +1515,14 @@ def main() -> int:
             "gpkg": gpkg_pfad.name,
             "geom": "MULTIPOLYGON",
             "qml": stile["gruenflaeche"],
+        },
+        {
+            "name": "stadtteil",
+            "titel": "Stadtteile",
+            "gpkg": gpkg_pfad.name,
+            "geom": "MULTIPOLYGON",
+            "qml": stile["stadtteil"],
+            "an": False,
         },
         {"name": "versorgung", "titel": "Versorgung (Tabelle)", "gpkg": gpkg_pfad.name, "geom": None},
         {"name": "lizenz", "titel": "Lizenzen (Tabelle)", "gpkg": gpkg_pfad.name, "geom": None},
@@ -1515,13 +1612,14 @@ def readme_schreiben(
             f"| `{n}` | {'Tabelle' if g is None else g} | {len(z)} | {feldliste(f)} |" for n, _, g, f, z in odbl_ebenen
         )
         if odbl_ebenen
-        else "| – | – | – | noch nicht erzeugt: OSM-Auszug (Handdownload) und Fußwegnetz fehlen |"
+        else "| – | – | – | noch nicht erzeugt: OSM-Auswertung (A3) und Fußwegnetz (A5b) fehlen noch |"
     )
+    beispiel = sorted(planer["raeume"])[0]
     text = f"""# Kiezatlas Potsdam: Daten zum Weiterverwenden
 
 Stand der Auswertung {planer["stand"]}. Erzeugt mit `skripte/16_export.py` aus denselben Datendateien wie die
 Seite (`daten/planer.js`, `daten/einrichtungen.js`, `daten/erreichbar.js`, `daten/zellen.js`) und der Geometrie aus
-der Projektdatenbank. Raumebene: **{"Planungsraum" if raumebene == "planungsraum" else "Stadtteil (32 Stadtteile; Planungsräume folgen, sobald die Grenzen vorliegen)"}**.
+der Projektdatenbank. Raumebene: **{"Planungsraum (die 19 Planungsräume der Landeshauptstadt, Ebene der Kita- und Schulentwicklungsplanung); die 32 Stadtteile liegen zur Orientierung als eigene Ebene bei" if raumebene == "planungsraum" else "Stadtteil (32 Stadtteile; Planungsräume folgen, sobald die Grenzen vorliegen)"}**.
 
 ## Dateien
 
@@ -1557,6 +1655,8 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
   Standort je Art (`m_<art>`, auf 10 m gerundet; leer = Zelle ohne Einwohner). Keine Altersklassen je Zelle.
 - `gruenflaeche`: ALKIS-Nutzung; `zaehlt_gruenversorgung` = {", ".join(sorted(gruen_zaehlt))}.
 - `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019.
+- `stadtteil`: die 32 Stadtteile mit Nummer, Name und Fläche, ohne Werte. In `zelle` steht der Stadtteil jeder
+  Zelle in `stadtteil`, die Raumeinheit in `raum_nr`.
 
 ## Ebenen aus OpenStreetMap (`kiezatlas_potsdam_odbl.gpkg`, `csv_odbl/`)
 
@@ -1574,6 +1674,7 @@ dieser Bedingung bleiben.
 Bei Weitergabe oder Veröffentlichung den Vermerk der genutzten Ebenen übernehmen:
 
 - **Grenzen der Raumeinheiten:** {raum_vermerk}
+- **Grenzen der Stadtteile:** {VERMERK["stadtteil"]}
 - **Einwohner, Zellen:** {VERMERK["zensus"]}
 - **Kitas, Horte, Schulen:** {VERMERK["mbjs"]}
 - **Gemeinbedarf, Grünflächen:** {VERMERK["lgb"]}
@@ -1593,6 +1694,9 @@ Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht un
   rund 50 m. Standorte in Brandenburg außerhalb der Stadt zählen mit, Berlin nicht; am Stadtrand ist der Wert
   deshalb teils nur eine Obergrenze.
 - **Zuordnung zur Raumeinheit:** über den Zellmittelpunkt bzw. den Standort.
+- **ÖPNV:** Die Gebietsklasse des Nahverkehrsplans gilt für Ortsteile; jede Zelle bekommt die Klasse ihres
+  Stadtteils. Zellen mit gemischter oder offener Klasse zählen nicht mit; wohnt dort mehr als die Hälfte der
+  Einwohner einer Raumeinheit, steht statt eines Werts ein Hinweis in `unsicherheit`.
 - **Status:** `amtlich` = Maßstab aus einem Potsdamer Dokument mit gelesener Fundstelle, bei Werten ohne Maßstab
   nur amtliche Daten. `orientierung` = Maßstab ohne Primärbeleg, Fundstelle nicht gelesen oder Berliner Methode;
   kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
@@ -1620,7 +1724,7 @@ Die Steckbriefe sind HTML für den Druck (A4) und laufen mit WeasyPrint (Python,
 ```
 python -c "from weasyprint import HTML; \\
   from weasyprint.text.fonts import FontConfiguration as F; f=F(); \\
-  HTML('daten/export/steckbriefe/13.html').write_pdf('13.pdf', font_config=f)"
+  HTML('daten/export/steckbriefe/{beispiel}.html').write_pdf('{beispiel}.pdf', font_config=f)"
 ```
 
 Die Schriften kommen aus `fonts/` des Repositorys (relativer Pfad); im Browser über „Drucken“ geht es ebenso.

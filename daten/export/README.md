@@ -2,7 +2,7 @@
 
 Stand der Auswertung 2026-11-05. Erzeugt mit `skripte/16_export.py` aus denselben Datendateien wie die
 Seite (`daten/planer.js`, `daten/einrichtungen.js`, `daten/erreichbar.js`, `daten/zellen.js`) und der Geometrie aus
-der Projektdatenbank. Raumebene: **Stadtteil (32 Stadtteile; Planungsräume folgen, sobald die Grenzen vorliegen)**.
+der Projektdatenbank. Raumebene: **Planungsraum (die 19 Planungsräume der Landeshauptstadt, Ebene der Kita- und Schulentwicklungsplanung); die 32 Stadtteile liegen zur Orientierung als eigene Ebene bei**.
 
 ## Dateien
 
@@ -26,13 +26,14 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 
 | Ebene | Geometrie | Zeilen | Felder |
 |---|---|---|---|
-| `raumeinheit` | MULTIPOLYGON | 32 | `nr`, `name`, `raumebene`, `ew`, `flaeche_km2`, `zellen`, `anteil_kita_500m`, `anteil_grundschule_1000m`, `anteil_grundschule_2000m`, `anteil_gruen_500m`, `plaetze_je_kind_kita`, `plaetze_je_kind_hort`, `plaetze_je_bedarf_kita`, `schueler_je_kind_grundschule`, `ew_je_kita`, `ew_je_grundschule`, `ew_je_bibliothek`, `ew_je_sport`, `ew_je_feuerwehr`, `ew_je_sonstiger_gemeinbedarf`, `oepnv_erschliessung`, `oepnv_takt`, `gruen_m2_je_ew`, `stand`, `vermerk_grenze` |
-| `versorgung` | Tabelle | 544 | `raum_nr`, `raum_name`, `raumebene`, `spalte`, `kennzahl`, `art`, `titel`, `zielgruppe`, `wert`, `einheit`, `methode`, `status`, `vorlaeufig`, `richtwert`, `richtwert_einheit`, `richtwert_quelle`, `richtwert_fundstelle`, `unsicherheit`, `quelle`, `stand`, `vermerk`, `prognose` |
+| `raumeinheit` | MULTIPOLYGON | 19 | `nr`, `name`, `raumebene`, `ew`, `flaeche_km2`, `zellen`, `anteil_kita_500m`, `anteil_grundschule_1000m`, `anteil_grundschule_2000m`, `anteil_gruen_500m`, `plaetze_je_kind_kita`, `plaetze_je_kind_hort`, `plaetze_je_bedarf_kita`, `schueler_je_kind_grundschule`, `ew_je_kita`, `ew_je_grundschule`, `ew_je_bibliothek`, `ew_je_sport`, `ew_je_feuerwehr`, `ew_je_sonstiger_gemeinbedarf`, `oepnv_erschliessung`, `oepnv_takt`, `gruen_m2_je_ew`, `stand`, `vermerk_grenze` |
+| `versorgung` | Tabelle | 323 | `raum_nr`, `raum_name`, `raumebene`, `spalte`, `kennzahl`, `art`, `titel`, `zielgruppe`, `wert`, `einheit`, `methode`, `status`, `vorlaeufig`, `richtwert`, `richtwert_einheit`, `richtwert_quelle`, `richtwert_fundstelle`, `unsicherheit`, `quelle`, `stand`, `vermerk`, `prognose` |
 | `einrichtung` | POINT | 679 | `id`, `art`, `art_text`, `unterart`, `name`, `plaetze`, `schueler`, `schueler_stand`, `status`, `in_potsdam`, `raum_nr`, `quelle`, `stand`, `lizenz` |
 | `zelle` | POLYGON | 3443 | `gitter_id`, `stadtteil`, `raum_nr`, `ew`, `m_bibliothek`, `m_feuerwehr`, `m_foerderschule`, `m_gruen`, `m_grundschule`, `m_gymnasium`, `m_hort`, `m_kita`, `m_osz`, `m_sek1`, `m_sonstige_schule`, `m_sonstiger_gemeinbedarf`, `m_sport`, `stand`, `lizenz` |
 | `gruenflaeche` | MULTIPOLYGON | 4892 | `id`, `art`, `bez`, `flaeche_m2`, `zaehlt_gruenversorgung`, `quelle`, `stand`, `lizenz` |
 | `haltestelle` | POINT | 315 | `stop_id`, `name`, `verkehrsmittel`, `fahrten_hvz_je_richtung`, `klasse`, `in_potsdam`, `raum_nr`, `stand`, `lizenz` |
-| `lizenz` | Tabelle | 6 | `ebene`, `lizenz`, `vermerk`, `lizenztext` |
+| `stadtteil` | MULTIPOLYGON | 32 | `nr`, `name`, `flaeche_km2`, `vermerk_grenze` |
+| `lizenz` | Tabelle | 7 | `ebene`, `lizenz`, `vermerk`, `lizenztext` |
 
 - `raumeinheit`: Grenzen mit Einwohnern und je Kennzahl einer Spalte (Kurzname wie in `versorgung.spalte`).
 - `versorgung`: jede Kennzahl als eigene Zeile mit `status`, `vorlaeufig`, Maßstab (`richtwert`, Quelle,
@@ -44,12 +45,14 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
   Standort je Art (`m_<art>`, auf 10 m gerundet; leer = Zelle ohne Einwohner). Keine Altersklassen je Zelle.
 - `gruenflaeche`: ALKIS-Nutzung; `zaehlt_gruenversorgung` = gruenanlage, park.
 - `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019.
+- `stadtteil`: die 32 Stadtteile mit Nummer, Name und Fläche, ohne Werte. In `zelle` steht der Stadtteil jeder
+  Zelle in `stadtteil`, die Raumeinheit in `raum_nr`.
 
 ## Ebenen aus OpenStreetMap (`kiezatlas_potsdam_odbl.gpkg`, `csv_odbl/`)
 
 | Ebene | Geometrie | Zeilen | Felder |
 |---|---|---|---|
-| – | – | – | noch nicht erzeugt: OSM-Auszug (Handdownload) und Fußwegnetz fehlen |
+| – | – | – | noch nicht erzeugt: OSM-Auswertung (A3) und Fußwegnetz (A5b) fehlen noch |
 
 Diese Ebenen sind aus OpenStreetMap abgeleitet und stehen unter der Open Database License 1.0
 (https://opendatacommons.org/licenses/odbl/1-0/), © OpenStreetMap-Mitwirkende. Wer sie verändert und weitergibt, gibt die veränderte Datenbank
@@ -60,7 +63,8 @@ dieser Bedingung bleiben.
 
 Bei Weitergabe oder Veröffentlichung den Vermerk der genutzten Ebenen übernehmen:
 
-- **Grenzen der Raumeinheiten:** © Landeshauptstadt Potsdam, dl-zero-de/2.0 (https://www.govdata.de/dl-de/zero-2-0)
+- **Grenzen der Raumeinheiten:** © Landeshauptstadt Potsdam, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
+- **Grenzen der Stadtteile:** © Landeshauptstadt Potsdam, dl-zero-de/2.0 (https://www.govdata.de/dl-de/zero-2-0)
 - **Einwohner, Zellen:** © Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Kitas, Horte, Schulen:** © Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Gemeinbedarf, Grünflächen:** © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
@@ -80,6 +84,9 @@ Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht un
   rund 50 m. Standorte in Brandenburg außerhalb der Stadt zählen mit, Berlin nicht; am Stadtrand ist der Wert
   deshalb teils nur eine Obergrenze.
 - **Zuordnung zur Raumeinheit:** über den Zellmittelpunkt bzw. den Standort.
+- **ÖPNV:** Die Gebietsklasse des Nahverkehrsplans gilt für Ortsteile; jede Zelle bekommt die Klasse ihres
+  Stadtteils. Zellen mit gemischter oder offener Klasse zählen nicht mit; wohnt dort mehr als die Hälfte der
+  Einwohner einer Raumeinheit, steht statt eines Werts ein Hinweis in `unsicherheit`.
 - **Status:** `amtlich` = Maßstab aus einem Potsdamer Dokument mit gelesener Fundstelle, bei Werten ohne Maßstab
   nur amtliche Daten. `orientierung` = Maßstab ohne Primärbeleg, Fundstelle nicht gelesen oder Berliner Methode;
   kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
@@ -107,7 +114,7 @@ Die Steckbriefe sind HTML für den Druck (A4) und laufen mit WeasyPrint (Python,
 ```
 python -c "from weasyprint import HTML; \
   from weasyprint.text.fonts import FontConfiguration as F; f=F(); \
-  HTML('daten/export/steckbriefe/13.html').write_pdf('13.pdf', font_config=f)"
+  HTML('daten/export/steckbriefe/101.html').write_pdf('101.pdf', font_config=f)"
 ```
 
 Die Schriften kommen aus `fonts/` des Repositorys (relativer Pfad); im Browser über „Drucken“ geht es ebenso.

@@ -50,6 +50,7 @@ def pruef(ok: bool, text: str) -> bool:
     return ok
 
 
+sys.dont_write_bytecode = True  # kein __pycache__ im Worktree
 _spec = importlib.util.spec_from_file_location("p0_daten", WURZEL / "pruefen" / "daten.py")
 p0 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(p0)
@@ -368,6 +369,7 @@ def main() -> int:
                     ("gruenflaeche", "SELECT count(*) FROM auswertung.gruenflaeche"),
                     ("haltestelle", "SELECT count(*) FROM auswertung.haltestelle"),
                     ("einrichtung", "SELECT count(*) FROM auswertung.einrichtung"),
+                    ("stadtteil", "SELECT count(*) FROM public.stadtteil"),
                 ):
                     n = con.execute(sql).fetchone()[0]
                     pruef(len(T[name][1]) == n, f"{name}: {len(T[name][1])} Zeilen, Datenbank {n}")
