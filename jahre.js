@@ -122,12 +122,15 @@ function zahlenFuellen() {
 
 // Gebäude-Schätzung: Zahlen aus daten/jahre_methode.js (gezählt aus daten/jahre/, Rücktest aus berichte/B4_holdout.md)
 function vz(v) { return v == null ? "k. A." : (v > 0 ? "+" : v < 0 ? "\u2212" : "±") + fmt.format(Math.abs(v)) + NB + "%"; }
+// „mehr“/„weniger“ folgt dem Vorzeichen der Abweichung, nicht dem Text
+function mehrWeniger(v) { return v == null ? "k. A.:" : v > 0 ? "mehr" : v < 0 ? "weniger" : "gleich viele"; }
 function sf(k) { return M.schieflage.filter(function (x) { return x.klasse === KL[k]; })[0] || {}; }
 function gebaeudeZahlen() {
   setze("g-alle", fmt.format(M.gebaeude)); setze("g-geschaetzt", fmt.format(M.je_g.geschaetzt));
   setze("g-nd", fmt.format(M.je_g.nicht_datiert)); setze("g-belegt", fmt.format(M.je_g.belegt)); setze("g-jahr", fmt.format(M.jahr));
   setze("g-geschaetzt-p", pz(100 * M.je_g.geschaetzt / M.gebaeude)); setze("g-nd-p", pz(100 * M.je_g.nicht_datiert / M.gebaeude));
   setze("g-sf-alt", vz(sf(0).abweichung)); setze("g-sf-ddr", vz(sf(3).abweichung));
+  setze("g-sf-alt-w", mehrWeniger(sf(0).abweichung)); setze("g-sf-ddr-w", mehrWeniger(sf(3).abweichung));
   setze("g-sf-alt-k", KL[0]); setze("g-sf-ddr-k", KL[3]); setze("g-stand", new Date(M.stand).toLocaleDateString("de-DE"));
   var neben = M.stufen.filter(function (x) { return x.s === 6; })[0];
   setze("g-neben", fmt.format(neben ? neben.neben : 0));
@@ -209,7 +212,7 @@ function karte() {
         { id: "dop", type: "raster", source: "dop", layout: { visibility: "none" }, paint: { "raster-saturation": -0.6 } },
         { id: "zellen-2d", type: "fill", source: "zellen", filter: ["==", ["get", "j_s"], 3], paint: { "fill-color": PALETTE[0], "fill-opacity": 0.9, "fill-outline-color": "rgba(250,251,248,0.4)" } },
         { id: "zellen-muster", type: "fill", source: "zellen", filter: ["==", ["get", "j_s"], 1], paint: { "fill-color": "#fafbf8", "fill-opacity": 0.95 } },
-        { id: "zellen-3d", type: "fill-extrusion", source: "zellen", layout: { visibility: "none" }, paint: { "fill-extrusion-color": PALETTE[0], "fill-extrusion-height": 0, "fill-extrusion-opacity": ["interpolate", ["linear"], ["zoom"], GEB_ZOOM - 0.4, 0.94, GEB_ZOOM + 0.2, 0.3], "fill-extrusion-vertical-gradient": true } },
+        { id: "zellen-3d", type: "fill-extrusion", source: "zellen", layout: { visibility: "none" }, paint: { "fill-extrusion-color": PALETTE[0], "fill-extrusion-height": 0, "fill-extrusion-opacity": 0.94, "fill-extrusion-vertical-gradient": true } },
         // Gebäude ab Zoom 14: alle blass (andere Bauzeit), nicht datiert grau, gewählte Bauzeit in Farbe; geschätzt heller, belegt kräftig mit Rand
         { id: "geb-rest", type: "fill", source: "gebaeude", minzoom: GEB_ZOOM, paint: { "fill-color": GEB_REST, "fill-outline-color": GEB_LINIE, "fill-opacity": 0.95 } },
         { id: "geb-nd", type: "fill", source: "gebaeude", minzoom: GEB_ZOOM, filter: ["==", ["get", "g"], "nicht_datiert"], paint: { "fill-color": GEB_ND, "fill-outline-color": GEB_LINIE, "fill-opacity": 0.95 } },
@@ -263,8 +266,10 @@ function karte() {
     map.setPaintProperty("zellen-muster", "fill-pattern", ["match", ["get", "j_s"], 2, "j-punkte", "j-schraffur"]);
     map.setFilter("geb-farbe", gebFilter()); map.setFilter("geb-belegt", ["all", gebFilter(), ["==", ["get", "g"], "belegt"]]);
     map.setPaintProperty("geb-farbe", "fill-color", gebFarbe());
-    map.setLayoutProperty("zellen-3d", "visibility", S.d3 ? "visible" : "none");
-    map.setLayoutProperty("zellen-2d", "visibility", S.d3 ? "none" : "visible");
+    // ab Zoom 14 keine Säulen: dort stehen die Gebäude, die Zellen liegen flach darunter (abgeblendet, wo Gebäude geladen)
+    var saeulen = S.d3 && map.getZoom() < GEB_ZOOM;
+    map.setLayoutProperty("zellen-3d", "visibility", saeulen ? "visible" : "none");
+    map.setLayoutProperty("zellen-2d", "visibility", saeulen ? "none" : "visible");
     map.setLayoutProperty("dop", "visibility", S.luft ? "visible" : "none");
     map.setLayoutProperty("basemap", "visibility", S.luft ? "none" : "visible");
     leisteZeigen(); listeZeigen(); hashSchreiben();
@@ -340,7 +345,7 @@ function karte() {
     else st.textContent = sp ? "Anteil " + name + " je Zelle" + (S.d3 ? ", Höhe: Zahl dieser Gebäude" : "") : "Bauzeit mit den meisten Gebäuden je Zelle" + (S.d3 ? ", Höhe: Zahl der Gebäude" : "");
     document.getElementById("kartenstatus").textContent = "Karte zeigt: " + st.textContent + (S.nr ? ", ausgewählt " + S.nr + " " + T.name(S.nr) : "") + (nah ? ", " + gebSichtText() : "") + ".";
     var L = document.getElementById("j-legende"); L.innerHTML = "";
-    if (sp) {
+    if (sp && !nah) {
       var stf = el("span", "j-legende__stufen"); stf.setAttribute("aria-hidden", "true");
       STUFEN.forEach(function (c) { var x = el("i"); x.style.background = c; stf.appendChild(x); });
       var m = el("span", "j-legende__marken"); [0].concat(GRENZEN, [100]).forEach(function (g) { m.appendChild(el("span", null, String(g))); });
@@ -350,7 +355,7 @@ function karte() {
     [["j-legende__muster j-legende__muster--schraffur", "Klassen geheim gehalten"], sp ? null : ["j-legende__muster j-legende__muster--punkte", "zwei Klassen gleichauf"], ["j-legende__muster j-legende__muster--blass", "unter " + WENIG + " Gebäuden, sehr unsicher"]]
       .forEach(function (x) { if (!x || nah) return; var s = el("span", "j-legende__eintrag"), i = el("i", x[0]); i.setAttribute("aria-hidden", "true"); s.appendChild(i); s.appendChild(document.createTextNode(x[1])); L.appendChild(s); });
     if (nah) {
-      [["j-legende__muster j-legende__muster--geschaetzt", "Gebäude, Bauzeit geschätzt (heller)"], gebBelegt ? ["j-legende__muster j-legende__muster--belegt", "Bauzeit belegt (kräftig, mit Rand)"] : null,
+      [["j-legende__muster j-legende__muster--geschaetzt", "Bauzeit geschätzt (Farbe der Bauzeit, heller)"], gebBelegt ? ["j-legende__muster j-legende__muster--belegt", "Bauzeit belegt (Farbe kräftig, mit Rand)"] : null,
         ["j-legende__muster j-legende__muster--nd", "nicht datiert"], sp ? ["j-legende__muster j-legende__muster--rest", "andere Bauzeit"] : null]
         .forEach(function (x) { if (!x) return; var s = el("span", "j-legende__eintrag"), i = el("i", x[0]); i.setAttribute("aria-hidden", "true"); s.appendChild(i); s.appendChild(document.createTextNode(x[1])); L.appendChild(s); });
       L.appendChild(el("span", "j-legende__quelle", "Gebäude: Schätzung je Haus, keine Aussage über einzelne Grundstücke. Bauzeit geschätzt aus dem Zensus 2022, den Bauzeiten der Großsiedlungen und den Nachbargebäuden; Umrisse © GeoBasis-DE/LGB, Daten verändert (eigene Berechnung)."));
@@ -391,6 +396,8 @@ function karte() {
   function teileImBild() {
     var b = map.getBounds(), w = b.getWest(), o = b.getEast(), s = b.getSouth(), n = b.getNorth(), l = {};
     for (var i = 0; i < 5; i++) for (var j = 0; j < 5; j++) { var nr = teilAn(w + (o - w) * (i + 0.5) / 5, s + (n - s) * (j + 0.5) / 5); if (nr) l[nr] = (l[nr] || 0) + 1; }
+    // dazu jede gezeichnete Zelle (je 1/20 Stichpunkt): kleine Stadtteile zwischen den Stichpunkten gehen nicht verloren
+    var gez = {}; getroffen(null, ZELL).forEach(function (f) { var p = f.properties; if (p.st && !gez[p.id]) { gez[p.id] = 1; l[p.st] = (l[p.st] || 0) + 0.05; } });
     // der gewählte Stadtteil zuerst, wenn er im Bild liegt; dann nach Anteil am Bild
     var nrs = Object.keys(l).sort(function (a, c) { return (c === S.nr) - (a === S.nr) || l[c] - l[a] || a - c; });
     gebMehr = nrs.length > GEB_MAX;
@@ -458,7 +465,7 @@ function karte() {
     }
     return h + "<p class=\"pop-q\">" + esc(D.beschriftung) + ". „–“: null oder geheim gehalten. " + esc(QUELLE_KURZ) + ", Daten verändert (eigene Berechnung).</p>";
   }
-  function getroffen(pt, ids) { var l = ids.filter(function (id) { return map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none"; }); return l.length ? map.queryRenderedFeatures(pt, { layers: l }) : []; }
+  function getroffen(pt, ids) { var l = ids.filter(function (id) { return map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none"; }); return !l.length ? [] : pt ? map.queryRenderedFeatures(pt, { layers: l }) : map.queryRenderedFeatures({ layers: l }); }
   map.on("click", function (e) {
     var g = map.getZoom() >= GEB_ZOOM ? getroffen(e.point, GEB) : [];
     if (g.length) { popup.setLngLat(e.lngLat).setHTML(gebText(g[0].properties)).addTo(map); return; }
@@ -471,7 +478,9 @@ function karte() {
     map.on("mouseleave", id, function () { map.getCanvas().style.cursor = ""; schild.style.display = "none"; });
   });
   if (FEIN) map.on("mousemove", function (e) {
-    var g = map.getZoom() >= GEB_ZOOM ? getroffen(e.point, GEB) : [], z = g.length ? [] : getroffen(e.point, ZELL), p;
+    if (e.originalEvent && e.originalEvent.buttons) { schild.style.display = "none"; return; }   // beim Ziehen keine Abfrage
+    var a = getroffen(e.point, (map.getZoom() >= GEB_ZOOM ? GEB : []).concat(ZELL)), p;
+    var g = a.filter(function (f) { return GEB.indexOf(f.layer.id) >= 0; }), z = g.length ? [] : a;
     if (g.length) { p = g[0].properties; schild.textContent = p.g === "nicht_datiert" ? "nicht datiert" : KL[+p.k] + ", " + STATUS[p.g]; }
     else if (z.length) { p = z[0].properties; schild.textContent = fmt.format(p.j_g) + " Gebäude, " + (p.j_s === 1 ? "Klassen geheim" : p.j_s === 2 ? "Gleichstand" : "meist " + KL[p.j_v]); }
     else { schild.style.display = "none"; return; }
@@ -592,7 +601,7 @@ function karte() {
     if (S.blick) map.jumpTo({ center: [S.blick[0], S.blick[1]], zoom: S.blick[2] });
     // Gebäude nachladen, Legende umstellen, Blick in die Adresse
     var warNah = map.getZoom() >= GEB_ZOOM;
-    map.on("moveend", function () { gebSicht(); var nah = map.getZoom() >= GEB_ZOOM; if (nah !== warNah) { warNah = nah; leisteZeigen(); } hashSchreiben(); });
+    map.on("moveend", function () { gebSicht(); var nah = map.getZoom() >= GEB_ZOOM; if (nah !== warNah) { warNah = nah; anwenden(); } else if (nah) leisteZeigen(); hashSchreiben(); });
     if (S.nr) { gewaehlt = S.nr; map.setFeatureState({ source: "teile", id: S.nr }, { gewaehlt: true }); }
     anwenden();
     gebSicht();

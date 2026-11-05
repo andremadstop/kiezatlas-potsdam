@@ -260,7 +260,7 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(g.z >= 14 && g.geladen.includes("71") && g.n > 50 && g.anim === 0, `Frage 7: Zoom ${g.z.toFixed(1)}, Gebäude aus ${g.geladen.join(", ")} (${g.n} farbig im Bild), keine Animation`);
       pruef(g.im_bild.length <= 4 && jahreAnfragen() === g.geladen.length, `höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (${jahreAnfragen()} Anfragen, ${g.geladen.length} Dateien)`);
       const leg1 = await page.$eval("#j-legende", (e) => e.textContent), st1 = await page.$eval("#kartenstatus", (e) => e.textContent);
-      pruef(/geschätzt/.test(leg1) && /nicht datiert/.test(leg1) && /keine Aussage über einzelne Grundstücke/.test(leg1) && /Daten verändert \(eigene Berechnung\)/.test(leg1) && /Gebäude aus 71/.test(st1), `ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „${st1.slice(0, 80)}…“`);
+      pruef(/geschätzt/.test(leg1) && /nicht datiert/.test(leg1) && /keine Aussage über einzelne Grundstücke/.test(leg1) && /Daten verändert \(eigene Berechnung\)/.test(leg1) && /Gebäude aus [^;.]*\b71 Stern/.test(st1), `ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „${st1}“`);
       pruef(/blick=13\.12\d+,52\.37\d+,1[45]\.\d\d/.test(await page.evaluate(() => location.hash)), "Adresse merkt sich den Blick auf die Gebäude (blick=…)");
       // Klick auf ein Gebäude: frei liegende Mitte eines gerenderten Umrisses
       const klickGeb = async (schicht, bed) => {
@@ -293,7 +293,19 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(jahreAnfragen() === vorher && /2\]/.test(f.filt) && /3\]/.test(f.filt) && f.ks.every((k) => k === 2 || k === 3) && f.rest > 0,
         `Zeitfilter 1949–1990: nur Klassen ${f.ks.join(",")} farbig, übrige blass, ${jahreAnfragen() - vorher} neue Anfragen`);
       const leg2 = await page.$eval("#j-legende", (e) => e.textContent);
-      pruef(/andere Bauzeit/.test(leg2), "Zeitfilter: Legende nennt „andere Bauzeit“");
+      pruef(/andere Bauzeit/.test(leg2) && !/Prozent der Gebäude in der Zelle/.test(leg2), "Zeitfilter: Legende nennt „andere Bauzeit“, keine Prozentskala der Zellen");
+      // Legendenmuster ohne Klassenfarbe (Farbe steht in der Klassenleiste)
+      const PAL = JSON.parse(fs.readFileSync(path.join(WURZEL, "jahre.js"), "utf8").match(/var PALETTE = (\[[^\]]+\])/)[1]);
+      const PAL_RGB = await page.evaluate((pal) => { const d = document.createElement("i"); document.body.appendChild(d); const r = pal.map((c) => { d.style.background = c; return getComputedStyle(d).backgroundColor; }); d.remove(); return r; }, PAL);
+      const muster = await page.$$eval(".j-legende__muster--geschaetzt, .j-legende__muster--belegt", (l) => l.map((e) => getComputedStyle(e).backgroundColor));
+      pruef(muster.length >= 1 && muster.every((c) => !PAL_RGB.includes(c)), `Legende ab Zoom 14: Muster für „geschätzt“/„belegt“ ohne Klassenfarbe (${muster.join(" ")})`);
+      // 3D ab Zoom 14: keine Säulen über den Gebäuden, Zellen flach
+      await page.evaluate(() => { document.getElementById("j-dreid").click(); });
+      await page.waitForTimeout(400);
+      const d3 = await page.evaluate(() => ({ s3: window.KIEZ_KARTE.getLayoutProperty("zellen-3d", "visibility"), s2: window.KIEZ_KARTE.getLayoutProperty("zellen-2d", "visibility"), d: window.KIEZ_JAHRE.S.d3, z: window.KIEZ_KARTE.getZoom() }));
+      pruef(d3.d && d3.z >= 14 && d3.s3 === "none" && d3.s2 === "visible", `3D ab Zoom 14: keine Säulen über den Gebäuden (zellen-3d ${d3.s3}, zellen-2d ${d3.s2}, Zoom ${d3.z.toFixed(1)})`);
+      await page.evaluate(() => { document.getElementById("j-dreid").click(); });
+      await page.waitForTimeout(300);
       const va2 = await axe(page);
       pruef(va2.length === 0, `Gebäudeansicht: axe ${va2.length} Verstöße ${va2.join(", ")}`);
       const vb2 = verboteneToene(await gerenderteFarben(page));
@@ -320,7 +332,10 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const quoten = M.ruecktest.flatMap((r) => r.je_bauzeit.concat(r.je_stufe)).filter((x) => x.bewertet != null).map((x) => `${x.treffer.toLocaleString("de-DE")} von ${x.bewertet.toLocaleString("de-DE")} (${x.quote.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`);
       pruef(m.stufen === 7 && JSON.stringify(m.tabs) === JSON.stringify(erwRt) && quoten.every((q) => m.rt.includes(q)) && m.sf === M.schieflage.length,
         `Methode: Stufentabelle, ${m.tabs.length} Rücktest-Tabellen je Bauzeit und Stufe (${quoten.length} Quoten mit n, gleich daten/jahre_methode.js), Vergleich mit dem Zensus`);
-      pruef(/\+41\s%/.test(m.text) && /\u221235\s%/.test(m.text) && /nicht vergleichbar/.test(m.text) && /Prüfgebäude/.test(m.text) && /Denkmale stammen fast alle/.test(m.text),
+      const sp = await page.evaluate(() => Object.fromEntries(["g-sf-alt", "g-sf-ddr", "g-sf-alt-w", "g-sf-ddr-w", "g-sf-alt-k", "g-sf-ddr-k", "g-nd", "g-neben"].map((k) => [k, document.querySelector(`[data-j="${k}"]`).textContent])));
+      const ndDatei = M.je_g.nicht_datiert.toLocaleString("de-DE");
+      pruef(sp["g-nd"] === ndDatei && sp["g-neben"] !== "…" && sp["g-neben"] !== sp["g-nd"], `Methode: „Nicht datiert“ nennt alle ${sp["g-nd"]}, davon ${sp["g-neben"]} Nebengebäude`);
+      pruef(/\+41\s%/.test(sp["g-sf-alt"]) && /\u221235\s%/.test(sp["g-sf-ddr"]) && sp["g-sf-alt-w"] === "mehr" && sp["g-sf-ddr-w"] === "weniger" && sp["g-sf-alt-k"] === "vor 1919" && /1979/.test(sp["g-sf-ddr-k"]) && /nicht vergleichbar/.test(m.text) && /Prüfgebäude/.test(m.text) && /Denkmale stammen fast alle/.test(m.text),
         "Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl");
       pruef((m.text.match(/visinage/gi) || []).length === 1 && /Methodenvorbild/.test(m.text), "Methode: Vorbild genau einmal genannt, als Methodenvorbild");
     }
@@ -446,7 +461,7 @@ console.log("\nHash und Bewegung");
     const pop = await page.$eval(".maplibregl-popup-content", (e) => e.textContent).catch(() => "");
     const leg = await page.$eval("#j-legende", (e) => e.textContent), meld = await page.$eval("#j-fixture", (e) => e.hidden ? "" : e.textContent);
     const linie = await page.evaluate(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-belegt"] }).length);
-    pruef(/belegt/.test(pop) && /Baujahr \d{4}/.test(pop) && /Quelle: /.test(pop) && /Belegt aus einer Quelle/.test(pop) && /belegt \(kräftig, mit Rand\)/.test(leg) && linie > 0 && /Beispieldaten/.test(meld) && fehler.length === 0,
+    pruef(/belegt/.test(pop) && /Baujahr \d{4}/.test(pop) && /Quelle: /.test(pop) && /Belegt aus einer Quelle/.test(pop) && /belegt \(Farbe kräftig, mit Rand\)/.test(leg) && linie > 0 && /Beispieldaten/.test(meld) && fehler.length === 0,
       `Fixture: „belegt“ kräftig mit Rand (${linie} Ränder), Popup mit Baujahr und Quelle, Legende, Beispieldaten-Hinweis (${pop.slice(0, 50)}…)`);
     await bild(page, "B5_1440_fixture_belegt.png");
     await ctx.close();

@@ -79,9 +79,10 @@
 .j-legende__muster--punkte{background:radial-gradient(circle,var(--ink) 0 1.2px,var(--papier) 1.4px) 0 0/5px 5px}
 .j-legende__muster--blass{background:var(--b5);opacity:.4}
 .j-legende__quelle{flex-basis:100%}
-/* Gebäude ab Zoom 14: geschätzt heller, belegt kräftig mit Rand, nicht datiert grau, andere Bauzeit blass */
-.j-legende__muster--geschaetzt{background:var(--b6);opacity:.58}
-.j-legende__muster--belegt{background:var(--b6);outline:1.5px solid var(--ink)}
+/* Gebäude ab Zoom 14: geschätzt heller, belegt kräftig mit Rand, nicht datiert grau, andere Bauzeit blass.
+   Die Muster zeigen nur Helligkeit und Rand, keine Klassenfarbe (die Farbe steht in der Klassenleiste). */
+.j-legende__muster--geschaetzt{background:var(--ink);opacity:.42}
+.j-legende__muster--belegt{background:var(--ink);outline:1.5px solid var(--ink);outline-offset:1px}
 .j-legende__muster--nd{background:#bcc0ba}
 .j-legende__muster--rest{background:#e5e7e2;outline-color:#9da39b}
 .j-legende__hinweis{font-weight:500;color:var(--ink)}
