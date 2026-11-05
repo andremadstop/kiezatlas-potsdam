@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de" data-daten="daten/fixtures/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methode: Kiezatlas Potsdam</title>
+<meta name="description" content="Wie der Planer des Kiezatlas Potsdam rechnet: Luftlinie und Fußweg, Raumebene, Kita- und Schulwerte, Richtwerte mit Status, Rundung, Stichtage und Lizenzen.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/planer-methode.html">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="planer.css">
+</head>
+<body class="textseite" data-seite="methode">
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+      <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer-methode.html" aria-current="true"><span>Methode</span></a></li>
+      <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt">
+  <h1>Wie der Planer rechnet</h1>
+  <p class="lede">Der Planer beantwortet zwei Fragen: Wie weit ist es von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung, und wie ist eine Raumeinheit insgesamt versorgt. Jede Zahl trägt Methode, Status und Quelle.</p>
+  <p class="fuss" id="beispiel" hidden>Beispieldaten: Die Tabelle unten zeigt unechte Werte und dient nur dem Aufbau.</p>
+
+  <h2>Luftlinie und Fußweg</h2>
+  <p>Die Potsdamer Fachpläne messen Einzugsbereiche in Luftlinie: der Nahverkehrsplan 2019 für Haltestellen, das Einzelhandelskonzept 2014 für die Nahversorgung. Der Planer rechnet darum zuerst in Luftlinie, vom Mittelpunkt der Zelle zur nächsten Einrichtung.</p>
+  <p>Der Fußweg kommt als Zusatz dazu. Er folgt dem Wegenetz aus OpenStreetMap und ist deshalb eine eigene Datei unter der Open Database License. An jeder Zahl steht, ob sie in Luftlinie oder als Fußweg gemessen ist.</p>
+  <p>Einrichtungen jenseits der Stadtgrenze in Brandenburg zählen für die Entfernungen mit, weil sie vom Stadtrand aus oft die nächsten sind. Einrichtungen in Berlin zählen bisher nicht.</p>
+
+  <h2>Raumebene</h2>
+  <p>Die Stadt plant Kita und Schule auf Planungsräumen. Solange deren Grenzen nicht vorliegen, rechnet der Planer je amtlichem Stadtteil. Die Auswahl der Planungsräume ist vorbereitet und wird frei, sobald die Datei der Stadt eingelesen ist.</p>
+
+  <h2>Kita und Hort</h2>
+  <p>In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind bezieht der Planer deshalb auf die Raumeinheit und nicht auf einen Radius. Plätze sind die Kapazität laut Betriebserlaubnis, nicht die belegten Plätze. Die Kinderzahlen stammen aus dem Zensus vom 15. Mai 2022, die Plätze vom Tag des Abrufs; beide Stände stehen an jeder Zeile. Kindertagespflege fehlt in den Daten, das unterschätzt die Versorgung der Jüngsten.</p>
+
+  <h2>Grundschule</h2>
+  <p>Grundschulen werden über Schulbezirke geplant (§ 106 Brandenburgisches Schulgesetz). Ohne die Schulbezirke ist jeder Grundschulwert vorläufig und so gekennzeichnet.</p>
+
+  <h2>Gemeinbedarf, Ärzte und Pflege</h2>
+  <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze kommen aus OpenStreetMap. Für sie nennt der Planer Lage und Entfernung, aber keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten.</p>
+
+  <h2>Richtwerte und ihr Status</h2>
+  <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein Potsdamer oder Brandenburger Dokument ihn nennt. Werte ohne solchen Beleg stehen als <b>Orientierung, kein Richtwert</b> daneben und sind in Tabelle und Karte gestrichelt markiert. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>
+  <div class="tabellenrahmen" id="richtwerte"></div>
+  <p class="fuss" id="planer-hinweis"></p>
+
+  <h2>Geheimhaltung, Rundung, Stichtag</h2>
+  <p>Der Zensus verändert kleine Werte mit dem Cell-Key-Verfahren. Summen vieler kleiner Zellen weichen darum ab. Der Planer rundet Einwohnerzahlen und nennt bei jeder Zeile, wie unsicher sie ist. Feine Altersklassen zeigt er nur für Raumeinheiten mit genug Einwohnern, nie je Zelle.</p>
+  <p>Stichtag des Zensus ist der 15. Mai 2022. Neubaugebiete, die danach bezogen wurden, fehlen in den Einwohnerzahlen, zum Beispiel in Krampnitz, im Bornstedter Feld und in Golm.</p>
+
+  <h2>Lizenzen</h2>
+  <p>Daten unter der Datenlizenz Deutschland (Zensus, Landesvermessung, Bildungsministerium) und Daten aus OpenStreetMap stehen in getrennten Dateien. Jede Datei nennt ihre Quellen mit dem Hinweis, dass die Daten verändert sind, und einem Link zum Lizenztext. Die Dateien mit OpenStreetMap-Anteil tragen <code>_odbl</code> im Namen und stehen vollständig unter <a class="link" href="planer-daten.html">Daten</a>.</p>
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+</footer>
+
+<script defer src="themen.js"></script>
+<script defer src="planer.js"></script>
+</body>
+</html>
