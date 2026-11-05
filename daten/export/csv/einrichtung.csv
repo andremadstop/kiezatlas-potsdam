@@ -1,0 +1,680 @@
+﻿id;art;art_text;unterart;name;plaetze;schueler;schueler_stand;status;in_potsdam;raum_nr;quelle;stand;lizenz;x;y
+103329;grundschule;Grundschule;G;"Grundschule ""Karl Hagemeister""";;478;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358771.41;5805441.04
+103354;grundschule;Grundschule;G;"Grundschule ""Heinrich Zille""";;582;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377894.3;5805214.9
+103366;grundschule;Grundschule;G;Grundschule am Fliegerberg;;166;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;372258.4;5798035.2
+103380;grundschule;Grundschule;G;Steinweg-Schule;;368;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378420.5;5808361.9
+103421;grundschule;Grundschule;G;Grundschule Ludwig Renn;;413;2022;kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;363507.5;5808018.1
+103445;grundschule;Grundschule;G;Inselschule Töplitz;;193;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357811.5;5811309.4
+103470;grundschule;Grundschule;G;"Grundschule ""Albert Einstein"" Schwielowsee OT Caputh Kreis Potsdam-Mittelmark";;334;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;363311.3;5801609.3
+103494;grundschule;Grundschule;G;Grundschule Glindow;;312;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357650.38;5803684.39
+103500;grundschule;Grundschule;G;Meusebach-Grundschule Geltow verlässliche Halbtagsgrundschule mit integrierter Kindertagesbetreuung;;271;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361933.9;5803457.2
+103512;grundschule;Grundschule;G;Grundschule Hanna von Pestalozza;;281;2022;kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;367319.31;5814071.74
+103561;grundschule;Grundschule;G;"Grundschule ""Am Wasserturm""";;741;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;367792.0;5822833.0
+103640;grundschule;Grundschule;G;Europagrundschule Ketzin;;344;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;353745.5;5816584.0
+105326;grundschule;Grundschule;G;Grundschule Max Dortu;;268;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367526.5;5807108.8
+105351;grundschule;Grundschule;G;Weidenhof-Grundschule;;422;2022;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370468.7;5804798.6
+105363;grundschule;Grundschule;G;Grundschule Am Pappelhain;;446;2022;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373002.4;5804488.3
+105405;grundschule;Grundschule;G;Grundschule am Humboldtring;;297;2022;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369136.2;5806748.4
+105429;grundschule;Grundschule;G;Zeppelin-Grundschule;;451;2022;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365460.0;5806175.3
+105430;grundschule;Grundschule;G;Waldstadt-Grundschule;;404;2022;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370378.4;5803622.6
+105454;grundschule;Grundschule;G;Rosa-Luxemburg-Schule;;559;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368476.4;5806995.7
+105466;grundschule;Grundschule;G;"Grundschule ""Am Priesterweg""";;404;2022;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372942.0;5803421.7
+105478;grundschule;Grundschule;G;Gerhart-Hauptmann-Grundschule Potsdam;;282;2022;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366242.7;5806709.3
+105491;grundschule;Grundschule;G;Grundschule Bruno H. Bürgel;;420;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370306.6;5806724.5
+105533;grundschule;Grundschule;G;Eisenhart-Schule;;296;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368132.2;5807766.7
+105673;sek1;Oberschule / Gesamtschule (Sek. I);G/S;BBIS Berlin Brandenburg International School, Genehmigte Ersatz- und Ganztagsschule Klasse 1-10, Anerkannte Ergänzungsschule Klasse 11-12;;588;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378778.64;5807130.12
+106008;grundschule;Grundschule;G;Grundschule Im Kirchsteigfeld;;374;2022;kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;372790.2;5802868.0
+106010;grundschule;Grundschule;G;Freie Schule Potsdam des Vereins Freie Schule Potsdam e.V.;;94;2022;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370714.7;5804568.0
+106045;grundschule;Grundschule;G;Evangelische Grundschule Potsdam;;299;2022;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368342.64;5809091.43
+106124;grundschule;Grundschule;G;Neue Grundschule Potsdam anerkannte Ersatzschule;;403;2022;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373183.2;5805209.0
+106306;grundschule;Grundschule;G;Schiller Grundschule im Sternfeld anerkannte Ersatzschule;;87;2022;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372530.0;5803180.0
+106320;grundschule;Grundschule;G;Aktive Schule Potsdam Grundschule;;38;2022;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369304.6;5806835.43
+106355;grundschule;Grundschule;G;Grundschule Auf dem Seeberg;;284;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378922.86;5807315.44
+106446;grundschule;Grundschule;G;Internationale Grundschule Potsdam genehmigte Ersatzschule;;339;2022;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369252.92;5804225.95
+106460;grundschule;Grundschule;G;Neue Grundschule Marquardt anerkannte Ersatzschule;;227;2022;kapazitaet;1;82;mbjs;2026-11-05;dl-de/by-2-0;361646.5;5814250.1
+106471;grundschule;Grundschule;G;Evangelische Grundschule Potsdam-Babelsberg -anerkannte Ersatzschule-;;308;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370055.0;5806373.0
+106586;grundschule;Grundschule;G;Katholische Marienschule Potsdam Grundschule - anerkannte Ersatzschule -;;294;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371773.0;5806767.0
+106653;grundschule;Grundschule;G;Goethe-Grundschule;;415;2022;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;370663.0;5806163.0
+106677;grundschule;Grundschule;G;Grundschule im Bornstedter Feld;;465;2022;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367163.83;5808610.9
+106720;grundschule;Grundschule;G;Grundschule Bornim;;286;2022;kapazitaet;1;11;mbjs;2026-11-05;dl-de/by-2-0;364251.81;5809928.04
+106732;grundschule;Grundschule;G;AWO Grundschule Marie Juchacz Potsdam - genehmigte Ersatzschule -;;121;2022;kapazitaet;1;17;mbjs;2026-11-05;dl-de/by-2-0;362744.86;5808804.13
+106770;grundschule;Grundschule;G;Grundschule Am Jungfernsee;;382;2022;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;367874.95;5810292.66
+106793;grundschule;Grundschule;G;Grundschule am Telegrafenberg;;106;2022;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369145.09;5805524.72
+106902;grundschule;Grundschule;G;Michael-Ende-Grundschule;;;;lage_ohne_kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371652.31;5805600.14
+106938;grundschule;Grundschule;G;Evangelische Grundschule Werder - genehmigte Ersatzschule -;;26;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357253.47;5801676.12
+107013;grundschule;Grundschule;G;Grundschule Krampnitz Potsdam;;;;lage_ohne_kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;367351.9;5814117.5
+112008;sek1;Oberschule / Gesamtschule (Sek. I);G/S;Grund- und Oberschule Wilhelmshorst;;472;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;367943.62;5799735.23
+112033;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Maxim-Gorki-Gesamtschule;;700;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378790.8;5807515.9
+112057;grundschule;Grundschule;G;"Grundschule ""Otto Nagel""";;365;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;370963.4;5800447.2
+112082;grundschule;Grundschule;G;Regenbogenschule Fahrland;;329;2022;kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;364491.8;5815402.1
+112136;sek1;Oberschule / Gesamtschule (Sek. I);S;"Oberschule ""Theodor Fontane""";;274;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;353506.9;5816012.4
+112938;grundschule;Grundschule;G;Karl-Foerster-Schule Städtische Grundschule Potsdam;;527;2022;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366272.76;5809085.73
+112963;sek1;Oberschule / Gesamtschule (Sek. I);G/S;Montessori-Oberschule mit Primarstufe;;496;2022;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;364808.2;5806147.1
+112975;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;"Gesamtschule ""Peter Joseph Lenné""";;625;2022;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369136.2;5806748.4
+112999;grundschule;Grundschule;G;Schule am Griebnitzsee;;292;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371828.0;5806765.0
+113001;sek1;Oberschule / Gesamtschule (Sek. I);G/S;Oberschule Theodor Fontane mit Primarstufe;;436;2022;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;370069.9;5802918.0
+113049;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Friedrich-Wilhelm-von-Steuben-Gesamtschule;;539;2022;kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;373149.7;5803164.3
+113050;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Voltaireschule Gesamtschulcampus mit gymnasialem Bildungsgang;;863;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367320.65;5806973.62
+113384;sek1;Oberschule / Gesamtschule (Sek. I);S;KARIBU-Oberschule Geltow anerkannte Ersatzschule;;33;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361767.06;5802680.12
+113426;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Leonardo-da-Vinci-Gesamtschule;;735;2022;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367597.62;5809511.83
+113438;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Internationale Gesamtschule Potsdam - anerkannte Ersatzschule -;;299;2022;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369253.0;5804226.0
+113440;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Neue Gesamtschule Babelsberg der ASG - anerkannte Ersatzschule -;;463;2022;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;372084.0;5805234.0
+113451;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Gesamtschule Am Schilfhof;;668;2022;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370414.0;5804847.0
+115540;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;"Sportschule Potsdam ""Friedrich Ludwig Jahn""";;664;2022;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;364740.93;5804323.18
+120560;gymnasium;Gymnasium;OG;Ernst-Haeckel-Gymnasium;;678;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357924.2;5806536.3
+120790;gymnasium;Gymnasium;OG;Humboldt-Gymnasium Potsdam;;758;2022;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369183.0;5805282.4
+120819;gymnasium;Gymnasium;OG;Hermann-von-Helmholtz-Gymnasium Europaschule;;722;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367983.1;5807731.7
+120820;gymnasium;Gymnasium;OG;Leibniz-Gymnasium Potsdam;;815;2022;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372876.2;5804489.7
+120832;gymnasium;Gymnasium;OG;Evangelisches Gymnasium Hermannswerder;;634;2022;kapazitaet;1;61;mbjs;2026-11-05;dl-de/by-2-0;366063.4;5805350.6
+120868;gymnasium;Gymnasium;OG;Einstein-Gymnasium Potsdam;;724;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367187.6;5807480.9
+121095;gymnasium;Gymnasium;OG;Neues Gymnasium Potsdam (Babelsberger Filmgymnasium) anerkannte Ersatzschule;;458;2022;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;372046.5;5805178.8
+121113;gymnasium;Gymnasium;OG;Schiller-Gymnasium;;205;2022;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373609.6;5803562.3
+121265;gymnasium;Gymnasium;OG;Katholische Marienschule Potsdam, Gymnasium anerkannte Ersatzschule;;289;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371773.0;5806767.0
+121290;gymnasium;Gymnasium;OG;Vicco-von-Bülow-Gymnasium;;727;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377010.0;5805834.0
+121307;gymnasium;Gymnasium;OG;Bertha-von-Suttner-Gymnasium Babelsberg;;513;2022;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;370660.0;5806070.0
+121356;gymnasium;Gymnasium;OG;Hannah-Arendt-Gymnasium;;543;2022;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365428.75;5806172.43
+121381;gymnasium;Gymnasium;OG;Dalton-Gymnasium Potsdam;;84;2022;kapazitaet;1;22;mbjs;2026-11-05;dl-de/by-2-0;367436.14;5808181.9
+121400;gymnasium;Gymnasium;OG;Clara-Immerwahr-Gymnasium;;;;lage_ohne_kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370619.16;5803082.65
+121423;gymnasium;Gymnasium;OG;Nord Gymnasium;;;;lage_ohne_kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;367351.9;5814117.5
+130539;sek1;Oberschule / Gesamtschule (Sek. I);G/S;Grund- und Oberschule Carl von Ossietzky;;809;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359422.88;5804905.77
+130734;sek1;Oberschule / Gesamtschule (Sek. I);S;Käthe-Kollwitz-Oberschule;;214;2022;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366502.2;5806981.7
+150010;sek1;Oberschule / Gesamtschule (Sek. I);G/O/OG;Schulzentrum am Stern;;775;2022;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372345.8;5804912.5
+160015;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Gesamtschule Potsdam - Drewitzer Modellschule anerkannte Ersatzschule;;171;2022;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373609.3;5803565.5
+160064;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Schule am Schloss;;409;2022;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367478.26;5809481.94
+160106;sek1;Oberschule / Gesamtschule (Sek. I);O/OG;Evangelische Gesamtschule Werder -genehmigte Ersatzschule-;;;;lage_ohne_kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357257.9;5801642.1
+200323;osz;Oberstufenzentrum;OSZ/OG;Oberstufenzentrum Werder des Landkreises Potsdam-Mittelmark;;1576;2021;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358939.62;5805425.19
+200372;osz;Oberstufenzentrum;OSZ;Oberstufenzentrum I - Technik;;974;2021;kapazitaet;1;22;mbjs;2026-11-05;dl-de/by-2-0;367486.0;5808101.6
+200384;osz;Oberstufenzentrum;OSZ;Oberstufenzentrum 2 Wirtschaft und Verwaltung Städtische Schule Potsdam - Europaschule;;1348;2021;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369933.5;5803359.4
+200396;osz;Oberstufenzentrum;OSZ;"Oberstufenzentrum ""Johanna Just""";;1354;2021;kapazitaet;1;23;mbjs;2026-11-05;dl-de/by-2-0;369230.2;5808281.0
+200440;osz;Oberstufenzentrum;BS;Oberlin Berufliche Schulen der Berufsbildungswerk im Oberlinhaus gGmbH - anerkannte Ersatzschule;;780;2021;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373385.9;5805796.0
+200803;osz;Oberstufenzentrum;BS;Medienschule Babelsberg, BFS für Medien und Kommunikation mit anerkannten Bildungsgängen, FOS - einjährig, anerkannte Ersatzschule in der FR Gestaltung;;143;2021;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;372099.87;5805327.41
+200864;osz;Oberstufenzentrum;BS;Berufliche Schule für Sport und Gesundheit der Europäischen Sportakademie des Landes Brandenburg;;182;2021;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365162.41;5805201.11
+330073;osz;Oberstufenzentrum;BS;Berufliche Schulen Hermannswerder anerkannte Berufsfachschule Soziales und anerkannte Fachschule für Sozialwesen der Hoffbauer gGmbH;;337;2021;kapazitaet;1;61;mbjs;2026-11-05;dl-de/by-2-0;366014.4;5805390.6
+330255;osz;Oberstufenzentrum;BS;Berufliche Schule Potsdam des AWO Bezirksverband Potsdam - anerkannte Fachschule für Sozialwesen in der Fachrichtung Sozialwesen -genehmigte Berufsfachsch. Soziales;;73;2021;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367460.3;5806838.5
+330267;osz;Oberstufenzentrum;BS;Berufliche Schulen Potsdam der ASG - Anerkannte Schulgesellschaft mbH - anerkannte Ersatzschule;;119;2021;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371902.01;5805319.71
+330280;osz;Oberstufenzentrum;F;PÄDAGOGIKA Fachschule Sozialwesen Fachrichtung Sozialpädagogik - anerkannte Ersatzschule;;;;lage_ohne_kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371908.94;5806078.58
+400828;foerderschule;Förderschule;FL;"Schule am Plessower See - Schule mit dem sonderpädagogischen Förderschwerpunkt ""Lernen""";;98;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357065.3;5806889.5
+400841;foerderschule;Förderschule;FL;"""Schule am Schleusenweg"" Schule mit dem sonderpädagogischen Förderschwerpunkt ""Lernen""";;91;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377991.6;5807398.9
+401092;foerderschule;Förderschule;FK;"Oberlinschule - Schule mit dem sonderpädagogischen Förderschwerpunkt ""körperliche und motorische Entwicklung""";;326;2022;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370027.2;5806420.1
+401250;foerderschule;Förderschule;FE;Fröbelschule Schule mit dem sonderpädagogischen Förderschwerpunkt emotionale und soziale Entwicklung;;48;2022;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369993.5;5802894.5
+401262;foerderschule;Förderschule;FL;"Schule mit dem sonderpädagogischen Förderschwerpunkt ""Lernen"" ""Schule am Nuthetal""";;155;2022;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370218.3;5804342.5
+401274;foerderschule;Förderschule;FG;"Comenius-Schule Schule mit dem sonderpädagogischen Förderschwerpunkt ""geistige Entwicklung""";;116;2022;kapazitaet;1;44;mbjs;2026-11-05;dl-de/by-2-0;367994.0;5805688.2
+401298;foerderschule;Förderschule;FSH;"Wilhelm-von-Türk-Schule Schule mit den sonderpädagogischen Förderschwerpunkten ""Hören"" und ""Sprache""";;177;2022;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370576.87;5804191.36
+401468;foerderschule;Förderschule;FE;Förderschule für Erziehungshilfe Geltow;;33;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361767.06;5802680.12
+600027;sonstige_schule;sonstige Schule;ZBW;"Schule des Zweiten Bildungsweges ""Heinrich von Kleist""";;420;2022;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367879.7;5807445.5
+700034;sonstige_schule;sonstige Schule;WS;Freie Waldorfschule Kleinmachnow;;369;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378496.3;5807007.6
+700046;sonstige_schule;sonstige Schule;WS;Waldorfschule Potsdam;;350;2022;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370574.6;5803346.3
+700058;sonstige_schule;sonstige Schule;WS;Freie Waldorfschule Werder (Havel) Christian Morgenstern;;298;2022;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358802.37;5807170.71
+alkis:bibliothek:DEBBAL010007K0XvBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362134.1;5808404.04
+alkis:bibliothek:DEBBAL540000qixBBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370905.85;5807709.1
+alkis:bibliothek:DEBBAL540001va2xBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367958.78;5806972.71
+alkis:bibliothek:DEBBAL540001vjyfBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;370062.2;5803272.98
+alkis:bibliothek:DEBBAL540001vjZiBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;368354.48;5804984.54
+alkis:bibliothek:DEBBAL540001vkLuBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365522.45;5805657.02
+alkis:bibliothek:DEBBAL540001vn3OBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367724.99;5806952.24
+alkis:bibliothek:DEBBAL540001vn3YBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367815.31;5806949.3
+alkis:bibliothek:DEBBAL540001XgFeBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372734.58;5804474.45
+alkis:bibliothek:DEBBAL540001XhmxBL;bibliothek;Bibliothek;bibliothek;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;373039.82;5802891.45
+alkis:feuerwehr:DEBBAL010009PnNBBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;83;lgb;2026-11-05;dl-de/by-2-0;363338.56;5815840.55
+alkis:feuerwehr:DEBBAL01000a18mnBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357634.19;5811248.45
+alkis:feuerwehr:DEBBAL01000azJNuBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;371373.34;5804665.01
+alkis:feuerwehr:DEBBAL01000be7ddBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;82;lgb;2026-11-05;dl-de/by-2-0;361852.57;5813765.69
+alkis:feuerwehr:DEBBAL01000caTwTBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361921.48;5803438.59
+alkis:feuerwehr:DEBBAL01000cMqi9BL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;14;lgb;2026-11-05;dl-de/by-2-0;370870.15;5810867.71
+alkis:feuerwehr:DEBBAL01000czY1pBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;372343.0;5819378.52
+alkis:feuerwehr:DEBBAL540000pO6FBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370260.08;5806966.29
+alkis:feuerwehr:DEBBAL540000qfWGBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373713.84;5805224.4
+alkis:feuerwehr:DEBBAL540001U0j1BL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;365873.24;5808908.02
+alkis:feuerwehr:DEBBAL540001v9nVBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368790.18;5807348.11
+alkis:feuerwehr:DEBBAL540001VTqABL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;363803.71;5810043.36
+alkis:feuerwehr:DEBBAL540001XfQCBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;72;lgb;2026-11-05;dl-de/by-2-0;372483.11;5803227.05
+alkis:feuerwehr:DEBBAL5400021oGMBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;15;lgb;2026-11-05;dl-de/by-2-0;363318.74;5808027.42
+alkis:feuerwehr:DEBBAL5400022oVbBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;365085.8;5814845.84
+alkis:feuerwehr:DEBBAL5400022oVGBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;365153.81;5814869.34
+alkis:feuerwehr:DEBBAL5400023xcKBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;361710.93;5808270.78
+alkis:feuerwehr:DEBBAL5400024rZrBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;86;lgb;2026-11-05;dl-de/by-2-0;371668.3;5815391.25
+alkis:feuerwehr:DEBBAL5400027kx0BL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;16;lgb;2026-11-05;dl-de/by-2-0;361019.43;5811154.9
+alkis:feuerwehr:DEBBAL540002az8MBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;85;lgb;2026-11-05;dl-de/by-2-0;367164.59;5812340.22
+alkis:feuerwehr:DEBBAL540002bXzPBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;1;81;lgb;2026-11-05;dl-de/by-2-0;360123.88;5815260.47
+alkis:feuerwehr:DEBBAL630000KA0EBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358982.09;5818293.88
+alkis:feuerwehr:DEBBAL690003urP3BL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;364186.35;5801116.07
+alkis:feuerwehr:DEBBAL690003YkfpBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357665.41;5803807.11
+alkis:feuerwehr:DEBBAL69000586rtBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;356224.5;5810477.0
+alkis:feuerwehr:DEBBAL690006uzgGBL;feuerwehr;Feuerwehr;feuerwehr;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359188.76;5804958.48
+alkis:sonstiger_gemeinbedarf:DEBBAL010007Eif7BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;370097.68;5803058.9
+alkis:sonstiger_gemeinbedarf:DEBBAL010008EAwfBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366614.68;5805737.2
+alkis:sonstiger_gemeinbedarf:DEBBAL010008EvlwBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358724.38;5807077.68
+alkis:sonstiger_gemeinbedarf:DEBBAL010008hh10BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;356387.74;5815054.74
+alkis:sonstiger_gemeinbedarf:DEBBAL0100096WA5BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366427.79;5805723.99
+alkis:sonstiger_gemeinbedarf:DEBBAL010009hQZ2BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372512.18;5804599.92
+alkis:sonstiger_gemeinbedarf:DEBBAL010009Js8EBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367322.63;5805250.58
+alkis:sonstiger_gemeinbedarf:DEBBAL010009PpGlBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359201.97;5804521.37
+alkis:sonstiger_gemeinbedarf:DEBBAL010009Wh6CBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373913.86;5805177.09
+alkis:sonstiger_gemeinbedarf:DEBBAL01000a44zCBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367608.25;5808440.54
+alkis:sonstiger_gemeinbedarf:DEBBAL01000afBnSBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362670.75;5806759.29
+alkis:sonstiger_gemeinbedarf:DEBBAL01000aRxGQBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366361.56;5807862.03
+alkis:sonstiger_gemeinbedarf:DEBBAL01000avdy7BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370359.99;5803593.75
+alkis:sonstiger_gemeinbedarf:DEBBAL01000bawXMBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370426.48;5803772.0
+alkis:sonstiger_gemeinbedarf:DEBBAL01000bKYGrBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373022.45;5804372.01
+alkis:sonstiger_gemeinbedarf:DEBBAL01000bQiMcBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;371989.96;5805467.83
+alkis:sonstiger_gemeinbedarf:DEBBAL01000bVkw7BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372379.7;5804686.5
+alkis:sonstiger_gemeinbedarf:DEBBAL01000bZb6QBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367750.18;5807965.49
+alkis:sonstiger_gemeinbedarf:DEBBAL01000c3KbBBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;43;lgb;2026-11-05;dl-de/by-2-0;368966.77;5806668.19
+alkis:sonstiger_gemeinbedarf:DEBBAL01000c4bIsBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367267.44;5809236.66
+alkis:sonstiger_gemeinbedarf:DEBBAL01000c628BBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366478.29;5806172.15
+alkis:sonstiger_gemeinbedarf:DEBBAL01000c6q1aBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364754.94;5804498.14
+alkis:sonstiger_gemeinbedarf:DEBBAL01000cMvsxBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367421.74;5809996.68
+alkis:sonstiger_gemeinbedarf:DEBBAL01000cRwWgBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362521.19;5808834.17
+alkis:sonstiger_gemeinbedarf:DEBBAL01000ctPGoBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367217.01;5810082.67
+alkis:sonstiger_gemeinbedarf:DEBBAL01000cxNDtBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;369830.6;5807599.26
+alkis:sonstiger_gemeinbedarf:DEBBAL01000cYspkBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur,oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367675.13;5806861.83
+alkis:sonstiger_gemeinbedarf:DEBBAL01000cZJ2WBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367965.25;5806852.1
+alkis:sonstiger_gemeinbedarf:DEBBAL01000d070uBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367191.58;5801379.74
+alkis:sonstiger_gemeinbedarf:DEBBAL01000dfUTgBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367296.22;5807361.94
+alkis:sonstiger_gemeinbedarf:DEBBAL540000pO2QBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370301.34;5806695.57
+alkis:sonstiger_gemeinbedarf:DEBBAL540000pO3bBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370121.9;5806397.85
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qdCBBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370368.96;5806370.16
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qdH2BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370572.78;5806271.81
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qeCUBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370789.94;5807201.38
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qfqGBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;371859.5;5806286.34
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qhkQBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370967.96;5805800.09
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qhMrBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370164.49;5806196.2
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qiqkBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;43;lgb;2026-11-05;dl-de/by-2-0;369202.71;5806863.62
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qiwXBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;369904.92;5807798.4
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qix2BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;369950.44;5807971.53
+alkis:sonstiger_gemeinbedarf:DEBBAL540000qixKBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370407.63;5808118.54
+alkis:sonstiger_gemeinbedarf:DEBBAL540001U0onBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;366109.41;5808796.07
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8DTBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368536.82;5808553.44
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8DXBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368701.47;5808939.03
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8E6BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368322.03;5809342.38
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8NcBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368335.71;5809135.75
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8NoBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368850.73;5809037.71
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8NpBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368856.78;5809590.18
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v8QJBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;369270.88;5809605.17
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9hOBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368452.59;5807739.69
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9igBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;23;lgb;2026-11-05;dl-de/by-2-0;369038.89;5807558.94
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9jVBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368567.2;5807482.31
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9skBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368401.6;5808130.95
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9sLBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368346.7;5807986.6
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9sRBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368510.9;5807999.96
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9sTBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;368672.51;5808613.49
+alkis:sonstiger_gemeinbedarf:DEBBAL540001v9tyBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;23;lgb;2026-11-05;dl-de/by-2-0;369938.4;5808762.38
+alkis:sonstiger_gemeinbedarf:DEBBAL540001va4HBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;44;lgb;2026-11-05;dl-de/by-2-0;368714.01;5805891.0
+alkis:sonstiger_gemeinbedarf:DEBBAL540001va6qBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;44;lgb;2026-11-05;dl-de/by-2-0;368607.3;5805852.99
+alkis:sonstiger_gemeinbedarf:DEBBAL540001va73BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;44;lgb;2026-11-05;dl-de/by-2-0;368523.08;5806090.34
+alkis:sonstiger_gemeinbedarf:DEBBAL540001va9dBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368277.49;5806762.66
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vif6BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369481.15;5804957.33
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vifQBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369314.43;5805070.13
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vifSBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369429.26;5805198.99
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vigdBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369532.28;5805080.96
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vitwBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;63;lgb;2026-11-05;dl-de/by-2-0;370485.75;5804724.38
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vji9BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;369801.57;5803201.6
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vjWeBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367612.5;5804769.67
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vjWPBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367900.53;5804831.43
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vjxeBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;370011.18;5802739.41
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vjxFBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;370269.76;5802917.72
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkDPBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;365952.95;5805342.7
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkFQBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366257.25;5805684.97
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkLtBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365522.69;5805724.5
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkLvBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365405.65;5805431.25
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkLXBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365239.15;5805216.65
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkMFBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365872.08;5806012.3
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vkwGBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366732.77;5805873.26
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vldVBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365449.68;5806104.29
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vlfhBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365530.37;5806002.62
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vlhwBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365926.26;5806302.03
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vm6JBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366376.44;5806411.54
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vm78BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366657.24;5806753.15
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vm99BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366202.29;5806559.16
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vml4BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366628.66;5807295.1
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmm5BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366865.23;5807202.1
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmtABL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367393.44;5806691.24
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmwTBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;367103.4;5807169.22
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmZCBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366496.88;5807800.69
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmZdBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;365226.47;5807437.21
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmZDBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366623.42;5807805.36
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmZrBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366883.06;5807455.54
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vmZTBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366558.45;5807388.15
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn0aBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366824.85;5807704.62
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn3gBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;22;lgb;2026-11-05;dl-de/by-2-0;366977.87;5807676.93
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn3IBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367422.19;5806490.7
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn3QBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367817.86;5806929.42
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn3xBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367425.43;5806855.36
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vn6VBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur,soziale_zwecke;;;;;lage_ohne_kapazitaet;1;22;lgb;2026-11-05;dl-de/by-2-0;367048.37;5807696.83
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vna4BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;22;lgb;2026-11-05;dl-de/by-2-0;367430.28;5807992.28
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnaFBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367442.93;5807125.48
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnc3BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367695.26;5807095.85
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vncRBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur,soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367532.95;5807451.21
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnDkBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;veranstaltung;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368101.45;5807652.98
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnF7BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368515.4;5807246.7
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnfaBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367677.32;5807528.43
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vniNBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367920.62;5807454.75
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnklBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367312.29;5807199.46
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnv3BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367707.57;5807214.89
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vnzdBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367202.59;5807271.6
+alkis:sonstiger_gemeinbedarf:DEBBAL540001voETBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367383.01;5808606.74
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vpldBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364655.91;5804145.95
+alkis:sonstiger_gemeinbedarf:DEBBAL540001vpnEBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367020.11;5801427.91
+alkis:sonstiger_gemeinbedarf:DEBBAL540001VSgDBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;364753.11;5811558.54
+alkis:sonstiger_gemeinbedarf:DEBBAL540001VSi9BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;365266.12;5811220.78
+alkis:sonstiger_gemeinbedarf:DEBBAL540001VSiZBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;365070.19;5812220.7
+alkis:sonstiger_gemeinbedarf:DEBBAL540001VSo1BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;364195.19;5809896.87
+alkis:sonstiger_gemeinbedarf:DEBBAL540001XgKVBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373814.02;5804531.19
+alkis:sonstiger_gemeinbedarf:DEBBAL540001XgKZBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373843.53;5804398.56
+alkis:sonstiger_gemeinbedarf:DEBBAL540001XhfEBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;372791.39;5802782.24
+alkis:sonstiger_gemeinbedarf:DEBBAL540001XhnNBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;373309.49;5803101.93
+alkis:sonstiger_gemeinbedarf:DEBBAL5400020sdYBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;14;lgb;2026-11-05;dl-de/by-2-0;371162.09;5810912.46
+alkis:sonstiger_gemeinbedarf:DEBBAL5400020sgxBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;14;lgb;2026-11-05;dl-de/by-2-0;370814.61;5812833.54
+alkis:sonstiger_gemeinbedarf:DEBBAL5400021oFzBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;15;lgb;2026-11-05;dl-de/by-2-0;363267.08;5808130.34
+alkis:sonstiger_gemeinbedarf:DEBBAL5400021oMNBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;15;lgb;2026-11-05;dl-de/by-2-0;363587.99;5808228.66
+alkis:sonstiger_gemeinbedarf:DEBBAL5400022oV3BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;365066.21;5814978.53
+alkis:sonstiger_gemeinbedarf:DEBBAL5400023xmrBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362229.14;5808318.55
+alkis:sonstiger_gemeinbedarf:DEBBAL5400024qVNBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;86;lgb;2026-11-05;dl-de/by-2-0;372601.81;5816286.07
+alkis:sonstiger_gemeinbedarf:DEBBAL5400024qVYBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;1;86;lgb;2026-11-05;dl-de/by-2-0;372626.42;5816758.89
+alkis:sonstiger_gemeinbedarf:DEBBAL5400027kyhBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;16;lgb;2026-11-05;dl-de/by-2-0;361540.85;5811210.55
+alkis:sonstiger_gemeinbedarf:DEBBAL5400028HhkBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;82;lgb;2026-11-05;dl-de/by-2-0;361651.81;5814005.04
+alkis:sonstiger_gemeinbedarf:DEBBAL5400028HjbBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;1;82;lgb;2026-11-05;dl-de/by-2-0;361833.64;5814015.03
+alkis:sonstiger_gemeinbedarf:DEBBAL630000KAmGBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358925.93;5818747.29
+alkis:sonstiger_gemeinbedarf:DEBBAL69000310LkBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke,veranstaltung;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357794.59;5811145.31
+alkis:sonstiger_gemeinbedarf:DEBBAL690003einZBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;370869.12;5801503.25
+alkis:sonstiger_gemeinbedarf:DEBBAL690003Nl8KBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361187.93;5803541.17
+alkis:sonstiger_gemeinbedarf:DEBBAL690003NluaBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361144.72;5803399.58
+alkis:sonstiger_gemeinbedarf:DEBBAL690003uqHbBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;362922.58;5801471.18
+alkis:sonstiger_gemeinbedarf:DEBBAL690003uqHIBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;362937.67;5801606.52
+alkis:sonstiger_gemeinbedarf:DEBBAL690003uqSGBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;363250.49;5801702.84
+alkis:sonstiger_gemeinbedarf:DEBBAL690003urk9BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur,soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;363861.58;5801712.97
+alkis:sonstiger_gemeinbedarf:DEBBAL690003urX7BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;363787.51;5801605.14
+alkis:sonstiger_gemeinbedarf:DEBBAL690003usL3BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;364701.45;5801922.32
+alkis:sonstiger_gemeinbedarf:DEBBAL690003usLDBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;364722.69;5801805.98
+alkis:sonstiger_gemeinbedarf:DEBBAL690003YkwzBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357674.24;5803041.45
+alkis:sonstiger_gemeinbedarf:DEBBAL690003Yl3UBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358484.57;5802522.3
+alkis:sonstiger_gemeinbedarf:DEBBAL690003YlE8BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357535.42;5803680.39
+alkis:sonstiger_gemeinbedarf:DEBBAL6900044yL1BL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;375039.28;5804782.76
+alkis:sonstiger_gemeinbedarf:DEBBAL690006uA2ABL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359122.4;5806541.02
+alkis:sonstiger_gemeinbedarf:DEBBAL690006uwYPBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;oeffentliche_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359678.45;5804039.91
+alkis:sonstiger_gemeinbedarf:DEBBAL690006uYDSBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;soziale_zwecke;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;360007.09;5805630.94
+alkis:sonstiger_gemeinbedarf:DEBBAL690006uYGYBL;sonstiger_gemeinbedarf;sonstiger Gemeinbedarf;kultur;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359750.59;5801362.49
+alkis:sport:DEBBAL010007pHyGBL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370401.49;5807184.39
+alkis:sport:DEBBAL010007zUBlTN;sport;Sportstätte;hallenbad,schwimmen;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370524.04;5805623.1
+alkis:sport:DEBBAL010008Ct5VTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373114.32;5804476.82
+alkis:sport:DEBBAL010008DqjkTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365362.57;5805437.97
+alkis:sport:DEBBAL010008O3HcBL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;372085.65;5806555.04
+alkis:sport:DEBBAL010008obrYBL;sport;Sportstätte;hallenbad,sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365136.97;5804904.96
+alkis:sport:DEBBAL0100090c0rTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;369617.26;5803347.61
+alkis:sport:DEBBAL010009AamdBL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359172.12;5811459.06
+alkis:sport:DEBBAL010009LzTWBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;72;lgb;2026-11-05;dl-de/by-2-0;372451.33;5803189.06
+alkis:sport:DEBBAL010009wk9WBL;sport;Sportstätte;sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370981.1;5805512.58
+alkis:sport:DEBBAL010009ZHeJTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;22;lgb;2026-11-05;dl-de/by-2-0;367261.11;5808115.07
+alkis:sport:DEBBAL01000a7SMjBL;sport;Sportstätte;sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370522.74;5802917.89
+alkis:sport:DEBBAL01000aa50cBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367604.77;5805008.78
+alkis:sport:DEBBAL01000ada3ZTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;369552.01;5806917.75
+alkis:sport:DEBBAL01000aIvB7BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;364867.23;5814682.17
+alkis:sport:DEBBAL01000ajnoZBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362765.11;5808784.29
+alkis:sport:DEBBAL01000anKkWTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366677.06;5805286.74
+alkis:sport:DEBBAL01000asTQlBL;sport;Sportstätte;sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368335.53;5807843.75
+alkis:sport:DEBBAL01000aTt1HTN;sport;Sportstätte;schwimmen;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358140.03;5803238.63
+alkis:sport:DEBBAL01000aw970BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372364.83;5805030.21
+alkis:sport:DEBBAL01000aye8eBL;sport;Sportstätte;hallenbad,schwimmen;;;;;lage_ohne_kapazitaet;1;44;lgb;2026-11-05;dl-de/by-2-0;368219.38;5806162.04
+alkis:sport:DEBBAL01000azouYBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;15;lgb;2026-11-05;dl-de/by-2-0;363522.01;5808142.14
+alkis:sport:DEBBAL01000b1ng1BL;sport;Sportstätte;hallenbad,schwimmen,sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372945.04;5804654.38
+alkis:sport:DEBBAL01000bdPZeTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367605.18;5804484.18
+alkis:sport:DEBBAL01000bew6QTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362420.72;5807413.51
+alkis:sport:DEBBAL01000bKIg1TN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;365986.97;5806800.58
+alkis:sport:DEBBAL01000bKKwHTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367009.86;5805292.15
+alkis:sport:DEBBAL01000bKTMuTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;373310.18;5803179.29
+alkis:sport:DEBBAL01000bKW1cBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367583.4;5809551.11
+alkis:sport:DEBBAL01000boawmBL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370781.03;5803270.67
+alkis:sport:DEBBAL01000bOpSPBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365429.61;5806294.45
+alkis:sport:DEBBAL01000bTL3FTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;363363.34;5817848.64
+alkis:sport:DEBBAL01000bTXr8TN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357806.99;5804104.61
+alkis:sport:DEBBAL01000c0ZxyTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;364514.23;5815325.38
+alkis:sport:DEBBAL01000c3YyYTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;82;lgb;2026-11-05;dl-de/by-2-0;361591.16;5814275.08
+alkis:sport:DEBBAL01000c4rcgTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;63;lgb;2026-11-05;dl-de/by-2-0;370444.62;5804957.54
+alkis:sport:DEBBAL01000c4rcqTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;63;lgb;2026-11-05;dl-de/by-2-0;370746.33;5804602.32
+alkis:sport:DEBBAL01000c7HljBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370563.48;5803288.57
+alkis:sport:DEBBAL01000c8G6mBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;370734.56;5806157.87
+alkis:sport:DEBBAL01000c9RHRTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;369657.52;5803757.92
+alkis:sport:DEBBAL01000cABvRTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;366973.97;5808946.35
+alkis:sport:DEBBAL01000cCCKcTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;373036.54;5819283.59
+alkis:sport:DEBBAL01000cECn2TN;sport;Sportstätte;schwimmen;;;;;lage_ohne_kapazitaet;1;85;lgb;2026-11-05;dl-de/by-2-0;367758.92;5812638.58
+alkis:sport:DEBBAL01000cEDOYTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;23;lgb;2026-11-05;dl-de/by-2-0;369684.41;5808415.32
+alkis:sport:DEBBAL01000cFO9fBL;sport;Sportstätte;hallenbad;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358782.55;5807498.33
+alkis:sport:DEBBAL01000cGShYTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361109.2;5803453.37
+alkis:sport:DEBBAL01000cGSiXTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361387.48;5803637.68
+alkis:sport:DEBBAL01000cIVs9BL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;372427.1;5804197.81
+alkis:sport:DEBBAL01000cj9cVTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;364448.37;5807579.08
+alkis:sport:DEBBAL01000cJXsZTN;sport;Sportstätte;schwimmen;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;365236.41;5802943.3
+alkis:sport:DEBBAL01000cKPZxTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;375758.99;5800850.17
+alkis:sport:DEBBAL01000clJ8JTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364644.96;5804119.46
+alkis:sport:DEBBAL01000cLsrJTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;363484.02;5808952.73
+alkis:sport:DEBBAL01000cNhL1TN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;369834.34;5801053.48
+alkis:sport:DEBBAL01000cNYkrTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;53;lgb;2026-11-05;dl-de/by-2-0;371919.48;5805082.37
+alkis:sport:DEBBAL01000cP7WaTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;360294.81;5811434.62
+alkis:sport:DEBBAL01000cPs3lTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;43;lgb;2026-11-05;dl-de/by-2-0;368956.51;5806920.59
+alkis:sport:DEBBAL01000cR1yrTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357542.24;5812340.71
+alkis:sport:DEBBAL01000cSdsdTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;370606.34;5801948.88
+alkis:sport:DEBBAL01000csmLhTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;86;lgb;2026-11-05;dl-de/by-2-0;372982.56;5816625.82
+alkis:sport:DEBBAL01000cuwtdTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;14;lgb;2026-11-05;dl-de/by-2-0;370713.88;5810726.09
+alkis:sport:DEBBAL01000cUy40TN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;356974.77;5809938.73
+alkis:sport:DEBBAL01000cUy4ATN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;356810.14;5809184.34
+alkis:sport:DEBBAL01000cVex2BL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;373007.24;5819735.98
+alkis:sport:DEBBAL01000cWhkmTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357788.05;5811350.7
+alkis:sport:DEBBAL01000cWhlpTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357559.54;5811305.31
+alkis:sport:DEBBAL01000cWhlqTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357561.05;5811553.78
+alkis:sport:DEBBAL01000cXytjTN;sport;Sportstätte;sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;86;lgb;2026-11-05;dl-de/by-2-0;371141.76;5814669.78
+alkis:sport:DEBBAL01000cY3q4TN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;363249.29;5801427.52
+alkis:sport:DEBBAL01000cYGSNTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;372193.49;5801788.81
+alkis:sport:DEBBAL01000cYsnmBL;sport;Sportstätte;schwimmen,sportgebaeude;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;369412.61;5807437.12
+alkis:sport:DEBBAL01000cZj8gTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366783.41;5805916.18
+alkis:sport:DEBBAL01000czlpCTN;sport;Sportstätte;sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364857.23;5804374.11
+alkis:sport:DEBBAL01000cZO0UBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;44;lgb;2026-11-05;dl-de/by-2-0;367945.84;5805675.14
+alkis:sport:DEBBAL01000d1fBpTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;364152.65;5801204.24
+alkis:sport:DEBBAL01000d2GbwTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;363420.33;5801875.84
+alkis:sport:DEBBAL01000d2gnGBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368591.8;5806988.15
+alkis:sport:DEBBAL01000d3YwLTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359848.95;5805517.67
+alkis:sport:DEBBAL01000d5SG7TN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358371.98;5804819.73
+alkis:sport:DEBBAL01000d5SGZTN;sport;Sportstätte;schwimmen;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357641.97;5805261.36
+alkis:sport:DEBBAL01000d6tNjTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;356604.02;5803528.65
+alkis:sport:DEBBAL01000d761nBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357258.72;5801778.99
+alkis:sport:DEBBAL01000d7ebGTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369098.74;5805373.44
+alkis:sport:DEBBAL01000d8kGBTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359298.66;5806441.54
+alkis:sport:DEBBAL01000d8WCaTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367313.5;5809317.98
+alkis:sport:DEBBAL01000ddqlKTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;85;lgb;2026-11-05;dl-de/by-2-0;366298.96;5812138.6
+alkis:sport:DEBBAL01000dgRbBBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;43;lgb;2026-11-05;dl-de/by-2-0;369052.96;5806830.88
+alkis:sport:DEBBAL01000dlLPqBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369321.88;5805412.58
+alkis:sport:DEBBAL01000doGnrBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;21;lgb;2026-11-05;dl-de/by-2-0;367710.57;5811007.02
+alkis:sport:DEBBAL540000pN5ATN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370386.87;5806753.93
+alkis:sport:DEBBAL540000pNKRTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;43;lgb;2026-11-05;dl-de/by-2-0;369056.91;5806471.51
+alkis:sport:DEBBAL540000qftrBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;371869.67;5806709.99
+alkis:sport:DEBBAL540000qfWBBL;sport;Sportstätte;hallenbad,sporthalle;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373488.04;5805621.31
+alkis:sport:DEBBAL540000qfY8BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;71;lgb;2026-11-05;dl-de/by-2-0;373214.22;5805260.02
+alkis:sport:DEBBAL540000qiiuBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;52;lgb;2026-11-05;dl-de/by-2-0;370013.55;5806351.28
+alkis:sport:DEBBAL540001U03jTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;366422.63;5809126.71
+alkis:sport:DEBBAL540001v7IpTN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;367774.89;5805031.4
+alkis:sport:DEBBAL540001v7lJTN;sport;Sportstätte;sportanlage,sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;1;23;lgb;2026-11-05;dl-de/by-2-0;369226.41;5808194.92
+alkis:sport:DEBBAL540001v80PTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;367051.31;5806873.34
+alkis:sport:DEBBAL540001v8ceTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;22;lgb;2026-11-05;dl-de/by-2-0;366942.88;5807814.93
+alkis:sport:DEBBAL540001v8iATN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367366.45;5809210.52
+alkis:sport:DEBBAL540001v9iDBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368056.86;5807870.35
+alkis:sport:DEBBAL540001vituBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;63;lgb;2026-11-05;dl-de/by-2-0;370282.57;5804308.21
+alkis:sport:DEBBAL540001viwlBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;63;lgb;2026-11-05;dl-de/by-2-0;370505.73;5804206.32
+alkis:sport:DEBBAL540001vjbjBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;64;lgb;2026-11-05;dl-de/by-2-0;370339.38;5803702.83
+alkis:sport:DEBBAL540001vjlGBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;369847.59;5803415.08
+alkis:sport:DEBBAL540001vjrzBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;369271.57;5804279.79
+alkis:sport:DEBBAL540001vjxfBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;65;lgb;2026-11-05;dl-de/by-2-0;370044.94;5802996.89
+alkis:sport:DEBBAL540001vk2sBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;62;lgb;2026-11-05;dl-de/by-2-0;368453.26;5805548.3
+alkis:sport:DEBBAL540001vkF3BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;61;lgb;2026-11-05;dl-de/by-2-0;366790.86;5805366.95
+alkis:sport:DEBBAL540001vkJEBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364972.54;5804698.59
+alkis:sport:DEBBAL540001vkMMBL;sport;Sportstätte;hallenbad;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;365908.59;5806101.37
+alkis:sport:DEBBAL540001vl0zBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;32;lgb;2026-11-05;dl-de/by-2-0;364756.76;5806181.5
+alkis:sport:DEBBAL540001vm8uBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366181.73;5806698.99
+alkis:sport:DEBBAL540001vm8zBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366326.97;5806223.84
+alkis:sport:DEBBAL540001vmjDBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366510.16;5806993.03
+alkis:sport:DEBBAL540001vmkXBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;31;lgb;2026-11-05;dl-de/by-2-0;366903.39;5807082.69
+alkis:sport:DEBBAL540001vmwFBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367348.18;5807105.97
+alkis:sport:DEBBAL540001vnbgBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367466.59;5807096.6
+alkis:sport:DEBBAL540001vnFMBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;368014.9;5807769.97
+alkis:sport:DEBBAL540001vnw6BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;41;lgb;2026-11-05;dl-de/by-2-0;367609.56;5807706.1
+alkis:sport:DEBBAL540001voGoBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;13;lgb;2026-11-05;dl-de/by-2-0;367223.4;5808594.09
+alkis:sport:DEBBAL540001VRYWTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;363249.53;5810100.22
+alkis:sport:DEBBAL540001VSo2BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;11;lgb;2026-11-05;dl-de/by-2-0;364205.64;5809914.8
+alkis:sport:DEBBAL540001XfC5TN;sport;Sportstätte;sportanlage,sporthalle;;;;;lage_ohne_kapazitaet;1;72;lgb;2026-11-05;dl-de/by-2-0;373719.13;5803656.36
+alkis:sport:DEBBAL540001Xg6WBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;72;lgb;2026-11-05;dl-de/by-2-0;372048.22;5802910.75
+alkis:sport:DEBBAL540001XhfTBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;372821.86;5802817.48
+alkis:sport:DEBBAL540001XhljBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;72;lgb;2026-11-05;dl-de/by-2-0;372876.78;5803410.54
+alkis:sport:DEBBAL540001XhnpBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;73;lgb;2026-11-05;dl-de/by-2-0;373149.04;5803253.5
+alkis:sport:DEBBAL5400022pSWBL;sport;Sportstätte;sportgebaeude;;;;;lage_ohne_kapazitaet;1;84;lgb;2026-11-05;dl-de/by-2-0;364260.05;5813974.42
+alkis:sport:DEBBAL5400023xmABL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;1;17;lgb;2026-11-05;dl-de/by-2-0;362274.01;5808154.34
+alkis:sport:DEBBAL5400027k1BTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;16;lgb;2026-11-05;dl-de/by-2-0;361640.93;5813020.87
+alkis:sport:DEBBAL540002ayozTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;1;85;lgb;2026-11-05;dl-de/by-2-0;366796.26;5812225.2
+alkis:sport:DEBBAL540002bXrFTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;1;81;lgb;2026-11-05;dl-de/by-2-0;359741.45;5815905.22
+alkis:sport:DEBBAL630000KAmABL;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358840.2;5818756.74
+alkis:sport:DEBBAL690003NkiKBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361917.79;5803554.34
+alkis:sport:DEBBAL690003Nlg0BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;361946.46;5804991.13
+alkis:sport:DEBBAL690003uqbXTN;sport;Sportstätte;sportanlage;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;364296.42;5801042.64
+alkis:sport:DEBBAL690003YjjYTN;sport;Sportstätte;sportanlage,sportgebaeude;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357985.33;5803747.96
+alkis:sport:DEBBAL690006uwv4BL;sport;Sportstätte;sportgebaeude,sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;359447.55;5804808.98
+alkis:sport:DEBBAL690006uXgMBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357104.69;5806923.73
+alkis:sport:DEBBAL690006uXsYBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;357908.77;5806455.33
+alkis:sport:DEBBAL690006uyVGBL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358727.51;5805387.93
+alkis:sport:DEBBAL690006uzf2BL;sport;Sportstätte;sporthalle;;;;;lage_ohne_kapazitaet;0;;lgb;2026-11-05;dl-de/by-2-0;358972.92;5805355.22
+KT00264;kita;Kita;krippe_kindergarten_hort;Comeniuskindergarten;70;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370704.3;5806528.0
+KT00342;kita;Kita;krippe_kindergarten;Evangelischer Kindergarten an der Erlöserkirche;86;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366367.8;5806818.0
+KT00353;kita;Kita;krippe_kindergarten;Waldorfkindergarten Wall-am-Kiez;49;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367335.9;5806600.0
+KT00360;kita;Kita;krippe_kindergarten;Himmelszelt;52;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;370991.8;5801019.0
+KT00387;kita;Kita;krippe_kindergarten;KiezKinder. Evangelischer Kindergarten im Heilig-Kreuz-Haus;41;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367328.3;5806691.0
+KT00389;kita;Kita;krippe_kindergarten;Kita Pfingstgemeinde;46;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368190.4;5809069.5
+KT00390;kita;Kita;krippe_kindergarten;Arche Noah;46;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369739.8;5804131.5
+KT00408;kita;Kita;krippe_kindergarten;Friedenshaus;88;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;367062.8;5807511.0
+KT00640;kita;Kita;krippe_kindergarten;Wirbelwind;53;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358991.9;5818774.7
+KT00646;hort;Hort;hort;Havel-KIDS, Hort;225;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;354004.0;5816508.5
+KT00679;kita;Kita;krippe_kindergarten;Kinderland;220;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370649.9;5804222.0
+KT00684;kita;Kita;krippe_kindergarten;Spatzenhaus;206;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369912.1;5803175.5
+KT00760;kita;Kita;krippe_kindergarten;Anne Frank;223;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;371401.43;5801040.81
+KT00764;kita;Kita;krippe_kindergarten;Spatzennest;36;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;376898.3;5800387.5
+KT00775;kita;Kita;krippe_kindergarten;Waldhäuschen;42;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377478.7;5806206.0
+KT00778;kita;Kita;krippe_kindergarten;Storchennest;60;;;kapazitaet;1;17;mbjs;2026-11-05;dl-de/by-2-0;361333.9;5808329.5
+KT00781;kita;Kita;krippe_kindergarten;Haus Sonnenschein;46;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371190.22;5815232.88
+KT00786;kita;Kita;krippe_kindergarten;Zwergenhof;80;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;368095.1;5798025.5
+KT00787;kita;Kita;krippe_kindergarten_hort;Seepferdchen;337;;;kapazitaet;1;82;mbjs;2026-11-05;dl-de/by-2-0;361646.66;5814250.13
+KT00788;kita;Kita;krippe_kindergarten;Villa Sonnenschein;124;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361964.78;5803490.54
+KT00792;kita;Kita;kindergarten_hort;Hort an der Regenbogenschule;279;;;kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;364493.03;5815401.68
+KT00793;kita;Kita;krippe_kindergarten;Fahrländer Landmäuse;143;;;kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;364843.46;5814694.05
+KT00797;kita;Kita;krippe_kindergarten;Villa Kunterbunt;41;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371208.97;5815277.59
+KT00798;kita;Kita;krippe_kindergarten;Spatzennest;119;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371201.8;5813305.0
+KT00802;kita;Kita;krippe_kindergarten;Märchenwald;53;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;355515.0;5810420.0
+KT00806;kita;Kita;krippe_kindergarten;Regenbogenland;52;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;372409.1;5798243.5
+KT00811;kita;Kita;krippe_kindergarten;Ameisenhügel;138;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;368004.1;5799911.0
+KT00816;kita;Kita;krippe_kindergarten;Inselnest;85;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357872.5;5811411.5
+KT00819;kita;Kita;krippe_kindergarten;Eichenhof;43;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358779.9;5805098.5
+KT00824;hort;Hort;hort;Zille-Hort;370;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377894.3;5805215.0
+KT00920;kita;Kita;krippe_kindergarten;Regenbogenland;210;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373274.4;5805398.5
+KT00924;kita;Kita;krippe_kindergarten;Clara Zetkin;100;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368216.0;5807707.0
+KT00928;kita;Kita;krippe_kindergarten;Sonnenschein;200;;;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369328.5;5806817.5
+KT00929;kita;Kita;krippe_kindergarten_hort;Kindergarten Silberahorn;236;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372998.4;5803554.0
+KT00933;kita;Kita;krippe_kindergarten;Zauberwald;238;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;370111.11;5802708.52
+KT00933#haus2;kita;Kita;krippe_kindergarten;Zauberwald;;;;lage_ohne_kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;370083.41;5802696.91
+KT00936;kita;Kita;krippe_kindergarten;Waldhaus;82;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;365504.12;5809353.45
+KT00938;kita;Kita;kindergarten_hort;Baumschule;240;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366242.86;5806709.15
+KT00938#haus2;kita;Kita;kindergarten_hort;Baumschule;;;;lage_ohne_kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;365882.0;5806683.5
+KT00950;kita;Kita;krippe_kindergarten;Kindergarten Sausewind;240;;;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369039.2;5806699.0
+KT00959;kita;Kita;krippe_kindergarten;Nuthewinkel;110;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369473.5;5805374.0
+KT00960;kita;Kita;krippe_kindergarten;Am Heiligen See;121;;;kapazitaet;1;23;mbjs;2026-11-05;dl-de/by-2-0;368904.1;5808427.0
+KT00964;kita;Kita;krippe_kindergarten_hort;Sternchen;272;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373381.3;5804618.39
+KT00964#haus2;kita;Kita;krippe_kindergarten_hort;Sternchen;;;;lage_ohne_kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373389.69;5804614.87
+KT00970;kita;Kita;krippe_kindergarten_hort;Sportakus;320;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373586.2;5803644.0
+KT00972;kita;Kita;krippe_kindergarten_hort;Zwergenland u. Schüleroase Nimmerland;98;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;372172.32;5806765.47
+KT00972#haus2;kita;Kita;krippe_kindergarten_hort;Zwergenland u. Schüleroase Nimmerland;;;;lage_ohne_kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;372208.6;5806691.81
+KT00973;hort;Hort;hort;Goethekids;297;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;370663.2;5806163.0
+KT00974;hort;Hort;hort;Montessori Hort;185;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;364808.2;5806147.0
+KT00979;kita;Kita;kindergarten_hort;Kindervilla am Griebnitzsee;120;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;372330.8;5806695.0
+KT00985;hort;Hort;hort;Havelsprotten;413;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368478.21;5806988.97
+KT00986;hort;Hort;hort;Hort Sonnenschein;216;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368132.2;5807766.73
+KT00992;hort;Hort;hort;Rasselbande;150;;;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370378.39;5803622.61
+KT00996;hort;Hort;hort;Hort zum Teufelssee;66;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369993.51;5802894.48
+KT00997;kita;Kita;krippe_kindergarten_hort;Froschkönig;245;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367262.1;5806663.81
+KT00997#haus2;kita;Kita;krippe_kindergarten_hort;Froschkönig;;;;lage_ohne_kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367291.59;5806658.26
+KT01043;kita;Kita;krippe_kindergarten_hort;Storchennest;195;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373347.0;5803382.0
+KT01308;kita;Kita;krippe_kindergarten_hort;St. Antonius;85;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370782.07;5806787.13
+KT01308#haus2;kita;Kita;krippe_kindergarten_hort;St. Antonius;;;;lage_ohne_kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370780.38;5806772.97
+KT01524;kita;Kita;krippe_kindergarten;Zwergenburg;30;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;362649.8;5820411.5
+KT01530;kita;Kita;krippe_kindergarten;Evangelischer Kindergarten St. Petri;40;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;353441.5;5816227.0
+KT02037;kita;Kita;krippe_kindergarten;Villa Kunterbunt;100;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;368679.6;5822393.0
+KT02580;kita;Kita;krippe_kindergarten;Butzemannhaus;60;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371275.8;5813889.0
+KT02623;kita;Kita;krippe_kindergarten_hort;Kindertagesstätte der Freien Waldorfschule Werder (Havel) e.V.;229;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358842.99;5807133.95
+KT02625;kita;Kita;krippe_kindergarten;Werderaner Früchtchen;214;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359193.3;5805182.5
+KT02626;kita;Kita;krippe_kindergarten;Spatzenhaus;31;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;354982.3;5801081.5
+KT02690;kita;Kita;krippe_kindergarten;Waldorfkindergarten am Hochwald e.V.;100;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378859.69;5807141.84
+KT02707;kita;Kita;krippe_kindergarten;Sandscholle;162;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371428.5;5805891.0
+KT02722;kita;Kita;kindergarten_hort;Stadtstrolche;168;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359178.3;5805241.0
+KT02760;kita;Kita;krippe_kindergarten;Hasenlaube;50;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365375.7;5805581.0
+KT02769;hort;Hort;hort;VHG mit integrierter Kindertagesbetreuung der Freien Schule Kleinmachnow e.V.;150;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378935.45;5807188.41
+KT02774;kita;Kita;krippe_kindergarten;Spielhaus;69;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;369791.0;5806414.5
+KT02776;kita;Kita;krippe_kindergarten_hort;Waldorfschule Potsdam;194;;;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370574.6;5803346.5
+KT02777;kita;Kita;krippe_kindergarten_hort;Zwergenland;23;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;354330.2;5820600.0
+KT02778;kita;Kita;krippe_kindergarten_hort;Rappelkiste;70;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;370200.8;5802731.0
+KT02785;kita;Kita;krippe_kindergarten;Evangelischer Kindergarten im Kunsthof;36;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357534.0;5803707.0
+KT02788;hort;Hort;hort;Sunshine Kids;170;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357607.0;5803846.0
+KT02794;hort;Hort;hort;Freie Schule Potsdam;100;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370710.09;5804568.81
+KT02794#haus2;hort;Hort;hort;Freie Schule Potsdam;;;;lage_ohne_kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370720.06;5804567.56
+KT02800;kita;Kita;krippe_kindergarten;Evangelische Integrationskindertagesstätte an der Nuthe;92;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370800.84;5804572.39
+KT02817;kita;Kita;krippe_kindergarten_hort;"Kita""Im Kirchsteigfeld""";129;;;kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;372764.87;5802741.97
+KT02819;hort;Hort;hort;Feldmäuse;212;;;kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;373038.4;5802880.0
+KT02819#haus2;hort;Hort;hort;Feldmäuse;;;;lage_ohne_kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;372764.87;5802741.97
+KT02864;kita;Kita;krippe_kindergarten;Evangelische Kita Sonnenblume;120;;;kapazitaet;1;73;mbjs;2026-11-05;dl-de/by-2-0;373199.62;5803266.21
+KT03020;hort;Hort;hort;Hort der evangelischen Grundschule Potsdam;195;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368190.38;5809069.48
+KT03020#haus2;hort;Hort;hort;Hort der evangelischen Grundschule Potsdam;;;;lage_ohne_kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368387.69;5809117.22
+KT03020#haus3;hort;Hort;hort;Hort der evangelischen Grundschule Potsdam;;;;lage_ohne_kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368393.69;5809114.26
+KT03186;hort;Hort;hort;Nuthegeister, Hort;130;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370677.2;5804136.5
+KT03199;kita;Kita;krippe_kindergarten;Fridolin;84;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368042.4;5808348.5
+KT03205;kita;Kita;krippe_kindergarten;Regenbogen;85;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357761.0;5803871.1
+KT03212;kita;Kita;krippe_kindergarten;Ameisenburg;110;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377989.5;5806747.5
+KT03223;kita;Kita;kindergarten_hort;Haus der fröhlichen Kinder;216;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366252.0;5809055.0
+KT03224;kita;Kita;krippe_kindergarten;Firlefanz;54;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367571.84;5810157.55
+KT03225;kita;Kita;krippe_kindergarten_hort;Wilde Früchtchen;181;;;kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;363273.7;5808423.5
+KT03229;kita;Kita;krippe_kindergarten;"Katholische Kita""Am Wasserturm - St. Martin""";100;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;368092.9;5822929.0
+KT03261;kita;Kita;krippe_kindergarten;Montessori-Kinderhaus;105;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373347.0;5803382.0
+KT03277;kita;Kita;krippe_kindergarten;"Montessori-Haus""Starke Kinder""";55;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371364.4;5814601.0
+KT03286;kita;Kita;krippe_kindergarten;Anne Frank;157;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358740.6;5807189.0
+KT03292;kita;Kita;krippe_kindergarten;Kinderland;102;;;kapazitaet;1;85;mbjs;2026-11-05;dl-de/by-2-0;366776.0;5812397.0
+KT03298;hort;Hort;hort;Traumzauberbaum;197;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371220.0;5814562.0
+KT03299;kita;Kita;krippe_kindergarten;Seeburger Früchtchen;47;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;373177.0;5819293.5
+KT03306;kita;Kita;krippe_kindergarten;Entdeckerland;102;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366739.6;5809409.0
+KT03311;kita;Kita;kindergarten;Berlin Brandenburg International School;78;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378781.91;5807125.96
+KT03316;kita;Kita;krippe_kindergarten;Waldorfkindergarten Stahnsdorf;47;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378107.5;5806361.5
+KT03319;kita;Kita;krippe_kindergarten;Schwielowsee;188;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;362935.2;5801570.0
+KT03320;hort;Hort;hort;"Integrierte Kindertagesbetreuung an der Grundschule""Albert Einstein""Caputh";290;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;363311.3;5801609.5
+KT03332;hort;Hort;hort;Weberspatzen;162;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370389.3;5806639.5
+KT03339;kita;Kita;kindergarten;Im Regenbogenland;160;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377762.5;5805163.5
+KT03340;kita;Kita;krippe_kindergarten;Montessori Kinderhaus Potsdam-West;66;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365525.6;5806018.0
+KT03341;kita;Kita;krippe_kindergarten;Integrationskindergarten Babelsberg, Oberlin Kita Babelsberg;102;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370027.2;5806420.0
+KT03358;kita;Kita;krippe_kindergarten;Buddelflink;42;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377164.1;5803092.5
+KT03360;kita;Kita;krippe_kindergarten;Am Seeberg;54;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378757.2;5807305.5
+KT03365;kita;Kita;krippe_kindergarten;"Katholische Kita""St. Thomas Morus""";50;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378800.6;5807308.5
+KT03371;kita;Kita;krippe_kindergarten_hort;Regenbogenkinder;55;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378417.7;5808437.0
+KT03377;kita;Kita;krippe_kindergarten;grasshoppers;26;;;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369197.2;5806918.5
+KT04024;kita;Kita;krippe_kindergarten;Kichererbsen;30;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370853.8;5806739.0
+KT04061;kita;Kita;krippe_kindergarten_hort;Kinderhafen;214;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370289.0;5805122.0
+KT04062;hort;Hort;hort;Kastanienhof;185;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367526.46;5807108.84
+KT04062#haus2;hort;Hort;hort;Kastanienhof;;;;lage_ohne_kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367523.16;5807086.87
+KT04062#haus3;hort;Hort;hort;Kastanienhof;;;;lage_ohne_kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367306.8;5806607.0
+KT04063;kita;Kita;krippe_kindergarten_hort;Sternschnuppe;210;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373045.7;5804251.5
+KT04064;kita;Kita;krippe_kindergarten;Löwenzahn;239;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369976.09;5803529.14
+KT04065;kita;Kita;krippe_kindergarten;Sonnenland, Integrationskita;240;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365359.5;5806007.0
+KT04066;kita;Kita;krippe_kindergarten;St. Peter und Paul;67;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;367036.4;5807313.5
+KT04068;kita;Kita;krippe_kindergarten;Am Kanal;138;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368562.48;5807113.75
+KT04087;kita;Kita;krippe_kindergarten;Sternkinder;240;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373273.4;5805128.0
+KT04097;kita;Kita;krippe_kindergarten;Comeniuskindergarten;34;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;370213.2;5806188.0
+KT04101;kita;Kita;krippe_kindergarten;GEOLINO;44;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;368219.25;5805215.5
+KT04106;hort;Hort;hort;Kinderhaus Ein Stein;243;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378305.8;5808422.5
+KT04141;hort;Hort;hort;Aki im Kulturhaus Babelsberg;57;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370126.7;5806398.5
+KT04148;kita;Kita;krippe_kindergarten;Sinnesgarten;101;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367104.57;5808681.55
+KT04157;kita;Kita;krippe_kindergarten;Kids Company;142;;;kapazitaet;1;11;mbjs;2026-11-05;dl-de/by-2-0;364667.4;5809631.5
+KT04158;hort;Hort;hort;Hausaufgabenbetreuung;20;;;kapazitaet;1;86;mbjs;2026-11-05;dl-de/by-2-0;371219.7;5814561.0
+KT04161;kita;Kita;krippe_kindergarten_hort;Kindertagesstätte Eiche;200;;;kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;363574.7;5807991.0
+KT04162;hort;Hort;hort;Hausaufgabenbetreuung und mehr;35;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;367792.2;5822832.5
+KT04165;kita;Kita;krippe_kindergarten;Vielfalt;81;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368020.6;5808796.0
+KT04166;hort;Hort;hort;"Aki im Kinderclub""Junior""";30;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372998.4;5803554.0
+KT04172;kita;Kita;krippe_kindergarten;Sonnenkinder;124;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371663.7;5806571.5
+KT04174;kita;Kita;krippe_kindergarten;"Evangelische Kita""HoffKids""";23;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370065.5;5806936.5
+KT04185;kita;Kita;krippe_kindergarten;Villa Ritz Kindergarten;61;;;kapazitaet;1;23;mbjs;2026-11-05;dl-de/by-2-0;368765.8;5807724.0
+KT04186;kita;Kita;krippe_kindergarten;Pittiplatsch;28;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370092.0;5806968.0
+KT04195;hort;Hort;hort;"Aki in Kooperation mit Kita""Sonnenland""";29;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365525.6;5806018.0
+KT04200;hort;Hort;hort;Aki im Kindertreff am Stern;20;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372735.6;5804546.0
+KT04201;hort;Hort;hort;Andere Kinderbetreuung (Aki) im Treffpunkt Freizeit;25;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368387.5;5808148.5
+KT04202;kita;Kita;krippe_kindergarten;Kiefernwichtel;91;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;364051.0;5822855.0
+KT04204;kita;Kita;krippe_kindergarten;Havelfrüchtchen;52;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;355632.7;5815410.0
+KT04209;hort;Hort;hort;"VHG""Inselschule""Töplitz";150;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357727.21;5811304.02
+KT04218;hort;Hort;hort;"VHG""Karl Hagemeister""";250;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358771.4;5805441.0
+KT04222;hort;Hort;hort;Lindenhof-Hort;200;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378917.3;5805892.5
+KT04223;kita;Kita;krippe_kindergarten;Kita klEinstein;110;;;kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;364686.1;5807934.0
+KT04234;kita;Kita;krippe_kindergarten;First Steps, Deutsch-englischer Kindergarten;20;;;kapazitaet;1;23;mbjs;2026-11-05;dl-de/by-2-0;369183.2;5808529.5
+KT04242;hort;Hort;hort;Hort Sonnenland;135;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365525.6;5806018.0
+KT04243;hort;Hort;hort;Malteser-Hort der katholischen Marienschule Potsdam;130;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371773.1;5806767.0
+KT04246;kita;Kita;krippe_kindergarten;Tausendfüßler;141;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365463.8;5806611.5
+KT04247;kita;Kita;kindergarten;Children´s House;66;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369252.9;5804226.0
+KT04260;hort;Hort;hort;Aki Aktive Kids;50;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371828.28;5806765.0
+KT04261;hort;Hort;hort;Hort der Internationalen Grundschule Potsdam;274;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369252.9;5804226.0
+KT04266;hort;Hort;hort;Flotow-Kids;404;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373186.91;5805224.65
+KT04282;hort;Hort;hort;"Integrierte Tagesbetreuung an der Förderschule mit dem sonderpädagogischen Förderschwerpunkt""Lernen""Kleinmachnow";30;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;377991.0;5807400.0
+KT04290;kita;Kita;krippe_kindergarten;Tönemaler;84;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366523.9;5809039.5
+KT04294;kita;Kita;krippe_kindergarten;Bergmännchen;109;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368326.9;5807340.5
+KT04296;kita;Kita;krippe_kindergarten;Neunmalklug;104;;;kapazitaet;1;11;mbjs;2026-11-05;dl-de/by-2-0;363837.0;5810023.5
+KT04308;kita;Kita;krippe_kindergarten_hort;Turmspatzen;205;;;kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;363510.49;5807998.09
+KT04308#haus2;kita;Kita;krippe_kindergarten_hort;Turmspatzen;;;;lage_ohne_kapazitaet;1;15;mbjs;2026-11-05;dl-de/by-2-0;363147.28;5807975.33
+KT04311;hort;Hort;hort;Buntstifte;94;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373010.6;5804488.21
+KT04311#haus2;hort;Hort;hort;Buntstifte;;;;lage_ohne_kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372857.2;5804986.7
+KT04311#haus3;hort;Hort;hort;Buntstifte;;;;lage_ohne_kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373504.0;5805228.5
+KT04318;kita;Kita;krippe_kindergarten_hort;Wasserläufer;160;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366375.9;5806727.0
+KT04326;hort;Hort;hort;Flitzpiepen;69;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;371828.28;5806765.0
+KT04334;kita;Kita;krippe_kindergarten;Kindergarten am Filmpark;153;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371667.74;5805654.46
+KT04336;kita;Kita;krippe_kindergarten;Zauberstein;166;;;kapazitaet;1;23;mbjs;2026-11-05;dl-de/by-2-0;368881.0;5807768.0
+KT04339;hort;Hort;hort;IKTB Werder Schule am Plessower See;56;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357065.34;5806889.5
+KT04345;hort;Hort;hort;VHG mit integrierter Kindertagesbetreuung;260;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361964.78;5803490.54
+KT04348;kita;Kita;krippe_kindergarten;Kinderspiel;30;;;kapazitaet;1;31;mbjs;2026-11-05;dl-de/by-2-0;366240.0;5807116.0
+KT04349;kita;Kita;krippe_kindergarten;"Kita""Stadt der Meister""";54;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370264.0;5806722.0
+KTS004371;kita;Kita;krippe_kindergarten_hort;Abenteuerland;260;;;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370416.0;5803597.0
+KTS004373;kita;Kita;krippe_kindergarten_hort;Am Babelsberg;161;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370282.09;5807070.87
+KTS004373#haus2;kita;Kita;krippe_kindergarten_hort;Am Babelsberg;;;;lage_ohne_kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370268.8;5807095.78
+KTS004377;kita;Kita;kindergarten_hort;"Hort""Am Schulplatz 1""";223;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366116.09;5808858.46
+KTS004378;kita;Kita;krippe_kindergarten;Springfrosch;120;;;kapazitaet;1;17;mbjs;2026-11-05;dl-de/by-2-0;361798.25;5808736.88
+KTS004392;kita;Kita;krippe_kindergarten;Zwergenvilla;48;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;371006.2;5801099.7
+KTS004400;hort;Hort;hort;NutheKids;214;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;370963.0;5800448.0
+KTS004416;hort;Hort;hort;WiKiHo;148;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;367940.0;5799747.0
+KTS004420;kita;Kita;krippe_kindergarten;Königskinder;139;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;368492.0;5809853.0
+KTS004422;kita;Kita;kindergarten_hort;Im Bornstedter Feld;385;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367151.82;5808638.3
+KTS004422#haus2;kita;Kita;kindergarten_hort;Im Bornstedter Feld;;;;lage_ohne_kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367075.0;5808619.0
+KTS004427;kita;Kita;krippe_kindergarten;KinderGarten Schulplatz 1;57;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;366116.09;5808858.46
+KTS004429;kita;Kita;krippe_kindergarten;HannaLegoranTo;106;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358107.0;5808108.0
+KTS004442;kita;Kita;kindergarten_hort;Baumhaus;128;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372600.0;5803407.0
+KTS004450;kita;Kita;krippe_kindergarten;Pfiffikus;120;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372397.0;5804727.0
+KTS004486;kita;Kita;krippe_kindergarten;Farbenspiel;137;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367589.0;5810045.0
+KTS004503;kita;Kita;krippe;KuKi;6;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;367271.15;5806905.57
+KTS 04575;hort;Hort;hort;Am Hochwald;161;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;378831.79;5807450.81
+KTS 04600;kita;Kita;krippe_kindergarten_hort;Schatzinsel;348;;;kapazitaet;1;63;mbjs;2026-11-05;dl-de/by-2-0;370457.26;5804548.94
+KTS 04601;kita;Kita;krippe_kindergarten;Abenteuerland;60;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;358115.22;5807814.24
+KTS 04606;kita;Kita;krippe_kindergarten;Wurzelwerk;137;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;369771.99;5803494.34
+KTS 04616;hort;Hort;hort;Hausaufgaben und mehr - Europaschule Ketzin;25;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;353745.5;5816584.0
+KTS 04623;hort;Hort;hort;Weltkinder;160;;;kapazitaet;1;32;mbjs;2026-11-05;dl-de/by-2-0;365362.65;5806109.16
+KTS 04644;kita;Kita;kindergarten_hort;Am Herzberg;125;;;kapazitaet;1;17;mbjs;2026-11-05;dl-de/by-2-0;362740.49;5808811.66
+KTS 04646;kita;Kita;krippe_kindergarten;Potsdam Kids;143;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369439.29;5805384.03
+KTS 04647;kita;Kita;krippe_kindergarten;Maulwurf;95;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;369593.29;5822597.0
+KTS 04653;kita;Kita;krippe_kindergarten;Ole Lukoie;130;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371846.0;5806237.08
+KTS 04656;kita;Kita;krippe_kindergarten;"Integrationskita""Havelzwerge""";96;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359165.19;5806464.92
+KTS 04688;kita;Kita;krippe_kindergarten;Kindergarten am Jungfernsee;120;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;367821.03;5810926.59
+KTS 04732;hort;Hort;hort;Hort Sausewind;225;;;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369135.17;5806747.02
+KTS 04732#haus2;hort;Hort;hort;Hort Sausewind;;;;lage_ohne_kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;369261.84;5806895.22
+KTS 04736;hort;Hort;hort;Hort Farbklexe, Hort am Schulungszentrum am Stern;225;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;372360.26;5805032.57
+KTS 04755;hort;Hort;hort;Hort Zauberwald;231;;;kapazitaet;1;65;mbjs;2026-11-05;dl-de/by-2-0;370014.64;5802972.75
+KTS 04757;hort;Hort;hort;Hort Bornim (Hort an der GS 11);221;;;kapazitaet;1;11;mbjs;2026-11-05;dl-de/by-2-0;364251.81;5809929.04
+KTS 04761;hort;Hort;hort;Hort Am Nuthepark;231;;;kapazitaet;1;43;mbjs;2026-11-05;dl-de/by-2-0;368983.65;5806674.51
+KTS 04765;kita;Kita;krippe_kindergarten;Kinderhaus Wölkchen 2;60;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359055.76;5818309.76
+KTS 04768;kita;Kita;krippe_kindergarten;Kindergarten Am Volkspark;90;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367189.44;5809100.26
+KTS 04769;kita;Kita;krippe_kindergarten;Spielgrün;100;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367290.68;5810071.78
+KTS 04770;kita;Kita;krippe_kindergarten;Havelblick;110;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;368316.6;5805741.59
+KTS 04774;kita;Kita;krippe_kindergarten;Zauberwald;100;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;355011.69;5800954.46
+KTS 04785;kita;Kita;krippe_kindergarten;"Kita""Am Jagdschloss""";110;;;kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373741.96;5804592.08
+KTS 04785#haus2;kita;Kita;krippe_kindergarten;"Kita""Am Jagdschloss""";;;;lage_ohne_kapazitaet;1;71;mbjs;2026-11-05;dl-de/by-2-0;373731.65;5804523.95
+KTS 04788;hort;Hort;hort;Hort Bornstedt an der GS 17;335;;;kapazitaet;1;21;mbjs;2026-11-05;dl-de/by-2-0;367874.95;5810292.66
+KTS 04789;kita;Kita;krippe_kindergarten;AWO Kita Inselmäuse;100;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368547.05;5807054.67
+KTS 04794;kita;Kita;krippe_kindergarten;FidL-Kinderhaus Pipapo;124;;;kapazitaet;1;84;mbjs;2026-11-05;dl-de/by-2-0;365635.58;5815200.46
+KTS 04806;kita;Kita;krippe;Schillers Sternchen, Krippe, Kita und Hort;104;;;kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;373609.6;5803562.3
+KTS 04806#haus2;kita;Kita;krippe;Schillers Sternchen, Krippe, Kita und Hort;;;;lage_ohne_kapazitaet;1;72;mbjs;2026-11-05;dl-de/by-2-0;372529.56;5803179.85
+KTS 04814;kita;Kita;krippe_kindergarten;Kasimir und Suse, Kita im Brunnenviertel;130;;;kapazitaet;1;64;mbjs;2026-11-05;dl-de/by-2-0;370701.19;5803071.13
+KTS 04828;kita;Kita;krippe_kindergarten;Evangelische Kita Kinderland Elstal;54;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;364036.16;5822823.0
+KTS 04907;kita;Kita;krippe_kindergarten;Evangelische Kita Hermannswerder;126;;;kapazitaet;1;61;mbjs;2026-11-05;dl-de/by-2-0;366092.15;5805488.85
+KTS 04908;hort;Hort;hort;Inklusive Schulanschluss- und Ferienbetreuung im Oberlinhaus;20;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370027.2;5806420.0
+KTS 04915;hort;Hort;hort;Hort der Evangelischen Grundschule Babelsberg;280;;;kapazitaet;1;52;mbjs;2026-11-05;dl-de/by-2-0;370053.83;5806373.28
+KTS 04933;kita;Kita;krippe_kindergarten;"Naturkindergarten""Naturkinder Kienwerder""";36;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;376481.82;5804745.39
+KTS 04939;hort;Hort;hort;Hort Potsdam Kids;250;;;kapazitaet;1;62;mbjs;2026-11-05;dl-de/by-2-0;369145.09;5805524.72
+KTS 04940;kita;Kita;krippe_kindergarten;Evangelischer Kindergarten Arche Noah;80;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;363960.17;5801593.47
+KTS 04979;kita;Kita;krippe_kindergarten;Bunte Knöppe;100;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367215.52;5810093.65
+KTS 04984;kita;Kita;krippe_kindergarten;Wildwuchs;200;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;359182.71;5806391.9
+KTS 04999;kita;Kita;krippe_kindergarten;Minimeter;127;;;kapazitaet;1;17;mbjs;2026-11-05;dl-de/by-2-0;362507.24;5808833.88
+KTS 05002;hort;Hort;hort;Hort Lummerland;50;;;kapazitaet;1;53;mbjs;2026-11-05;dl-de/by-2-0;371600.72;5805567.62
+KTS 05004;hort;Hort;hort;Hort der Evangelischen Grundschule Werder;113;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357250.59;5801641.07
+KTS 05011;hort;Hort;hort;Hort Gutenberg;123;;;kapazitaet;1;41;mbjs;2026-11-05;dl-de/by-2-0;368259.58;5807579.57
+KTS 05017;kita;Kita;krippe_kindergarten;Evangelische Campus-Kita Werder;120;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;357288.97;5801592.04
+KTS 05024;kita;Kita;krippe_kindergarten;Kita Bullerbü;151;;;kapazitaet;1;13;mbjs;2026-11-05;dl-de/by-2-0;367427.9;5809987.37
+KTS 05050;kita;Kita;krippe_kindergarten;LUMI.NATURA Kinderbetreuungseinrichtung;80;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361803.26;5805963.98
+KTS 05063;kita;Kita;sonstige;Verlässliche Eltern-Kind-Gruppe in der Betreuungseinrichtung LUMI.NATURA;12;;;kapazitaet;0;;mbjs;2026-11-05;dl-de/by-2-0;361803.26;5805963.98
