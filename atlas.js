@@ -3,9 +3,9 @@
 (function () {
 "use strict";
 var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN;
-var A = window.KIEZ = {};                       // geteilte Helfer für schaugrafik.js
-var fmt = new Intl.NumberFormat("de-DE");
-var fmt1 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+var A = window.KIEZ = {};                       // Seitenzustand für schaugrafik.js
+var T = window.KIEZ_THEMEN;                     // gemeinsamer Themenkern (themen.js)
+var fmt = T.fmt, fmt1 = T.fmt1;
 var NB = " ";
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var SCHMAL = matchMedia("(max-width:860px)").matches;
@@ -15,26 +15,10 @@ var SCHWELLE = 1000;                            // Mindestgröße für Vergleich
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function setze(feld, wert) { document.querySelectorAll('[data-feld="' + feld + '"]').forEach(function (n) { n.textContent = wert; }); }
 function q(feld, wert) { document.querySelectorAll('[data-q="' + feld + '"]').forEach(function (n) { n.textContent = wert; }); }
-function rundEw(v) { return fmt.format(v >= 1000 ? Math.round(v / 100) * 100 : Math.round(v / 10) * 10); }
-function proz(v) { return v == null ? "k. A." : fmt1.format(v) + NB + "%"; }
-function kachel(G, id) { return (G.kacheln || []).filter(function (k) { return k.id === id; })[0]; }
-function name(nr) { return nr ? K.stadtteile[nr].name : "Potsdam"; }
-A.fmt = fmt; A.fmt1 = fmt1; A.rundEw = rundEw; A.kachel = kachel; A.name = name; A.proz = proz;
+var rundEw = T.rundEw, proz = T.proz, kachel = T.kachel, name = T.name, esc = T.esc;
 
-// ---------- Farben: ein Farbton je Stadtbezirk (erste Ziffer), heller und dunkler je Stadtteil
-var TOENE = { 1: 28, 2: 205, 3: 150, 4: 350, 5: 265, 6: 95, 7: 185, 8: 45 };
-var proBezirk = {}, FARBE = {}, BEZIRKFARBE = {};
-ST.features.forEach(function (f) { var b = f.properties.bezirk; (proBezirk[b] = proBezirk[b] || []).push(f.properties.nr); });
-ST.features.forEach(function (f) {
-  var b = f.properties.bezirk, l = proBezirk[b], i = l.indexOf(f.properties.nr), n = l.length;
-  var hell = n > 1 ? 72 - 28 * i / (n - 1) : 58;
-  FARBE[f.properties.nr] = "hsl(" + TOENE[b] + ",30%," + hell.toFixed(0) + "%)";
-  BEZIRKFARBE[b] = "hsl(" + TOENE[b] + ",30%,52%)";
-  f.properties.farbe = FARBE[f.properties.nr];
-});
-A.FARBE = FARBE; A.BEZIRKFARBE = BEZIRKFARBE; A.proBezirk = proBezirk;
-var TEIL = {}; ST.features.forEach(function (f) { TEIL[f.properties.nr] = f; });
-A.TEIL = TEIL;
+// ---------- Farben: ein Farbton je Stadtbezirk, heller und dunkler je Stadtteil (themen.js)
+var proBezirk = T.proBezirk, FARBE = T.FARBE, BEZIRKFARBE = T.BEZIRKFARBE, TEIL = T.TEIL;
 
 // ---------- Kopf: Stadtzahlen
 var stand = new Date(K.stand_auswertung).toLocaleDateString("de-DE");
@@ -56,51 +40,12 @@ setze("zellen-stadt", fmt.format(K.stadt.zellen));
   });
 })();
 
-// ---------- Themen der Karte
-var STUFEN = ["--k1", "--k2", "--k3", "--k4", "--k5"].map(function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); });
-var GRAU = "#d5d8d3";
-var THEMEN = [
-  { id: "stadtteile", kurz: "Stadtteile", name: "Stadtteile" },
-  { id: "ew", kurz: "Einwohner", name: "Einwohner je Zelle", einheit: "Personen", quelle: "Zensus 2022, Bevölkerungszahl" },
-  { id: "d_alter", kurz: "Alter", name: "Durchschnittsalter", einheit: "Jahre", nenner: "a_ges", quelle: "Zensus 2022, Durchschnittsalter" },
-  { id: "q_u18", kurz: "unter 18", name: "Anteil unter 18 Jahre", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen" },
-  { id: "q_65p", kurz: "65 und älter", name: "Anteil 65 Jahre und älter", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen" },
-  { id: "q_v1949", kurz: "vor 1949", name: "Wohnungen in Gebäuden vor 1949", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Baujahresklassen" },
-  { id: "q_fern", kurz: "Fernwärme", name: "Wohnungen mit Fernwärme", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Energieträger der Heizung" }
-];
-var THEMA = {}; THEMEN.forEach(function (t) { THEMA[t.id] = t; });
-A.THEMEN = THEMEN; A.THEMA = THEMA; A.STUFEN = STUFEN; A.GRAU = GRAU;
+// ---------- Themen der Karte (Themen, Klassen, Farben, Höhen aus themen.js)
+var STUFEN = T.STUFEN, THEMEN = T.THEMEN, THEMA = T.THEMA, KLASSEN = T.KLASSEN;
 function werte(feld) { return Z.features.map(function (f) { return f.properties[feld]; }).filter(function (v) { return v != null && !isNaN(v); }).sort(function (a, b) { return a - b; }); }
-function stufen(t) {
-  var w = werte(t.id);
-  if (t.einheit === "%") return { grenzen: [20, 40, 60, 80], min: 0, max: 100, fest: true };
-  var qn = [0.2, 0.4, 0.6, 0.8].map(function (p) { return w[Math.min(w.length - 1, Math.floor(p * w.length))]; });
-  var g = []; qn.forEach(function (v) { if (!g.length || v > g[g.length - 1]) g.push(v); });
-  return { grenzen: g, min: w[0], max: w[w.length - 1] };
-}
-var KLASSEN = {}; THEMEN.slice(1).forEach(function (t) { KLASSEN[t.id] = stufen(t); });
-A.KLASSEN = KLASSEN;
-A.klasse = function (t, v) { var s = KLASSEN[t.id], i = 0; while (i < s.grenzen.length && v >= s.grenzen[i]) i++; return Math.min(i, 4); };
-A.unscharf = function (t, p) { return t.nenner ? (p[t.nenner] == null || p[t.nenner] < 10) : false; };
-
-var HOCH = 1100;                                   // Säulenhöhe in Metern beim Höchstwert (Darstellung)
 var hk = { k: 0 };                                 // Höhenfaktor, wird animiert
-function grund(t) {
-  var v = ["get", t.id], s = KLASSEN[t.id], rel;
-  if (t.id === "ew") rel = ["sqrt", ["/", v, s.max]];
-  else if (t.einheit === "%") rel = ["/", ["min", 100, v], 100];
-  else rel = ["max", 0, ["/", ["-", v, s.min], s.max - s.min]];
-  var flach = t.nenner ? ["<", ["coalesce", ["get", t.nenner], 0], 10] : false;
-  function bei(H) { var h = ["*", hk.k * H, rel]; return flach ? ["case", flach, 3, h] : h; }
-  // Höhe passt sich dem Maßstab an: über der ganzen Stadt hoch, im Stadtteil niedriger
-  return ["interpolate", ["linear"], ["zoom"], 10, bei(HOCH * 1.3), 12, bei(HOCH * 0.45), 13, bei(HOCH * 0.18), 14, bei(HOCH * 0.075), 16, bei(HOCH * 0.03)];
-}
-function farbe(t) {
-  var s = KLASSEN[t.id], e = ["step", ["get", t.id], STUFEN[0]];
-  s.grenzen.forEach(function (g, i) { e.push(g, STUFEN[Math.min(i + 1, 4)]); });
-  if (t.nenner) e = ["case", ["<", ["coalesce", ["get", t.nenner], 0], 10], GRAU, e];
-  return e;
-}
+function grund(t) { return T.hoehe(t, { faktor: hk.k }); }
+var farbe = T.farbe;
 
 // ---------- Kennzahlen für die Fragen (alles live)
 (function () {
@@ -138,12 +83,9 @@ function farbe(t) {
 
 // ---------- Geometrie-Helfer
 function inRing(x, y, r) { var c = false; for (var i = 0, j = r.length - 1; i < r.length; j = i++) { var xi = r[i][0], yi = r[i][1], xj = r[j][0], yj = r[j][1]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
-function polys(f) { return f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates; }
+var polys = T.polys, umriss = T.umriss, GANZ = T.GANZ;
 function inTeil(x, y, f) { return polys(f).some(function (p) { if (!inRing(x, y, p[0])) return false; for (var h = 1; h < p.length; h++) if (inRing(x, y, p[h])) return false; return true; }); }
 function welcherTeil(x, y) { for (var i = 0; i < ST.features.length; i++) if (inTeil(x, y, ST.features[i])) return ST.features[i].properties.nr; return null; }
-function umriss(f) { var a = [180, 90, -180, -90]; polys(f).forEach(function (p) { p[0].forEach(function (c) { a[0] = Math.min(a[0], c[0]); a[1] = Math.min(a[1], c[1]); a[2] = Math.max(a[2], c[0]); a[3] = Math.max(a[3], c[1]); }); }); return [[a[0], a[1]], [a[2], a[3]]]; }
-var GANZ = (function () { var a = [180, 90, -180, -90]; ST.features.forEach(function (f) { var u = umriss(f); a[0] = Math.min(a[0], u[0][0]); a[1] = Math.min(a[1], u[0][1]); a[2] = Math.max(a[2], u[1][0]); a[3] = Math.max(a[3], u[1][1]); }); return [[a[0], a[1]], [a[2], a[3]]]; })();
-A.polys = polys; A.umriss = umriss; A.GANZ = GANZ;
 
 // ---------- Grenzfall: eine echte Beispielzelle aus den Daten finden
 var GZ = (function () {
@@ -390,7 +332,6 @@ document.getElementById("dreid").addEventListener("change", function (e) {
 // ---------- Klicks in der Karte
 function zeile(t, a) { return "<tr><td>" + t + "</td><td>" + a + "</td></tr>"; }
 function zz(v) { return v == null ? "k. A." : fmt.format(v); }
-function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 map.on("click", function (e) {
   var lay = ["gebaeude3d", "gebaeude2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var g = map.queryRenderedFeatures(e.point, { layers: lay });
