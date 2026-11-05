@@ -1,4 +1,4 @@
-# A5a Erreichbarkeit in Luftlinie: Lauf 20261105T103151Z
+# A5a Erreichbarkeit in Luftlinie: Lauf 20261105T103300Z
 
 Erzeugt von `skripte/14_erreichbarkeit.py` (Rolle `kiezatlas_rechnen`, kein Netzabruf). Gerechnet in EPSG:25833 vom Mittelpunkt der Zensus-Zelle aus. Der Mittelpunkt kann bis zu 71 m vom tatsächlichen Wohnort abweichen; Meterwerte sind auf 0,1 m gespeichert, aussagekräftig sind sie auf rund 50 m.
 
