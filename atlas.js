@@ -237,7 +237,7 @@ function gebaeudeLaden(nr) {
   if (!nr) { map.getSource("gebaeude").setData(LEER); return; }
   var v = "KIEZ_GEB_" + nr;
   if (window[v]) { map.getSource("gebaeude").setData(window[v]); return; }
-  var s = document.createElement("script"); s.src = "daten/gebaeude/" + nr + ".js";
+  var s = document.createElement("script"); s.src = KIEZ_THEMEN.v("daten/gebaeude/" + nr + ".js");
   s.onload = function () { if (gewaehlt === nr && window[v]) map.getSource("gebaeude").setData(window[v]); status(); };
   document.body.appendChild(s);
 }
@@ -396,7 +396,9 @@ var SCHRITTE = {
   5: { nr: A.FRAGE.fern, thema: "q_fern", grenze: false, geb3d: false, kamera: "teil", pitch: 50, bearing: -10, maxZoom: 14 },
   6: { nr: GZ ? GZ.p.st : "", thema: "stadtteile", grenze: true, geb3d: false, luftbild: false, kamera: "zelle", pitch: 0, bearing: 0 },
   7: { nr: "", thema: "ew", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 45, bearing: -8 },
-  8: { nr: "", thema: "ew", grenze: false, geb3d: false, kamera: "stadt", pitch: 52, bearing: -16 }
+  8: { nr: "", thema: "q_u18", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 48, bearing: -12 },
+  9: { nr: "", thema: "q_v1949", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 48, bearing: 14 },
+  10: { nr: "", thema: "ew", grenze: false, geb3d: false, kamera: "stadt", pitch: 52, bearing: -16 }
 };
 var aktiv = -1;
 function schritt(i, zwingen) {
@@ -558,9 +560,9 @@ sortBox.addEventListener("change", function (e) { register(e.target.value); });
 register("nr");
 zeigeZahlen("");
 document.getElementById("sb-karte").addEventListener("click", function () {
-  aktiv = 8; zustand({ nr: S.nr, thema: S.thema === "stadtteile" ? "ew" : S.thema, grenze: false, kamera: S.nr ? "teil" : "stadt", pitch: 50, bearing: -14, maxZoom: 15 });
+  aktiv = 10; zustand({ nr: S.nr, thema: S.thema === "stadtteile" ? "ew" : S.thema, grenze: false, kamera: S.nr ? "teil" : "stadt", pitch: 50, bearing: -14, maxZoom: 15 });
   document.getElementById("buehne").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth" });
-  document.getElementById("frage-8").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "center" });
+  document.getElementById("frage-10").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "center" });
 });
 document.getElementById("sb-grafik").addEventListener("click", function () {
   if (A.schauGebiet) A.schauGebiet(S.nr);

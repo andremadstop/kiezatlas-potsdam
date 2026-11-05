@@ -87,9 +87,48 @@ async function zahlenPruefen(page) {
   });
 }
 
-async function planer(basis, art) {
-  console.log(`planer.html über ${art}`);
+// Zwei Läufe je Weg: mit den echten Dateien aus daten/ (A6) und mit den Beispieldateien (planer.html?daten=fixtures),
+// die auch Fußweg und OpenStreetMap enthalten. Solange <html data-odbl> keine _odbl-Datei nennt, sind Fußweg und
+// OSM-Arten mit den echten Daten gesperrt und die Seite fragt keine fehlende Datei an.
+const FIX = "?daten=fixtures";
+async function planerEcht(basis, art) {
+  console.log(`planer.html über ${art}, echte Daten`);
   const { ctx, page, fehler, abgewiesen, geladen } = await oeffnen(basis, "planer.html");
+  const js = jsGewicht(geladen);
+  pruef(js <= GRENZE_JS_KB, `Startgewicht ${js} KB gz JS mit echten Daten (Grenze ${GRENZE_JS_KB})`);
+  pruef(!geladen.some((u) => /\/daten\/fixtures\//.test(u)), "keine Datei aus daten/fixtures/ geladen");
+  pruef(await page.evaluate(() => document.getElementById("beispiel").hidden), "kein Hinweis „Beispieldaten“");
+  const sperre = await page.evaluate(() => ({
+    fuss: document.querySelector('#weg input[value="fuss"]').disabled,
+    osm: ["arzt", "apotheke", "supermarkt", "pflege", "spielplatz"].every((a) => { const i = document.querySelector(`#ein input[value="${a}"]`); return !i || i.disabled; }),
+    odbl: document.documentElement.getAttribute("data-odbl") }));
+  const odblDateien = ["einrichtungen_odbl.js", "erreichbar_fuss_odbl.js", "planer_fuss_odbl.js"].filter((f) => fs.existsSync(path.join(WURZEL, "daten", f)));
+  pruef(odblDateien.length > 0 || (sperre.fuss && sperre.osm), `ohne _odbl-Dateien in daten/ sind Fußweg (${sperre.fuss}) und OSM-Arten (${sperre.osm}) gesperrt, data-odbl="${sperre.odbl}"`);
+  const chips = await page.$$eval('#ein input[name="ein"]:not(:disabled)', (l) => l.map((i) => i.value));
+  pruef(chips.includes("kita") && chips.includes("grundschule") && chips.length >= 5, `Einrichtungs-Chips aus den echten Daten: ${chips.join(", ")}`);
+  await page.check('#zu input[value="kita"]', { force: true }); await warteBereit(page);
+  const zl = await page.evaluate(() => ({ sicht: window.KIEZ_KARTE.getLayoutProperty("zellen", "visibility"), n: window.KIEZ_KARTE.querySourceFeatures("zellen").length, ein: (window.KIEZ_EINRICHTUNGEN || {}).features?.length }));
+  pruef(zl.sicht === "visible" && zl.n > 0 && zl.ein > 600, `Kita (Luftlinie) mit echten Daten: ${zl.n} Zellen gezeichnet, ${zl.ein} Einrichtungen`);
+  await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page);
+  const z = await zahlenPruefen(page);
+  pruef(z.zeilen > 5 && z.ohneQuelle === 0 && z.ohneMethode === 0 && z.ewVermerk && z.quellenListe > 0 && z.orientierung === z.orientierungMarkiert,
+    `Versorgungstabelle mit echten Daten: ${z.zeilen} Zeilen, ohne Quelle ${z.ohneQuelle}, ohne Methode ${z.ohneMethode}, Orientierung ${z.orientierungMarkiert}/${z.orientierung}`);
+  const popup = await page.evaluate(() => {
+    const m = window.KIEZ_KARTE, f = m.queryRenderedFeatures({ layers: ["ein"] })[0]; if (!f) return null;
+    const p = m.project(f.geometry.coordinates); m.fire("click", { point: p, lngLat: m.unproject(p), originalEvent: {} });
+    const c = document.querySelector(".maplibregl-popup-content"); const t = c ? c.textContent : ""; document.querySelectorAll(".maplibregl-popup").forEach((x) => x.remove()); return t;
+  });
+  pruef(!!popup && /dl-de/.test(popup) && /Daten verändert/.test(popup), `Klick auf Einrichtung mit echten Daten: ${(popup || "").slice(0, 90)}…`);
+  const verstoss = await axe(page);
+  pruef(verstoss.length === 0, `axe mit echten Daten: ${verstoss.length} Verstöße ${verstoss.join(", ")}`);
+  pruef(fehler.length === 0, `Konsole ohne Fehler mit echten Daten (${fehler.length}${fehler.length ? ": " + fehler.slice(0, 3).join(" | ") : ""})`);
+  bericht.laeufe.push({ seite: "planer.html", art: art + ", echt", js_kb_gz: js, axe: verstoss.length, fehler: fehler.length, abgewiesen: abgewiesen.length });
+  await ctx.close();
+}
+
+async function planer(basis, art) {
+  console.log(`planer.html über ${art}, Beispieldaten`);
+  const { ctx, page, fehler, abgewiesen, geladen } = await oeffnen(basis, "planer.html" + FIX);
   const js = jsGewicht(geladen);
   pruef(js <= GRENZE_JS_KB, `Startgewicht ${js} KB gz JS (Grenze ${GRENZE_JS_KB}); geladen: ${[...new Set(geladen)].filter((u) => u.endsWith(".js")).map((u) => u.split("/").slice(-2).join("/")).join(", ")}`);
   const zellenAmStart = geladen.some((u) => u.endsWith("/daten/zellen.js"));
@@ -160,9 +199,9 @@ async function rundreise(basis, art) {
     r: (document.querySelector('#raeume .treffer[aria-pressed="true"]') || { dataset: {} }).dataset.nr,
     zellen: window.KIEZ_KARTE.getLayoutProperty("zellen", "visibility"),
     hash: location.hash.replace(/&k=.*$/, ""), k: (location.hash.match(/k=([^&]*)/) || [])[1] }));
-  const a = await oeffnen(basis, "planer.html", { hash: ziel });
+  const a = await oeffnen(basis, "planer.html" + FIX, { hash: ziel });
   const z1 = await zustand(a.page), h1 = await a.page.evaluate(() => location.hash); await a.ctx.close();
-  const b = await oeffnen(basis, "planer.html", { hash: h1 });
+  const b = await oeffnen(basis, "planer.html" + FIX, { hash: h1 });
   const z2 = await zustand(b.page); await b.ctx.close();
   const kGleich = (x, y) => { const p = (s) => (s || "").split("/").map(Number); const [u, v] = [p(x), p(y)]; return u.length === 5 && u.every((w, i) => Math.abs(w - v[i]) < 0.01); };
   pruef(z1.ein === "arzt,grundschule,kita" && z1.zu === "grundschule" && z1.weg === "fuss" && z1.r === "14" && z1.zellen === "visible"
@@ -184,7 +223,7 @@ async function raumebeneFremd() {
     }
     return r.continue();
   });
-  await page.goto(HTTP + "planer.html#r=13", { waitUntil: "load" });
+  await page.goto(HTTP + "planer.html" + FIX + "#r=13", { waitUntil: "load" });
   await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });
   const z = await page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, text: document.getElementById("vs-inhalt").textContent, ebene: window.KIEZ_PLANER && window.KIEZ_PLANER.raumebene }));
   pruef(z.ebene === "planungsraum" && z.zeilen === 0 && /Planungsräumen/.test(z.text) && fehler.length === 0,
@@ -203,7 +242,7 @@ async function fussFehlschlag() {
     if (/\/daten\/fixtures\/planer_fuss_odbl\.js$/.test(u.split(/[?#]/)[0]) && ++versuche === 1) return r.fulfill({ status: 404, body: "" });
     return r.continue();
   });
-  await page.goto(HTTP + "planer.html#r=13", { waitUntil: "load" });
+  await page.goto(HTTP + "planer.html" + FIX + "#r=13", { waitUntil: "load" });
   await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });
   await page.check('#weg input[value="fuss"]', { force: true }); await warteBereit(page);
   const a = await page.evaluate(() => ({ weg: document.querySelector('#weg input:checked').value, meldung: document.getElementById("kartenstatus").textContent + document.getElementById("teilen-hinweis").textContent, zeilen: document.querySelectorAll(".vs-zeile").length }));
@@ -281,6 +320,7 @@ function downloadsPruefen(liste) {
 
 try {
   for (const [basis, art] of [[FILE, "file://"], [HTTP, "HTTP"]]) {
+    await planerEcht(basis, art);
     await planer(basis, art);
     await rundreise(basis, art);
     await handy(basis, art);

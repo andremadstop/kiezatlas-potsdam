@@ -30,6 +30,13 @@ ERLAUBT_FUNKTION = re.compile(r"^(Gebaeude|Bauteil|Turm|VorratsbehaelterSpeicher
                               r"SonstigesBauwerkOderSonstigeEinrichtung)(:\d+)?$")
 ADRESSFELD = re.compile(r"""["']?\b(strasse|straße|hausnr|hausnummer|adresse|anschrift)\b["']?\s*:""", re.I)
 
+# Amtliche Einrichtungsnamen aus dem MBJS-WFS, die eine Anschrift enthalten (dieselbe benannte Ausnahme wie in
+# pruefen/A8_export.py, NAMENS_AUSNAHMEN). Sie bezeichnen eine öffentliche Einrichtung, keine Person; vor der Suche
+# entfernt, damit jeder andere Treffer weiter auffällt. Ergänzt in der Integration (I1, 05.11.2026).
+# Schreibweisen: JSON (daten/*.js), Klartext, CSV mit verdoppelten Anführungszeichen (daten/export/csv/).
+NAMENS_AUSNAHMEN = ['Hort\\"Am Schulplatz 1\\"', 'Hort"Am Schulplatz 1"', 'Hort""Am Schulplatz 1""',
+                    "KinderGarten Schulplatz 1"]
+
 fehler: list[str] = []
 
 
@@ -124,12 +131,15 @@ def main() -> int:
             continue
         if ADRESSFELD.search(text):
             treffer_feld.append(p.relative_to(WURZEL).as_posix())
+        for n in NAMENS_AUSNAHMEN:
+            text = text.replace(n, "")
         if adresse_in(text, je_strasse):
             treffer_adresse.append(p.relative_to(WURZEL).as_posix())
     pruefe(not treffer_feld, f"kein Adressfeld in {len(dateien)} Dateien (daten/, export/, downloads/): "
                              f"{treffer_feld or 'keins'}")
-    pruefe(not treffer_adresse, f"keine Adresse aus gebaeude_adresse in diesen Dateien "
-                                f"(Dateien mit Treffer: {len(treffer_adresse)})")
+    pruefe(not treffer_adresse, "keine Adresse aus gebaeude_adresse in diesen Dateien, außer zwei amtlichen "
+                                f"Einrichtungsnamen (Dateien mit Treffer: {len(treffer_adresse)} "
+                                f"{treffer_adresse[:5]})")
 
     print(f"\n{'BESTANDEN' if not fehler else 'NICHT BESTANDEN'}: {len(fehler)} Fehler")
     return 1 if fehler else 0

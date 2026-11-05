@@ -141,7 +141,7 @@ def hausnummern(spez: str) -> list[str]:
 
 
 def adressen_zerlegen(adresse: str) -> list[tuple[str, str]]:
-    """'Am Fährgut 1, 11-20' → [(Am Fährgut, 1), (Am Fährgut, 11) …]. Ohne Hausnummer: leer."""
+    """'Musterweg 1, 11-20' → [(Musterweg, 1), (Musterweg, 11) …]. Ohne Hausnummer: leer."""
     paare: list[tuple[str, str]] = []
     strasse = None
     for stueck in re.split(r";\s*|,\s*(?=[A-ZÄÖÜ][a-zäöüß])|(?<=[\d)])\s+(?=[A-ZÄÖÜ][a-zäöüß])", adresse):

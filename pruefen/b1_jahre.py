@@ -53,7 +53,14 @@ def main() -> int:
           and all("Daten verändert (eigene Berechnung)" in q["vermerk"] and "govdata.de/dl-de/by-2-0" in q["vermerk"]
                   for q in d["quellen"].values()), "Vermerk dl-de/by-2-0 mit Link und Bearbeitungshinweis (Kopf und quellen)")
     pruef(d["beschriftung"] == "Gebäude mit Wohnraum je Zelle, nicht einzelne Gebäude", "Beschriftung „nicht einzelne Gebäude“")
-    pruef('"oid"' not in text and not (DATEN / "jahre").exists(), "keine Gebäude-oid, kein daten/jahre/ aus B1")
+    # Im Integrationszweig liegt daten/jahre/ von B4 vor; dann Basis als Bereich angeben (ausbau/p0..ausbau/b1),
+    # geprüft wird, dass die Commits von B1 kein daten/jahre/ anlegen (Ergänzung I1, 05.11.2026).
+    if ".." in basis:
+        jahre = subprocess.run(["git", "-C", str(WURZEL), "diff", "--name-only", basis, "--", "daten/jahre"],
+                               capture_output=True, text=True, check=False).stdout.strip()  # nosec B603 B607
+    else:
+        jahre = (DATEN / "jahre").exists()
+    pruef('"oid"' not in text and not jahre, "keine Gebäude-oid, kein daten/jahre/ aus B1")
 
     yaml = (WURZEL / "config" / "potsdam.yaml").read_text(encoding="utf-8")
     pruef("zensus_gebaeude_jahr" not in yaml, "kein Pipeline-Eintrag zensus_gebaeude_jahr in config/potsdam.yaml (Korrektur 17)")

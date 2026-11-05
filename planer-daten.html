@@ -34,8 +34,8 @@
 
   <h2>Planer: Einrichtungen, Entfernungen, Versorgung</h2>
   <ul class="dateiliste">
-    <li data-datei="einrichtungen.js" data-schema="einrichtungen.json" data-da="nein" data-odbl="nein">
-      <span class="datei">einrichtungen.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="einrichtungen.js" data-schema="einrichtungen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/einrichtungen.js">einrichtungen.js</a><span class="stand">vorhanden</span>
       <p class="was">Kitas, Horte und Schulen (Bildungsministerium Brandenburg) und Gemeinbedarf aus dem Liegenschaftskataster als Punkte, ohne Adresse und ohne Kontaktdaten.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>). Vermerk je Quelle in der Datei, mit „Daten verändert (eigene Berechnung)“.</p>
     </li>
@@ -44,8 +44,8 @@
       <p class="was">Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze aus OpenStreetMap als Punkte, ohne Namen.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz.</p>
     </li>
-    <li data-datei="erreichbar.js" data-schema="erreichbar.json" data-da="nein" data-odbl="nein">
-      <span class="datei">erreichbar.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="erreichbar.js" data-schema="erreichbar.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/erreichbar.js">erreichbar.js</a><span class="stand">vorhanden</span>
       <p class="was">Entfernung in Luftlinie von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung je Art, in der Reihenfolge von <code>zellen.js</code>.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
     </li>
@@ -54,8 +54,8 @@
       <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
     </li>
-    <li data-datei="planer.js" data-schema="planer.json" data-da="nein" data-odbl="nein">
-      <span class="datei">planer.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="planer.js" data-schema="planer.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planer.js">planer.js</a><span class="stand">vorhanden</span>
       <p class="was">Versorgung je Raumeinheit in Luftlinie: Anteile in Reichweite, Einwohner je Einrichtung, Plätze je Kind, Grün je Einwohner. Jeder Wert mit Methode, Status, Stand, Unsicherheit und Quelle.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
     </li>
@@ -92,33 +92,39 @@
 
   <h2>Gebäudejahre</h2>
   <ul class="dateiliste">
-    <li data-datei="jahre_zellen.js" data-schema="jahre_zellen.json" data-da="nein" data-odbl="nein">
-      <span class="datei">jahre_zellen.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="jahre_zellen.js" data-schema="jahre_zellen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_zellen.js">jahre_zellen.js</a><span class="stand">vorhanden</span>
       <p class="was">Gebäude mit Wohnraum nach Baujahr je Zelle aus dem Zensus 2022.</p>
       <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
     </li>
-    <li data-datei="jahre/*.js" data-schema="jahre_gebaeude.json" data-da="nein" data-odbl="nein">
-      <span class="datei">jahre/&lt;Nr&gt;.js</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Geschätzte Bauzeit je Gebäude, je Stadtteil; Schätzungen gekennzeichnet, keine Aussage über einzelne Grundstücke.</p>
+    <li data-datei="jahre/*.js" data-schema="jahre_gebaeude.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre/11.js">jahre/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
+      <p class="was">Bauzeitklasse je Gebäude, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11); Schätzungen gekennzeichnet, keine Aussage über einzelne Grundstücke, kein Einzeljahr bei Gebäuden mit Wohnraum.</p>
       <p class="lizenz">dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>); Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="jahre_methode.js" data-schema="jahre_methode.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_methode.js">jahre_methode.js</a><span class="stand">vorhanden</span>
+      <p class="was">Zahlen der Methodenseite „Bauzeiten“: Gebäude je Stufe der Schätzung, Rücktest je Bauzeit und Stufe mit Fallzahl, Vergleich mit dem Zensus.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
     </li>
   </ul>
 
   <h2>Für Geoinformationssysteme</h2>
-  <p>Für die Arbeit in QGIS oder ArcGIS folgen dieselben Inhalte als GeoPackage und CSV. Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>.</p>
+  <p>Für die Arbeit in QGIS oder ArcGIS stehen dieselben Inhalte als GeoPackage und CSV bereit, Koordinaten in ETRS89 / UTM 33N (EPSG:25833). Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>. Raumebene sind vorerst die 32 Stadtteile; Planungsräume folgen, sobald ihre Grenzen vorliegen.</p>
   <ul class="dateiliste">
-    <li data-export="gpkg" data-da="nein" data-odbl="nein"><span class="datei">GeoPackage, ohne OpenStreetMap-Anteil</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Einrichtungen, Zellwerte auf erlaubter Stufe, Versorgungstabelle je Raumeinheit, Grünflächen; Koordinaten in ETRS89 / UTM 33N (EPSG:25833).</p></li>
-    <li data-export="gpkg_odbl" data-da="nein" data-odbl="ja"><span class="datei">GeoPackage mit OpenStreetMap-Anteil (_odbl)</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Fußwegwerte und Einrichtungen aus OpenStreetMap, unter der Open Database License.</p></li>
-    <li data-export="csv" data-da="nein" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Dieselben Tabellen ohne Geometrie, getrennt nach Lizenz.</p></li>
-    <li data-export="readme" data-da="nein" data-odbl="nein"><span class="datei">Beschreibung mit Lizenz, Vermerken und Methode</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Was in jeder Datei steht und wie es berechnet ist.</p></li>
-    <li data-export="qgis" data-da="nein" data-odbl="nein"><span class="datei">QGIS-Projekt mit Stilen</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Öffnet die GeoPackages mit denselben Klassen wie die Karte.</p></li>
-    <li data-export="steckbrief" data-da="nein" data-odbl="nein"><span class="datei">Steckbrief je Raumeinheit (PDF)</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Die Versorgungstabelle einer Raumeinheit zum Drucken.</p></li>
+    <li data-export="gpkg" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.gpkg" download>kiezatlas_potsdam.gpkg</a><span class="stand">vorhanden</span>
+      <p class="was">GeoPackage ohne OpenStreetMap-Anteil: Raumeinheiten mit Versorgungswerten, Versorgungstabelle, Einrichtungen, Zellen mit Entfernungen, Grünflächen, Haltestellen; QGIS-Stile sind eingebettet.</p>
+      <p class="lizenz">Je Ebene: Grenzen dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
+    <li data-export="gpkg_odbl" data-da="nein" data-odbl="ja"><span class="datei">kiezatlas_potsdam_odbl.gpkg</span><span class="stand stand--folgt">folgt</span>
+      <p class="was">Fußwegwerte und Einrichtungen aus OpenStreetMap, unter der Open Database License; folgt mit dem OpenStreetMap-Auszug.</p></li>
+    <li data-export="csv" data-da="ja" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
+    <li data-export="readme" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/README.md">README.md</a><span class="stand">vorhanden</span>
+      <p class="was">Was in jeder Ebene steht, wie es berechnet ist, Vermerke und Lizenzen.</p></li>
+    <li data-export="qgis" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.qgz" download>kiezatlas_potsdam.qgz</a><span class="stand">vorhanden</span>
+      <p class="was">QGIS-Projekt mit relativen Pfaden; neben <code>kiezatlas_potsdam.gpkg</code> speichern, dann öffnet es die Ebenen mit denselben Klassen wie die Karte.</p></li>
+    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/steckbriefe/11.html">Steckbrief je Stadtteil</a><span class="stand">vorhanden</span>
+      <p class="was">Die Versorgungstabelle eines Stadtteils als Druckseite (A4, über den Druckdialog als PDF); eine Datei je Stadtteilnummer, der Link zeigt Stadtteil 11.</p></li>
   </ul>
 </main>
 

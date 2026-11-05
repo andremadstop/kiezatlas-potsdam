@@ -117,7 +117,27 @@
       <p>Jedes Gebiet, auch mehrere zum Vergleich, lässt sich als Schaugrafik mitnehmen: als SVG, als PNG in Druckauflösung oder über die Druckansicht als PDF. Titel, Stichtag und Quellenvermerk stehen immer mit drauf.</p>
       <a class="knopf knopf--rand" href="#schaugrafik"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Schaugrafik gestalten</span></a>
     </li>
-    <li class="frage frage--frei" id="frage-8" data-schritt="8">
+    <li class="frage" id="frage-8" data-schritt="8">
+      <p class="frage__nr">Frage 8</p>
+      <h2 class="frage__titel">Wie weit ist es zur nächsten Kita?</h2>
+      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie. Dazu kommt je Stadtteil eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
+      <p class="frage__kann"><b>Mehr dazu:</b> Die Planer-Seite zeigt Einrichtungen und Entfernungen. Unter Daten liegen dieselben Werte als GeoPackage und CSV für QGIS.</p>
+      <div class="frage__knoepfe">
+        <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="8"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Kinder auf der Karte zeigen</span></button>
+        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
+      </div>
+    </li>
+    <li class="frage" id="frage-9" data-schritt="9">
+      <p class="frage__nr">Frage 9</p>
+      <h2 class="frage__titel">Wann wurde mein Viertel gebaut?</h2>
+      <p>Der Zensus 2022 zählt die Gebäude mit Wohnraum je Zelle nach Baujahr. Die Seite Bauzeiten zeigt das Gitter Klasse für Klasse und ab Stadtteil-Zoom jedes Gebäude mit seiner Bauzeitklasse. Das ist fast immer eine Schätzung und so gekennzeichnet, keine Aussage über einzelne Grundstücke.</p>
+      <p class="frage__kann"><b>Mehr dazu:</b> Die Methodenseite der Bauzeiten nennt für jede Stufe der Schätzung, wie oft sie im Rücktest stimmt.</p>
+      <div class="frage__knoepfe">
+        <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="9"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Altbau auf der Karte zeigen</span></button>
+        <a class="knopf knopf--voll" href="jahre.html"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Bauzeiten öffnen</span></a>
+      </div>
+    </li>
+    <li class="frage frage--frei" id="frage-10" data-schritt="10">
       <p class="frage__nr">Selbst erkunden</p>
       <h2 class="frage__titel">Jetzt gehört die Karte Ihnen.</h2>
       <p>Alle Themen stehen in der Leiste über der Karte. Ein Klick auf einen Stadtteil wählt ihn aus; darunter lassen sich alle Stadtteile vergleichen. Ohne Führung, ohne Kamerafahrten und mit teilbarem Link: die Karte zum freien Erkunden.</p>
@@ -255,11 +275,12 @@
 <section class="quellen-block" id="quellen" aria-labelledby="h-quellen">
   <h2 id="h-quellen" class="abschnitt">Quellen und Lizenzen</h2>
   <ul class="quellen">
-    <li>Zensus 2022, Gitterzellen 100 m (Bevölkerungszahl; Alter in 5 Altersklassen; Durchschnittsalter; Energieträger der Heizung; überwiegende Heizungsart; Wohnungen nach modifizierten Mikrozensus-Baujahresklassen). <span class="vermerk">© Statistische Ämter des Bundes und der Länder, 2024 bzw. 2025</span>; Destatis: freie Nutzung mit Namensnennung, in Open-Data-Katalogen als <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> geführt. Eigene Auswertung (Zuordnung zu Stadtteilen, Summen, Anteile). Datensätze: <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html">Destatis, Gitterdaten Zensus 2022</a>.</li>
+    <li>Zensus 2022, Gitterzellen 100 m (Bevölkerungszahl; Alter in 5 Altersklassen; Durchschnittsalter; Energieträger der Heizung; überwiegende Heizungsart; Wohnungen nach modifizierten Mikrozensus-Baujahresklassen). <span class="vermerk">© Statistische Ämter des Bundes und der Länder, 2024 bzw. 2025</span>; Destatis: freie Nutzung mit Namensnennung, in Open-Data-Katalogen als <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> geführt. Daten verändert (eigene Berechnung: Zuordnung zu Stadtteilen, Summen, Anteile). Datensätze: <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html">Destatis, Gitterdaten Zensus 2022</a>.</li>
     <li>Stadtteile in Potsdam. Landeshauptstadt Potsdam, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/zero-2-0">dl-zero-de/2.0</a>. Datensatz: <a href="https://opendata.potsdam.de/explore/dataset/stadtteile/">opendata.potsdam.de/explore/dataset/stadtteile</a> (von Hand heruntergeladen).</li>
     <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse, Höhe genähert). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
     <li>Luftbild: Digitale Orthophotos DOP20. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. Dienst: <code>https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms</code>.</li>
     <li>Hintergrundkarte: basemap.de Web Raster grau. <span class="vermerk">© basemap.de / BKG</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
+    <li>Planer und Bauzeiten: Kita- und Schulstandorte <span class="vermerk">© Ministerium für Bildung, Jugend und Sport</span>; Flächennutzung und Gebäudemerkmale aus ALKIS <span class="vermerk">© GeoBasis-DE/LGB</span>; jeweils <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung). Haltestellen und Takte <span class="vermerk">VBB Verkehrsverbund Berlin-Brandenburg GmbH</span>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Daten verändert (eigene Berechnung). Richtwerte aus dem Nahverkehrsplan 2019 und dem Potsdamer Baulandmodell 2019, Bauzeiten der Großsiedlungen aus „Potsdamer Platte“ (2008), jeweils nur Zahlen mit Fundstelle. Alle Dateien mit Vermerk: <a href="planer-daten.html">Daten</a>.</li>
     <li>Gegenproben: Regionaldatenbank Deutschland, Tabelle 12411-01-01-5-B (Bevölkerungsstand Potsdam); Landeshauptstadt Potsdam, „Stadtteile im Blick 2022“, S. 26 (Potsdam West). Je eine Zahl übernommen.</li>
     <li>Werkzeuge: Geodaten-Import-Pipeline (Apache-2.0, <a href="https://github.com/andremadstop/geodaten-import-pipeline">github.com/andremadstop/geodaten-import-pipeline</a>), PostgreSQL mit PostGIS, MapLibre GL JS 4.7.1 (BSD-3-Clause), GSAP 3.15.1 (GreenSock Standard License). Schrift: Barlow und Barlow Semi Condensed (SIL Open Font License 1.1).</li>
   </ul>
@@ -270,7 +291,7 @@
   <p class="fuss-seite__marke" aria-hidden="true">Kiezatlas Potsdam</p>
   <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
   <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
-  <p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Planer</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
 </footer>
 
 <div id="druck" aria-hidden="true"></div>

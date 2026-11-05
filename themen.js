@@ -86,13 +86,16 @@ function melden(text) {
   if (!m) { m = document.createElement("p"); m.id = "ladestatus"; m.className = "nur-sr"; m.setAttribute("aria-live", "polite"); document.body.appendChild(m); }
   m.textContent = text;
 }
+// Cache-Busting: Die Deploy-Kopie (skripte/deploy_kopie.py) setzt window.KIEZ_V; dann hängt jede nachgeladene
+// Datei ?v=<Stand> an. Im Repo und per file:// bleibt KIEZ_V leer, die Pfade bleiben unverändert.
+function v(src) { return window.KIEZ_V && src.indexOf("?") < 0 ? src + "?v=" + window.KIEZ_V : src; }
 function laden(src, global, fertig) {
   var w = src + " " + global;
   if (window[global] != null) { fertig(window[global]); return; }
   if (wartend[w]) { wartend[w].push(fertig); return; }
   var l = wartend[w] = [fertig], s = document.createElement("script");
   function ende(wert) { delete wartend[w]; l.forEach(function (f) { f(wert); }); }
-  s.src = src; s.async = true;
+  s.src = v(src); s.async = true;
   s.onload = function () { var d = window[global]; if (d == null) melden("Daten aus " + src + " sind unvollständig."); ende(d == null ? null : d); };
   s.onerror = function () { melden("Daten aus " + src + " ließen sich nicht laden."); ende(null); };
   document.head.appendChild(s);
@@ -128,6 +131,6 @@ window.KIEZ_THEMEN = {
   polys: polys, umriss: umriss, GANZ: GANZ,
   TEIL: TEIL, FARBE: FARBE, BEZIRKFARBE: BEZIRKFARBE, proBezirk: proBezirk,
   fmt: fmt, fmt1: fmt1, rundEw: rundEw, proz: proz, name: name, kachel: kachel, esc: esc,
-  ebenen: ebenen, laden: laden
+  ebenen: ebenen, laden: laden, v: v
 };
 })();

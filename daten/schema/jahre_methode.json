@@ -1,0 +1,412 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Kennzahlen der Gebäude-Schätzung (Methodenseite Bauzeiten)",
+ "x-datei": "jahre_methode.js",
+ "x-global": "^KIEZ_JAHRE_METHODE$",
+ "x-odbl": false,
+ "x-eigentuemer": "B5 Zweig 2 (skripte/26_jahre_methode.py)",
+ "x-zulieferung": "Von B5 Zweig 2 zugeliefert; Übernahme nach daten/schema/jahre_methode.json in der Integration (Tabelle 0.4: daten/schema gehört P0).",
+ "description": "Zählung aus daten/jahre/<nr>.js und Tabellen aus berichte/B4_holdout.md (SHA256 in herkunft). Nur Zählungen und Quoten, keine Gebäudekennungen, keine Adressen. Zensuswerte gerundet.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "stand",
+  "herkunft",
+  "gebaeude",
+  "je_g",
+  "jahr",
+  "stufen",
+  "ruecktest",
+  "gegenprobe",
+  "berlin",
+  "schieflage",
+  "summen"
+ ],
+ "properties": {
+  "fixture": {
+   "const": true
+  },
+  "stand": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+  },
+  "herkunft": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "bericht",
+    "sha256",
+    "skript",
+    "dateien"
+   ],
+   "properties": {
+    "bericht": {
+     "type": "string"
+    },
+    "sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "skript": {
+     "type": "string"
+    },
+    "dateien": {
+     "type": "integer",
+     "minimum": 1
+    }
+   }
+  },
+  "gebaeude": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "je_g": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "belegt",
+    "geschaetzt",
+    "nicht_datiert"
+   ],
+   "properties": {
+    "belegt": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "geschaetzt": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "nicht_datiert": {
+     "type": "integer",
+     "minimum": 0
+    }
+   }
+  },
+  "jahr": {
+   "type": "integer",
+   "minimum": 0
+  },
+  "stufen": {
+   "type": "array",
+   "minItems": 6,
+   "maxItems": 6,
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "s",
+     "name",
+     "gebaeude",
+     "wohnraum",
+     "neben"
+    ],
+    "properties": {
+     "s": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6
+     },
+     "name": {
+      "type": "string"
+     },
+     "gebaeude": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "wohnraum": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "neben": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   }
+  },
+  "ruecktest": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "name",
+     "art",
+     "n",
+     "je_stufe",
+     "je_bauzeit"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "art": {
+      "type": "string"
+     },
+     "n": {
+      "type": [
+       "integer",
+       "null"
+      ]
+     },
+     "je_stufe": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "$ref": "#/$defs/ruecktest"
+      }
+     },
+     "je_bauzeit": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "$ref": "#/$defs/ruecktest"
+      }
+     }
+    }
+   }
+  },
+  "gegenprobe": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "menge",
+    "n",
+    "ohne_klasse",
+    "gleich",
+    "bewertet",
+    "quote",
+    "median_abstand",
+    "median_abstand_abw"
+   ],
+   "properties": {
+    "menge": {
+     "type": "string"
+    },
+    "n": {
+     "type": "integer"
+    },
+    "ohne_klasse": {
+     "type": "integer"
+    },
+    "gleich": {
+     "type": "integer"
+    },
+    "bewertet": {
+     "type": "integer"
+    },
+    "quote": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ]
+    },
+    "median_abstand": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ]
+    },
+    "median_abstand_abw": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ]
+    }
+   }
+  },
+  "berlin": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "gesamt",
+    "zensus",
+    "blocktyp",
+    "nachbarn"
+   ],
+   "properties": {
+    "gesamt": {
+     "type": [
+      "integer",
+      "number"
+     ],
+     "minimum": 0,
+     "maximum": 100
+    },
+    "zensus": {
+     "type": [
+      "integer",
+      "number"
+     ],
+     "minimum": 0,
+     "maximum": 100
+    },
+    "blocktyp": {
+     "type": [
+      "integer",
+      "number"
+     ],
+     "minimum": 0,
+     "maximum": 100
+    },
+    "nachbarn": {
+     "type": [
+      "integer",
+      "number"
+     ],
+     "minimum": 0,
+     "maximum": 100
+    }
+   }
+  },
+  "schieflage": {
+   "type": "array",
+   "minItems": 2,
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "klasse",
+     "zensus",
+     "kaskade",
+     "abweichung",
+     "stufe3",
+     "stufe4",
+     "stufe5"
+    ],
+    "properties": {
+     "klasse": {
+      "type": "string"
+     },
+     "zensus": {
+      "type": "integer"
+     },
+     "kaskade": {
+      "type": "integer"
+     },
+     "abweichung": {
+      "type": [
+       "integer",
+       "number",
+       "null"
+      ]
+     },
+     "stufe3": {
+      "type": "integer"
+     },
+     "stufe4": {
+      "type": "integer"
+     },
+     "stufe5": {
+      "type": "integer"
+     }
+    }
+   }
+  },
+  "summen": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "geprueft",
+    "eingehalten",
+    "mit_luecke",
+    "ueberschritten"
+   ],
+   "properties": {
+    "geprueft": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "eingehalten": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "mit_luecke": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "ueberschritten": {
+     "type": "integer",
+     "minimum": 0
+    }
+   }
+  }
+ },
+ "$defs": {
+  "ruecktest": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "n",
+    "ohne_klasse",
+    "treffer",
+    "bewertet",
+    "quote",
+    "median_abstand",
+    "median_abstand_fehl"
+   ],
+   "properties": {
+    "stufe": {
+     "type": "string"
+    },
+    "bauzeit": {
+     "type": "string"
+    },
+    "n": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "ohne_klasse": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "treffer": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "bewertet": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "quote": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ],
+     "minimum": 0,
+     "maximum": 100
+    },
+    "median_abstand": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ]
+    },
+    "median_abstand_fehl": {
+     "type": [
+      "integer",
+      "number",
+      "null"
+     ]
+    }
+   }
+  }
+ }
+}

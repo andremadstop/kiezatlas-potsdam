@@ -103,7 +103,7 @@ function gebaeudeLaden() {
   if (!nr) { map.getSource("gebaeude").setData(LEER); hin.textContent = "Gebäude gibt es je Stadtteil: bitte zuerst einen Stadtteil wählen."; return; }
   var v = "KIEZ_GEB_" + nr;
   if (window[v]) { map.getSource("gebaeude").setData(window[v]); return; }
-  var s = document.createElement("script"); s.src = "daten/gebaeude/" + nr + ".js";
+  var s = document.createElement("script"); s.src = KIEZ_THEMEN.v("daten/gebaeude/" + nr + ".js");
   s.onload = function () { if (S.nr === nr && window[v]) map.getSource("gebaeude").setData(window[v]); };
   document.body.appendChild(s);
 }

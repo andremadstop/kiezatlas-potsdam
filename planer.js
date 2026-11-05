@@ -1,12 +1,16 @@
 /* Kiezatlas Potsdam: Planer-Seite (planer.html) und Methode (planer-methode.html).
-   Daten nur per <script> (KIEZ_THEMEN.laden), nie per fetch (file://). Datenordner steht in <html data-daten>,
-   bis zur Integration "daten/fixtures/" (Beispielwerte). Zustand im Hash, z. B.
+   Daten nur per <script> (KIEZ_THEMEN.laden), nie per fetch (file://). Datenordner steht in <html data-daten>
+   ("daten/"); mit planer.html?daten=fixtures zeigt die Seite die Beispieldateien aus daten/fixtures/ (Prüfung).
+   <html data-odbl> nennt die veröffentlichten _odbl-Dateien; fehlt eine, sind Fußweg bzw. OSM-Arten gesperrt
+   statt eine fehlende Datei anzufragen. Zustand im Hash, z. B.
    planer.html#ein=kita,gs&zu=kita&weg=luft&raum=st&r=13&k=12.00/52.40000/13.06000/0/0
    Keine Kamerabewegung von selbst; Klicks in die Karte bewegen die Kamera nie. */
 (function () {
 "use strict";
 var T = window.KIEZ_THEMEN, ST = window.KIEZ_STADTTEILE, NB = " ";
-var WURZEL = document.documentElement.getAttribute("data-daten") || "daten/";
+var FIXTURE = /(?:^|&)daten=fixtures(?:&|$)/.test(location.search.replace(/^\?/, ""));
+var WURZEL = FIXTURE ? "daten/fixtures/" : document.documentElement.getAttribute("data-daten") || "daten/";
+var ODBL = document.documentElement.getAttribute("data-odbl");   // null = keine Angabe: alle vorhanden
 var SEITE = document.body.getAttribute("data-seite");
 var fmt = T.fmt, fmt1 = T.fmt1, esc = T.esc, zahl2 = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 2 });
 var DLDE = "https://www.govdata.de/dl-de/by-2-0";
@@ -23,6 +27,9 @@ var DATEI = {
   erreichbar_fuss: { src: "erreichbar_fuss_odbl.js", global: "KIEZ_ERREICHBAR_FUSS", odbl: true },
   zellen: { src: "daten/zellen.js", global: "KIEZ_ZELLEN", bestand: true }
 };
+// Veröffentlicht? Dateien ohne ODbL immer; _odbl-Dateien nur, wenn <html data-odbl> sie nennt (oder Fixtures)
+function da(n) { var d = DATEI[n]; return !d.odbl || FIXTURE || ODBL === null || ODBL.split(/[\s,]+/).indexOf(d.src) > -1; }
+var FUSS_DA = da("erreichbar_fuss") || da("planer_fuss"), OSM_DA = da("ein_odbl");
 var beispielGesehen = false;
 function holen(n, fertig) {
   var d = DATEI[n];
@@ -112,7 +119,8 @@ var S = { ein: ["kita", "grundschule"], zu: "", weg: "luft", raum: "st", r: "", 
   // nur bekannte Kurzschlüssel; Fremdes aus einem Link legt keine Arten an
   if ("ein" in h) S.ein = h.ein ? h.ein.split(",").map(function (c) { return CODE[c]; }).filter(function (a, i, l) { return a && l.indexOf(a) === i; }) : [];
   if (h.zu && CODE[h.zu]) S.zu = CODE[h.zu];
-  if (h.weg === "fuss") S.weg = "fuss";
+  if (h.weg === "fuss" && FUSS_DA) S.weg = "fuss";
+  if (!OSM_DA) S.ein = S.ein.filter(function (a) { return ART[a].g !== "versorgung"; });
   if (h.raum === "pr") S.raum = "pr";
   if (h.r) S.r = h.r;
   if (h.k) { var k = h.k.split("/").map(Number); if (k.length >= 3 && k.every(function (x) { return !isNaN(x); }) && k[0] >= 0 && k[0] <= 22 && Math.abs(k[1]) <= 85 && Math.abs(k[2]) <= 180) S.kam = { zoom: k[0], center: [k[2], k[1]], pitch: k[3] || 0, bearing: k[4] || 0 }; }
@@ -202,10 +210,11 @@ function einBauen() {
     arten.forEach(function (a) {
       var A = art(a), l = el("label", "chip chip--ein"), r = document.createElement("input");
       r.type = "checkbox"; r.value = a; r.name = "ein"; r.checked = S.ein.indexOf(a) > -1;
-      l.appendChild(r); l.appendChild(swatch(a)); l.appendChild(el("span", null, A.kurz)); l.title = A.name;
+      var aus = g.id === "versorgung" && !OSM_DA; if (aus) { r.disabled = true; l.classList.add("chip--aus"); }
+      l.appendChild(r); l.appendChild(swatch(a)); l.appendChild(el("span", null, A.kurz)); l.title = A.name + (aus ? ": folgt mit dem OpenStreetMap-Auszug" : "");
       reihe.appendChild(l);
     });
-    fs.appendChild(reihe); fs.appendChild(el("p", "fuss", g.hinweis)); box.appendChild(fs);
+    fs.appendChild(reihe); fs.appendChild(el("p", "fuss", g.hinweis + (g.id === "versorgung" && !OSM_DA ? " Folgt: Der OpenStreetMap-Auszug ist noch nicht eingebunden." : ""))); box.appendChild(fs);
   });
   if (fokus != null) { var f = box.querySelector('input[value="' + fokus + '"]'); if (f) f.focus(); }
 }
@@ -262,7 +271,10 @@ function zuBauen() {
     r.checked = S.zu === a; r.disabled = aus; l.classList.toggle("chip--aus", aus);
     l.title = !a ? "Keine Entfernungen anzeigen" : aus ? art(a).name + ": nicht in den Daten (" + (S.weg === "fuss" ? "Fußweg" : "Luftlinie") + ")" : "Entfernung jeder bewohnten Zelle zur nächsten Einrichtung: " + art(a).name;
   });
-  document.querySelectorAll('#weg input').forEach(function (r) { r.checked = r.value === S.weg; });
+  document.querySelectorAll('#weg input').forEach(function (r) {
+    r.checked = r.value === S.weg;
+    if (r.value === "fuss" && !FUSS_DA) { r.disabled = true; r.parentNode.classList.add("chip--aus"); r.parentNode.title = "Fußweg folgt: Der OpenStreetMap-Auszug für das Wegenetz ist noch nicht eingebunden."; }
+  });
 }
 $("zu").addEventListener("change", function (e) { if (e.target.name === "zu") { S.zu = e.target.value; zuAnwenden(); } });
 $("weg").addEventListener("change", function (e) { if (e.target.name === "weg") wegSetzen(e.target.value); });
@@ -441,7 +453,7 @@ function versorgung() {
 var FRAGEN = [
   { titel: "Wie weit ist es zur nächsten Kita?", text: "Färbt jede bewohnte Zelle nach der Entfernung zur nächsten Kita. Klick auf einen Kreis zeigt Plätze und Quelle.", ein: ["kita"], zu: "kita" },
   { titel: "Liegt eine Grundschule in der Nähe?", text: "Entfernung zur nächsten Grundschule. Vorläufig, denn Grundschulen werden über Schulbezirke geplant, die hier noch fehlen.", ein: ["grundschule"], zu: "grundschule" },
-  { titel: "Wo ist das nächste Grün?", text: "Entfernung zur nächsten öffentlichen Grünfläche, dazu Spielplätze aus OpenStreetMap.", ein: ["spielplatz"], zu: "gruen" },
+  { titel: "Wo ist das nächste Grün?", text: "Entfernung zur nächsten öffentlichen Grünfläche" + (OSM_DA ? ", dazu Spielplätze aus OpenStreetMap." : "; Spielplätze folgen mit dem OpenStreetMap-Auszug."), ein: ["spielplatz"], zu: "gruen" },
   { titel: "Wie ist ein Stadtteil versorgt?", text: "Stadtteil wählen: Die Tabelle nennt je Zeile Wert, Methode, Status und Quelle.", ein: ["kita", "hort", "grundschule"], zu: "", raum: true }
 ];
 function fragenBauen() {
@@ -451,7 +463,7 @@ function fragenBauen() {
     b.appendChild(el("span", "frage-knopf__nr", String(i + 1))); var t = el("span", "frage-knopf__text");
     t.appendChild(el("b", null, F.titel)); t.appendChild(el("span", null, F.text)); b.appendChild(t);
     b.addEventListener("click", function () {
-      S.ein = F.ein.slice(); S.zu = F.zu;
+      S.ein = F.ein.filter(function (x) { return OSM_DA || ART[x].g !== "versorgung"; }); S.zu = F.zu;
       document.querySelectorAll('#ein input').forEach(function (r) { r.checked = S.ein.indexOf(r.value) > -1; });
       einAnwenden(); zuAnwenden();
       if (F.raum) { var v = $("block-raum"); v.scrollIntoView({ block: "start", behavior: RUHIG ? "auto" : "smooth" }); var f = $("raeume").querySelector(".treffer"); if (f) f.focus({ preventScroll: true }); }

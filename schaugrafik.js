@@ -323,7 +323,7 @@ A.schauGebiet = function (nr) {
 function schriften() {
   return new Promise(function (ok, fehler) {
     if (window.KIEZ_SCHRIFTEN) return ok(window.KIEZ_SCHRIFTEN);
-    var s = document.createElement("script"); s.src = "fonts/einbettung.js";
+    var s = document.createElement("script"); s.src = window.KIEZ_THEMEN ? KIEZ_THEMEN.v("fonts/einbettung.js") : "fonts/einbettung.js";
     s.onload = function () { ok(window.KIEZ_SCHRIFTEN); }; s.onerror = fehler; document.body.appendChild(s);
   });
 }
