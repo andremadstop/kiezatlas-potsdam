@@ -3,60 +3,15 @@
 (function () {
 "use strict";
 var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN;
-var fmt = new Intl.NumberFormat("de-DE"), fmt1 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }), NB = " ";
+var T = window.KIEZ_THEMEN, fmt = T.fmt, fmt1 = T.fmt1, NB = "\u00a0";
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches, SCHMAL = matchMedia("(max-width:860px)").matches, FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
-function rundEw(v) { return fmt.format(v >= 1000 ? Math.round(v / 100) * 100 : Math.round(v / 10) * 10); }
-function proz(v) { return v == null ? "k. A." : fmt1.format(v) + NB + "%"; }
-function name(nr) { return nr ? K.stadtteile[nr].name : "Potsdam"; }
-function kachel(G, id) { return (G.kacheln || []).filter(function (k) { return k.id === id; })[0]; }
-function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+var rundEw = T.rundEw, proz = T.proz, name = T.name, kachel = T.kachel, esc = T.esc;
 
-// ---------- Farben und Themen (wie auf der Startseite)
-var TOENE = { 1: 28, 2: 205, 3: 150, 4: 350, 5: 265, 6: 95, 7: 185, 8: 45 }, proBezirk = {}, FARBE = {}, BEZIRKFARBE = {}, TEIL = {};
-ST.features.forEach(function (f) { var b = f.properties.bezirk; (proBezirk[b] = proBezirk[b] || []).push(f.properties.nr); TEIL[f.properties.nr] = f; });
-ST.features.forEach(function (f) {
-  var b = f.properties.bezirk, l = proBezirk[b], i = l.indexOf(f.properties.nr), n = l.length;
-  FARBE[f.properties.nr] = "hsl(" + TOENE[b] + ",30%," + (n > 1 ? 72 - 28 * i / (n - 1) : 58).toFixed(0) + "%)";
-  BEZIRKFARBE[b] = "hsl(" + TOENE[b] + ",30%,52%)"; f.properties.farbe = FARBE[f.properties.nr];
-});
-var STUFEN = ["--k1", "--k2", "--k3", "--k4", "--k5"].map(function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }), GRAU = "#d5d8d3";
-var THEMEN = [
-  { id: "stadtteile", kurz: "Stadtteile", name: "Stadtteile", h: "stadtteile" },
-  { id: "ew", kurz: "Einwohner", name: "Einwohner je Zelle", einheit: "Personen", quelle: "Zensus 2022, Bevölkerungszahl", h: "ew" },
-  { id: "d_alter", kurz: "Alter", name: "Durchschnittsalter", einheit: "Jahre", nenner: "a_ges", quelle: "Zensus 2022, Durchschnittsalter", h: "alter" },
-  { id: "q_u18", kurz: "unter 18", name: "Anteil unter 18 Jahre", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen", h: "u18" },
-  { id: "q_65p", kurz: "65 und älter", name: "Anteil 65 Jahre und älter", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen", h: "65p" },
-  { id: "q_v1949", kurz: "vor 1949", name: "Wohnungen in Gebäuden vor 1949", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Baujahresklassen", h: "vor1949" },
-  { id: "q_fern", kurz: "Fernwärme", name: "Wohnungen mit Fernwärme", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Energieträger der Heizung", h: "fern" }
-];
-var THEMA = {}, HASHTHEMA = {}; THEMEN.forEach(function (t) { THEMA[t.id] = t; HASHTHEMA[t.h] = t.id; });
-function werte(f) { return Z.features.map(function (x) { return x.properties[f]; }).filter(function (v) { return v != null && !isNaN(v); }).sort(function (a, b) { return a - b; }); }
-var KLASSEN = {};
-THEMEN.slice(1).forEach(function (t) {
-  if (t.einheit === "%") { KLASSEN[t.id] = { grenzen: [20, 40, 60, 80], min: 0, max: 100, fest: true }; return; }
-  var w = werte(t.id), g = [];
-  [0.2, 0.4, 0.6, 0.8].map(function (p) { return w[Math.min(w.length - 1, Math.floor(p * w.length))]; }).forEach(function (v) { if (!g.length || v > g[g.length - 1]) g.push(v); });
-  KLASSEN[t.id] = { grenzen: g, min: w[0], max: w[w.length - 1] };
-});
-var HOCH = 1100;
-function hoehe(t) {
-  var v = ["get", t.id], s = KLASSEN[t.id], rel;
-  if (t.id === "ew") rel = ["sqrt", ["/", v, s.max]];
-  else if (t.einheit === "%") rel = ["/", ["min", 100, v], 100];
-  else rel = ["max", 0, ["/", ["-", v, s.min], s.max - s.min]];
-  var flach = t.nenner ? ["<", ["coalesce", ["get", t.nenner], 0], 10] : false;
-  function bei(H) { var h = ["*", H, rel]; return flach ? ["case", flach, 3, h] : h; }
-  return ["interpolate", ["linear"], ["zoom"], 10, bei(HOCH * 1.3), 12, bei(HOCH * 0.45), 13, bei(HOCH * 0.18), 14, bei(HOCH * 0.075), 16, bei(HOCH * 0.03)];
-}
-function farbe(t) {
-  var s = KLASSEN[t.id], e = ["step", ["get", t.id], STUFEN[0]];
-  s.grenzen.forEach(function (g, i) { e.push(g, STUFEN[Math.min(i + 1, 4)]); });
-  return t.nenner ? ["case", ["<", ["coalesce", ["get", t.nenner], 0], 10], GRAU, e] : e;
-}
-function polys(f) { return f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates; }
-function umriss(f) { var a = [180, 90, -180, -90]; polys(f).forEach(function (p) { p[0].forEach(function (c) { a[0] = Math.min(a[0], c[0]); a[1] = Math.min(a[1], c[1]); a[2] = Math.max(a[2], c[0]); a[3] = Math.max(a[3], c[1]); }); }); return [[a[0], a[1]], [a[2], a[3]]]; }
-var GANZ = (function () { var a = [180, 90, -180, -90]; ST.features.forEach(function (f) { var u = umriss(f); a[0] = Math.min(a[0], u[0][0]); a[1] = Math.min(a[1], u[0][1]); a[2] = Math.max(a[2], u[1][0]); a[3] = Math.max(a[3], u[1][1]); }); return [[a[0], a[1]], [a[2], a[3]]]; })();
+// ---------- Farben und Themen: gemeinsamer Kern in themen.js (wie auf der Startseite)
+var FARBE = T.FARBE, BEZIRKFARBE = T.BEZIRKFARBE, TEIL = T.TEIL, STUFEN = T.STUFEN;
+var THEMEN = T.THEMEN, THEMA = T.THEMA, HASHTHEMA = T.HASH, KLASSEN = T.KLASSEN;
+var hoehe = T.hoehe, farbe = T.farbe, umriss = T.umriss, GANZ = T.GANZ;
 
 // ---------- Zustand aus dem Hash
 var S = { thema: "stadtteile", nr: "", d3: false, luft: false, geb: false, kam: null };

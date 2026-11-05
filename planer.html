@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de" data-daten="daten/fixtures/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planer: Kiezatlas Potsdam</title>
+<meta name="description" content="Planer-Karte des Kiezatlas Potsdam: Kitas, Schulen, Gemeinbedarf und Grün, Entfernungen je 100-Meter-Zelle und Versorgung je Raumeinheit, mit Methode und Quelle bei jeder Zahl.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/planer.html">
+<meta name="theme-color" content="#f1f2ee">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kiezatlas Potsdam: Planer">
+<meta property="og:description" content="Versorgung mit Kita, Schule und Grün in Potsdam, je Zelle und je Raumeinheit.">
+<meta property="og:image" content="https://souverain-systems.de/kiezatlas/og.png">
+<meta property="og:locale" content="de_DE">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="karte.css">
+<link rel="stylesheet" href="planer.css">
+</head>
+<body class="kartenseite planerseite" data-seite="karte">
+<a class="sprung" href="#werkzeug-start">Zum Werkzeug springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+      <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer-methode.html"><span>Methode</span></a></li>
+      <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="kartenflaeche" id="inhalt">
+  <div class="kartenrahmen">
+    <div id="karte" role="region" aria-label="Planer-Karte von Potsdam. Mit Pfeiltasten verschieben, Plus und Minus zoomen."></div>
+    <div class="werkzeug" role="toolbar" aria-label="Erreichbarkeit und Messart">
+      <fieldset class="themen" id="zu"><legend class="nur-sr">Entfernung zur nächsten Einrichtung je Zelle</legend></fieldset>
+      <fieldset class="themen weg" id="weg">
+        <legend class="nur-sr">Messart der Entfernung</legend>
+        <label class="chip chip--schalter"><input type="radio" name="weg" value="luft"><span>Luftlinie</span></label>
+        <label class="chip chip--schalter"><input type="radio" name="weg" value="fuss"><span>Fußweg</span></label>
+      </fieldset>
+    </div>
+    <div class="legende" id="legende"></div>
+    <p class="beispiel" id="beispiel" hidden>Beispieldaten: Die Werte auf dieser Seite sind unecht und dienen nur dem Aufbau.</p>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  <aside class="seite" id="seite" aria-label="Fragen, Einrichtungen und Versorgung">
+    <button class="seite__griff" id="seite-griff" type="button" aria-expanded="false" aria-controls="seite-inhalt">
+      <span class="seite__griffstrich" aria-hidden="true"></span>
+      <span class="seite__grifftext"><b id="griff-name">Versorgung</b> <span>Fragen, Einrichtungen, Tabelle</span></span>
+    </button>
+    <div class="seite__inhalt" id="seite-inhalt">
+      <div class="block" id="werkzeug-start" tabindex="-1">
+        <h1 class="seite__titel">Versorgung planen</h1>
+        <p class="fuss seite__lede">Kitas, Schulen, Gemeinbedarf und Grün auf der Karte, Entfernungen je 100-Meter-Zelle und eine Versorgungstabelle je Raumeinheit. Jede Ansicht lässt sich als Link teilen.</p>
+        <h2 class="block__titel">Fragen</h2>
+        <ul class="fragenliste" id="fragen"></ul>
+      </div>
+
+      <div class="block" id="block-einrichtungen">
+        <h2 class="block__titel">Einrichtungen</h2>
+        <div id="ein"></div>
+      </div>
+
+      <div class="block" id="block-raum">
+        <h2 class="block__titel">Raumeinheit</h2>
+        <label class="suche"><span>Ebene</span>
+          <select id="raumebene"></select>
+        </label>
+        <p class="fuss" id="raumebene-hinweis"></p>
+        <ul class="trefferliste raumliste" id="raeume" aria-label="Raumeinheiten"></ul>
+      </div>
+
+      <div class="block" id="versorgung" tabindex="-1">
+        <h2 class="steckbrief__name" id="vs-name">Keine Raumeinheit gewählt</h2>
+        <p class="fuss" id="vs-art">Raumeinheit in der Liste oder in der Karte wählen. Die Tabelle zeigt je Zeile Wert, Methode, Status und Quelle.</p>
+        <div class="seite__aktion">
+          <button class="knopf knopf--rand" type="button" id="zoom-raum"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Ganz Potsdam zeigen</span></button>
+          <button class="knopf knopf--rand" type="button" id="link-teilen"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Link zu dieser Ansicht</span></button>
+        </div>
+        <p class="fuss" id="teilen-hinweis" aria-live="polite"></p>
+        <div id="vs-inhalt"></div>
+      </div>
+
+      <div class="block seite__fuss">
+        <p class="fuss" id="fuss-quellen">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Hintergrund © basemap.de / BKG, dl-de/by-2-0. Weitere Quellen je Zahl in der Tabelle und unter <a class="link" href="planer-daten.html">Daten</a>.</p>
+        <p class="fuss" id="fuss-odbl" hidden>Fußwege und Einrichtungen aus OpenStreetMap: © OpenStreetMap-Mitwirkende, ODbL 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). Die abgeleiteten Dateien stehen unter <a class="link" href="planer-daten.html">Daten</a>.</p>
+        <p class="fuss">Datenschutz: Die Karte lädt Kacheln von basemap.de; dieser Server sieht die IP-Adresse. Keine Cookies, keine Zählung.</p>
+        <p class="fuss-seite__links"><a class="link" href="planer-methode.html">Methode</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="themen.js"></script>
+<script defer src="planer.js"></script>
+</body>
+</html>
