@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daten der Bauzeiten: Kiezatlas Potsdam</title>
-<meta name="description" content="Bauzeiten Potsdam zum Weiterverwenden: Gebäude mit Wohnraum nach Bauzeit je 100-m-Zelle und je Stadtteil als CSV und GeoJSON, mit Lizenzvermerk.">
+<meta name="description" content="Bauzeiten Potsdam zum Weiterverwenden: Gebäude mit Wohnraum nach Bauzeit je 100-m-Zelle und je Stadtteil als CSV, GeoJSON und GeoPackage, mit Lizenzvermerk.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#f1f2ee">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -44,6 +44,10 @@
         <li>
           <div><h3>Zellen als Geodaten (GeoJSON)</h3><p>Dieselben Zellen mit ihrer Fläche, Koordinaten in WGS 84 (EPSG:4326). Lässt sich in QGIS direkt öffnen.</p></div>
           <button class="knopf knopf--rand" type="button" id="j-d-zellen-geojson" disabled><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">GeoJSON speichern</span></button>
+        </li>
+        <li>
+          <div><h3>Zellen und Stadtteile als GeoPackage</h3><p>Eine Datei für QGIS oder ArcGIS mit zwei Ebenen, <code>zellen</code> und <code>stadtteile</code>, und der Tabelle <code>hinweis</code> mit Quelle und Lizenz. Koordinaten in ETRS89 / UTM Zone 33N (EPSG:25833); die Zellen sind exakt aus der Gitterkennung berechnet. Werte wie in den beiden CSV-Dateien.</p></div>
+          <a class="knopf knopf--rand" href="daten/download/bauzeiten.gpkg" download="kiezatlas-bauzeiten.gpkg" id="j-d-gpkg"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">GeoPackage speichern</span></a>
         </li>
         <li>
           <div><h3>Je <span data-j="raum-name">Stadtteil</span> (CSV)</h3><p>Genäherte Mischung der Bauzeiten je <span data-j="raum-name">Stadtteil</span>, Anteile in ganzen Prozent, Gebäudezahlen auf 10 gerundet.</p></div>
@@ -89,7 +93,7 @@
   <section class="j-teil" aria-labelledby="d-fehlt">
     <h2 id="d-fehlt">Noch nicht hier</h2>
     <div class="j-teil__text">
-      <p>Ein GeoPackage in EPSG:25833 und eine Auswertung je Planungsraum gibt es noch nicht. Bis dahin lässt sich die GeoJSON-Datei in QGIS umprojizieren und über die Zellmittelpunkte jeder eigenen Raumebene zuordnen.</p>
+      <p>Eine Auswertung je Planungsraum gibt es noch nicht. Sie kommt dazu, sobald die Grenzen der Planungsräume als Datei vorliegen. Bis dahin lassen sich die Zellen aus dem GeoPackage in QGIS über ihre Mittelpunkte jeder eigenen Raumebene zuordnen.</p>
     </div>
   </section>
 </main>

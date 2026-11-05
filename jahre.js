@@ -358,9 +358,23 @@ function karte() {
     kamera(f.top ? huelle(rangliste(S.von, S.bis).map(function (x) { return x.nr; })) : T.GANZ, f.d3);
   }
   window.addEventListener("scroll", function () { geblaettert = true; }, { once: true, passive: true });
-  var beob = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { if (e.isIntersecting) schritt(+e.target.getAttribute("data-schritt")); });
-  }, { rootMargin: "-45% 0px -45% 0px" });
+  // Auslöseband: am Desktop die Bildschirmmitte; auf dem Handy liegt die Bühne oben über dem Text,
+  // dort zählt nur der sichtbare Lesebereich darunter (sonst stellt sich die Karte um, bevor die Frage lesbar ist)
+  var beob = null, beobZeit = 0;
+  function beobachten() {
+    if (beob) beob.disconnect();
+    var rm = "-45% 0px -45% 0px", schmal = matchMedia("(max-width:860px)").matches;
+    if (schmal) {
+      var bh = document.getElementById("buehne").getBoundingClientRect().height, rest = Math.max(innerHeight - bh, 80);
+      rm = "-" + Math.round(bh + rest * 0.2) + "px 0px -" + Math.round(rest * 0.45) + "px 0px";
+    }
+    beob = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) schritt(+e.target.closest("[data-schritt]").getAttribute("data-schritt")); });
+    }, { rootMargin: rm });
+    // Handy: der Titel der Frage löst aus, nicht ihr Kasten (dessen Oberkante liegt eine Zeile über dem Titel)
+    document.querySelectorAll("[data-schritt]").forEach(function (f) { beob.observe(schmal ? f.querySelector(".frage__titel, h1") || f : f); });
+  }
+  window.addEventListener("resize", function () { clearTimeout(beobZeit); beobZeit = setTimeout(beobachten, 200); }, { passive: true });
 
   // ---------- Vergleich der Gebiete
   var sortierung = "nr", liste = document.getElementById("j-liste"), zeilen = {};
@@ -422,11 +436,13 @@ function karte() {
 
   map.on("load", function () {
     map.addImage("j-schraffur", muster("schraffur")); map.addImage("j-punkte", muster("punkte"));
+    // Quellenbox eingeklappt wie in atlas.js/karte.js (Knopf „i“ öffnet sie; Quellen stehen auch in Legende und Fuß)
+    var att = document.querySelector("#karte .maplibregl-ctrl-attrib"); if (att) att.classList.remove("maplibregl-compact-show");
     bereit = true;
     if (S.d3) map.jumpTo({ pitch: 50 });
     if (S.nr) { gewaehlt = S.nr; map.setFeatureState({ source: "teile", id: S.nr }, { gewaehlt: true }); }
     anwenden();
-    document.querySelectorAll("[data-schritt]").forEach(function (f) { beob.observe(f); });
+    beobachten();
     window.KIEZ_JAHRE = { S: S, schritt: schritt, anwenden: anwenden, map: map };
     window.KIEZ_BEREIT = true;
   });
@@ -492,7 +508,7 @@ function daten() {
         "vorherrschend: Klasse mit den meisten Gebäuden; leer bei Gleichstand oder geheimen Klassen.",
         "Datei je " + RAUM.einzahl + ": Anteile genähert (Zellanteile mit der Gebäudezahl gewichtet), ganze Prozent; Gebäudezahlen auf 10 gerundet;",
         "vergleichbar = 0 heißt weniger als " + MINDEST + " Gebäude mit bekannter Bauzeit.",
-        "Keine Daten aus OpenStreetMap, keine Adressen, keine Angaben zu einzelnen Gebäuden.", "Koordinaten der GeoJSON-Datei: WGS 84 (EPSG:4326)."];
+        "Keine Daten aus OpenStreetMap, keine Adressen, keine Angaben zu einzelnen Gebäuden.", "Koordinaten der GeoJSON-Datei: WGS 84 (EPSG:4326). GeoPackage (bauzeiten.gpkg): ETRS89 / UTM Zone 33N (EPSG:25833), gleiche Werte, Tabelle hinweis mit Quelle und Lizenz."];
       speichern("LIESMICH-kiezatlas-bauzeiten.txt", "text/plain;charset=utf-8", t.join("\n") + "\n");
     }
   };

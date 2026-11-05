@@ -17,6 +17,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { DatabaseSync } from "node:sqlite";  // Node ≥ 22.5; für den Abgleich des GeoPackage
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const WURZEL = path.resolve(HIER, "..");
@@ -172,6 +173,8 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const leg = await page.$eval("#j-legende", (e) => e.textContent);
       pruef(/Zensus 2022, Stichtag/.test(leg) && /nicht einzelne Gebäude/.test(leg), "Legende nennt Quelle, Stichtag und „nicht einzelne Gebäude“");
       pruef(/Daten verändert \(eigene Berechnung\)/.test(await page.$eval("#j-zahlen-quelle", (e) => e.textContent)), "Kopfzahlen mit dl-de-Vermerk „Daten verändert (eigene Berechnung)“");
+      const ohneHinweis = await page.$$eval('[data-j$="-n"]', (l) => l.filter((b) => !/hochgerechnet/i.test(b.closest("p").textContent)).map((b) => b.getAttribute("data-j")));
+      pruef(ohneHinweis.length === 0 && /hochgerechnet und gerundet/.test(await page.$eval("#frage-1", (e) => e.textContent)), `Gebäudezahlen in den Fragen als „hochgerechnet“ gekennzeichnet, Unsicherheitshinweis ${ohneHinweis.join(" ")}`);
       // Zell-Popup
       // erst die Ansicht (schritt setzt die Kamera auf ganz Potsdam), dann nah heran, damit eine Zelle viele Pixel groß ist
       await page.evaluate(() => window.KIEZ_JAHRE.schritt(5));
@@ -210,6 +213,31 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(rz.length > 30 && ok, `CSV je Stadtteil ${rc.name}: ${rz.length - 1} Gebiete, Gebäudezahlen auf 10 gerundet`);
       const lm = await lade("j-d-liesmich");
       pruef(/Daten verändert \(eigene Berechnung\)/.test(lm.text) && /https:\/\/www\.govdata\.de\/dl-de\/by-2-0/.test(lm.text) && /Keine Daten aus OpenStreetMap/.test(lm.text), `Liesmich ${lm.name}: Vermerk, Lizenzlink, kein OSM`);
+      // GeoPackage (statisch, skripte/25_jahre_gpkg.py): Aufbau nach OGC-Norm und dieselben Werte wie die CSV-Dateien des Browsers
+      const href = await page.$eval("#j-d-gpkg", (a) => a.getAttribute("href"));
+      const db = new DatabaseSync(path.join(WURZEL, href), { readOnly: true });
+      const ein = (sql) => db.prepare(sql).get(), alle = (sql) => db.prepare(sql).all();
+      const pflicht = alle("select name from sqlite_master where type='table'").map((r) => r.name);
+      const kopf = ein("select geom from zellen limit 1").geom, kb = Buffer.from(kopf);
+      const box = ein("select min_x, min_y, max_x, max_y, srs_id from gpkg_contents where table_name='zellen'");
+      pruef(ein("pragma application_id").application_id === 0x47504b47 && ["gpkg_spatial_ref_sys", "gpkg_contents", "gpkg_geometry_columns", "zellen", "stadtteile", "hinweis"].every((t) => pflicht.includes(t))
+        && kb.toString("latin1", 0, 2) === "GP" && kb.readInt32LE(4) === 25833 && box.srs_id === 25833 && box.min_x > 350000 && box.max_x < 385000 && box.min_y > 5795000 && box.max_y < 5825000
+        && ein("select count(*) n from gpkg_spatial_ref_sys where srs_id in (-1, 0, 4326, 25833)").n === 4 && ein("pragma integrity_check").integrity_check === "ok",
+        `GeoPackage ${href}: Pflichttabellen, application_id GPKG, Geometriekopf GP, EPSG:25833, Ausdehnung Potsdam`);
+      const gz = ein("select count(*) n from zellen").n, gzc = z.slice(1).map((l) => l.split(","));
+      const gzOk = gz === n && alle("select gitter_id, gebaeude, anteil_vor_1919 a from zellen order by gitter_id").every((r, i, l) => {
+        const c = gzc.find((x) => x[0] === r.gitter_id); return c && +c[2] === r.gebaeude && (c[3] === "" ? r.a === null : Math.abs(+c[3] - r.a) < 1e-9);
+      });
+      pruef(gzOk, `GeoPackage zellen: ${gz} Zeilen, Gebäude und Anteile gleich der Zell-CSV`);
+      const rk = rz[0].split(","), rcsv = rz.slice(1).map((l) => Object.fromEntries(l.split(",").map((w, i) => [rk[i], w])));
+      const gst = alle("select * from stadtteile order by cast(nr as integer)");
+      const stOk = gst.length === rcsv.length && gst.every((r, i) => rk.every((k) => k === "name" || String(r[k] ?? "") === rcsv[i][k]));
+      pruef(stOk, `GeoPackage stadtteile: ${gst.length} Gebiete, alle Spalten gleich der Stadtteil-CSV (gerundet)`);
+      const hin = Object.fromEntries(alle("select schluessel, wert from hinweis").map((r) => [r.schluessel, r.wert]));
+      const spaltenGp = alle("select name from pragma_table_info('zellen') union all select name from pragma_table_info('stadtteile')").map((r) => r.name).join(" ");
+      pruef(/Daten verändert \(eigene Berechnung\)/.test(hin.vermerk) && hin.lizenztext === "https://www.govdata.de/dl-de/by-2-0" && !/strasse|hausnr|adress|eigentu/i.test(spaltenGp),
+        "GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten");
+      db.close();
       const alles = csv.text + gj.text + rc.text;
       pruef(!/strasse|straße|hausnr|adresse|eigentuemer|eigentümer/i.test(alles.replace(/keine Adressen/g, "")), "Downloads ohne Adress- oder Eigentümerfelder");
     }
@@ -223,6 +251,21 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
     pruef(quer[0] <= quer[1], `375 px: kein waagrechtes Scrollen (${quer[0]} ≤ ${quer[1]})`);
     const va = await axe(h.page);
     pruef(va.length === 0, `375 px: axe ${va.length} Verstöße ${va.join(", ")}`);
+    if (seite === "jahre.html") {
+      // Wie ein Mensch blättern: in Schritten scrollen, bis die Frage aktiv wird; ihr Titel muss dann sichtbar und nicht von der Bühne verdeckt sein
+      for (const n of [1, 2, 3]) {
+        let aktiv = false;
+        for (let s = 0; s < 200 && !aktiv; s++) {
+          await h.page.mouse.wheel(0, 30); await h.page.waitForTimeout(25);
+          aktiv = await h.page.$eval("#frage-" + n, (e) => e.classList.contains("ist-aktiv"));
+        }
+        const frei = await h.page.$eval("#frage-" + n + " .frage__titel", (t) => {
+          const r = t.getBoundingClientRect(), x = r.left + Math.min(40, r.width / 2), y = r.top + r.height / 2;
+          return y > 0 && y < innerHeight && t.contains(document.elementFromPoint(x, y));
+        });
+        pruef(aktiv && frei, `375 px: Frage ${n} wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist`);
+      }
+    }
     if (seite === "jahre.html" && art === "file") {
       await bild(h.page, "B5_375.png");
       await h.page.$eval("#frage-2", (e) => e.scrollIntoView({ block: "center" })); await h.page.waitForTimeout(400);
