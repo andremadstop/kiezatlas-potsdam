@@ -1,0 +1,3 @@
+Importlauf 20261105T101043Z · 3.03 s
+  zensus_struktur          ok     neu  6334  geändert     0  gelöscht     0  unverändert     0
+  Änderungskarte: 20261105T101043Z-karte.html
