@@ -23,7 +23,8 @@ Liest die Datenbank nur (psql als Leserolle), die Rohdaten-Zips nur zum Hash, ke
 Aufruf (Passwort nur aus der Umgebung, nie auf der Kommandozeile):
   set -a; . ../kiezatlas-potsdam/.env; set +a
   PGPASSWORD="$LESE_PASSWORD" python3 -I pruefen/A1_zensus.py [--basis ausbau/p0]
-  Im Integrationszweig: --basis ausbau/p0..ausbau/a1 (prüft die Commits von A1, Ergänzung I1)
+  Im Integrationszweig: --basis ausbau/p0..ausbau/a1 (prüft nur die Commits von A1, nicht den offenen Stand;
+  dazu kommen ungetrackte Dateien. Ergänzung I1)
 Rückgabe 0 = alle Prüfungen bestanden, 1 = Befund.
 """
 from __future__ import annotations

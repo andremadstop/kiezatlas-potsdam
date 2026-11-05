@@ -35,7 +35,7 @@ window.KIEZ_THEMEN = {
   polys,   umriss, GANZ,          // Geometrie
   TEIL, FARBE, BEZIRKFARBE, proBezirk,   // Stadtteile
   fmt, fmt1, rundEw, proz, name, kachel, esc,   // Text
-  ebenen,  laden                  // Ebenen-Register und Nachladen
+  ebenen,  laden,  v              // Ebenen-Register, Nachladen, Cache-Busting
 };
 ```
 
@@ -102,6 +102,10 @@ KIEZ_THEMEN.laden(src, global, fertig)
 // Lädt daten/… per <script>-Tag (nie fetch), ruft fertig(window[global]) auf.
 // Liegt window[global] schon vor, sofort. Gleichzeitige Aufrufe für dieselbe Datei laden einmal.
 // Bei Ladefehler fertig(null) und eine Meldung im Element mit aria-live, kein Konsolenfehler.
+
+KIEZ_THEMEN.v(src)
+// Hängt ?v=<window.KIEZ_V> an, wenn die Deploy-Kopie (skripte/deploy_kopie.py) KIEZ_V setzt; sonst src unverändert.
+// laden() nutzt es selbst; für eigene <script>-Tags (Gebäude, Schrifteinbettung) aufrufen. Ergänzt in I1.
 
 KIEZ_THEMEN.ebenen.registrieren({
   id:      "erreichbar",                  // eindeutig

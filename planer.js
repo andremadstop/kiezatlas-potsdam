@@ -29,7 +29,8 @@ var DATEI = {
 };
 // Veröffentlicht? Dateien ohne ODbL immer; _odbl-Dateien nur, wenn <html data-odbl> sie nennt (oder Fixtures)
 function da(n) { var d = DATEI[n]; return !d.odbl || FIXTURE || ODBL === null || ODBL.split(/[\s,]+/).indexOf(d.src) > -1; }
-var FUSS_DA = da("erreichbar_fuss") || da("planer_fuss"), OSM_DA = da("ein_odbl");
+var FUSS_DA = da("erreichbar_fuss") && da("planer_fuss"), OSM_DA = da("ein_odbl");
+function erlaubt(a) { return OSM_DA || !ART[a] || ART[a].g !== "versorgung"; }   // OSM-Arten nur mit einrichtungen_odbl.js
 var beispielGesehen = false;
 function holen(n, fertig) {
   var d = DATEI[n];
@@ -120,7 +121,7 @@ var S = { ein: ["kita", "grundschule"], zu: "", weg: "luft", raum: "st", r: "", 
   if ("ein" in h) S.ein = h.ein ? h.ein.split(",").map(function (c) { return CODE[c]; }).filter(function (a, i, l) { return a && l.indexOf(a) === i; }) : [];
   if (h.zu && CODE[h.zu]) S.zu = CODE[h.zu];
   if (h.weg === "fuss" && FUSS_DA) S.weg = "fuss";
-  if (!OSM_DA) S.ein = S.ein.filter(function (a) { return ART[a].g !== "versorgung"; });
+  S.ein = S.ein.filter(erlaubt);
   if (h.raum === "pr") S.raum = "pr";
   if (h.r) S.r = h.r;
   if (h.k) { var k = h.k.split("/").map(Number); if (k.length >= 3 && k.every(function (x) { return !isNaN(x); }) && k[0] >= 0 && k[0] <= 22 && Math.abs(k[1]) <= 85 && Math.abs(k[2]) <= 180) S.kam = { zoom: k[0], center: [k[2], k[1]], pitch: k[3] || 0, bearing: k[4] || 0 }; }
@@ -210,7 +211,7 @@ function einBauen() {
     arten.forEach(function (a) {
       var A = art(a), l = el("label", "chip chip--ein"), r = document.createElement("input");
       r.type = "checkbox"; r.value = a; r.name = "ein"; r.checked = S.ein.indexOf(a) > -1;
-      var aus = g.id === "versorgung" && !OSM_DA; if (aus) { r.disabled = true; l.classList.add("chip--aus"); }
+      var aus = !erlaubt(a); if (aus) { r.disabled = true; l.classList.add("chip--aus"); }
       l.appendChild(r); l.appendChild(swatch(a)); l.appendChild(el("span", null, A.kurz)); l.title = A.name + (aus ? ": folgt mit dem OpenStreetMap-Auszug" : "");
       reihe.appendChild(l);
     });
@@ -463,7 +464,7 @@ function fragenBauen() {
     b.appendChild(el("span", "frage-knopf__nr", String(i + 1))); var t = el("span", "frage-knopf__text");
     t.appendChild(el("b", null, F.titel)); t.appendChild(el("span", null, F.text)); b.appendChild(t);
     b.addEventListener("click", function () {
-      S.ein = F.ein.filter(function (x) { return OSM_DA || ART[x].g !== "versorgung"; }); S.zu = F.zu;
+      S.ein = F.ein.filter(erlaubt); S.zu = F.zu;
       document.querySelectorAll('#ein input').forEach(function (r) { r.checked = S.ein.indexOf(r.value) > -1; });
       einAnwenden(); zuAnwenden();
       if (F.raum) { var v = $("block-raum"); v.scrollIntoView({ block: "start", behavior: RUHIG ? "auto" : "smooth" }); var f = $("raeume").querySelector(".treffer"); if (f) f.focus({ preventScroll: true }); }
@@ -591,6 +592,8 @@ function methode() {
       tr.appendChild(el("td", null, (w.status === "orientierung" ? "Orientierung, kein Richtwert" : "amtlicher Maßstab") + (w.vorlaeufig ? "; vorläufig, ohne Schulbezirk" : "")));
       var td = el("td"), Q = P.quellen[(w.richtwert || w).q] || { vermerk: (w.richtwert || w).q };
       td.appendChild(vermerkKnoten(Q.vermerk)); if (w.richtwert && w.richtwert.seite) td.appendChild(document.createTextNode(", " + w.richtwert.seite));
+      // Maßstab aus einem Dokument ohne Lizenz: dazu die Quelle der Daten mit ihrem Vermerk (Lizenz)
+      if (w.richtwert && w.q && w.q !== w.richtwert.q && P.quellen[w.q]) { td.appendChild(document.createTextNode(". Daten: ")); td.appendChild(vermerkKnoten(P.quellen[w.q].vermerk)); }
       tr.appendChild(td); tb.appendChild(tr);
     });
     tab.appendChild(tb); box.appendChild(tab);

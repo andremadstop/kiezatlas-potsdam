@@ -2,9 +2,9 @@
 
 Kopiert genau die Dateien, die auf souverain-systems.de/kiezatlas/ gehören, in einen Ordner außerhalb des Repos
 und hängt in den HTML-Seiten an jeden lokalen Verweis auf .js, .css, .svg, .png und .woff2 ein ?v=<mtime> der
-Zieldatei an. Für nachgeladene Dateien (KIEZ_THEMEN.laden, Gebäude, Schrifteinbettung) setzt jede Seite
-window.KIEZ_V = jüngste mtime unter daten/ und fonts/; themen.js hängt den Wert an. Das Repo bleibt unverändert,
-file:// im Repo läuft ohne ?v.
+Zieldatei an, dazu an jeden Verweis unter daten/ (Downloads). Für nachgeladene Dateien (KIEZ_THEMEN.laden,
+Gebäude, Schrifteinbettung) setzt jede Seite window.KIEZ_V = jüngste mtime unter daten/ und fonts/; themen.js
+hängt den Wert an. Das Repo bleibt unverändert, file:// im Repo läuft ohne ?v.
 
 Lädt nichts hoch und ruft nichts aus dem Netz ab. Der Upload ist Andres Schritt (additiver rsync, kein --delete).
 Am Ende schreibt das Skript MD5SUMS in den Zielordner: dagegen prüft man nach dem Upload die live geladenen Dateien.
@@ -30,7 +30,8 @@ DATEIEN = ["atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "kar
 ORDNER = ["vendor", "fonts", "daten"]
 AUSSER = ["daten/fixtures", "daten/schema"]
 
-VERWEIS = re.compile(r'((?:src|href)=")([^"#?:]+\.(?:js|css|svg|png|woff2))(")')
+# Seitenbestandteile und alle Dateien unter daten/ (auch Downloads wie .gpkg, .csv); Links auf Seiten bleiben ohne ?v
+VERWEIS = re.compile(r'((?:src|href)=")((?:daten/[^"#?:]+)|(?:[^"#?:]+\.(?:js|css|svg|png|woff2)))(")')
 
 
 def dateiliste():
@@ -73,9 +74,12 @@ def main():
         print("\n".join(str(p) for p in liste))
         return
     ziel = Path(o.ziel).resolve()
-    if ziel == WURZEL or WURZEL in ziel.parents:
-        sys.exit("Ziel liegt im Repo")
+    if ziel == WURZEL or WURZEL in ziel.parents or ziel in WURZEL.parents:
+        sys.exit("Ziel liegt im Repo oder enthält es")
     if ziel.exists():
+        # nur eine frühere Kopie dieses Skripts ersetzen (erkennbar an MD5SUMS), nie einen fremden Ordner
+        if any(ziel.iterdir()) and not (ziel / "MD5SUMS").is_file():
+            sys.exit(f"{ziel} ist nicht leer und keine frühere Deploy-Kopie (MD5SUMS fehlt); anderes --ziel wählen")
         shutil.rmtree(ziel)
     stempel = stand(liste)
     md5 = []

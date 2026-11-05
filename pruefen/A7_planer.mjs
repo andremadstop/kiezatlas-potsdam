@@ -102,8 +102,13 @@ async function planerEcht(basis, art) {
     fuss: document.querySelector('#weg input[value="fuss"]').disabled,
     osm: ["arzt", "apotheke", "supermarkt", "pflege", "spielplatz"].every((a) => { const i = document.querySelector(`#ein input[value="${a}"]`); return !i || i.disabled; }),
     odbl: document.documentElement.getAttribute("data-odbl") }));
-  const odblDateien = ["einrichtungen_odbl.js", "erreichbar_fuss_odbl.js", "planer_fuss_odbl.js"].filter((f) => fs.existsSync(path.join(WURZEL, "daten", f)));
-  pruef(odblDateien.length > 0 || (sperre.fuss && sperre.osm), `ohne _odbl-Dateien in daten/ sind Fußweg (${sperre.fuss}) und OSM-Arten (${sperre.osm}) gesperrt, data-odbl="${sperre.odbl}"`);
+  // data-odbl muss zu daten/ passen: genannt = vorhanden; Fußweg offen nur mit beiden Fußweg-Dateien, OSM-Arten nur mit einrichtungen_odbl.js
+  const genannt = (sperre.odbl || "").split(/[\s,]+/).filter(Boolean), da = (f) => fs.existsSync(path.join(WURZEL, "daten", f));
+  const alleOdbl = ["einrichtungen_odbl.js", "erreichbar_fuss_odbl.js", "planer_fuss_odbl.js"];
+  const passt = genannt.every(da) && alleOdbl.every((f) => genannt.includes(f) || !da(f));
+  const fussErw = !(genannt.includes("erreichbar_fuss_odbl.js") && genannt.includes("planer_fuss_odbl.js")), osmErw = !genannt.includes("einrichtungen_odbl.js");
+  pruef(sperre.odbl !== null && passt && sperre.fuss === fussErw && sperre.osm === osmErw,
+    `data-odbl="${sperre.odbl}" passt zu daten/ (${passt}); Fußweg gesperrt ${sperre.fuss} (erwartet ${fussErw}), OSM-Arten gesperrt ${sperre.osm} (erwartet ${osmErw})`);
   const chips = await page.$$eval('#ein input[name="ein"]:not(:disabled)', (l) => l.map((i) => i.value));
   pruef(chips.includes("kita") && chips.includes("grundschule") && chips.length >= 5, `Einrichtungs-Chips aus den echten Daten: ${chips.join(", ")}`);
   await page.check('#zu input[value="kita"]', { force: true }); await warteBereit(page);
@@ -285,7 +290,7 @@ async function textseiten(basis, art) {
   const m = await oeffnen(basis, "planer-methode.html");
   const r = await m.page.evaluate(() => ({ zeilen: document.querySelectorAll("#richtwerte tbody tr").length,
     orient: [...document.querySelectorAll("#richtwerte tbody tr")].filter((t) => /Orientierung, kein Richtwert/.test(t.textContent)).length,
-    vermerk: [...document.querySelectorAll("#richtwerte tbody tr")].every((t) => /dl-de|ODbL|Lizenz/.test(t.textContent)) }));
+    vermerk: [...document.querySelectorAll("#richtwerte tbody tr")].every((t) => /dl-de|ODbL|CC BY|Lizenz/.test(t.textContent)) }));
   const v1 = await axe(m.page);
   pruef(r.zeilen > 0 && r.orient > 0 && r.vermerk && v1.length === 0 && m.fehler.length === 0,
     `planer-methode.html über ${art}: ${r.zeilen} Maßstäbe aus der Datei, ${r.orient} als Orientierung, Vermerk je Zeile ${r.vermerk}, axe ${v1.length}, Fehler ${m.fehler.length}`);

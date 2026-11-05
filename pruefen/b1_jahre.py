@@ -56,8 +56,9 @@ def main() -> int:
     # Im Integrationszweig liegt daten/jahre/ von B4 vor; dann Basis als Bereich angeben (ausbau/p0..ausbau/b1),
     # geprüft wird, dass die Commits von B1 kein daten/jahre/ anlegen (Ergänzung I1, 05.11.2026).
     if ".." in basis:
-        jahre = subprocess.run(["git", "-C", str(WURZEL), "diff", "--name-only", basis, "--", "daten/jahre"],
-                               capture_output=True, text=True, check=False).stdout.strip()  # nosec B603 B607
+        r = subprocess.run(["git", "-C", str(WURZEL), "diff", "--name-only", basis, "--", "daten/jahre"],
+                           capture_output=True, text=True, check=False)  # nosec B603 B607
+        jahre = r.stdout.strip() if r.returncode == 0 else f"git diff {basis} scheiterte"
     else:
         jahre = (DATEN / "jahre").exists()
     pruef('"oid"' not in text and not jahre, "keine Gebäude-oid, kein daten/jahre/ aus B1")
