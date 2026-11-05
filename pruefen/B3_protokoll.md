@@ -45,6 +45,13 @@ Bildauswertung die Befliegung findet, in der ein heutiges Gebäude zum ersten Ma
   `form_abweichend` = an der Stelle stand vorher ein anderer Baukörper (Ersatzneubau), `unklar` = nicht entscheidbar
   (Schatten, Bäume, Bildfehler). Unklare Gebäude zählen nicht zu den 50 und gehen nicht in die Trefferquote ein;
   ihre Zahl steht im Bericht.
+- **Lesart, während der Sichtung festgelegt (vor dem Klassifikator):**
+  - Ein Rohbau mit erkennbarem Umriss (Wände, Kran am Baukörper) zählt als „zu sehen“; Baugrube, Fundament und
+    freigeräumtes Baufeld zählen nicht.
+  - `frueher_moeglich = 1`: Das Gebäude ist in Befliegung k_ref sicher zu sehen, in der Befliegung davor ist an der Stelle
+    ein unscharfer Körper, der derselbe sein kann (meist 1953 mit 1 m Graustufen). Für diese Gebäude ist nur „k_ref oder
+    früher“ belegt. Sie zählen in der Nebenbedingung (alle haben k_ref ≤ 3), aber nicht in Trefferquoten mit genauem k.
+  - Die Bögen hat der Agent in der Reihenfolge der Lose gesichtet, Los 1 vollständig vor Los 2 bis 4, diese vor Los 5.
 - Ablage: `$KIEZ_DATEN/luftbild_lgb/2026-11-05/referenz/referenz.csv` (außerhalb des öffentlichen Repos, weil die oid
   über ALKIS auf eine Adresse führt; Korrektur 6). Ins Repo kommt nur der SHA256 (Abschnitt 7).
 - **Zirkularität:** Referenz und Automatik lesen dieselben Bilder. Gemessen wird also „Automatik gegen Sichtprüfung“,
@@ -79,6 +86,12 @@ Bildauswertung die Befliegung findet, in der ein heutiges Gebäude zum ersten Ma
 
 ## 7. Referenz (wird nach der Sichtprüfung eingetragen, vor dem Klassifikator)
 
-- Datei: `referenz.csv`, SHA256: _offen_
-- Gesichtete Lose: _offen_
-- Gebäude gesamt / k_ref ≥ 4 (nach 2009) / k_ref = 3 / k_ref ≤ 2 / unklar: _offen_
+Eingetragen am 05.11.2026 nach der Sichtung, vor dem ersten Code des Klassifikators.
+
+- Datei: `referenz.csv` (200 Zeilen, Spalten nr, los, oid, funktion, flaeche_m2, k_ref, unklar, frueher_moeglich,
+  form_abweichend, notiz), SHA256 `6f5a0fb5ceb6ffb737292cca9852e414ea8f7794b5169f84291e1ae8270d4173`
+- Gesichtete Lose: 1 bis 5 (Nr. 1 bis 200). Nach Los 4 standen 46 Gebäude mit k_ref ≥ 4 in der Referenz, deshalb
+  wurde Los 5 vollständig nachgezogen.
+- Gebäude gesamt 200 / k_ref ≥ 4 (nach 2009): **56** / k_ref = 3: 29 / k_ref ≤ 2: 108 / unklar: 7
+- Verteilung k_ref (ohne unklar): 0: 41, 1: 27, 2: 40, 3: 29, 4: 23, 5: 16, 6: 9, 7: 8
+- `frueher_moeglich`: 30 Gebäude (alle k_ref ≤ 2), `form_abweichend` (Vorgängerbau an der Stelle): 14 Gebäude
