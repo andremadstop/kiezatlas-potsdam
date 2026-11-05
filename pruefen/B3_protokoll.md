@@ -114,3 +114,24 @@ abgestimmt; ändert sich die Methode nach dem ersten Lauf, stehen beide Läufe i
 6. Klammer: `nicht_vor` = Flugjahr der Befliegung k_auto − 1 (bei k_auto = 0 leer), `nicht_nach` = Flugjahr k_auto.
    Geschrieben werden nur Gebäude des Rahmens im Pilotgebiet (keine Nebengebäude, E5).
 7. Erst nach der Klammer liest das Skript `referenz.csv` (SHA256 wird vorher geprüft) und wertet nach §5 aus.
+
+## 9. Ergebnis und Entscheidung (05.11.2026)
+
+Ein Lauf der Methode aus §8, ohne Änderung danach. Zahlen in `berichte/B3_pilot.md`.
+
+- **Hauptkriterium:** 44 von 56 Gebäuden mit k_ref ≥ 4 getroffen (78,6 %), unter der Schwelle von 80 %.
+- **Nebenbedingung:** 44 von 137 Gebäuden, die 2012 schon zu sehen sind, datiert die Automatik auf „nach 2012“
+  (32,1 %), erlaubt sind 10 %.
+- **Entscheidung: B3 wird nicht ausgerollt.** Die 2.374 Pilotzeilen bleiben in `auswertung.jahr_klammer` mit der Quelle
+  „LGB DOP-Zeitreihe, Pilot Bornstedt (nicht ausgerollt)“. B4 nutzt sie nicht als Kaskadenstufe.
+- **Woran es liegt (Befund, kein Umbau):** In den Graustufen-Befliegungen 1953 und 1996 liegt der Wert am eigenen Ort
+  im Median bei 0,18 und damit weit unter der Schwelle (0,40 bzw. 0,32). Alte Gebäude gelten dort fast nie als
+  sichtbar. Fällt zusätzlich eine farbige Befliegung aus (Schatten, Bäume, neues Dach), schiebt die Treppe das Gebäude
+  nach vorn: 11 Gebäude mit k_ref = 0 landen bei 2015, 6 bei 2021. Die Zensus-Gegenprobe zeigt dieselbe Richtung:
+  947 Wohngebäude erstmals 2015 bis 2021 gegen 757 Gebäude mit Wohnraum ab 2010 im Zensus (Größenordnung, ALKIS zählt
+  Reihenhäuser einzeln).
+- **Was trägt:** Neubauten nach 2012 erkennt die Automatik meist richtig oder um eine Stufe daneben (51 von 56,
+  91,1 %). Für eine Klammer je Gebäude reicht das nicht, weil die Fehldatierung alter Gebäude den Bestand verfälscht.
+- **Grenze der Messung:** Referenz und Automatik lesen dieselben Bilder; die Sichtprüfung hat der Agent gemacht, nicht
+  Andre. Ein zweiter Lauf mit geänderter Methode wäre jetzt an der Referenz abgestimmt und bräuchte eine neue,
+  unabhängige Stichprobe (Lose ab Nr. 201 in derselben Reihenfolge).

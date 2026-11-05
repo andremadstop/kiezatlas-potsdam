@@ -479,6 +479,10 @@ def auswerten() -> int:
     return 0
 
 
+def _tsd(n: int) -> str:
+    return f"{n:,}".replace(",", ".")
+
+
 def _pz(a: int, b: int) -> str:
     return f"{a} von {b} ({100 * a / b:.1f} %)".replace(".", ",") if b else "–"
 
@@ -490,7 +494,7 @@ def _bericht(**w) -> None:
         "# B3 Luftbild-Pilot Bornstedt: Ergebnis",
         "",
         f"Stand {datetime.now(UTC):%d.%m.%Y}. Erzeugt von `skripte/23_luftbild_pilot.py auswerten`. Protokoll, Stichprobe und",
-        "Trefferregel stehen in `pruefen/B3_protokoll.md` und wurden vor diesem Lauf festgelegt (Commits f482058, 67bffd5).",
+        "Trefferregel stehen in `pruefen/B3_protokoll.md` und wurden vor diesem Lauf festgelegt (Commits f482058, 67bffd5, 2683650).",
         "Dieser Bericht enthält nur Zählungen, keine Gebäudekennungen.",
         "",
         "## Entscheidung",
@@ -500,7 +504,7 @@ def _bericht(**w) -> None:
         "  mindestens 50 Gebäude).",
         f"- Nebenbedingung: Von den Referenzgebäuden, die 2012 schon zu sehen sind, datiert die Automatik {_pz(*w['neben'])}",
         "  fälschlich auf „nach 2012“ (zulässig höchstens 10 %).",
-        f"- Folge: Die {len(w['k_auto'])} Zeilen in `auswertung.jahr_klammer` tragen die Quelle „{w['quelle']}“.",
+        f"- Folge: Die {_tsd(len(w['k_auto']))} Zeilen in `auswertung.jahr_klammer` tragen die Quelle „{w['quelle']}“.",
         "  B4 nimmt nur Zeilen ohne den Zusatz „nicht ausgerollt“ als Kaskadenstufe." if not w["ausrollen"] else
         "  B4 darf sie als Kaskadenstufe 2 nehmen, vorerst nur für Bornstedt.",
         "",
@@ -531,10 +535,10 @@ def _bericht(**w) -> None:
         "",
         "## Automatik",
         "",
-        f"- Gebäude im Rahmen: {w['n']}, davon mit Klammer: {len(w['k_auto'])}.",
+        f"- Gebäude im Rahmen: {_tsd(w['n'])}, davon mit Klammer: {_tsd(len(w['k_auto']))}.",
         "- Verteilung k_auto (erste Befliegung mit Gebäude): " + ", ".join(
             f"{FLUGJAHR[j]}: {c}" for j, c in enumerate(w["verteilung"])) + ".",
-        f"- Median der Klammerbreite (ohne „schon 1953“): {w['median_breite']} Jahre." if w["median_breite"] else "",
+        f"- Median der Klammerbreite (ohne „schon 1953“): {w['median_breite']:g} Jahre." if w["median_breite"] else "",
         "- Schwellen (95-%-Quantil der Nullverteilung) je Befliegung: " + ", ".join(
             f"{FLUGJAHR[k]}: {s:.2f}".replace(".", ",") for k, s in enumerate(w["schwelle"])) + ".",
         "- Median des Werts am eigenen Ort je Befliegung: " + ", ".join(
@@ -542,11 +546,11 @@ def _bericht(**w) -> None:
         "",
         "## Gegenprobe Zensus 2022 (beschreibend, kein Abbruchkriterium)",
         "",
-        f"- 100-m-Zellen mit Mittelpunkt in Bornstedt: {zz[0]}, Gebäude mit Wohnraum insgesamt {zz[1]},",
+        f"- 100-m-Zellen mit Mittelpunkt in Bornstedt: {zz[0]}, Gebäude mit Wohnraum insgesamt {_tsd(zz[1])},",
         f"  davon 2000 bis 2009: {zz[2]}, 2010 bis 2015: {zz[3]}, 2016 und später: {zz[4]}",
         f"  (zusammen ab 2010: {zz[3] + zz[4]}). Werte mit Cell-Key-Verfahren, „–“ als 0 gezählt; Stichtag 15.05.2022.",
-        f"- Automatik, Wohngebäude im Rahmen, erstmals 2015 bis 2021 zu sehen: {w['wohnen_neu_46']};",
-        f"  erstmals 2015 bis 2024: {w['wohnen_neu_47']}.",
+        f"- Automatik, Wohngebäude im Rahmen, erstmals 2015 bis 2021 zu sehen: {_tsd(w['wohnen_neu_46'])};",
+        f"  erstmals 2015 bis 2024: {_tsd(w['wohnen_neu_47'])}.",
         "- Vergleich nur in der Größenordnung: ALKIS zählt Gebäudeteile (Reihenhäuser einzeln), der Zensus Gebäude mit",
         "  Wohnraum; Flugjahre und Zensus-Klassen decken sich nicht (Bauten von 2010 bis Mai 2012 sind schon im Flug 2012).",
         "",
