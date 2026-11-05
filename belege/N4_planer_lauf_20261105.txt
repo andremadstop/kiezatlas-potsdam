@@ -1,0 +1,9 @@
+Raumebene: planungsraum (19 Raumeinheiten, aus vorbereitet/planungsraeume.csv (public.planungsraum noch leer))
+bewohnte Zellen im Stadtgebiet ohne Raumeinheit: 0 mit 0 EW
+Strittige Lage 103512 (grundschule): zählt nicht als Ziel; neu gerechnet 67 Zellen Luftlinie, 295 Zellen Fußweg (nur lesend, zelle_erreichbar unverändert)
+Prognose (H11): ../kiezatlas-daten/eingang/prognose_planungsraum.csv fehlt, Spalte prognose nicht ausgegeben
+Ortsangabe widerspricht Lage: MBJS 103512 (Groß Glienicke ≠ Fahrland), 8 Grundschulwerte in 101, 103 gesperrt
+luftlinie: 19 Raumeinheiten, 323 Werte, 0 Werte wegen Geheimhaltung null
+Ortsangabe widerspricht Lage: MBJS 103512 (Groß Glienicke ≠ Fahrland), 4 Grundschulwerte in 101, 103 gesperrt
+fussweg: 19 Raumeinheiten, 190 Werte, 0 Werte wegen Geheimhaltung null
+geschrieben: planer.js, erreichbar.js, einrichtungen.js, planer_fuss_odbl.js, erreichbar_fuss_odbl.js, einrichtungen_odbl.js

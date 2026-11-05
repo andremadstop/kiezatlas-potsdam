@@ -36,6 +36,7 @@ Quelle: `$KIEZ_DATEN/nvp_potsdam/2019/2020-09-29_nvp_potsdam_mit_anlagen.pdf`, s
    (11 Bornim, 13 Bornstedt, 32 Potsdam West, 64 Waldstadt I/Industriegelände, 72 Drewitz, 84 Fahrland, 86 Groß Glienicke),
    offen bei 2 (43 Zentrum Ost/Nuthepark, 44 Hauptbahnhof/Brauhausberg Nord, kein gleichnamiger NVP-Ortsteil).
    Die genaue Zuordnung braucht die Geometrie der statistischen Bezirke (H1). Bis dahin: blockiert für die 9 Stadtteile.
+   **Nachlauf N2 (05.11.2026): mit den statistischen Bezirken bestimmt, siehe Abschnitt 6.**
 3. **Messung:** Stichtag Dienstag 10.11.2026 (Schultag; Herbstferien Brandenburg 19.–30.10.2026), Fenster 06:00–09:00,
    Mittel je Stunde. Gezählt werden Abfahrten (ohne Endhalt der Fahrt, ohne pickup_type 1), alle Linien zusammen, getrennt
    nach `direction_id`; es zählt die stärkere Richtung. Fahrten des Vortags nach Mitternacht (Zeiten ≥ 24:00) werden
@@ -87,3 +88,60 @@ eine Plausibilitätsprüfung (anderer Fahrplan), keine Abnahme.
 - Ohne Abfahrt am Stichtag und deshalb nicht in der Tabelle (DHID-Stamm de:12054): Hiroshima-Nagasaki-Platz, Freiligrathstr.,
   Otto-Erich-Str. (alle Rudolf-Breitscheid-Straße), Am Küssel, Wublitzstr./Am Bahnhof, Hauptbahnhof/Friedrich-Engels-Str.
   (Tramsteig), die Fähranleger Auf dem Kiewitt und Hermannswerder. Ursache (Baustelle, Saison) nicht geprüft.
+
+## 6. Nachlauf N2: Gebietsklasse je statistischem Bezirk (05.11.2026)
+
+Eingang: `$KIEZ_DATEN/eingang/statistische-bezirke-in-potsdam.geojson` (H1, LHP, Stand 31.12.2021, 86 Bezirke,
+dl-de/by-2-0, sha256 `e5949434…`). Nur intern gerechnet; in `daten/` und im Export steht nichts daraus.
+Ergebnis in `config/richtwerte.yaml` → `oepnv.gebietsklassen.statistische_bezirke` (29 Bezirke) und in den 9
+Stadtteil-Einträgen (`bezirke_geprueft`, `anteil_ew_prozent`). Gegenprobe: `pruefen/a4_gebietsklassen.py`, Ausgabe
+`belege/a4_gebietsklassen_20261105.txt` (0 Befunde).
+
+**Wie zugeordnet wird.** Der NVP hat keine Ortsteilgrenzen als Datei. Anlage 2 listet die Einwohner je statistischem
+Bezirk (Nummern von 2017); die ersten zwei Ziffern bilden die Ortsteilgruppe, Tab. 4.1 teilt einige Gruppen weiter.
+Alle 86 Bezirke liegen zu ≥ 99 % in dem Stadtteil ihrer ersten zwei Ziffern. Je Bezirk eine Grundlage:
+- **name:** Bezirksname = NVP-Ortsteil (z. B. 131 Das Kurze Feld, 323 Forststraße, 843 Kartzow).
+- **anker:** Haltestellen, die Anlage 3 oder 4 unter dem Ortsteil bzw. der Klasse führt, liegen im Bezirk
+  (z. B. 844 mit sechs Fahrländer Haltestellen der Klasse II, 845 Fahrländer See, 842 Rotkehlchenweg; 111 mit der
+  Haltestelle Institut für Agrartechnik als Anker für „Institut Bornim“).
+- **nummer:** Ortsteil aus der Nummerngruppe der Anlage 2. 43 und 44 bestehen aus den Bezirken der Gruppe 42 von 2017
+  (421 Brauhausberg Nord, 422 Hauptbahnhof, 423 Zentrum Ost), also Südliche Innenstadt, Klasse I. Anlage 4 führt
+  Am Havelblick (441) und Schlaatzstr. (442) unter Klasse I (Zeile Teltower Vorstadt, ebenfalls I).
+- **ausschluss:** einziger übrig bleibender Ortsteil der Gruppe (113 Katharinenholz → Bornim, 322 Luftschiffhafen →
+  Potsdam West, 722/725 → Drewitz).
+
+**Umnummerierung 2017 → 2021 (nach Namen):** 330 → 324 Wildpark, 421/422 → 441/442, 423 → 431 (+ 432 Nuthepark),
+660 → 644 Industriegelände, 670 → 613 Forst Potsdam Süd, 841 → 844 Fahrland Ortslage, 842 → 845 Krampnitz.
+
+**Ergebnis für die 9 Stadtteile** (Einwohneranteile Zensus 2022, Zellmittelpunkt im Bezirk):
+
+| Stadtteil | Bezirke → Klasse | Stadtteilklasse |
+|---|---|---|
+| 11 Bornim | 112, 113 → II; 111, 114 → III | gemischt: II 83 %, III 17 % |
+| 13 Bornstedt | 132 → I; 133 → II; 131 → III | gemischt: I 73 %, II 13 %, III 15 % |
+| 32 Potsdam West | 321, 322 → I; 323 → III; 324 Wildpark ohne Klasse | gemischt: I 85 %, III 14 %, ohne 1 % |
+| 43 Zentrum Ost und Nuthepark | 431, 432 → I | **I** (vorher offen) |
+| 44 Hauptbahnhof und Brauhausberg Nord | 441, 442 → I | **I** (vorher offen) |
+| 64 Waldstadt I und Industriegelände | 641–643 Waldstadt I → I oder II; 644 → II | nicht eindeutig: nach Tab. 4.1 ganz II, nach Text/Anlage 4 zu 98 % I |
+| 72 Drewitz | 722–725 → I; 721 Drewitz Ortslage (Alt Drewitz) → III | gemischt: I 83 %, III 17 % |
+| 84 Fahrland | 844, 845 → II; 842, 843 → III | gemischt: II 96 %, III 4 % |
+| 86 Groß Glienicke | 860 → II oder III | nicht trennbar: ein Bezirk mit Groß Glienicke (II) und Waldsiedlung (III) |
+
+Genau bestimmt ist damit die Klasse **je Bezirk** in 7 der 9 Stadtteile vollständig; eine einzige Stadtteilklasse gibt es
+nur in 43 und 44. In 11, 13, 32, 72 und 84 ist der Stadtteil tatsächlich gemischt. Offen bleiben Waldstadt I (Widerspruch
+im NVP) und Groß Glienicke (keine feinere Grenze). Eine Mehrheitsklasse je Stadtteil wird bewusst nicht gesetzt.
+
+**Folge für A6 (nicht in N2 geändert):** `15_planer.py` nimmt die Klasse je Zelle aus dem Stadtteil. Mit der Klasse je
+Bezirk hätten in diesen 9 Stadtteilen statt rund 50.340 nur noch rund 11.050 Einwohner keine eindeutige Klasse
+(Waldstadt I und Groß Glienicke). Die neue Klasse I für 43 und 44 macht `daten/planer.js` veraltet: `pruefen/A6_planer.py`
+meldet mit der neuen YAML Abweichungen in den Planungsräumen 401 und 601 (ÖPNV-Erschließung und -Takt). Neu rechnen ist
+Sache von A6 (`15_planer.py`) und danach A8 (Export).
+
+**Soll-Ist je Haltestelle** (Fahrten HVZ am Stichtag gegen die Untergrenze der Tab. 4.3 für die Klasse des Bezirks):
+75 Potsdamer Haltestellen in Bezirken mit Klasse, davon 14 unter dem Soll, u. a. Bornstedter Feld (Am Pfingstberg,
+Hannes-Meyer-Str., Wiesenpark, Schlegelstr./Pappelallee), Zentrum Ost (Humboldtring, Wiesenstr.), Am Havelblick und
+Finkenweg, Fahrländer See. Am Havelblick und Fahrländer See führt auch Anlage 4 als Defizit. Liste im Beleg. Die
+Taktklasse je Haltestelle (`auswertung.haltestelle.klasse`) hängt nicht von der Gebietsklasse ab und bleibt unverändert;
+`a4_haltestelle.py` ist mit der neuen YAML grün. `13_oepnv.py --trocken` lief nicht: Er legt eine TEMP-Tabelle an, das
+darf die Leserolle nicht, und `RECHNEN_PASSWORD` steht nicht in der `.env`.
+

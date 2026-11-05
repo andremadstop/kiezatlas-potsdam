@@ -1,6 +1,7 @@
 # A3: Übergabe an A5b, A6, A8
 
-Stand 05.11.2026. Code fertig und getestet, **echte Daten fehlen** (H5: OSM-PBF von Andre).
+Stand 05.11.2026. Code fertig und getestet. **Nachlauf N1 (05.11.2026):** mit dem BBBike-Auszug Potsdam (Stand
+31.10.2026) geladen, `12_osm.sh pruefen` 5 von 5 erfüllt; Zahlen in `belege/N1_osm_fussweg_20261105.md`.
 
 ## Ablauf, sobald die PBF da ist
 

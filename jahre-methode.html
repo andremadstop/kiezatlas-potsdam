@@ -108,14 +108,14 @@
         <tbody></tbody>
       </table>
       <ol class="j-wege">
-        <li><b>Genaues Jahr</b> aus einer Quelle mit klarer Lizenz. Bisher keine: Die Denkmallisten aus Wikipedia und vom Landesamt dienen nur der Prüfung, weil ihre Nutzung als Datenbank lizenzrechtlich nicht geklärt ist.</li>
+        <li><b>Genaues Jahr</b> aus einer Quelle mit klarer Lizenz: das Erstellungsjahr von Baudenkmalen in Wikidata (frei, CC0), zugeordnet über die Nummer der Denkmalliste oder den Ort des Objekts. Die Karte zeigt diese Gebäude als „belegt“. Die Denkmallisten aus Wikipedia und vom Landesamt dienen nur der Prüfung, weil ihre Nutzung als Datenbank lizenzrechtlich nicht geklärt ist.</li>
         <li><b>Luftbildklammer</b> aus Luftbildern verschiedener Jahre. Im Versuch für Bornstedt blieb die Trefferquote unter der vorab gesetzten Schwelle, deshalb nicht genutzt.</li>
         <li><b>Großsiedlung:</b> Für die Großsiedlungen der Stadt ist die Bauzeit belegt (Broschüre „Potsdamer Platte“ der Stadt, 2008). Ihre Grenzen sind aus der Bauform der Gebäude abgeleitet; Gebiete, für die sich so keine sichere Grenze ziehen ließ, bleiben bei der Zensus-Verteilung.</li>
         <li><b>Zensus-Verteilung:</b> Die Zahl der Gebäude je Bauzeit in der 100-m-Zelle wird auf die Wohngebäude der Zelle verteilt, gelenkt von ihrer Form im Kataster (Dachform, Höhe, Grundfläche, Bauweise, Nutzung). Fehlen Klassen wegen der Geheimhaltung, füllt sie der Rest der umgebenden 1-km-Zelle auf, sofern diese ganz in der Stadt liegt.</li>
         <li><b>Nachbarn:</b> Wo der Zensus nicht reicht (mehr Umrisse als gezählte Gebäude, Zelle ohne Wert), gilt die häufigste Bauzeit der datierten Gebäude im Umkreis von 100 m, wenn es mindestens drei sind.</li>
         <li><b>Nicht datiert:</b> <span data-j="g-nd">…</span> Gebäude, davon <span data-j="g-neben">…</span> Nebengebäude wie Garagen, Lauben und Schuppen; die übrigen blieben ohne Ergebnis. Die Karte zeigt sie grau.</li>
       </ol>
-      <p>Wohngebäude tragen kein Einzeljahr, nur eine Klasse: Das Kataster führt keine Zahl der Wohnungen, und ein Jahr je Einfamilienhaus könnte auf die Eigentümer verweisen. Ausnahme wären Denkmale aus einer freigegebenen Quelle. Heute tragen <span data-j="g-jahr">…</span> Gebäude ein Jahr. Die Gebäudedateien enthalten keine Adressen und keine Kennungen.</p>
+      <p>Wohngebäude tragen kein Einzeljahr, nur eine Klasse: Das Kataster führt keine Zahl der Wohnungen, und ein Jahr je Einfamilienhaus könnte auf die Eigentümer verweisen. Das gilt auch für Baudenkmale mit Wohnraum, solange die Zahl der Wohnungen unbekannt ist. Ein Jahr tragen nur <span data-j="g-jahr">…</span> belegte Gebäude ohne Wohnraum, etwa Kirchen und Schlösser. Die Gebäudedateien enthalten keine Adressen und keine Kennungen.</p>
       <p>Der Aufbau als Folge von Wegen mit Rücktest folgt dem Berliner Projekt visinage als Methodenvorbild. Daten, Klassen und Prüfsätze sind eigene.</p>
     </div>
   </section>
@@ -123,12 +123,13 @@
   <section class="j-teil" id="m-ruecktest" aria-labelledby="m-rt">
     <h2 id="m-rt">Wie oft die Schätzung trifft</h2>
     <div class="j-teil__text">
-      <p>Geprüft wird an Gebäuden mit bekannter Bauzeit, die in keine Schätzung eingehen. Treffer heißt: Die geschätzte Klasse überschneidet die bekannte Bauzeit. Die Regeln standen vor dem Lauf fest. Die Quoten gelten nur für die jeweiligen Prüfgebäude, nicht für die ganze Stadt.</p>
+      <p>Geprüft wird an Gebäuden mit bekannter Bauzeit, die in keine Schätzung eingehen. Die genauen Jahre aus Wikidata werden dafür zurückgehalten: Die Schätzung wird für den Rücktest ohne sie gerechnet, sonst kennte sie die Antwort schon. Treffer heißt: Die geschätzte Klasse überschneidet die bekannte Bauzeit. Die Regeln standen vor dem Lauf fest. Die Quoten gelten nur für die jeweiligen Prüfgebäude, nicht für die ganze Stadt.</p>
       <div id="j-m-ruecktest"></div>
       <p>Gegenprobe ohne bekannte Jahre: An den Gebäuden der Großsiedlungen wurde die Zensus-Verteilung allein gerechnet. Sie ergibt bei <span data-j="g-gegen">…</span> von <span data-j="g-gegen-n">…</span> Gebäuden dieselbe Klasse wie die belegte Bauzeit des Gebiets. Das vergleicht zwei Schätzungen, nicht Schätzung und Wahrheit.</p>
       <ul>
         <li>Die Denkmale stammen fast alle aus der Zeit vor 1919 und stehen meist in Altbauzellen, in denen der Zensus selbst kaum anderes zeigt. Dort ist die Klasse leicht zu treffen.</li>
         <li>Die Luftbildprüfung deckt nur Bornstedt ab. Viele ihrer Spannen liegen über einer Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.</li>
+        <li>Die Denkmale aus Wikidata und aus Wikipedia sind zum Teil dieselben Gebäude; die beiden Prüfsätze sind nicht unabhängig. Viele Wikidata-Denkmale sind Kirchen, Schlösser und Parkbauten ohne Wohnraum, für die der Zensus nichts sagt; ohne das genaue Jahr bleiben sie oft ohne Klasse.</li>
         <li>Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude.</li>
         <li>Beim Berliner Vorbild trafen die Schätzungen in dessen Rücktest <span data-j="g-berlin">…</span>. Mit Potsdam ist das nicht vergleichbar: Hier gibt es acht breite Klassen statt Jahrzehnten, eine davon 30 Jahre lang, und andere Prüfsätze.</li>
       </ul>
@@ -144,6 +145,13 @@
         <thead><tr><th scope="col">Bauzeit</th><th scope="col">Zensus, rund</th><th scope="col">Gebäudekarte</th><th scope="col">Abweichung</th></tr></thead>
         <tbody></tbody>
       </table>
+      <p>Eine zweite Gegenprobe ist die Statistik der Stadt zu Wohngebäuden nach Baualter. Sie hat nur vier Gruppen; drei davon passen auf die Klassen hier:</p>
+      <table class="j-tabelle" id="j-m-lhp">
+        <caption class="nur-sr">Wohngebäude je Baualtersgruppe: Statistik der Stadt, Zensus und Schätzung je Gebäude, ganze Stadt</caption>
+        <thead><tr><th scope="col">Bauzeit</th><th scope="col">Stadt 2022</th><th scope="col">Zensus, rund</th><th scope="col">Stadt 2025</th><th scope="col">Gebäudekarte</th><th scope="col">Abweichung</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="fuss" id="j-m-lhp-quelle"></p>
       <p>Die Großsiedlungen (Stufe 3) entstehen ohne Zensus. Gegen den Zensus geprüft halten sie in <span data-j="g-summen">…</span> Paaren aus Stadtteil und Bauzeit die Grenze von 10&nbsp;% Überschreitung ein.</p>
       <p class="fuss">Zahlen aus dem Bericht <code>berichte/B4_holdout.md</code> (SHA256 beginnt mit <span data-j="g-sha">…</span>) und aus den Gebäudedateien, Stand <span data-j="g-stand">…</span>; zusammengeführt von <code>skripte/26_jahre_methode.py</code>. Zensuswerte gerundet und durch die Geheimhaltung verändert.</p>
     </div>

@@ -71,10 +71,22 @@ WP_LIZENZ = "CC BY-SA 4.0"
 WD_DATEI = Path(os.environ.get("KIEZ_WD_CSV", KIEZ_DATEN / "eingang/wikidata_potsdam_baujahr.csv"))
 WD_QUELLE = "Wikidata"
 WD_LIZENZ = "CC0 1.0"
+# Zuordnung über die Denkmal-ID nutzt die Adressen der BLDAM-Liste (Lizenz ungeklärt, E8): nur Prüfspalte.
+# Quelle mit „BLDAM“ und Lizenz mit „ungeklärt“, damit Kaskade (24) und Prüfung (B2) sie sicher ausschließen.
+WD_ID_QUELLE = "Wikidata, Zuordnung über BLDAM-ID (nur Prüfung)"
+WD_ID_LIZENZ = "CC0 1.0; Zuordnung über die BLDAM-Liste ungeklärt (E8)"
+WD_ID_ABSTAND_M = 150      # ID und Koordinate widersprechen sich, wenn der Punkt weiter von allen ID-Gebäuden liegt
+WD_MIN_FLAECHE_M2 = 100    # Punkt außerhalb jedes Umrisses: nächstes Gebäude nur ab dieser Grundfläche
+# Objekte, deren Erstellungsjahr in Wikidata nicht das des heutigen Gebäudes ist (Handstichprobe N3):
+WD_AUSSCHLUSS = {
+    "Q1549185": "Großes Militärwaisenhaus: 1724 ist die Gründung der Anstalt, der heutige Bau ist jünger",
+}
 DDB_KEY = KIEZ_DATEN / "eingang/ddb-key"
 OSM_ORDNER = KIEZ_DATEN / "eingang/osm"
-WD_ENSEMBLE = re.compile(r"(park|garten|gärten|friedhof|kirchhof|siedlung|allee|platz|ensemble|anlage)\b",
-                         re.IGNORECASE)
+# Ensemble nur, wenn die Bezeichnung damit beginnt und keine Hausnummer trägt: „Louis-Nathan-Allee 5“,
+# „Allee nach Sanssouci 7“ und „Sparkasse Luisenplatz“ sind Gebäude (N3, vorher Teilwortsuche).
+WD_ENSEMBLE = re.compile(r"^\W*(park|garten|gärten|friedhof|kirchhof|siedlung|wohnsiedlung|allee|platz|ensemble|"
+                         r"anlage|gesamtanlage)\b[^\d]*$", re.IGNORECASE)
 
 # Funktionen aus dem Snapshot, die nie als Hauptgebäude eines Denkmals gelten.
 NEBEN = ("Garage", "Gebäude zum Parken", "Tiefgarage", "Schuppen", "Gartenhaus", "Überdachung",
@@ -380,12 +392,16 @@ def wikidata_lesen() -> list[dict]:
                 continue
             pm = re.match(r"Point\(([-\d.]+) ([-\d.]+)\)", r.get("coord") or "")
             zeilen.append({"item": r["item"].strip(), "von": von, "bis": bis, "genau": genau,
-                           "midas": (r.get("denkmal_id") or "").strip(),
+                           "midas": (r.get("denkmal_id") or "").strip(), "label": r.get("itemLabel") or "",
                            "ensemble": bool(WD_ENSEMBLE.search(r.get("itemLabel") or "")),
                            "ew": float(pm.group(1)) if pm else None, "ns": float(pm.group(2)) if pm else None})
-    werte = collections.Counter(z["item"] for z in zeilen)
+    # Mehrere Jahre je Objekt: keines ist genau. Gezählt werden verschiedene Spannen, nicht Zeilen; dieselbe
+    # Spanne kommt doppelt, wenn ein Objekt zwei Koordinaten oder zwei Denkmal-IDs hat (N3).
+    werte = collections.defaultdict(set)
     for z in zeilen:
-        if werte[z["item"]] > 1:
+        werte[z["item"]].add((z["von"], z["bis"]))
+    for z in zeilen:
+        if len(werte[z["item"]]) > 1:
             z["genau"] = False
     return zeilen
 
@@ -468,6 +484,37 @@ def punkt_zuordnen(cur, punkte: list[tuple[str, float, float]]) -> dict[str, str
                    g.geom::geography <-> ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)::geography
           LIMIT 1) g""", (list(NEBEN),))
     return dict(cur.fetchall())
+
+
+def punkt_pruefen(cur, punkte: list[tuple[str, float, float]], id_paare: list[tuple[str, str]]):
+    """Wikidata (N3): je Punkt das Gebäude wie punkt_zuordnen mit Lage (im Umriss?) und Grundfläche, dazu der
+    Abstand des Punkts zu jedem Gebäude, das die Denkmal-ID liefert. id_paare: (schluessel, oid)."""
+    cur.execute("CREATE TEMP TABLE b2_wdp (k text, lon float8, lat float8) ON COMMIT DROP")
+    with cur.copy("COPY b2_wdp FROM STDIN") as cp:
+        for p in punkte:
+            cp.write_row(p)
+    cur.execute(f"""
+        SELECT p.k, g.oid, g.im, g.flaeche FROM b2_wdp p
+        CROSS JOIN LATERAL (
+          SELECT g.oid, ST_Intersects(g.geom, ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)) AS im,
+                 ST_Area(g.geom::geography) AS flaeche
+          FROM {SNAPSHOT} g
+          WHERE ST_DWithin(g.geom::geography, ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)::geography, 10)
+            AND (ST_Intersects(g.geom, ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326))
+                 OR coalesce(g.funktion, '') <> ALL(%s))
+          ORDER BY ST_Intersects(g.geom, ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)) DESC,
+                   g.geom::geography <-> ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)::geography
+          LIMIT 1) g""", (list(NEBEN),))
+    lage = {k: (oid, im, fl) for k, oid, im, fl in cur.fetchall()}
+    cur.execute("CREATE TEMP TABLE b2_wdi (k text, oid text) ON COMMIT DROP")
+    with cur.copy("COPY b2_wdi FROM STDIN") as cp:
+        for p in id_paare:
+            cp.write_row(p)
+    cur.execute(f"""
+        SELECT i.k, i.oid, ST_Distance(g.geom::geography, ST_SetSRID(ST_MakePoint(p.lon, p.lat), 4326)::geography)
+        FROM b2_wdi i JOIN b2_wdp p ON p.k = i.k JOIN {SNAPSHOT} g ON g.oid = i.oid""")
+    abstand = {(k, oid): d for k, oid, d in cur.fetchall()}
+    return lage, abstand
 
 
 def ersetzen(conn, quelle_muster: str, zeilen: list[tuple], trocken: bool) -> None:
@@ -579,40 +626,99 @@ def lauf_wikipedia(conn, trocken: bool, stand: dict) -> None:
 
 
 def lauf_wikidata(conn, trocken: bool, stand: dict) -> None:
+    """Zuordnung (N3, nach der Handstichprobe, Bericht berichte/B2_genaue_jahre.md; Gegenprobe Nachlauf):
+      Veröffentlicht (nur_pruefung false, Stufe 1 der Kaskade) wird nur die Zuordnung über die eigene
+      Koordinate: das Gebäude, in dessen Umriss der Punkt liegt, oder das nächste Hauptgebäude bis 10 m mit
+      mindestens WD_MIN_FLAECHE_M2 Grundfläche (ein Punkt im Hof eines großen Baus darf nicht an einer Laube
+      hängen).
+      Die Zuordnung über die Denkmal-ID (P2081) läuft über die Adressen der BLDAM-Liste, deren Lizenz offen ist
+      (E8, § 87a UrhG). Sie steht deshalb nur als Prüfspalte in jahr_beleg (WD_ID_QUELLE, nur_pruefung true),
+      mit den Regeln aus N3: ID nur für dieses Objekt, höchstens ENSEMBLE_GRENZE Gebäude, bei mehreren Gebäuden
+      nur Bauten ab WD_MIN_FLAECHE_M2 (mindestens das größte), Punkt höchstens WD_ID_ABSTAND_M von einem der
+      Gebäude entfernt.
+      Objekte aus WD_AUSSCHLUSS (Jahr ist nachweislich nicht das des heutigen Gebäudes) bekommen kein Jahr.
+    """
     if not WD_DATEI.exists():
         print(f"  wikidata: blockiert (H9), Datei fehlt: {WD_DATEI}")
         stand["wikidata"] = {"blockiert": f"H9, fehlt {WD_DATEI}"}
         return
     wd = wikidata_lesen()
     with conn.cursor() as cur:
-        cur.execute("SELECT split_part(beleg_url, '#', 2), oid_bezug FROM auswertung.jahr_beleg "
-                    "WHERE quelle LIKE 'BLDAM%'")
-        je_midas = collections.defaultdict(list)
-        for m, o in cur.fetchall():
+        cur.execute(f"""SELECT split_part(b.beleg_url, '#', 2), b.oid_bezug, ST_Area(g.geom::geography)
+                        FROM auswertung.jahr_beleg b JOIN {SNAPSHOT} g ON g.oid = b.oid_bezug
+                        WHERE b.quelle LIKE 'BLDAM%'""")
+        je_midas, flaeche = collections.defaultdict(list), {}
+        for m, o, fl in cur.fetchall():
             je_midas[m].append(o)
-    punkte = [(str(i), r["ew"], r["ns"]) for i, r in enumerate(wd) if r["ns"] is not None]
-    with conn.transaction(), conn.cursor() as cur:
-        per_punkt = punkt_zuordnen(cur, punkte) if punkte else {}
+            flaeche[o] = fl
     # Mehrere Objekte mit derselben Denkmal-ID: nur über die eigene Koordinate (wie bei Wikipedia)
     paare = {(r["midas"], r["item"]) for r in wd if r["midas"]}
     mehrfach = {m for m, n in collections.Counter(m for m, _ in paare).items() if n > 1}
-    z = collections.Counter(zeilen=len(wd))
-    zeilen = []
+    punkte = [(str(i), r["ew"], r["ns"]) for i, r in enumerate(wd) if r["ns"] is not None]
+    id_paare = [(str(i), o) for i, r in enumerate(wd) if r["ns"] is not None and r["midas"]
+                and r["midas"] not in mehrfach for o in je_midas.get(r["midas"], [])]
+    with conn.transaction(), conn.cursor() as cur:
+        lage, abstand = punkt_pruefen(cur, punkte, id_paare) if punkte else ({}, {})
+    z = collections.Counter(zeilen=len(wd), objekte=len({r["item"] for r in wd}))
+    zeilen, intern, detail = [], [], []
     for i, r in enumerate(wd):
+        k = str(i)
         if r["ensemble"]:
             z["ensemble_ohne_jahr"] += 1  # Park, Friedhof, Siedlung: Jahr der Anlage, kein Gebäude-Baujahr
             continue
-        oids = je_midas.get(r["midas"], []) if r["midas"] and r["midas"] not in mehrfach else []
-        if not oids and per_punkt.get(str(i)):
-            oids = [per_punkt[str(i)]]
-        if not oids or len(oids) > ENSEMBLE_GRENZE:
-            z["ohne_gebaeude_oder_ensemble"] += 1
+        if r["item"].rsplit("/", 1)[-1] in WD_AUSSCHLUSS:
+            z["ausgeschlossen"] += 1
             continue
-        z["zugeordnet"] += 1
+        # Prüfspalte: über die Denkmal-ID zu den Gebäuden der BLDAM-Liste (nie veröffentlicht, E8)
+        ids = je_midas.get(r["midas"], []) if r["midas"] and r["midas"] not in mehrfach else []
+        if len(ids) > ENSEMBLE_GRENZE:
+            z["id_ensemble"] += 1
+            ids = []
+        if len(ids) > 1:  # mehrere Gebäude je ID: kleine Nebenbauten (Remise, Kiosk) erben das Jahr nicht
+            gross = [o for o in ids if flaeche.get(o, 0) >= WD_MIN_FLAECHE_M2]
+            if len(gross) < len(ids):
+                z["id_kleinbau_ohne_jahr"] += len(ids) - max(len(gross), 1)
+            ids = gross or [max(ids, key=lambda o: flaeche.get(o, 0))]
+        if ids and r["ns"] is not None and min(abstand.get((k, o), 0.0) for o in ids) > WD_ID_ABSTAND_M:
+            z["id_widerspricht_ort"] += 1
+            ids = []
+        # Veröffentlicht: nur über die eigene Koordinate (Wikidata, CC0, und ALKIS)
+        oids = []
+        if k in lage:
+            oid, im, fl = lage[k]
+            if im or fl >= WD_MIN_FLAECHE_M2:
+                oids = [oid]
+            else:
+                z["punkt_nur_bei_kleinem_bau"] += 1
+        elif r["ns"] is None:
+            z["ohne_koordinate"] += 1
+        if ids:
+            z["pruefspalte_ID"] += 1
+            for oid in ids:
+                intern.append((oid, r["von"], r["bis"], "bau", r["genau"], True, WD_ID_QUELLE, WD_ID_LIZENZ,
+                               r["item"]))
+                detail.append({"item": r["item"], "label": r["label"], "midas": r["midas"], "weg": "ID",
+                               "veroeffentlicht": False, "oids_je_id": len(ids), "oid": oid, "von": r["von"],
+                               "bis": r["bis"], "genau": r["genau"], "ew": r["ew"], "ns": r["ns"]})
+            if oids and oids[0] not in ids:
+                z["koordinate_weicht_von_ID_ab"] += 1   # Hinweis für die Handprüfung, kein Ausschluss
+        if not oids:
+            z["ohne_gebaeude"] += 1
+            continue
+        z["zugeordnet_Koordinate"] += 1
+        z["genau" if r["genau"] else "nicht_genau"] += 1
         for oid in oids:
             zeilen.append((oid, r["von"], r["bis"], "bau", r["genau"], False, WD_QUELLE, WD_LIZENZ, r["item"]))
+            detail.append({"item": r["item"], "label": r["label"], "midas": r["midas"], "weg": "Koordinate",
+                           "veroeffentlicht": True, "oids_je_id": len(oids), "oid": oid, "von": r["von"],
+                           "bis": r["bis"], "genau": r["genau"], "ew": r["ew"], "ns": r["ns"]})
+    z["gebaeude"] = len({zl[0] for zl in zeilen})
+    z["gebaeude_genau"] = len({zl[0] for zl in zeilen if zl[4]})
+    z["pruefspalte_ID_gebaeude"] = len({zl[0] for zl in intern})
     stand["wikidata"] = dict(z)
+    stand["wikidata_detail"] = detail
     ersetzen(conn, WD_QUELLE, zeilen, trocken)
+    ersetzen(conn, WD_ID_QUELLE, intern, trocken)
 
 
 def lauf_ddb(conn, trocken: bool, stand: dict) -> None:
@@ -642,6 +748,8 @@ def main() -> int:
     ap.add_argument("--quelle", default=",".join(LAEUFE), help="Komma-Liste aus " + ", ".join(LAEUFE))
     ap.add_argument("--trocken", action="store_true", help="nichts schreiben, nur zählen")
     ap.add_argument("--stand", type=Path, help="Zählungen als JSON hierhin schreiben (ohne Adressen)")
+    ap.add_argument("--detail", type=Path, help="Wikidata-Zuordnung je Zeile als CSV, nur außerhalb des Repos "
+                                                  "(für die Handstichprobe)")
     a = ap.parse_args()
     import psycopg
 
@@ -651,6 +759,16 @@ def main() -> int:
             print(f"Quelle {q}")
             LAEUFE[q](conn, a.trocken, stand)
     stand.pop("bldam_je_midas", None)
+    detail = stand.pop("wikidata_detail", None)
+    if a.detail and detail is not None:
+        # Nur intern (Bezeichnungen können Adressen enthalten): nie ins Repo schreiben
+        if WURZEL in a.detail.resolve().parents:
+            sys.exit("--detail darf nicht ins Repo zeigen (Bezeichnungen mit Adressen)")
+        a.detail.parent.mkdir(parents=True, exist_ok=True)
+        with a.detail.open("w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(detail[0]) if detail else ["item"])
+            w.writeheader()
+            w.writerows(detail)
     print(json.dumps(stand, ensure_ascii=False, indent=1))
     if a.stand:
         a.stand.write_text(json.dumps(stand, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

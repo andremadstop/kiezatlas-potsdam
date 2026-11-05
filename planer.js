@@ -353,6 +353,8 @@ function legende() {
     T.STUFEN.forEach(function (f) { var x = el("span"); x.style.background = f; st.appendChild(x); }); L.appendChild(st);
     var m = el("div", "marken"); m.appendChild(el("span", null, "0"));
     k.grenzen.forEach(function (g) { m.appendChild(el("span", null, fmt.format(g))); }); m.appendChild(el("span", null, "mehr " + ein)); L.appendChild(m);
+    var str = ((window.KIEZ_EINRICHTUNGEN || {}).features || []).filter(function (f) { return f.properties.hinweis && f.properties.art === S.zu; });
+    if (str.length) L.appendChild(el("p", "legende__q", str.map(function (f) { return f.properties.name; }).join(", ") + ": Lage strittig, zählt nicht für die Entfernungen."));
     var q = el("p", "legende__q legende__vermerk"); q.appendChild(vermerkKnoten(vermerke(d.quellen).join(" "))); L.appendChild(q);
   }
   var sichtbar = S.ein.filter(function (a) { return ARTEN_IN.ein.indexOf(a) > -1 || (window.KIEZ_EINRICHTUNGEN_ODBL && ARTEN_IN.ein_odbl.indexOf(a) > -1); });
@@ -544,7 +546,8 @@ function popupEinrichtung(e, f) {
   if (tab) h += "<table class='pop-tab'>" + tab + "</table>";
   if (p.plaetze != null) h += "<div class='pop-q'>Kapazität laut Betriebserlaubnis, nicht belegte Plätze.</div>";
   if (p.status === "lage_ohne_kapazitaet" || osm) h += "<div class='pop-q'>Nur Lage, ohne Kapazität" + (NUR_LAGE[p.art] ? "; keine Aussage zur Versorgung" : "") + ".</div>";
-  if (p.in_potsdam === false) h += "<div class='pop-q'>Außerhalb der Stadtgrenze; zählt für die Entfernungen mit.</div>";
+  if (p.hinweis) h += "<div class='pop-q'>" + esc(p.hinweis) + "</div>";
+  else if (p.in_potsdam === false) h += "<div class='pop-q'>Außerhalb der Stadtgrenze; zählt für die Entfernungen mit.</div>";
   h += "<div class='pop-q'>" + vermerkHtml(Q.vermerk) + "</div>";
   new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(x.f.geometry.coordinates).setHTML(h).addTo(map);
   return true;

@@ -3,7 +3,8 @@
 
 Schreibt daten/jahre_methode.js (window.KIEZ_JAHRE_METHODE). Liest nur Dateien, kein Netz, keine Datenbank:
 - daten/jahre/<nr>.js (B4): Zahl der Gebäude je Stufe und je Status g, gezählt
-- berichte/B4_holdout.md (B4): Abdeckung, Rücktest, Gegenprobe, Summenvergleich, gelesen aus den Tabellen
+- berichte/B4_holdout.md (B4): Abdeckung, Rücktest, Gegenprobe, Summenvergleich, Baualter-Statistik der LHP (H4),
+  gelesen aus den Tabellen
 
 Die Abdeckung im Bericht muss mit der Zählung aus den Dateien übereinstimmen, sonst bricht das Skript ab
 (Bericht und Dateien aus verschiedenen Läufen). Der SHA256 des Berichts steht in der Ausgabe.
@@ -89,7 +90,8 @@ def ruecktest_tabelle(tab: dict, erste: str) -> list:
     aus = []
     for z in tab["zeilen"]:
         t, n_bew, q = treffer(z[3])
-        aus.append({erste: z[0], "n": zahl(z[1]), "ohne_klasse": zahl(z[2]), "treffer": t, "bewertet": n_bew, "quote": q,
+        aus.append({erste: z[0], "n": zahl(z[1]), "ohne_klasse": zahl(z[2]), "treffer": t, "bewertet": n_bew,
+                    "quote": q,
                     "median_abstand": zahl(z[4]), "median_abstand_fehl": zahl(z[5])})
     return aus
 
@@ -135,14 +137,20 @@ def erzeugen() -> str:
         fehler("Abdeckungstabelle unvollständig")
 
     ruecktest = []
-    for praefix, rid, art in (("Sichtprüfung Luftbilder", "luftbild", "Sichtprüfung von Luftbildern, ein Stadtteil (Bornstedt)"),
-                              ("Wikipedia-Denkmalliste", "denkmale", "Baudenkmale mit Jahr aus der Wikipedia-Liste, nur Prüfspalte")):
+    for praefix, rid, art in (("Sichtprüfung Luftbilder", "luftbild",
+                               "Sichtprüfung von Luftbildern, ein Stadtteil (Bornstedt)"),
+                              ("Wikidata, genaue Jahre", "wikidata", "Baudenkmale mit genauem Jahr aus Wikidata; "
+                               "die Schätzung wird ohne diese Jahre gerechnet"),
+                              ("Wikipedia-Denkmalliste", "denkmale",
+                               "Baudenkmale mit Jahr aus der Wikipedia-Liste, nur Prüfspalte")):
         kopf, tabs = suche(ab, praefix)
         if len(tabs) != 2:
             fehler(f"{kopf}: {len(tabs)} Tabellen statt 2")
         m = re.search(r":\s*([\d.]+) Gebäude$", kopf)
-        ruecktest.append({"id": rid, "name": kopf.split(":")[0].split(" (")[0], "art": art, "n": zahl(m.group(1)) if m else None,
-                          "je_stufe": ruecktest_tabelle(tabs[0], "stufe"), "je_bauzeit": ruecktest_tabelle(tabs[1], "bauzeit")})
+        ruecktest.append({"id": rid, "name": kopf.split(":")[0].split(" (")[0], "art": art,
+                          "n": zahl(m.group(1)) if m else None,
+                          "je_stufe": ruecktest_tabelle(tabs[0], "stufe"),
+                          "je_bauzeit": ruecktest_tabelle(tabs[1], "bauzeit")})
 
     _, tabs = suche(ab, "Gegenprobe: Zensus-Verteilung")
     z = tabs[0]["zeilen"][0]
@@ -151,19 +159,31 @@ def erzeugen() -> str:
                   "median_abstand": zahl(z[4]), "median_abstand_abw": zahl(z[5])}
 
     text = roh.decode("utf-8")
-    m = re.search(r"([\d,]+) % Treffer über alle Schätzungen, Zensus ([\d,]+) %, Blocktyp ([\d,]+) %, Nachbarn ([\d,]+) %", text)
+    m = re.search(r"([\d,]+) % Treffer über alle Schätzungen, Zensus ([\d,]+) %, "
+                  r"Blocktyp ([\d,]+) %, Nachbarn ([\d,]+) %", text)
     if not m:
         fehler("Vergleichswerte Berlin nicht gefunden")
-    berlin = dict(zip(("gesamt", "zensus", "blocktyp", "nachbarn"), (zahl(x) for x in m.groups())))
+    berlin = dict(zip(("gesamt", "zensus", "blocktyp", "nachbarn"), (zahl(x) for x in m.groups()), strict=True))
 
     _, tabs = suche(ab, "Kaskade gesamt gegen den Zensus")
     schieflage = [{"klasse": z[0], "zensus": zahl(z[1]), "kaskade": zahl(z[2]), "abweichung": zahl(z[3]),
                    "stufe3": zahl(z[4]), "stufe4": zahl(z[5]), "stufe5": zahl(z[6])} for z in tabs[0]["zeilen"]]
 
-    m = re.search(r"Geprüft: (\d+) Paare aus Stadtteil und Klasse; eingehalten (\d+), nur mit Lücke erklärbar (\d+), überschritten (\d+)", text)
+    m = re.search(r"Geprüft: (\d+) Paare aus Stadtteil und Klasse; eingehalten (\d+), "
+                  r"nur mit Lücke erklärbar (\d+), überschritten (\d+)", text)
     if not m:
         fehler("Ergebnis der Summenprüfung nicht gefunden")
-    summen = dict(zip(("geprueft", "eingehalten", "mit_luecke", "ueberschritten"), (int(x) for x in m.groups())))
+    summen = dict(zip(("geprueft", "eingehalten", "mit_luecke", "ueberschritten"), (int(x) for x in m.groups()),
+                      strict=True))
+
+    # Baualter-Statistik der LHP (H4, Nachtrag N3): Stadtsummen in drei Gruppen
+    _, tabs = suche(ab, "Plausibilität: Baualter-Statistik der LHP")
+    lhp = [{"gruppe": z[0], "lhp_2022": zahl(z[1]), "zensus_2022": zahl(z[2]), "zensus_abw": zahl(z[3]),
+            "lhp_2025": zahl(z[4]), "kaskade": zahl(z[5]), "kaskade_abw": zahl(z[6])} for z in tabs[0]["zeilen"]]
+    m = re.search(r"Quelle: (© Landeshauptstadt Potsdam[^\n]*?)\.\s*$", text, re.MULTILINE)
+    if not m:
+        fehler("Vermerk der Baualter-Statistik nicht gefunden")
+    lhp_vermerk = m.group(1)
 
     if len(stand) != 1:
         fehler(f"daten/jahre/ hat mehrere Stände {sorted(stand)}")
@@ -180,6 +200,7 @@ def erzeugen() -> str:
         "berlin": berlin,
         "schieflage": schieflage,
         "summen": summen,
+        "lhp": {"vermerk": lhp_vermerk, "gruppen": lhp},
     }
     return "window.KIEZ_JAHRE_METHODE=" + json.dumps(inhalt, ensure_ascii=False, separators=(",", ":")) + ";\n"
 

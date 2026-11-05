@@ -1,4 +1,4 @@
-# B2 Genaue Jahre (Kaskadenstufe 1), Stand 05.11.2026
+# B2 Genaue Jahre (Kaskadenstufe 1), Stand 05.11.2026 (Nachlauf N3: Wikidata eingelesen)
 
 Skript `skripte/22_jahre_genau.py`, Tabelle `auswertung.jahr_beleg`, Bezug ist der Snapshot
 `auswertung.gebaeude_stand_20261105`. Zählungen je Lauf: `berichte/B2_stand.json`. Prüfung:
@@ -10,16 +10,18 @@ Beschreibungstexte.
 | | Gebäude |
 |---|---:|
 | genau datiert, nur Prüfspalte (Wikipedia, `art = 'bau'`, `genau`) | 343 |
-| genau datiert, für die Kaskade zugelassen (`nur_pruefung = false`) | **0** |
+| genau datiert, für die Kaskade zugelassen (`nur_pruefung = false`, Wikidata, CC0, Zuordnung über die Koordinate) | **106** |
+| mit Wikidata-Jahr überhaupt (auch Jahrzehnt oder mehrere Jahre, nicht genau), veröffentlichter Weg | 150 |
 | mit irgendeinem Baujahr (auch ungenau, „vor 1874“, Spannen), Prüfspalte | 385 |
 | als Baudenkmal gekennzeichnet (BLDAM, ohne Jahr) | 2.319 |
 | davon Mitglied eines Ensembles mit mehr als 4 Gebäuden | 783 |
 
 Die Erwartung im Bauplan lag bei rund 1.000 bis 2.500 genau datierten Gebäuden. Beide Zahlen liegen deutlich
-darunter, aus zwei Gründen:
+darunter, aus drei Gründen:
 
-- Die Quellen, die in die Kaskade dürfen, fehlen: DDB-API (H8, kein Key in `eingang/ddb-key`) und Wikidata
-  (H9, keine CSV in `eingang/`). Die Leser dafür sind gebaut bzw. vorbereitet, siehe unten.
+- Die DDB-API (H8) fehlt weiter (kein Key, das DDB-Formular ist defekt).
+- Wikidata führt in Potsdam nur für 242 Denkmal-Objekte ein Erstellungsjahr (Handexport H9); nach dem
+  Aussortieren von Nicht-Gebäuden und Rekonstruktionen bleiben 196 Zeilen, davon 120 mit genauem Jahr.
 - Wikipedia nennt in der Liste der Baudenkmale nur bei 462 von 1.822 Zeilen überhaupt ein Jahr in der
   Form, die die Regeln sicher lesen. Die Regeln sind bewusst streng; sie wurden nicht gelockert, um die
   Erwartung zu erreichen.
@@ -34,7 +36,8 @@ Referenz für Neubauten (Prüfbericht Korrektur 7, wichtig für B3 und den Holdo
 |---|---:|---|---|
 | BLDAM Denkmalliste Potsdam (PDF, Teil D) | 2.393 | 1.660 IDs, 1.497 zugeordnet, 43 Ensembles > 4 Gebäude | ja (Lizenz offen, E8) |
 | Wikipedia, Liste der Baudenkmale (27 Teillisten) | 497 | 438 Zeilen zugeordnet (375 über ID, 63 über Koordinate) | ja (CC BY-SA, Korrektur 5) |
-| Wikidata (Handexport H9) | 0 | blockiert: `eingang/wikidata_potsdam_baujahr.csv` fehlt | nein (CC0) |
+| Wikidata (Handexport H9, 05.11.2026 16:37) | 161 | 189 Zeilen mit Jahr (7 nur Jahrhundert verworfen), 176 Objekte; 161 über die eigene Koordinate zugeordnet, 27 ohne Gebäude (davon 6 ohne Koordinate, 7 nur bei Kleinbauten); 150 Gebäude, davon 106 genau | nein (CC0) |
+| Wikidata, Zuordnung über BLDAM-ID (Gegenprobe Nachlauf) | 114 | 96 Objekte über die Denkmal-ID, 108 Gebäude; läuft über die Adressen der BLDAM-Liste | ja (Lizenz der BLDAM-Liste offen, E8) |
 | DDB-API (H8) | 0 | blockiert: `eingang/ddb-key` fehlt; Leser nicht gebaut, weil Antwortformat und API-Bedingungen erst mit Key prüfbar sind | nein (CC0, vorher bestätigen) |
 | OSM `start_date` (H5) | 0 | blockiert: kein Extrakt unter `eingang/osm/` | ja (E1) |
 
@@ -105,15 +108,56 @@ Durchgang 4 im Einzelnen (Urteil: Jahr und Art stimmen mit dem Text überein):
   genaues Jahr setzen.
 - Denkmal-Kennzeichen für B4 (Korrektur 6, Denkmale dürfen ein genaues Jahr tragen): `quelle LIKE 'BLDAM%'`.
   Ensemble-Mitglieder tragen den Zusatz „(Ensemble, mehr als 4 Gebäude)“ in `quelle`.
-- Kein Wert aus B2 darf derzeit in `auswertung.gebaeude_jahr` oder in veröffentlichte Dateien: Wikipedia und
-  OSM sind nur Prüfspalte, BLDAM hat keine geklärte Lizenz. Freigegeben für die Kaskade wären nur Wikidata-
-  und DDB-Zeilen (`nur_pruefung = false`), die es noch nicht gibt.
+- In `auswertung.gebaeude_jahr` und in veröffentlichte Dateien dürfen nur Wikidata-Zeilen (seit N3) und künftig
+  DDB-Zeilen (`nur_pruefung = false`). Wikipedia und OSM sind nur Prüfspalte, BLDAM hat keine geklärte Lizenz.
 
-- Wikidata-Zeilen (sobald H9 vorliegt): Namen mit Park, Garten, Friedhof, Siedlung, Allee, Platz, Anlage
-  bekommen kein Jahr; teilen sich mehrere Objekte eine Denkmal-ID, gilt nur die eigene Koordinate; hat ein
-  Objekt mehrere Erstellungsjahre, ist keines genau. Offline mit erfundenen Zeilen geprüft (`--trocken`).
 - Rekonstruktionen (zum Beispiel Stadtschloss/Landtag, Garnisonkirche): Wikidata kann dort das Jahr des
-  Originals führen. Andre prüft diese Fälle beim Durchsehen der CSV; das Skript erkennt sie nicht.
+  Originals führen. Andre hat die bekannten Fälle beim Durchsehen der CSV aussortiert
+  (`eingang/wikidata_potsdam_aussortiert.md`); die Stichprobe fand einen weiteren (Ausschlussliste im Skript).
+  Das Skript erkennt solche Fälle nicht von selbst.
+
+## Wikidata (Nachlauf N3)
+
+Eingelesen mit `skripte/22_jahre_genau.py --quelle wikidata` aus `eingang/wikidata_potsdam_baujahr.csv`
+(196 Zeilen, CC0 1.0, Abfrage `entwuerfe/2026-11-05-wikidata-abfrage-b2.rq`, Eigenschaft P2081 = BLDAM-Objektnummer).
+Zählungen: `berichte/B2_stand.json`, Schlüssel `wikidata`.
+
+Regeln:
+- **Genauigkeit:** `precision` 9 (Jahr) und feiner ergibt ein genaues Jahr, 8 (Jahrzehnt) eine Spanne ohne
+  `genau`, 7 (Jahrhundert) und gröber wird verworfen (7 Zeilen). Hat ein Objekt verschiedene Jahre, ist keines
+  genau; gezählt werden verschiedene Spannen, nicht Zeilen (ein Objekt mit zwei Koordinaten und einem Jahr bleibt
+  genau, Korrektur N3).
+- **Ensembles:** nur, wenn die Bezeichnung mit Park, Garten, Friedhof, Siedlung, Allee, Platz, Anlage beginnt und
+  keine Hausnummer trägt. Vorher fielen „… Allee 5“ oder „… Luisenplatz“ als Ensemble heraus (Teilwortsuche,
+  Korrektur N3). Im Export sind keine Ensembles mehr; Andre hatte sie schon aussortiert.
+- **Zuordnung (seit der Gegenprobe zum Nachlauf):** veröffentlicht wird nur die Zuordnung über die eigene
+  Koordinate des Wikidata-Objekts: das Gebäude, in dessen Umriss der Punkt liegt, sonst das nächste Hauptgebäude
+  bis 10 m mit mindestens 100 m² Grundfläche (7 Punkte lagen nur bei Kleinbauten und blieben ohne Gebäude,
+  6 Objekte haben keine Koordinate). Die Zuordnung über die Denkmal-ID lief über die Adressen der BLDAM-Liste
+  (B0); deren Lizenz ist offen (E8, § 87a UrhG), und die BLDAM-Liste ist laut `QUELLEN.md` nur intern. Sie
+  steht deshalb nur noch als Prüfspalte in `jahr_beleg` (`quelle` „Wikidata, Zuordnung über BLDAM-ID (nur
+  Prüfung)“, `nur_pruefung = true`), mit den Regeln aus N3: keine ID für mehrere Objekte, keine Ensemble-ID
+  (mehr als 4 Gebäude, 4 Fälle), kein Widerspruch zwischen ID und Ort (Punkt mehr als 150 m von allen
+  ID-Gebäuden, 3 Fälle), bei mehreren Gebäuden je ID nur Bauten ab 100 m² (2 Kleinbauten ausgelassen). Bei
+  8 Objekten trifft die Koordinate ein anderes Gebäude als die ID. Die Handstichprobe N3 prüfte noch beide Wege;
+  für den Koordinatenweg allein ist sie nicht wiederholt (offen).
+- **Ausschlussliste** (`WD_AUSSCHLUSS` im Skript, mit Grund): Objekte, deren Erstellungsjahr nachweislich nicht
+  das des heutigen Gebäudes ist. Derzeit eines (Gründungsjahr einer Anstalt, Neubau Jahrzehnte später).
+
+Handstichprobe der Zuordnung (Bauplan B2, „20 Zuordnungen gegen Gebäudeumriss und Bezeichnung“): drei Durchgänge
+zu je 20, geschichtet nach Zuordnungsweg, geprüft vom Agenten (eine Durchsicht durch Andre steht aus), Einzelheiten ohne Bezeichnungen und Adressen in
+`belege/N3_wikidata_stichprobe.md`. Durchgang 1: 2 falsch (Gründungsjahr statt Baujahr; Punkt im Hof an einem
+Kleinbau), Durchgang 2: 1 falsch (Nebenbau erbte das Jahr der Villa); nach jeder Korrektur neu gezogen.
+**Durchgang 3: 18 richtig oder plausibel, 2 mit Einschränkung (Denkmale aus mehreren Bauten; ohne
+veröffentlichtes Jahr), 0 falsch.**
+
+Gegenprobe an 33 Gebäuden, die in Wikidata (veröffentlichter Weg) und in der Wikipedia-Prüfspalte ein genaues
+Jahr haben: 16 gleiches Jahr, 17 anderes Jahr in derselben Bauzeitklasse, 0 in einer anderen Klasse (`berichte/B4_holdout.md`).
+
+Was davon veröffentlicht wird (B4): Stufe 1 der Kaskade, 106 Gebäude „belegt“ (vor der Gegenprobe 129, mit
+der Zuordnung über die BLDAM-ID). Ein Einzeljahr tragen nur die 53 Gebäude ohne Wohnraum; 2 weitere ohne
+Wohnraum haben eine Spanne statt eines Jahrs und zeigen nur die Klasse; die 51 Gebäude mit Wohnraum zeigen nur die Klasse, weil ALKIS keine Wohneinheiten führt
+und „weniger als 3 Wohneinheiten“ nicht entscheidbar ist (Prüfbericht Korrektur 6, Datenschutz).
 
 ## Abrufe
 

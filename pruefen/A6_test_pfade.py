@@ -5,6 +5,7 @@ Ohne Datenbank und ohne Netz: kleine erfundene Eingaben (klar unecht) für
   - Geheimhaltung (Raumeinheit unter 100 EW), Mindestgröße der Zielgruppe
   - Prognose-Spalte aus $KIEZ_DATEN/eingang/prognose_planungsraum.csv (H11)
   - Raumebene planungsraum (H1)
+  - strittige Lage einer Schule (N4), Vermerk statistische Bezirke (N2), VBB-Quelle im Fußweg (N1)
 Die erzeugten Dateien landen in einem Temp-Ordner und laufen durch die Prüfregeln von pruefen/daten.py
 (Vertrag, ODbL-Kopf, keine OSM-Spur außerhalb _odbl, keine Adressen, keine feinen Klassen).
 
@@ -13,6 +14,7 @@ Aufruf: python -I pruefen/A6_test_pfade.py   Rückgabe 0 = alle Tests bestanden.
 
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import os
@@ -248,6 +250,65 @@ def main() -> int:
         )
         ok("osm" in PF["quellen"] and "osm" not in PL["quellen"], "OSM-Quelle nur in der Fußweg-Datei")
 
+        # Strittige Lage (N4, Pestalozza-Fall): Ortsangabe widerspricht den Koordinaten
+        ds = beispiel()
+        ds["ort_abweichung"] = [{"id": "s1", "name": "Beispiel-Schule (unecht)", "ot": "Ort X", "stadtteil": "Ort Y",
+                                 "raum": "A", "raum_ot": "B"}]
+        ds["ziel"] = {"luftlinie": defaultdict(dict), "fussweg": defaultdict(dict)}
+        for m_ in ("luftlinie", "fussweg"):
+            for g in ids:
+                ds["ziel"][m_]["grundschule"][g] = "s1" if g in ids[:2] else "s9"
+                ds["ziel"][m_]["kita"][g] = "k1"
+
+        class CurS:
+            def execute(self, sql, par=None):
+                self.par = par
+
+            def fetchall(self):
+                return [(g, 900.0) for g in self.par[2]]   # neue Luftlinie ohne s1
+
+        alt_fuss = p.fussweg_ohne
+        try:
+            p.fussweg_ohne = lambda cur, art, aus: {g: 1000.0 for g in ids}
+            ms: list[str] = []
+            p.strittig_neu_rechnen(CurS(), ds, ms)
+            ok(
+                [ds["erreichbar"]["luftlinie"]["grundschule"][g] for g in ids] == [900.0, 900.0, 1100.0, 1350.0]
+                and [ds["erreichbar"]["fussweg"]["grundschule"][g] for g in ids] == [1000.0, 1000.0, 1400.0, 1700.0]
+                and ds["erreichbar"]["luftlinie"]["kita"][ids[0]] == 200,
+                "strittige Lage: nur Zellen mit dem strittigen Ziel neu, andere Arten und Zellen unverändert",
+            )
+            ok(ds["strittig"]["grundschule"]["luftlinie"] == 2 and ms, "strittige Lage: Zahl der Zellen gemeldet")
+            p.fussweg_ohne = lambda cur, art, aus: {g: 100.0 for g in ids}
+            try:
+                p.strittig_neu_rechnen(CurS(), ds, [])
+                abbruch = ""
+            except SystemExit as e:
+                abbruch = str(e)
+            ok("Fußweg < Luftlinie" in abbruch, "strittige Lage: Fußweg unter der Luftlinie bricht ab")
+        finally:
+            p.fussweg_ohne = alt_fuss
+        ES = p.einrichtungen_datei(ds)
+        hin = {f["properties"]["id"]: f["properties"].get("hinweis") for f in ES["features"]}
+        ok(hin["s1"] and "strittig" in hin["s1"] and not hin["k1"], "einrichtungen.js: Hinweis nur am strittigen Punkt")
+        ER = p.erreichbar_datei(ds, rw, "luftlinie", ids)
+        ok("Beispiel-Schule (unecht) (MBJS s1) zählt nicht als Ziel" in ER["hinweis"], "erreichbar.js nennt den Punkt")
+        PS = p.planer_datei(ds, rw, "luftlinie", {}, {}, [])
+        gs = [w for nr in ("A", "B") for w in PS["raeume"][nr]["werte"] if (w["kennzahl"], w["art"]) in p.GS_KENNZAHLEN]
+        ok(gs and all(w["wert"] is None and "ohne diesen Standort" in w["unsicherheit"] for w in gs),
+           "Grundschulwerte in beiden betroffenen Raumeinheiten gesperrt, mit Hinweis")
+        # Vermerk statistische Bezirke (N2): Stadtteilklasse über die Bezirke bestimmt
+        rw_b = copy.deepcopy(rw)
+        rw_b["oepnv"]["gebietsklassen"]["stadtteile"]["A"] = {"klasse": "II", "zuordnung": "bezirke"}
+        PB = p.planer_datei(beispiel(), rw_b, "luftlinie", {}, {}, [])
+        ub = next(w for w in PB["raeume"]["A"]["werte"] if w["kennzahl"] == "oepnv_erschliessung")
+        ok("statbezirk" in PB["quellen"] and "statistischen Bezirke" in ub["unsicherheit"]
+           and "statbezirk" not in PL["quellen"], "Vermerk statistische Bezirke nur, wenn eine Klasse daraus stammt")
+        dh = beispiel()
+        dh["erreichbar"]["fussweg"]["haltestelle"] = {g: 300.0 for g in ids}
+        ok("vbb" in p.erreichbar_datei(dh, rw, "fussweg", ids)["quellen"] and "vbb" not in EF["quellen"],
+           "Fußweg mit Haltestellen nennt die VBB-Quelle (N1)")
+
         # Dateien schreiben und mit den Regeln von daten.py prüfen
         (tmp / "zellen.js").write_text(
             "window.KIEZ_ZELLEN=" + json.dumps({"features": [{"properties": {"id": g}} for g in ids]}) + ";",
@@ -262,6 +323,7 @@ def main() -> int:
             ("erreichbar_fuss_odbl.js", "KIEZ_ERREICHBAR_FUSS", EF, p.ODBL_KOPF),
             ("einrichtungen_odbl.js", "KIEZ_EINRICHTUNGEN_ODBL", EO, p.ODBL_KOPF),
             ("erreichbar.js", "KIEZ_ERREICHBAR", p.erreichbar_datei(d, rw, "luftlinie", ids), ""),
+            ("einrichtungen.js", "KIEZ_EINRICHTUNGEN", ES, ""),
         ):
             pfad = tmp / name
             p.js_schreiben(pfad, var, inhalt, kopf)

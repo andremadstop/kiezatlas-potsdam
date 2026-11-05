@@ -48,9 +48,10 @@ der Vermerk oben, für den Bestand mit „Zensus 2022“ und demselben Zusatz.
 
 Bezugswerte je Thema (Korrektur 25): Personen gegen die Einwohner im Bevölkerungsgitter (182.673, Abweichung 0,00 %);
 Haushalte gegeneinander (Destatis weist das Insgesamt je Zelle in allen drei Haushaltsdateien gleich aus, das ist
-eine Stimmigkeitsprüfung); Familien gegen Haushalte mit Kernfamilie (43.895, +1,07 %). Das unabhängige
-Zensus-Gemeindeergebnis Potsdam fehlt noch (Handdownload, siehe unten). `pruefen/A1_zensus.py` prüft es, sobald
-`$KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv` (Spalten `merkmal;wert;quelle`) vorliegt.
+eine Stimmigkeitsprüfung); Familien gegen Haushalte mit Kernfamilie (43.895, +1,07 %). Unabhängiger Bezug ist seit
+dem Nachlauf N2 das Zensus-Gemeindeergebnis Potsdam (`$KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv`), alle
+sechs Themen unter 3 %: Personen −0,07 %, Haushalte −0,66 %, Familien −1,42 %. Tabelle je Klasse:
+`belege/A1_gemeindeabgleich_20261105.md`.
 
 Nenner der Abdeckung: 3.411 Zellen mit Einwohnern. Die 3.443 Zellen aus `pruefen/INVENTAR.md` (D1) zählen 32 Zellen
 mit Mittelpunkt in Potsdam, aber 0 Einwohnern, mit.
@@ -76,8 +77,8 @@ mit Mittelpunkt in Potsdam, aber 0 Einwohnern, mit.
 - **Kernfamilien:** Die Summe der 13 Klassen liegt 6,4 % unter „Insgesamt“ (Grenze 3 %). Das sind die Daten
   (viele kleine Klassen mit `–`), kein Ladefehler. A6 zeigt Familienanteile nur gegen die Klassensumme und mit Hinweis.
 
-- **Zensus-Gemeindeergebnis Potsdam (12054000)** als unabhängiger Bezugswert je Thema: Personen nach Alter, private
-  Haushalte nach Größe/Typ/Seniorenstatus, Familien, Staatsangehörigkeit. Liegt in der Zensusdatenbank
-  (ergebnisse.zensus2022.de), die in den Abrufregeln nicht freigegeben ist. Braucht einen Handdownload von Andre nach
-  `$KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv`.
+- ~~Zensus-Gemeindeergebnis Potsdam~~ erledigt im Nachlauf N2 (05.11.2026): Datei liegt in `eingang/` (Herkunft und
+  SHA256 in `eingang/HERKUNFT.md`, Zensusdatenbank Tabellen 1000A-1004, 1000A-1020, 5000H-1001/-1004/-1006,
+  6000F-1002, dl-de/by-2-0), `pruefen/A1_zensus.py` prüft dagegen. Vermerk wie Zeile 2. Für I1: Zeile 34 in
+  `QUELLEN.md` auf „ausgewertet (A1, N2)“ setzen.
 - Zweite Stufe (Eigentümerquote, 10er-Jahresgruppen, Geburtsland) nur nach Bedarf, nicht geladen.

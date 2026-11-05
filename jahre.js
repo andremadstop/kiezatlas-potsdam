@@ -360,7 +360,7 @@ function karte() {
       [["j-legende__muster j-legende__muster--geschaetzt", "Bauzeit geschätzt (Farbe der Bauzeit, heller)"], gebBelegt ? ["j-legende__muster j-legende__muster--belegt", "Bauzeit belegt (Farbe kräftig, mit Rand)"] : null,
         ["j-legende__muster j-legende__muster--nd", "nicht datiert"], sp ? ["j-legende__muster j-legende__muster--rest", "andere Bauzeit"] : null]
         .forEach(function (x) { if (!x) return; var s = el("span", "j-legende__eintrag"), i = el("i", x[0]); i.setAttribute("aria-hidden", "true"); s.appendChild(i); s.appendChild(document.createTextNode(x[1])); L.appendChild(s); });
-      L.appendChild(el("span", "j-legende__quelle", "Gebäude: Schätzung je Haus, keine Aussage über einzelne Grundstücke. Bauzeit geschätzt aus dem Zensus 2022, den Bauzeiten der Großsiedlungen und den Nachbargebäuden; Umrisse © GeoBasis-DE/LGB, Daten verändert (eigene Berechnung)."));
+      L.appendChild(el("span", "j-legende__quelle", "Gebäude: Schätzung je Haus, keine Aussage über einzelne Grundstücke. Bauzeit geschätzt aus dem Zensus 2022, den Bauzeiten der Großsiedlungen und den Nachbargebäuden, belegt bei einigen Baudenkmalen aus Wikidata (CC0); Umrisse © GeoBasis-DE/LGB, Daten verändert (eigene Berechnung)."));
     } else {
       L.appendChild(el("span", "j-legende__eintrag j-legende__hinweis", "Näher heran (ab Zoom " + GEB_ZOOM + "): einzelne Gebäude"));
       L.appendChild(el("span", "j-legende__quelle", D.beschriftung + ". " + QUELLE_KURZ + "."));
@@ -650,6 +650,12 @@ function methode() {
   // Gebäudekarte gegen Zensus, ganze Stadt
   var sl = document.querySelector("#j-m-schieflage tbody");
   M.schieflage.forEach(function (x) { zeile(sl, [x.klasse, fmt.format(x.zensus), fmt.format(x.kaskade), vz(x.abweichung)]); });
+  // Baualter-Statistik der Stadt (H4): Stadtsummen in drei Gruppen, nur zur Plausibilität
+  var lh = document.querySelector("#j-m-lhp tbody");
+  if (lh && M.lhp) {
+    M.lhp.gruppen.forEach(function (x) { zeile(lh, [x.gruppe, fmt.format(x.lhp_2022), fmt.format(x.zensus_2022), fmt.format(x.lhp_2025), fmt.format(x.kaskade), vz(x.kaskade_abw)]); });
+    document.getElementById("j-m-lhp-quelle").textContent = "Abweichung: Gebäudekarte gegen die Statistik 2025. Die Zählweisen unterscheiden sich (Wohngebäude zum Jahresende, Gebäude mit Wohnraum im Mai 2022, Umrisse im Kataster 2026). " + M.lhp.vermerk + ".";
+  }
 }
 
 // =====================================================================================

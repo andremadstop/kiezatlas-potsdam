@@ -31,6 +31,9 @@ Regeln (Bauplan A6 und Prüfbericht 4, 8, 9, 13, 15):
   - Ärzte, Apotheken, Pflege: nur Entfernung, keine Versorgungsaussage (Korrektur 13).
   - Status: amtlich nur bei Richtwerten mit gelesener Fundstelle (geprueft gesetzt); Berliner Methode und Werte
     ohne Primärbeleg oder ohne gelesene Fundstelle: orientierung.
+  - Strittige Lage (N4): Schulen, deren Ortsangabe „Potsdam/OT …“ den Koordinaten widerspricht, zählen für keine
+    Entfernung (nächstes anderes Ziel, nur lesend neu gerechnet) und sperren die Grundschulwerte der betroffenen
+    Raumeinheiten; der Punkt trägt in einrichtungen.js das Feld hinweis.
 
 Aufruf (aus dem Worktree; Passwort nur aus der .env):
     KIEZ_DATEN=../kiezatlas-daten ../kiezatlas-potsdam-west/.venv/bin/python -I skripte/03_planungsraeume.py \
@@ -38,8 +41,9 @@ Aufruf (aus dem Worktree; Passwort nur aus der .env):
     set -a; . ../kiezatlas-potsdam/.env; set +a
     PGHOST=127.0.0.1 PGPORT=55461 PGDATABASE=kiezatlas PGUSER=mosidi_lesen PGPASSWORD="$LESE_PASSWORD" \\
     KIEZ_DATEN=../kiezatlas-daten \\
-    uv run -q --no-project --with-requirements ../geodaten-import-pipeline/requirements.txt \\
-        python -I skripte/15_planer.py
+    uv run -q --offline --no-project --with-requirements ../geodaten-import-pipeline/requirements.txt \\
+        --with numpy --with scipy python -I skripte/15_planer.py
+numpy und scipy braucht nur der Fußweg-Nachbau ohne Standorte mit strittiger Lage (strittig_neu_rechnen, N4).
 """
 
 from __future__ import annotations
@@ -64,6 +68,10 @@ DLDE = "https://www.govdata.de/dl-de/by-2-0"
 ODBL = "https://opendatacommons.org/licenses/odbl/1-0/"
 CCBY = "https://creativecommons.org/licenses/by/4.0/"
 VERAENDERT = "Daten verändert (eigene Berechnung)"
+# Stand des OSM-Auszugs (BBBike Potsdam), laut $KIEZ_DATEN/osm/2026-11-05/HERKUNFT.md
+OSM_STAND = "31.10.2026"
+# Anteil der amtlichen Kita-Standorte (MBJS), die auch in OSM stehen (A3, belege/N1_osm_fussweg_20261105.md)
+OSM_KITA_VOLLSTAENDIG = "78 %"
 ODBL_KOPF = (
     "/* Abgeleitet aus OpenStreetMap. © OpenStreetMap-Mitwirkende, Open Database License 1.0 (ODbL), "
     f"{ODBL}. Inhalte unter der Database Contents License 1.0. {VERAENDERT}. */\n"
@@ -106,6 +114,16 @@ QUELLEN = {
         "vermerk": f"© Landeshauptstadt Potsdam, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
         "url": "https://opendata.potsdam.de/explore/dataset/planungsraume-in-potsdam/",
         "stand": "2025-12-31",
+    },
+    "statbezirk": {
+        "quelle": (
+            "Statistische Bezirke der Landeshauptstadt Potsdam (86 Flächen), Open-Data-Portal, Stand 31.12.2021; "
+            "nur für die NVP-Gebietsklasse einzelner Stadtteile (A4/N2, config/richtwerte.yaml)"
+        ),
+        "lizenz": "dl-de/by-2-0",
+        "vermerk": f"© Landeshauptstadt Potsdam, Statistische Bezirke, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
+        "url": "https://opendata.potsdam.de/explore/dataset/statistische-bezirke-in-potsdam/",
+        "stand": "2021-12-31",
     },
     "osm": {
         "quelle": "OpenStreetMap",
@@ -325,10 +343,12 @@ def lesen(cur) -> dict:
         g: {"raum": str(nr), "i_u3": a or 0, "i_3_5": b or 0, "i_6_9": c or 0, "i_10_15": e or 0}
         for g, nr, a, b, c, e in cur.fetchall()
     }
-    cur.execute("""SELECT gitter_id, art, methode, meter FROM auswertung.zelle_erreichbar""")
+    cur.execute("""SELECT gitter_id, art, methode, meter, ziel_id FROM auswertung.zelle_erreichbar""")
     d["erreichbar"] = {"luftlinie": defaultdict(dict), "fussweg": defaultdict(dict)}
-    for g, art, methode, meter in cur.fetchall():
+    d["ziel"] = {"luftlinie": defaultdict(dict), "fussweg": defaultdict(dict)}
+    for g, art, methode, meter, ziel in cur.fetchall():
         d["erreichbar"][methode][art][g] = None if meter is None else float(meter)
+        d["ziel"][methode][art][g] = ziel
     cur.execute("SELECT gitter_id, methode, radius_m, m2_je_ew FROM auswertung.zelle_gruen")
     d["gruen"] = {"luftlinie": {}, "fussweg": {}}
     for g, methode, radius, m2 in cur.fetchall():
@@ -354,7 +374,7 @@ def lesen(cur) -> dict:
         "lat",
         "raum",
     )
-    d["einrichtungen"] = [dict(zip(spalten, r)) for r in cur.fetchall()]
+    d["einrichtungen"] = [dict(zip(spalten, r, strict=True)) for r in cur.fetchall()]
     for e in d["einrichtungen"]:
         e["raum"] = None if e["raum"] is None else str(e["raum"])
     # Schulen mit Ortsangabe „Potsdam/OT …“, deren Punkt in einem anderen Stadtteil liegt (Geokodierung oder
@@ -362,7 +382,8 @@ def lesen(cur) -> dict:
     # genannten Ortsteils; dort werden die Grundschulwerte bis zur Klärung nicht ausgewiesen.
     cur.execute(
         f"""SELECT e.id, e.name, substr(m.ort, length('Potsdam/OT ') + 1) AS ot, s.name, r.nr,
-                   (SELECT r2.nr FROM {tab} r2 JOIN public.stadtteil s2 ON ST_Contains(r2.geom, ST_PointOnSurface(s2.geom))
+                   (SELECT r2.nr FROM {tab} r2
+                    JOIN public.stadtteil s2 ON ST_Contains(r2.geom, ST_PointOnSurface(s2.geom))
                     WHERE s2.name = substr(m.ort, length('Potsdam/OT ') + 1) LIMIT 1)
             FROM auswertung.einrichtung e
             JOIN public.mbjs_schule m ON m.schul_nr = e.id
@@ -385,6 +406,99 @@ def lesen(cur) -> dict:
                    FROM auswertung.osm_poi ORDER BY osm_id""")
     d["osm_poi"] = [{"id": i, "art": a, "unterart": u, "lon": x, "lat": y} for i, a, u, x, y in cur.fetchall()]
     return d
+
+
+def strittig_text(a: dict) -> str:
+    """Hinweis zu einer Schule, deren Ortsangabe ihrer Lage widerspricht (für Karte, Datei und Export)."""
+    return (
+        f"Lage strittig: Ortsangabe „Potsdam/OT {a['ot']}“, Koordinaten im Stadtteil {a['stadtteil'] or 'außerhalb'}. "
+        "Aus den amtlichen Daten nicht entscheidbar (Schulgebäude laut ALKIS gibt es in beiden Orten); "
+        "bis zur Klärung zählt der Standort für keine Entfernung und keine Kennzahl."
+    )
+
+
+def strittig_neu_rechnen(cur, d: dict, meldungen: list) -> None:
+    """Entfernungen ohne die Standorte mit strittiger Lage (Ortsangabe ≠ Koordinaten, d["ort_abweichung"]).
+
+    Betroffen sind nur Zellen, deren nächstes Ziel in auswertung.zelle_erreichbar ein strittiger Standort ist. Für sie
+    wird das nächste andere Ziel derselben Art gesucht, ohne in die Datenbank zu schreiben (zelle_erreichbar gehört A5):
+    - Luftlinie wie A5a (skripte/14_erreichbarkeit.py): Zellmittelpunkt in EPSG:25833, KNN, auf 0,1 m gerundet.
+    - Fußweg mit den Funktionen von A5b (skripte/14b_fussweg.py: netz_laden, naechstes_ziel, auf_zehntel), nur
+      lesend. Braucht numpy und scipy im Lauf (uv --with numpy --with scipy).
+    """
+    art_von = {e["id"]: e["art"] for e in d["einrichtungen"]}
+    je_art: dict[str, list[str]] = defaultdict(list)
+    for a in d.get("ort_abweichung", []):
+        if a["id"] in art_von:
+            je_art[art_von[a["id"]]].append(a["id"])
+    strittig: dict = {}
+    for art, aus in sorted(je_art.items()):
+        info = {"ids": sorted(aus), "luftlinie": 0, "fussweg": 0}
+        betroffen = sorted(g for g, z in d["ziel"]["luftlinie"][art].items() if z in aus)
+        if betroffen:
+            cur.execute(
+                """SELECT z.gitter_id, round(ST_Distance(ST_Transform(z.geom, 25833), n.geom)::numeric, 1)
+                   FROM public.zensus_zelle z
+                   CROSS JOIN LATERAL (SELECT e.geom FROM auswertung.einrichtung e
+                                       WHERE e.art = %s AND e.id <> ALL(%s::text[])
+                                       ORDER BY e.geom <-> ST_Transform(z.geom, 25833), e.id LIMIT 1) n
+                   WHERE z.gitter_id = ANY(%s)""",
+                (art, aus, betroffen),
+            )
+            neu = {g: float(m) for g, m in cur.fetchall()}
+            if set(neu) != set(betroffen):
+                raise SystemExit(f"Strittige Lage {aus}: Luftlinie nicht für alle {len(betroffen)} Zellen gerechnet")
+            d["erreichbar"]["luftlinie"][art].update(neu)
+            info["luftlinie"] = len(betroffen)
+        betroffen_f = sorted(g for g, z in d["ziel"]["fussweg"][art].items() if z in aus)
+        if betroffen_f:
+            fuss = fussweg_ohne(cur, art, aus)
+            luft = d["erreichbar"]["luftlinie"][art]
+            for g in betroffen_f:
+                m = fuss.get(g)
+                if m is not None and luft.get(g) is not None and m < luft[g]:
+                    raise SystemExit(f"Strittige Lage {aus}: Fußweg < Luftlinie in Zelle {g}")
+                d["erreichbar"]["fussweg"][art][g] = m
+            info["fussweg"] = len(betroffen_f)
+        strittig[art] = info
+        meldungen.append(
+            f"Strittige Lage {', '.join(aus)} ({art}): zählt nicht als Ziel; neu gerechnet {info['luftlinie']} Zellen "
+            f"Luftlinie, {info['fussweg']} Zellen Fußweg (nur lesend, zelle_erreichbar unverändert)"
+        )
+    d["strittig"] = strittig
+
+
+def fussweg_ohne(cur, art: str, aus: list[str]) -> dict:
+    """Fußweg jeder Zelle zum nächsten Ziel der Art ohne die IDs in aus (Netz und Verfahren von A5b)."""
+    import importlib.util
+
+    try:
+        import numpy as np
+        import scipy  # noqa: F401  (14b_fussweg.py braucht scipy.sparse und scipy.spatial)
+    except ImportError as e:
+        raise SystemExit(
+            f"Fußweg ohne strittige Lage braucht numpy und scipy ({e}). Aufruf: uv run --offline … "
+            "--with numpy --with scipy python -I skripte/15_planer.py"
+        ) from e
+
+    spec = importlib.util.spec_from_file_location("a5b_fussweg", WURZEL / "skripte" / "14b_fussweg.py")
+    a5b = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = a5b   # dataclasses in 14b_fussweg.py brauchen das Modul in sys.modules
+    spec.loader.exec_module(a5b)
+    netz = a5b.netz_laden(cur)
+    ids, xy, _ = a5b.zellen_laden(cur)
+    cur.execute(
+        """SELECT GeometryType(geom), ST_X(geom), ST_Y(geom) FROM auswertung.einrichtung
+           WHERE art = %s AND id <> ALL(%s::text[]) ORDER BY id""",
+        (art, aus),
+    )
+    ziele = cur.fetchall()
+    if any(t != "POINT" for t, _, _ in ziele):
+        raise SystemExit(f"{art}: Ziele ohne Punktgeometrie, Fußweg ohne strittige Lage nicht nachgebaut")
+    ziel_xy = np.array([(x, y) for _, x, y in ziele], dtype=np.float64).reshape(-1, 2)
+    meter, _ = a5b.naechstes_ziel(netz, ziel_xy, xy)
+    meter = a5b.auf_zehntel(meter)
+    return {g: (float(m) if np.isfinite(m) else None) for g, m in zip(ids, meter, strict=True)}
 
 
 def rand_unsicher() -> dict:
@@ -451,8 +565,9 @@ def raum_von(d: dict, g: str) -> str | None:
 class Rechner:
     def __init__(self, d: dict, rw: dict, methode: str, rand: dict):
         self.d, self.rw, self.methode = d, rw, methode
-        # Die Randliste stammt aus der Luftlinie (A5a) und gilt nicht für Netzentfernungen
-        self.rand = rand if methode == "luftlinie" else {}
+        # Randliste aus der Luftlinie (A5a). Beim Fußweg ist sie eine untere Schranke: Der Fußweg ist nie kürzer als
+        # die Luftlinie, eine dort nur obere Grenze bleibt es beim Fußweg; es können weitere Zellen hinzukommen.
+        self.rand = rand
         g = rw["geheimhaltung"]
         self.min_ew, self.rd_ew = g["min_ew_raumeinheit"], g["rundung_ew"]
         self.min_zg = rw["planer"]["min_zielgruppe"]
@@ -463,6 +578,7 @@ class Rechner:
         self.stand_zensus = "Zensus 15.05.2022"
         self.zg_cache: dict = {}
         self.geheim_null = 0
+        self.statbezirk = False   # ÖPNV-Klasse eines Stadtteils aus den statistischen Bezirken benutzt (Vermerk)
 
     def zg(self, name):
         if name not in self.zg_cache:
@@ -470,8 +586,10 @@ class Rechner:
         return self.zg_cache[name]
 
     def q_art(self, art: str) -> str:
-        """Quelle der Standorte: OSM beim Fußweg, ALKIS bei Grün und Gemeinbedarf, sonst MBJS."""
-        if self.methode == "fussweg":
+        """Quelle der Standorte (nicht des Wegenetzes): OSM-Arten, ALKIS bei Grün und Gemeinbedarf, sonst MBJS.
+
+        Beim Fußweg kommt das Netz aus OSM; das steht in quellen der Datei, die Ziele bleiben amtlich (A5b)."""
+        if any(p["art"] == art for p in self.d["osm_poi"]):
             return "osm"
         if art == "gruen" or any(e["id"].startswith("alkis:") for e in self.d["einrichtungen"] if e["art"] == art):
             return "lgb"
@@ -513,7 +631,8 @@ class Rechner:
             "status": status,
             "richtwert": rwobj,
             "q": self.q_art(art),
-            "stand": f"{self.stand_zensus}, Standorte 05.11.2026",
+            "stand": f"{self.stand_zensus}, Standorte 05.11.2026"
+            + (f", Wegenetz OpenStreetMap {OSM_STAND}" if self.methode == "fussweg" else ""),
         }
         teile = []
         fein = self.rw["planer"]["zielgruppen"][zg]["felder"] is not None
@@ -533,10 +652,23 @@ class Rechner:
             if fein
             else f"{self.basis_u} Anteil ganzzahlig gerundet."
         )
-        teile.append("Entfernung vom Zellmittelpunkt (bis 71 m vom Wohnort), aussagekräftig auf rund 50 m.")
+        if self.methode == "fussweg":
+            teile.append(
+                f"Fußweg über das Wegenetz aus OpenStreetMap (Auszug {OSM_STAND}) vom Zellmittelpunkt "
+                "(bis 71 m vom Wohnort)."
+            )
+        else:
+            teile.append("Entfernung vom Zellmittelpunkt (bis 71 m vom Wohnort), aussagekräftig auf rund 50 m.")
         if rand_ueber and w["wert"] is not None:
             teile.append(
-                f"Für {prozent(rand_ueber, nenner)} % der Zielgruppe ist die Entfernung nur eine Obergrenze "
+                (
+                    f"Für {'' if prozent(rand_ueber, nenner) == 100 else 'mindestens '}"
+                    f"{prozent(rand_ueber, nenner)} % der Zielgruppe ist der Fußweg nur eine "
+                    "Obergrenze (Einrichtungen in Berlin oder jenseits des Datengebiets nicht gerechnet; gezählt "
+                    "nach der Luftlinie, beim Fußweg können es mehr sein)."
+                )
+                if self.methode == "fussweg"
+                else f"Für {prozent(rand_ueber, nenner)} % der Zielgruppe ist die Entfernung nur eine Obergrenze "
                 "(Einrichtungen in Berlin oder jenseits des Datengebiets nicht gerechnet)."
             )
         if grund:
@@ -563,6 +695,7 @@ class Rechner:
             return None
         paare = [(dist.get(g), z["ew"]) for g, z in self.d["zellen"].items() if z["raum"] == raum]
         med = gew_median(paare)
+        weg = "Fußweg über das Wegenetz" if self.methode == "fussweg" else "Luftlinie"
         return {
             "kennzahl": "entfernung_median",
             "art": art,
@@ -572,9 +705,15 @@ class Rechner:
             "methode": self.methode,
             "status": "orientierung",
             "q": "osm",
-            "stand": f"{self.stand_zensus}, Standorte laut Datenstand",
-            "unsicherheit": "Median nach Einwohnern. Nur Lage, keine Versorgungsaussage: ohne Kapazität, "
-            "Bedarfsplanung auf größeren Bereichen." + self.neubau(raum, ebene),
+            "stand": f"{self.stand_zensus}, OpenStreetMap, Auszug {OSM_STAND}",
+            "unsicherheit": f"Median nach Einwohnern, {weg}. Nur Lage, keine Versorgungsaussage: "
+            "OpenStreetMap kennt keine Kapazitäten"
+            + ("; Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen (Bedarfsplanung)"
+               if art == "arzt" else "")
+            + ". OpenStreetMap ist freiwillig erfasst, die Vollständigkeit für diese Art ist ungeprüft (zum "
+            f"Vergleich: von den amtlichen Kita-Standorten stehen {OSM_KITA_VOLLSTAENDIG} in OpenStreetMap); fehlt "
+            "ein Standort, ist die Entfernung zu groß. Standorte in Berlin zählen nicht: am Stadtrand teils nur "
+            "Obergrenze." + self.neubau(raum, ebene),
         }
 
 
@@ -615,7 +754,7 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
     hort_rein = sum(e["plaetze"] for e in kap if e["art"] == "hort")
     alle = sum(e["plaetze"] for e in kap if e["art"] in ("kita", "hort"))
     s = defaultdict(float)
-    for g, st in r.d["struktur"].items():
+    for st in r.d["struktur"].values():
         if st["raum"] == raum:
             for k in ("i_u3", "i_3_5", "i_6_9", "i_10_15"):
                 s[k] += st[k]
@@ -817,6 +956,9 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
         if klasse in KLASSEN_RANG:
             w["wert"] = rund(anteil(klasse, mit_takt), 1)
             txt = f"Gebietsklasse {klasse} laut NVP Tab. 4.1 ({gk.get('zuordnung')}). "
+            if gk.get("zuordnung") == "bezirke":
+                r.statbezirk = True
+                txt += STATBEZIRK_TEXT
         elif teile_kl:
             spanne = [x for x in (rund(anteil(k, mit_takt), 1) for k in teile_kl) if x is not None] or ["k. A."]
             w["wert"] = None
@@ -836,6 +978,10 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
     return aus
 
 
+STATBEZIRK_TEXT = (
+    "Klasse über die statistischen Bezirke bestimmt (NVP Anlage 2; © Landeshauptstadt Potsdam, Statistische "
+    f"Bezirke, dl-de/by-2-0, {VERAENDERT}). "
+)
 NVP_GELTUNG = (
     " NVP-Geltung 2019 bis 2023 abgelaufen, Nachfolger ungeprüft: deshalb Orientierung, kein geltender Richtwert."
 )
@@ -907,6 +1053,7 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
     grenze = r.rw["planer"]["oepnv_max_ohne_klasse_prozent"]
     ew_ges = sum(z["ew"] for _, z in zellen)
     mit, gemischt, ohne, ohne_st, je_klasse = [], [], 0, 0, defaultdict(int)
+    ueber_bezirke: set[str] = set()
     for g, z in zellen:
         if g not in r.d["zelle_stadtteil"]:
             ohne += z["ew"]
@@ -917,6 +1064,8 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
         if k in KLASSEN_RANG:
             mit.append((z, k))
             je_klasse[k] += z["ew"]
+            if gk.get("zuordnung") == "bezirke":
+                ueber_bezirke.add(r.d["zelle_stadtteil"][g])
             continue
         ohne += z["ew"]
         moegl = {x for v in (gk.get("teile") or {}).values() if v for x in re.findall(r"\b(I{1,3})\b", str(v))}
@@ -930,6 +1079,9 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
         "Gebietsklasse je Zelle aus ihrem Stadtteil (NVP Tab. 4.1 gilt für Ortsteile; Zuordnung A4), Anteil der "
         f"Einwohner mit eindeutiger Klasse: {klassen_txt or 'keine'}. "
     )
+    if ueber_bezirke:
+        r.statbezirk = True
+        txt += f"Stadtteil {', '.join(sorted(ueber_bezirke))}: " + STATBEZIRK_TEXT
     if ohne - ohne_st:
         txt += (
             f"{prozent(ohne - ohne_st, ew_ges)} % der Einwohner wohnen in Stadtteilen mit gemischter oder offener "
@@ -990,6 +1142,12 @@ def gruen(r: Rechner, raum: str, ebene: str) -> dict | None:
         if v < rwobj["wert"]:
             unter += z["ew"]
     med = gew_median(paare)
+    if r.methode == "fussweg" and not paare:
+        # A5b schreibt je Zelle nur die erreichbare Fläche (m2_je_ew leer); je Einwohner gibt es nur die Luftlinie
+        vorab = ("Beim Fußweg nicht berechnet: Grün je Einwohner gibt es bisher nur in Luftlinie (Datei planer.js). "
+                 f"Gemeint wäre: Grünanlagen und Parks (ALKIS) bis {radius} m Fußweg je Einwohner. ")
+    else:
+        vorab = ""
     return {
         "kennzahl": "gruen_m2_je_ew",
         "art": "gruen",
@@ -1002,8 +1160,11 @@ def gruen(r: Rechner, raum: str, ebene: str) -> dict | None:
         "q": "lgb",
         "stand": f"Einwohner: {r.stand_zensus}; ALKIS-Nutzung 05.11.2026",
         "unsicherheit": (
-            f"Median über die Zellen der Raumeinheit, nach Einwohnern gewichtet: Grünanlagen und Parks "
-            f"(ALKIS) im {radius}-m-Kreis je Einwohner im selben Kreis. "
+            (
+                vorab
+                or f"Median über die Zellen der Raumeinheit, nach Einwohnern gewichtet: Grünanlagen und Parks "
+                f"(ALKIS) im {radius}-m-Kreis je Einwohner im selben Kreis. "
+            )
             + (
                 f"{prozent(unter, ges)} % der Einwohner wohnen in Zellen unter {rwobj['wert']} m² je EW. "
                 if ges
@@ -1025,8 +1186,7 @@ def kennzahlen_fussweg(r: Rechner, raum: str, ebene: str) -> list[dict]:
                 werte.append(w)
     w = gruen(r, raum, ebene)
     if w:
-        w["q"] = "osm"
-        werte.append(w)
+        werte.append(w)   # Ziel ALKIS (q lgb), Netz OSM (quellen.osm der Datei)
     return werte
 
 
@@ -1075,10 +1235,21 @@ def erreichbar_datei(d: dict, rw: dict, methode: str, ids: list[str]) -> dict | 
             "gruen = Abstand zum Rand der nächsten Grünanlage bzw. des nächsten Parks (ALKIS)."
         )
     else:
-        q = {k: QUELLEN[k] for k in ("zensus", "mbjs", "lgb", "osm")}
+        # Haltestellen als Ziel stammen aus dem VBB-GTFS (CC BY 4.0), auch im Fußweg-Zweig zu nennen
+        q = {k: QUELLEN[k] for k in ("zensus", "mbjs", "lgb", "osm") + (("vbb",) if "haltestelle" in werte else ())}
         hinweis = (
-            f"Fußweg über das Wegenetz vom Mittelpunkt der 100-m-Zelle, auf {rd} m gerundet. null = Zelle ohne "
-            "Einwohner oder ohne Netzanschluss."
+            f"Fußweg über das Wegenetz aus OpenStreetMap (Auszug {OSM_STAND}) vom Mittelpunkt der 100-m-Zelle, auf "
+            f"{rd} m gerundet. null = Zelle ohne Einwohner oder ohne Netzanschluss. Standorte in Brandenburg "
+            "außerhalb der Stadt zählen mit, Berlin nicht (Standorte aus OpenStreetMap nach dem Land der nächsten "
+            "VBB-Haltestelle): am Stadtrand teils nur Obergrenze. Kitas, Schulen, Gemeinbedarf und Grün sind amtliche "
+            "Standorte (MBJS, ALKIS), Haltestellen aus dem VBB-Fahrplan, die übrigen Arten aus OpenStreetMap."
+        )
+    for art, info in sorted(d.get("strittig", {}).items()):
+        namen = {a["id"]: a["name"] for a in d.get("ort_abweichung", [])}
+        hinweis += (
+            f" {art}: {', '.join(f'{namen.get(i, i)} (MBJS {i})' for i in info['ids'])} zählt nicht als Ziel, "
+            "weil die Lage strittig ist (Ortsangabe und Koordinaten widersprechen sich); dort gilt der nächste andere "
+            "Standort."
         )
     return {
         "stand": date.today().isoformat(),
@@ -1096,6 +1267,7 @@ def erreichbar_datei(d: dict, rw: dict, methode: str, ids: list[str]) -> dict | 
 
 
 def einrichtungen_datei(d: dict) -> dict:
+    strittig = {a["id"]: strittig_text(a) for a in d.get("ort_abweichung", [])}
     feats = []
     for e in d["einrichtungen"]:
         q = "lgb" if e["id"].startswith("alkis:") else "mbjs"
@@ -1117,6 +1289,8 @@ def einrichtungen_datei(d: dict) -> dict:
                 },
             }
         )
+        if e["id"] in strittig:
+            feats[-1]["properties"]["hinweis"] = strittig[e["id"]]
     return {
         "type": "FeatureCollection",
         "stand": date.today().isoformat(),
@@ -1124,8 +1298,7 @@ def einrichtungen_datei(d: dict) -> dict:
             "Kitas, Horte und Schulen laut MBJS (Plätze je Kita einmal am Hauptstandort, weitere Häuser "
             "ohne Plätze), Gemeinbedarf aus ALKIS nur als Lage ohne Kapazität. Ohne Adresse und Kontakt."
             + "".join(
-                f" {a['name']} (MBJS {a['id']}): Ortsangabe „Potsdam/OT {a['ot']}“, Lage laut Koordinaten im "
-                f"Stadtteil {a['stadtteil'] or 'außerhalb'}; ungeklärt."
+                f" {a['name']} (MBJS {a['id']}): {strittig_text(a)}"
                 for a in d.get("ort_abweichung", [])
             )
         ),
@@ -1168,7 +1341,8 @@ def ort_abweichung_anwenden(d: dict, raeume: dict, meldungen: list) -> None:
         txt = (
             f"Bis zur Klärung kein Wert: Die {a['name']} (MBJS {a['id']}) hat die Ortsangabe „Potsdam/OT {a['ot']}“, "
             f"liegt laut Koordinaten aber im Stadtteil {a['stadtteil'] or 'außerhalb'}. Ob die Quelle falsch verortet "
-            f"oder es ein Interimsstandort ist, ist offen; betroffen sind die Raumeinheiten {lage}. "
+            f"oder es ein Interimsstandort ist, ist offen (in beiden Orten gibt es Schulgebäude laut ALKIS); betroffen "
+            f"sind die Raumeinheiten {lage}. Entfernungen rechnen bis dahin ohne diesen Standort. "
         )
         n = 0
         for nr in betroffen:
@@ -1197,9 +1371,13 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         f"{r.geheim_null} Werte wegen Geheimhaltung null"
     )
     benutzt = {w["q"] for x in raeume.values() for w in x["werte"]} | {"zensus"}
+    if methode == "fussweg":
+        benutzt.add("osm")   # Wegenetz aus OpenStreetMap, auch bei amtlichen Zielen
     if ebene == "planungsraum":
         benutzt.add("planungsraum")
     benutzt_rw = {w["richtwert"]["q"] for x in raeume.values() for w in x["werte"] if "richtwert" in w}
+    if r.statbezirk:
+        benutzt.add("statbezirk")
     quellen = {k: QUELLEN[k] for k in sorted(benutzt)}
     quellen.update({k: DOKUMENTE[k] for k in sorted(benutzt_rw)})
     hinweis = (
@@ -1212,8 +1390,8 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         "Kinder und Einwohner: Zensus 2022, Stichtag 15.05.2022; Neubaugebiete danach (u. a. Krampnitz, "
         "Bornstedter Feld, Golm) fehlen. Einwohner auf "
         f"{rw['geheimhaltung']['rundung_ew']} gerundet; Werte aus feinen Altersklassen nur bei Raumeinheiten ab "
-        f"{rw['geheimhaltung']['min_ew_raumeinheit']} Einwohnern. Status amtlich: Maßstab aus einem geltenden Potsdamer "
-        "Dokument mit gelesener Fundstelle bzw. bei Werten ohne Maßstab nur amtliche Daten; orientierung: "
+        f"{rw['geheimhaltung']['min_ew_raumeinheit']} Einwohnern. Status amtlich: Maßstab aus einem geltenden "
+        "Potsdamer Dokument mit gelesener Fundstelle bzw. bei Werten ohne Maßstab nur amtliche Daten; orientierung: "
         "Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung (NVP 2019) oder Berliner Methode."
     )
     if methode == "luftlinie":
@@ -1242,19 +1420,22 @@ def main() -> int:
         if rolle != "mosidi_lesen":
             raise SystemExit(f"Erwartet die Leserolle mosidi_lesen, verbunden als {rolle}")
         d = lesen(cur)
+        meldungen_strittig: list[str] = []
+        strittig_neu_rechnen(cur, d, meldungen_strittig)
     ids = zellen_reihenfolge()
     meldungen: list[str] = [
         f"Raumebene: {d['raumebene']} ({len(d['raeume'])} Raumeinheiten, aus {d['raum_herkunft']})",
         f"bewohnte Zellen im Stadtgebiet ohne Raumeinheit: {d['ohne_raum'][0]} mit {d['ohne_raum'][1]} EW",
+        *meldungen_strittig,
     ]
-    rand = rand_unsicher()  # gilt nur für Luftlinie (A5a); der Fußweg hat keine Randliste
+    rand = rand_unsicher()  # aus der Luftlinie (A5a); beim Fußweg untere Schranke der Obergrenzen-Zellen
     prog = prognose_lesen(rw, d["raumebene"], meldungen)
     geschrieben, fehlt = [], []
     for name, var, inhalt, kopf in (
         ("planer.js", "KIEZ_PLANER", planer_datei(d, rw, "luftlinie", rand, prog, meldungen), ""),
         ("erreichbar.js", "KIEZ_ERREICHBAR", erreichbar_datei(d, rw, "luftlinie", ids), ""),
         ("einrichtungen.js", "KIEZ_EINRICHTUNGEN", einrichtungen_datei(d), ""),
-        ("planer_fuss_odbl.js", "KIEZ_PLANER_FUSS", planer_datei(d, rw, "fussweg", {}, prog, meldungen), ODBL_KOPF),
+        ("planer_fuss_odbl.js", "KIEZ_PLANER_FUSS", planer_datei(d, rw, "fussweg", rand, prog, meldungen), ODBL_KOPF),
         ("erreichbar_fuss_odbl.js", "KIEZ_ERREICHBAR_FUSS", erreichbar_datei(d, rw, "fussweg", ids), ODBL_KOPF),
         ("einrichtungen_odbl.js", "KIEZ_EINRICHTUNGEN_ODBL", einrichtungen_odbl_datei(d), ODBL_KOPF),
     ):

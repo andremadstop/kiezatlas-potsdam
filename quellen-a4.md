@@ -40,3 +40,16 @@ Das Grundgerüst von P0 hatte im Abschnitt `oepnv` andere Schlüssel. Am 05.11.2
 | `erschliessung_anteil_prozent.wert: 80` | `erschliessung.anteil_ew_prozent: 80`, `erschliessung.teilflaeche_min_ew: 200` |
 | `taktklassen.<K>.fahrten_hvz_je_richtung_min: null` | Werte 6 / 2 / 1, dazu `soll_hvz` |
 | – | neu: `aktualitaet`, `messung`, `gebietsklassen` (Tab. 4.1 und Zuordnung der 32 Stadtteile) |
+
+## Statistische Bezirke (Zeile 12 in `QUELLEN.md`), Nachlauf N2
+
+| Feld | Wert |
+|---|---|
+| Daten | Statistische Bezirke der Landeshauptstadt Potsdam (86 Flächen), Stand 31.12.2021 |
+| Abruf | Handdownload H1 vom 05.11.2026 (Export GeoJSON, opendata.potsdam.de), Herkunft und Freigabe in `$KIEZ_DATEN/eingang/HERKUNFT.md`, sha256 `e5949434…df3`. N2 hat nichts geladen. |
+| Lizenz | dl-de/by-2-0 (laut Datensatz) |
+| Verwendung | nur intern: `pruefen/a4_gebietsklassen.py` verschneidet die Bezirke per SELECT mit Stadtteilen, Zensus-Zellen und Haltestellen. Keine Geometrie und keine Zahl je Bezirk in `daten/` oder im Export. |
+| Ergebnis | Zuordnung Bezirk → NVP-Ortsteil → Gebietsklasse für die 29 Bezirke der Stadtteile 11, 13, 32, 43, 44, 64, 72, 84, 86 in `config/richtwerte.yaml` (`oepnv.gebietsklassen.statistische_bezirke`); Protokoll `pruefen/a4_nvp_lesung.md`, Abschnitt 6 |
+| Vermerk (falls je veröffentlicht) | © Landeshauptstadt Potsdam, Statistische Bezirke Stand 31.12.2021, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung) |
+
+Hinweis für I1: In Zeile 12 von `QUELLEN.md` die statistischen Bezirke als „intern genutzt (A4-Gegenprobe, N2)“ ergänzen.

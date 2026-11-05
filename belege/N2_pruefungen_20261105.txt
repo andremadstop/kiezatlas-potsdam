@@ -1,0 +1,51 @@
+# Nachlauf N2, Prüfläufe 05.11.2026 (Worktree kiezatlas-wt-N2, Zweig nachlauf/n2, Basis ausbau/integration)
+
+## pruefen/b1_jahre.py (Standard: ausbau/integration)
+  ok    Potsdam: 2869 Zellen mit Gebäuden, Σ 23155 (Erwartung 2869 / 23155)
+  ok    keine Anteile in Zellen ohne Gebäude
+  ok    Anteile: Länge 8, Summe 100 ± 0,5 (Abweichungen: [])
+  ok    vorherrschend null, wo anteile null
+  ok    vorherrschend zeigt auf die größte Klasse
+  ok    gzip -9 13066 Byte ≤ 120 KB
+  ok    Vermerk dl-de/by-2-0 mit Link und Bearbeitungshinweis (Kopf und quellen)
+  ok    Beschriftung „nicht einzelne Gebäude“
+  ok    keine Gebäude-oid in jahre_zellen.js
+  ok    daten/jahre/ gegen ausbau/integration unberührt
+  ok    kein Pipeline-Eintrag zensus_gebaeude_jahr in config/potsdam.yaml (Korrektur 17)
+  ok    01_vorbereiten.py, 02_auswerten.py, potsdam.yaml, QUELLEN.md gleich ausbau/integration (Korrektur 21)
+  ok    Commits ausbau/p0...ausbau/b1: kein daten/jahre/, keine Datei aus Korrektur 21
+
+0 Abweichungen
+
+## pruefen/b1_jahre.py ausbau/p0...ausbau/b1
+  ok    01_vorbereiten.py, 02_auswerten.py, potsdam.yaml, QUELLEN.md gleich ausbau/p0...ausbau/b1 (Korrektur 21)
+  ok    Commits ausbau/p0...ausbau/b1: kein daten/jahre/, keine Datei aus Korrektur 21
+
+0 Abweichungen
+
+## pruefen/a4_haltestelle.py (neue richtwerte.yaml)
+Haltestellen 315, davon in Potsdam 283, ohne Klasse 0, stop_id eindeutig 315
+  Potsdam Klasse I         112
+  Potsdam Klasse II        138
+  Potsdam Klasse III       30
+  Potsdam Klasse unter III 3
+ok
+
+## pruefen/a4_gebietsklassen.py
+0 Befund(e)
+(volle Ausgabe: belege/a4_gebietsklassen_20261105.txt)
+
+## pruefen/A6_planer.py (Folge für A6, nicht von N2 zu beheben)
+mit richtwerte.yaml von ausbau/integration: 0 Befunde. Mit der N2-YAML:
+  FEHLT oepnv_erschliessung: SQL = Datei in allen 19 Planungsräumen, 7 ohne Wert (über 50 % ohne Klasse) ([('401', None, 100.0), ('601', 75, 77.27565478746243)])
+  FEHLT oepnv_takt: SQL = Datei in allen 19 Planungsräumen, 7 ohne Wert (über 50 % ohne Klasse) ([('401', None, 26.750861079219288), ('601', 74, 68.97810218978103)])
+2 Befund(e)
+
+## Sozialräume (Auftrag N2, Punkt 4): offen, nicht eingebaut
+
+Der bestehende Raumebenen-Mechanismus trägt keine dritte Ebene ohne neue Oberfläche:
+- daten/planer.js hat genau ein Feld `raumebene` je Datei (heute „planungsraum“); 15_planer.py rechnet eine Ebene.
+- planer.js (A7) kennt in seiner Tabelle RAUMEBENE nur Stadtteile (st) und Planungsräume (pr); eine Ebene braucht dort
+  einen Eintrag und eine Grenzdatei (wie daten/planungsraeume.js aus 17_planungsraeume_js.py).
+Sozialräume (6, eingang/sozialraume-in-potsdam.geojson, dl-de/by-2-0) brauchen also eine zweite Planer-Datei bzw.
+ein Ebenen-Feld (A6), eine Grenzdatei und einen Eintrag in planer.js (A7). Entscheidung für A6/A7, nicht in N2.

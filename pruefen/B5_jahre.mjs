@@ -92,7 +92,13 @@ let gebAlle = 0;
   for (const f of JDATEIEN) {
     const d = ladeJs(path.join(JAHRE, f));
     if (d.fixture) fehl.push(f + ": Fixture");
-    for (const [q, v] of Object.entries(d.quellen)) if (!v.quelle || !/Daten verändert \(eigene Berechnung\)/.test(v.vermerk) || !/govdata\.de\/dl-de\/by-2-0/.test(v.vermerk)) fehl.push(`${f}: Quelle ${q} ohne Vermerk „Daten verändert“ oder Lizenzlink`);
+    // Vermerk je Lizenz (Nachtrag N3): dl-de mit „Daten verändert“ und Lizenzlink; CC0 (Wikidata) mit Link zur CC0-Erklärung.
+    // Andere Lizenzen (ODbL, CC BY-SA, ungeklärt) fallen durch, auch wenn der Vermerk passt.
+    for (const [q, v] of Object.entries(d.quellen)) {
+      const dl = /dl-de\/by-2-0/.test(v.lizenz) && !/odbl|by-sa|ungekl/i.test(v.lizenz) && /Daten verändert \(eigene Berechnung\)/.test(v.vermerk) && /govdata\.de\/dl-de\/by-2-0/.test(v.vermerk);
+      const cc0 = v.lizenz === "CC0 1.0" && /creativecommons\.org\/publicdomain\/zero\/1\.0/.test(v.vermerk);
+      if (!v.quelle || !(dl || cc0)) fehl.push(`${f}: Quelle ${q} (${v.lizenz}) ohne Vermerk „Daten verändert“ mit dl-de-Link oder CC0-Link`);
+    }
     for (const x of d.features) {
       gebAlle++;
       const p = x.properties, extra = Object.keys(p).filter((k) => !NAMEN.includes(k));
@@ -338,6 +344,13 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(/\+41\s%/.test(sp["g-sf-alt"]) && /\u221235\s%/.test(sp["g-sf-ddr"]) && sp["g-sf-alt-w"] === "mehr" && sp["g-sf-ddr-w"] === "weniger" && sp["g-sf-alt-k"] === "vor 1919" && /1979/.test(sp["g-sf-ddr-k"]) && /nicht vergleichbar/.test(m.text) && /Prüfgebäude/.test(m.text) && /Denkmale stammen fast alle/.test(m.text),
         "Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl");
       pruef((m.text.match(/visinage/gi) || []).length === 1 && /Methodenvorbild/.test(m.text), "Methode: Vorbild genau einmal genannt, als Methodenvorbild");
+      // Nachtrag N3: Baualter-Statistik der LHP (H4) als Plausibilität; Gruppen summieren sich zur Gesamtzeile
+      const lh = await page.evaluate(() => ({ n: document.querySelectorAll("#j-m-lhp tbody tr").length, q: (document.getElementById("j-m-lhp-quelle") || {}).textContent || "" }));
+      const gr = M.lhp ? M.lhp.gruppen : [], ges = gr.find((x) => x.gruppe === "zusammen"), teil = gr.filter((x) => x !== ges);
+      pruef(M.lhp && lh.n === gr.length && ges && teil.reduce((a, x) => a + x.kaskade, 0) === ges.kaskade && teil.reduce((a, x) => a + x.lhp_2025, 0) === ges.lhp_2025
+        && ges.kaskade === M.schieflage.reduce((a, x) => a + x.kaskade, 0) && /dl-de\/by-2-0/.test(lh.q) && /Daten verändert/.test(lh.q),
+        `Methode: Baualter-Statistik der Stadt (H4), ${lh.n} Zeilen, Gruppen = Gesamt, Gebäudekarte = Summe der Zensus-Tabelle, Vermerk mit Lizenz`);
+      pruef(/Wikidata/.test(m.text) && /zurückgehalten/.test(m.text) && !/Bisher keine/.test(m.text), "Methode: genaue Jahre aus Wikidata genannt, im Rücktest zurückgehalten");
     }
     if (seite === "jahre-daten.html") {
       const n = await page.evaluate(() => window.KIEZ_JAHRE_ZELLEN.gebaeude.filter((x) => x != null).length);

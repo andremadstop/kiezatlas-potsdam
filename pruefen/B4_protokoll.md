@@ -54,3 +54,42 @@ Median 25 m² Grundfläche), „Gebäude für Vorratshaltung“.
 ## Erwartung (keine Zielvorgabe)
 
 Unter Berlins 61,4 % (visinage, mit Gebäudealterskarte 1992/93 und Luftbilddatierung).
+
+## Nachtrag N3 (05.11.2026, vor Lauf 3 festgelegt und committet)
+
+Anlass: Seit dem Wikidata-Handexport (H9) gibt es freigegebene genaue Jahre in Stufe 1. Die Prüfgebäude der
+Wikipedia-Liste sind großenteils dieselben Denkmale. Ein Rücktest gegen die veröffentlichte Kaskade träfe dort
+fast immer, weil Stufe 1 die Antwort schon kennt (Prüfbericht Korrektur 7: der Holdout darf die genauen Jahre
+nicht sehen). Die Regeln der Kaskade selbst bleiben unverändert.
+
+1. **Rücktest-Lauf ohne Stufe 1.** Der Rücktest rechnet die Kaskade ein zweites Mal, ohne jedes genaue Jahr
+   (Stufe 1 leer, alle Prüfgebäude fallen in Stufe 2 bis 6). Gemessen wird die Klasse aus diesem Lauf.
+   Die Abdeckungstabelle im Bericht bleibt die der veröffentlichten Kaskade (mit Stufe 1).
+2. **Dritter Prüfsatz Wikidata** (CC0, Stufe 1 der veröffentlichten Kaskade, im Rücktest zurückgehalten):
+   Zeilen mit `quelle = 'Wikidata'`, `genau`, `art = 'bau'`; je Gebäude Spanne [kleinstes `jahr_von`,
+   größtes `jahr_bis`], Spanne über 20 Jahre fällt heraus (wie Wikipedia). Er überschneidet sich mit dem
+   Wikipedia-Satz; die Zahl der gemeinsamen Gebäude steht im Bericht. Ausweis wie die anderen Sätze.
+3. **Summenprüfung Stufen 1 bis 3 nur für Gebäude mit Wohnraum** (Codekorrektur, keine Regeländerung): Der
+   Zensus zählt nur Gebäude mit Wohnraum; Schlösser und Kirchen aus Stufe 1 gehören nicht in den Vergleich.
+4. **Baualter-Statistik der LHP (H4) statt „blockiert“.** Die Datei liegt seit 05.11.2026 in `eingang/`
+   (dl-de/by-2-0). Vergleich der Stadtsummen der Gebäude mit Wohnraum in den drei Gruppen, in denen die
+   Klassen zusammenpassen: vor 1949, 1949–1990, ab 1991. Zensus gegen die LHP-Zeile 2022 (Zensusjahr),
+   Kaskade gegen die LHP-Zeile 2025 (nächster Stand zum ALKIS-Snapshot). Nur zur Plausibilität, keine
+   Schwelle: Die LHP zählt Wohngebäude zum 31.12., der Zensus Gebäude mit Wohnraum zum 15.05.2022, die
+   Kaskade ALKIS-Umrisse.
+5. **Gegenprobe Wikidata gegen Wikipedia** an den Gebäuden, die in beiden Quellen ein genaues Jahr haben:
+   Zahl mit gleichem Jahr, gleicher Klasse, anderer Klasse. Keine Schwelle.
+
+## Nachtrag Gegenprobe zum Nachlauf (05.11.2026, nach dem Lauf geschrieben)
+
+Ehrlicher Hinweis: Dieser Nachtrag ist **nach** einem weiteren Lauf geschrieben, nicht vorher. Anlass war ein
+Lizenzfund, kein Ergebnis des Rücktests: Die Zuordnung der Wikidata-Jahre über die Denkmal-ID lief über die
+Adressen der BLDAM-Liste (Lizenz offen, E8). Seitdem nimmt Stufe 1 nur Wikidata-Zeilen, die über die eigene
+Koordinate des Objekts zugeordnet sind (`skripte/22_jahre_genau.py`, Commit f9e87ce); die ID-Zuordnung steht
+als Prüfspalte mit `nur_pruefung = true`.
+
+- Regeln, Schwellen und Prüfsätze der Kaskade und des Rücktests sind unverändert. Der Prüfsatz Wikidata
+  (Nachtrag N3, Punkt 2) bleibt definiert über `quelle = 'Wikidata'`; er ist dadurch kleiner geworden
+  (105 statt 129 Gebäude), die Überschneidung mit Wikipedia 33 statt 39.
+- Neu gelaufen: `24_jahre_kaskade.py rechnen` und `ruecktest`; `berichte/B4_holdout.md` ist dieser Lauf.
+  Der Vorlauf mit ID-Zuordnung ist nicht gesondert abgelegt (Stand in Commit e009fad).

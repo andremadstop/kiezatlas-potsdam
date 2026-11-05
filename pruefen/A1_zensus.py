@@ -17,14 +17,20 @@ Liest die Datenbank nur (psql als Leserolle), die Rohdaten-Zips nur zum Hash, ke
      Liegt das Zensus-Gemeindeergebnis als Handdownload vor ($KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv,
      Spalten merkmal;wert;quelle mit merkmal = i_ges, hh_ges, kf_ges, …), wird zusätzlich dagegen geprüft.
   5. Geheimhaltung: keine Datei unter daten/ enthält ein Feld aus zensus_struktur (feine Klassen je Zelle).
-  6. Paketgrenze: git diff gegen den Basiszweig berührt nur Dateien von A1.
+  6. Paketgrenze: git diff gegen die Basis berührt nur Dateien von A1 (siehe Aufruf: drei Lesarten).
   7. Planungsräume: Abdeckung je Planungsraum, sobald public.planungsraum gefüllt ist (H1), sonst Hinweis.
 
 Aufruf (Passwort nur aus der Umgebung, nie auf der Kommandozeile):
   set -a; . ../kiezatlas-potsdam/.env; set +a
-  PGPASSWORD="$LESE_PASSWORD" python3 -I pruefen/A1_zensus.py [--basis ausbau/p0]
-  Im Integrationszweig: --basis ausbau/p0..ausbau/a1 (prüft nur die Commits von A1, nicht den offenen Stand;
-  dazu kommen ungetrackte Dateien. Ergänzung I1)
+  PGPASSWORD="$LESE_PASSWORD" python3 -I pruefen/A1_zensus.py [--basis BASIS]
+  BASIS (Nachlauf N2, 05.11.2026; vorher Standard ausbau/p0, auf dem Integrationsstand dauerhaft rot):
+    ausbau/integration (Standard)  Nachlauf: geprüft wird, was seit dem Integrationsstand dazukam, eingecheckt
+                                   und offen. Erlaubt sind die Dateien von A1 und die in NACHLAUF_PFADE
+                                   freigegebenen Dateien der Nachlauf-Pakete (je Eintrag mit Paket).
+    ausbau/p0                      Paketzweig ausbau/a1 selbst, eingecheckt und offen, nur Dateien von A1.
+    ausbau/p0...ausbau/a1          Bereich (drei Punkte = ab dem gemeinsamen Vorfahren): nur die Commits von A1,
+                                   ohne offenen Stand und ohne ungetrackte Dateien. So lässt sich auf jedem Zweig
+                                   belegen, dass A1 seine Grenze gehalten hat. Zwei Punkte gelten wie drei.
 Rückgabe 0 = alle Prüfungen bestanden, 1 = Befund.
 """
 from __future__ import annotations
@@ -73,6 +79,14 @@ MITTEL = {"Nettokaltmiete (€/m²)": "miete_qm", "Leerstandsquote (%)": "leer_q
 # Dateien, die A1 laut Bauplan 0.4 (mit Korrekturen) ändern oder anlegen darf
 A1_PFADE = [r"skripte/01_vorbereiten\.py", r"skripte/10_zensus_struktur\.py", r"pruefen/A1_[^/]+",
             r"quellen-a1\.md", r"belege/A1_[^/]+", r"belege/20261105T\d{6}Z[^/]*"]
+# Nur bei Basis ausbau/integration (Nachlauf): Dateien, die ein Nachlauf-Paket neben A1 laut Auftrag anfassen darf.
+# Jeder Eintrag nennt sein Paket; ein neues Nachlauf-Paket trägt hier seine Dateien ein, statt die Prüfung zu lockern.
+NACHLAUF_PFADE = {
+    # N2 (05.11.2026): Zensus-Gegenprobe A1, Paketgrenze B1, Gebietsklassen A4 (richtwerte.yaml nur Abschnitt oepnv)
+    "N2": [r"pruefen/b1_jahre\.py", r"pruefen/a4_[^/]+", r"belege/a4_[^/]+", r"quellen-a4\.md",
+           r"config/richtwerte\.yaml", r"belege/N2_[^/]+"],
+}
+NACHLAUF_BASIS = "ausbau/integration"
 
 befunde: list[str] = []
 hinweise: list[str] = []
@@ -199,7 +213,22 @@ def summen() -> None:
             g, q = gemeinde[ges]
             pruef(abs(100 * (summe - g) / g) < GRENZE,
                   f"{thema}: gegen Gemeindeergebnis {zahl(g)} ({q}), Abweichung {100 * (summe - g) / g:+.2f} %")
-    if not gemeinde:
+            # Klassen gegen die Gemeindetabelle nur zur Information: Cell-Key und „–“ in kleinen Klassen
+            # drücken die Gittersummen je Klasse (Kernfamilie −6,4 % schon gegen das eigene Insgesamt)
+            for k in klassen:
+                if k in gemeinde and gemeinde[k][0]:
+                    gk = gemeinde[k][0]
+                    print(f"          Klasse {k:<12} Gitter {zahl(s[k]):>8}  Gemeinde {zahl(gk):>8}  "
+                          f"({100 * (s[k] - gk) / gk:+.1f} %)")
+    if gemeinde:
+        fehlen = [ges for _, ges, _ in THEMEN.values() if ges not in gemeinde]
+        pruef(not fehlen, "Gemeindeergebnis deckt alle sechs Zählthemen ab"
+              + (f" (fehlt: {', '.join(fehlen)})" if fehlen else ""))
+        h = hashlib.sha256(GEMEINDE.read_bytes()).hexdigest()
+        herkunft = GEMEINDE.with_name("HERKUNFT.md")
+        pruef(herkunft.exists() and h in herkunft.read_text(encoding="utf-8"),
+              f"{GEMEINDE.name}: SHA256 wie in eingang/HERKUNFT.md ({h[:12]}…)")
+    else:
         print("        Hinweis: Zensus-Gemeindeergebnis Potsdam fehlt "
               "($KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv nicht vorhanden). "
               "Bezugswerte oben stammen aus demselben Zensus (Gitter), nicht aus der Gemeindetabelle.")
@@ -227,15 +256,34 @@ def geheimhaltung() -> None:
     pruef(not treffer, f"keine daten/-Datei mit Feldern aus zensus_struktur ({', '.join(treffer) or 'keine Treffer'})")
 
 
+def git(*args: str) -> list[str]:
+    # -z: Dateinamen mit Leerzeichen oder Umlauten kommen roh, nicht in Anführungszeichen
+    aus = subprocess.run(["git", "-C", str(WURZEL), *args, "-z"],  # noqa: S603,S607
+                         capture_output=True, text=True, check=True).stdout
+    return [n for n in aus.split("\0") if n]
+
+
 def paketgrenze(basis: str) -> None:
-    print(f"6. Paketgrenze (git diff gegen {basis}, eingecheckt und offen)")
-    namen = subprocess.run(["git", "-C", str(WURZEL), "diff", "--name-only", basis],  # noqa: S603,S607
-                           capture_output=True, text=True, check=True).stdout.split()
-    neu = subprocess.run(["git", "-C", str(WURZEL), "ls-files", "--others", "--exclude-standard"],  # noqa: S603,S607
-                         capture_output=True, text=True, check=True).stdout.split()
-    fremd = [n for n in sorted(set(namen) | set(neu)) if not any(re.fullmatch(p, n) for p in A1_PFADE)]
-    print(f"        geändert/neu: {', '.join(sorted(set(namen) | set(neu))) or '–'}")
-    pruef(not fremd, f"nur Dateien von A1 berührt ({', '.join(fremd) or 'keine fremden'})")
+    bereich = ".." in basis
+    if bereich:
+        # „a..b“ wäre bei git diff Spitze gegen Spitze; gemeint ist ab dem gemeinsamen Vorfahren („a...b“)
+        von, bis = basis.replace("...", "..").split("..", 1)
+        rng = f"{von}...{bis}"
+        print(f"6. Paketgrenze (git diff {rng}: nur die Commits von {bis}, ohne offenen Stand)")
+        namen = git("diff", "--name-only", rng)
+        neu: list[str] = []
+    else:
+        print(f"6. Paketgrenze (git diff gegen {basis}, eingecheckt und offen)")
+        namen = git("diff", "--name-only", basis)
+        neu = git("ls-files", "--others", "--exclude-standard")
+    erlaubt = list(A1_PFADE)
+    if basis == NACHLAUF_BASIS:
+        erlaubt += [p for ps in NACHLAUF_PFADE.values() for p in ps]
+        print(f"        Nachlauf: erlaubt sind A1 und {', '.join(NACHLAUF_PFADE)} (NACHLAUF_PFADE)")
+    alle = sorted(set(namen) | set(neu))
+    fremd = [n for n in alle if not any(re.fullmatch(p, n) for p in erlaubt)]
+    print(f"        geändert/neu: {', '.join(alle) or '–'}")
+    pruef(not fremd, f"nur erlaubte Dateien berührt ({', '.join(fremd) or 'keine fremden'})")
 
 
 def planungsraeume() -> None:
@@ -254,7 +302,7 @@ def planungsraeume() -> None:
 
 
 def main() -> int:
-    basis = sys.argv[sys.argv.index("--basis") + 1] if "--basis" in sys.argv else "ausbau/p0"
+    basis = sys.argv[sys.argv.index("--basis") + 1] if "--basis" in sys.argv else NACHLAUF_BASIS
     rohdaten()
     schluessel()
     abdeckung()

@@ -12,6 +12,7 @@ Braucht die Leserolle in der Umgebung (wie 16_export.py). Aufruf: python -I prue
 
 from __future__ import annotations
 
+import hashlib
 import shutil
 import sqlite3
 import subprocess
@@ -37,9 +38,14 @@ def erwarte(ok: bool, text: str) -> None:
 
 def main() -> int:
     print("[1] Fixtures nie nach daten/export")
+    # Seit N1/N4 gibt es echte _odbl-Dateien in daten/export: Der abgelehnte Lauf darf sie nicht anfassen
+    echt_odbl = WURZEL / "daten" / "export" / "kiezatlas_potsdam_odbl.gpkg"
+    vorher = hashlib.md5(echt_odbl.read_bytes()).hexdigest() if echt_odbl.exists() else None
     r = lauf(str(EXPORT), "--quelle", "daten/fixtures")
     erwarte(r.returncode != 0 and "fixture" in (r.stderr + r.stdout), "Abbruch mit Hinweis auf fixture")
-    erwarte(not (WURZEL / "daten" / "export" / "kiezatlas_potsdam_odbl.gpkg").exists(), "daten/export ohne _odbl-Datei")
+    nachher = hashlib.md5(echt_odbl.read_bytes()).hexdigest() if echt_odbl.exists() else None
+    stand_odbl = "da" if vorher else "fehlt"
+    erwarte(vorher == nachher, f"daten/export: _odbl-Datei vom abgelehnten Lauf unberührt ({stand_odbl})")
     r = lauf(str(EXPORT), "--quelle", "daten/fixtures", "--ziel", "daten/export/probe")
     erwarte(
         r.returncode != 0 and not (WURZEL / "daten" / "export" / "probe").exists(),
@@ -54,8 +60,8 @@ def main() -> int:
         erwarte((tmp / "fix" / "kiezatlas_potsdam_odbl.gpkg").exists(), "kiezatlas_potsdam_odbl.gpkg geschrieben")
         erwarte(
             sorted(p.name for p in (tmp / "fix" / "csv_odbl").glob("*.csv"))
-            == ["einrichtung_odbl.csv", "versorgung_fuss_odbl.csv", "zelle_fuss_odbl.csv"],
-            "csv_odbl/ mit drei Ebenen",
+            == ["einrichtung_odbl.csv", "lizenz.csv", "versorgung_fuss_odbl.csv", "zelle_fuss_odbl.csv"],
+            "csv_odbl/ mit drei Ebenen und lizenz.csv",
         )
         r = lauf(str(PRUEF), "--quelle", "daten/fixtures", "--ziel", str(tmp / "fix"), "--odbl-erwartet")
         erwarte(
@@ -64,7 +70,13 @@ def main() -> int:
             + ("" if r.returncode == 0 else " | " + " | ".join(z for z in r.stdout.splitlines() if "FEHLT" in z)[:600]),
         )
 
-        r = lauf(str(EXPORT), "--ziel", str(tmp / "fix"), "--ohne-beleg")
+        # Quelle ohne _odbl.js: echte Dateien von daten/ ohne die ODbL-Dateien (diese liegen seit N1 vor)
+        ohne = tmp / "quelle_ohne_odbl"
+        ohne.mkdir()
+        for f in (WURZEL / "daten").glob("*.js"):
+            if not f.stem.endswith("_odbl"):
+                shutil.copy2(f, ohne / f.name)
+        r = lauf(str(EXPORT), "--quelle", str(ohne), "--ziel", str(tmp / "fix"), "--ohne-beleg")
         fix = tmp / "fix"
         erwarte(
             r.returncode == 0

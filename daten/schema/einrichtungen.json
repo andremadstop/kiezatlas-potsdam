@@ -130,6 +130,10 @@
        },
        "in_potsdam": {
         "type": "boolean"
+       },
+       "hinweis": {
+        "type": "string",
+        "description": "Nur bei Standorten mit strittiger Lage (Ortsangabe widerspricht den Koordinaten); der Standort zählt dann für keine Entfernung"
        }
       }
      }

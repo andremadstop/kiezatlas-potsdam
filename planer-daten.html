@@ -39,8 +39,8 @@
       <p class="was">Kitas, Horte und Schulen (Bildungsministerium Brandenburg) und Gemeinbedarf aus dem Liegenschaftskataster als Punkte, ohne Adresse und ohne Kontaktdaten.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>). Vermerk je Quelle in der Datei, mit „Daten verändert (eigene Berechnung)“.</p>
     </li>
-    <li data-datei="einrichtungen_odbl.js" data-schema="einrichtungen_odbl.json" data-da="nein" data-odbl="ja">
-      <span class="datei">einrichtungen_odbl.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="einrichtungen_odbl.js" data-schema="einrichtungen_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/einrichtungen_odbl.js">einrichtungen_odbl.js</a><span class="stand">vorhanden</span>
       <p class="was">Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze aus OpenStreetMap als Punkte, ohne Namen.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz.</p>
     </li>
@@ -49,9 +49,9 @@
       <p class="was">Entfernung in Luftlinie von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung je Art, in der Reihenfolge von <code>zellen.js</code>.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
     </li>
-    <li data-datei="erreichbar_fuss_odbl.js" data-schema="erreichbar_fuss_odbl.json" data-da="nein" data-odbl="ja">
-      <span class="datei">erreichbar_fuss_odbl.js</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap.</p>
+    <li data-datei="erreichbar_fuss_odbl.js" data-schema="erreichbar_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/erreichbar_fuss_odbl.js">erreichbar_fuss_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap (Stand 31.10.2026), in der Reihenfolge von <code>zellen.js</code>.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
     </li>
     <li data-datei="planer.js" data-schema="planer.json" data-da="ja" data-odbl="nein">
@@ -59,8 +59,8 @@
       <p class="was">Versorgung je Raumeinheit in Luftlinie: Anteile in Reichweite, Einwohner je Einrichtung, Plätze je Kind, Grün je Einwohner. Jeder Wert mit Methode, Status, Stand, Unsicherheit und Quelle.</p>
       <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
     </li>
-    <li data-datei="planer_fuss_odbl.js" data-schema="planer_fuss_odbl.json" data-da="nein" data-odbl="ja">
-      <span class="datei">planer_fuss_odbl.js</span><span class="stand stand--folgt">folgt</span>
+    <li data-datei="planer_fuss_odbl.js" data-schema="planer_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/planer_fuss_odbl.js">planer_fuss_odbl.js</a><span class="stand">vorhanden</span>
       <p class="was">Dieselben Versorgungswerte als Fußweg.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
     </li>
@@ -120,8 +120,9 @@
     <li data-export="gpkg" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.gpkg" download>kiezatlas_potsdam.gpkg</a><span class="stand">vorhanden</span>
       <p class="was">GeoPackage ohne OpenStreetMap-Anteil: Raumeinheiten mit Versorgungswerten, Versorgungstabelle, Einrichtungen, Zellen mit Entfernungen, Grünflächen, Haltestellen; QGIS-Stile sind eingebettet.</p>
       <p class="lizenz">Je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
-    <li data-export="gpkg_odbl" data-da="nein" data-odbl="ja"><span class="datei">kiezatlas_potsdam_odbl.gpkg</span><span class="stand stand--folgt">folgt</span>
-      <p class="was">Fußwegwerte und Einrichtungen aus OpenStreetMap, unter der Open Database License; folgt mit dem OpenStreetMap-Auszug.</p></li>
+    <li data-export="gpkg_odbl" data-da="ja" data-odbl="ja"><a class="datei link" href="daten/export/kiezatlas_potsdam_odbl.gpkg" download>kiezatlas_potsdam_odbl.gpkg</a><span class="stand">vorhanden</span>
+      <p class="was">GeoPackage mit OpenStreetMap-Anteil: Einrichtungen aus OpenStreetMap (ohne Namen), Zellen mit Fußweg zum nächsten Standort, Versorgungstabelle im Fußweg. Dieselben Ebenen als CSV: <a class="link" href="daten/export/csv_odbl/einrichtung_odbl.csv">einrichtung_odbl</a>, <a class="link" href="daten/export/csv_odbl/zelle_fuss_odbl.csv">zelle_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/versorgung_fuss_odbl.csv">versorgung_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/lizenz.csv">lizenz</a>.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz; amtliche Anteile und Haltestellen (VBB, CC BY 4.0) mit ihrem Vermerk in der Tabelle <code>lizenz</code>.</p></li>
     <li data-export="csv" data-da="ja" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand">vorhanden</span>
       <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
     <li data-export="readme" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/README.md">README.md</a><span class="stand">vorhanden</span>
@@ -134,7 +135,7 @@
 </main>
 
 <footer class="fuss-seite">
-  <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-methode.html">Methode</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-methode.html">Methode</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
 </footer>
 </body>
 </html>

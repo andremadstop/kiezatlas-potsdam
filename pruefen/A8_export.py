@@ -265,7 +265,7 @@ def main() -> int:
     ix = {s: i for i, s in enumerate(sp)}
     quellwerte = [(nr, w) for nr, r in planer["raeume"].items() for w in r["werte"]]
     abw = 0
-    for z, (nr, w) in zip(zeilen, quellwerte):
+    for z, (nr, w) in zip(zeilen, quellwerte, strict=False):
         if not (
             z[ix["raum_nr"]] == nr
             and z[ix["kennzahl"]] == w["kennzahl"]
@@ -311,7 +311,7 @@ def main() -> int:
     sp, zeilen = T["einrichtung"]
     ix = {s: i for i, s in enumerate(sp)}
     abw = 0
-    for z, f in zip(zeilen, ein["features"]):
+    for z, f in zip(zeilen, ein["features"], strict=False):
         p = f["properties"]
         if any(
             not zahl_gleich(z[ix[k]], p.get(k)) if k in ("plaetze", "schueler", "in_potsdam") else z[ix[k]] != p.get(k)
@@ -324,7 +324,7 @@ def main() -> int:
     sp, zeilen = T["zelle"]
     ix = {s: i for i, s in enumerate(sp)}
     abw = 0
-    for i, (z, gid) in enumerate(zip(zeilen, ids)):
+    for i, (z, gid) in enumerate(zip(zeilen, ids, strict=False)):
         if z[ix["gitter_id"]] != gid or z[ix["ew"]] != zp[gid].get("ew") or z[ix["stadtteil"]] != zp[gid].get("st"):
             abw += 1
         for art in err["arten"]:
@@ -347,8 +347,8 @@ def main() -> int:
         pruef(kopf[: len(ohne)] == ohne, f"csv/{name}.csv: Spalten wie GPKG")
         pruef(len(cz) == len(zeilen), f"csv/{name}.csv: {len(cz)} Zeilen wie GPKG")
         abw = 0
-        for gz, c in zip(zeilen, cz):
-            for k, wert in zip(ohne, c):
+        for gz, c in zip(zeilen, cz, strict=False):
+            for k, wert in zip(ohne, c, strict=False):
                 v = gz[sp.index(k)]
                 if v is None:
                     abw += wert != ""
@@ -506,6 +506,31 @@ def main() -> int:
             )
             if "einrichtung_odbl" in go["tabellen"]:
                 pruef("name" not in go["spalten"]["einrichtung_odbl"], "einrichtung_odbl: ohne Namen")
+            if "versorgung_fuss_odbl" in go["tabellen"]:
+                # Fußweg: Titel ohne „Luftlinie“; amtliche Ziele mit ihrem dl-de-Vermerk, jede Zeile mit OSM (Netz)
+                sp, zz = go["tabellen"]["versorgung_fuss_odbl"]
+                ix = {k: sp.index(k) for k in ("art", "titel", "vermerk", "methode")}
+                amtlich = {"kita": "Ministerium für Bildung", "hort": "Ministerium für Bildung",
+                           "grundschule": "Ministerium für Bildung", "gruen": "GeoBasis-DE/LGB"}
+                fuss = [z for z in zz if z[ix["methode"]] == "fussweg"]
+                pruef(
+                    fuss and not [z for z in fuss if "Luftlinie" in (z[ix["titel"]] or "")],
+                    f"versorgung_fuss_odbl: kein Titel einer Fußweg-Zeile nennt Luftlinie ({len(fuss)} Zeilen)",
+                )
+                ohne = [f"{z[sp.index('raum_nr')] if 'raum_nr' in sp else '?'} {z[ix['art']]}" for z in fuss
+                        if z[ix["art"]] in amtlich and amtlich[z[ix["art"]]] not in (z[ix["vermerk"]] or "")]
+                pruef(not ohne, f"versorgung_fuss_odbl: amtliche Ziele mit MBJS- bzw. LGB-Vermerk ({ohne[:5]})")
+                pruef(
+                    all("OpenStreetMap-Mitwirkende" in (z[ix["vermerk"]] or "") for z in fuss),
+                    "versorgung_fuss_odbl: jede Fußweg-Zeile nennt das OSM-Wegenetz im Vermerk",
+                )
+                lsp = go["tabellen"]["lizenz"][0]
+                lz_fuss = [z for z in lz if z[lsp.index("ebene")] == "versorgung_fuss_odbl"]
+                pruef(
+                    bool(lz_fuss) and all(k in lz_fuss[0][lsp.index("vermerk")]
+                                          for k in ("Ministerium für Bildung", "GeoBasis-DE/LGB")),
+                    "_odbl.gpkg lizenz versorgung_fuss_odbl: MBJS- und LGB-Vermerk",
+                )
     else:
         print("  --    keine _odbl-Datei (A3/A5b leer); ODbL-Pfad mit --odbl-erwartet gegen Fixtures prüfen")
 

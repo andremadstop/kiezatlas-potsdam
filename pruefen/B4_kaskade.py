@@ -5,10 +5,13 @@ Prüft:
       Klasse und Quelle oder als „nicht datiert“ (Stufe 6, ohne Klasse und Quelle)
   A2  „aktualit“ kommt in keiner B4-Datei vor (Skript, Konfiguration, Daten)
   A3  der Rücktest-Bericht weist je Stufe und je bekannter Bauzeit Treffer, Median und n aus
-  A4  Summenprüfung nur für Stufen 1 bis 3, Stufe 4 als tautologisch gekennzeichnet; H4 als blockiert genannt
+  A4  Summenprüfung nur für Stufen 1 bis 3, Stufe 4 als tautologisch gekennzeichnet; H4-Vergleich (LHP-Baualter)
+      im Bericht (Nachtrag N3)
+  N3  Rücktest ohne Stufe 1 (Holdout sieht keine genauen Jahre), Prüfsatz Wikidata; Stufe 1 hat Gebäude
   A5  kein OSM- und kein Wikipedia-Wert in gebaeude_jahr (Prüfabfrage); keine BLDAM-Herkunft
   A6  größte Datei daten/jahre/<nr>.js ≤ 400 KB gz
-  K6  kein Einzeljahr für Gebäude mit Wohnraum (außer freigegebene Denkmale); in daten/jahre nur dann j
+  K6  kein Einzeljahr für Gebäude mit Wohnraum: ALKIS führt keine Wohneinheiten, „weniger als 3“ ist nicht
+      entscheidbar, also gar keins (auch nicht bei Denkmalen); in daten/jahre j nur bei Stufe 1
   K   keine oid, keine Adressfelder, kein Feld d in daten/jahre; Summe der Gebäude = kennzahlen.json
   K   dl-de-Vermerke mit „Daten verändert (eigene Berechnung)“ und Lizenzlink; Hinweis zur Unsicherheit
   K   Blocktyp-Gebiete mit Beleg (Seite), Bauzeit und Klasse
@@ -74,29 +77,43 @@ def main() -> int:
     pruef(len(potsdam) == 52309, f"Gebäude in Potsdam im Snapshot: {len(potsdam)} (erwartet 52.309)")
     pruef(set(zeilen) == potsdam, f"gebaeude_jahr deckt genau diese Gebäude ab ({len(zeilen)} Zeilen)")
     schlecht = [o for o, (j, k, _g, q, s) in zeilen.items()
-                if not ((s in (1, 2, 3, 4, 5) and k in KLASSEN and q) or (s == 6 and k is None and q is None and j is None))]
-    pruef(not schlecht, f"jede Zeile: Klasse mit Quelle (Stufe 1–5) oder nicht datiert (Stufe 6); Abweichungen {len(schlecht)}")
+                if not ((s in (1, 2, 3, 4, 5) and k in KLASSEN and q)
+                        or (s == 6 and k is None and q is None and j is None))]
+    pruef(not schlecht, "jede Zeile: Klasse mit Quelle (Stufe 1–5) oder nicht datiert (Stufe 6); "
+                        f"Abweichungen {len(schlecht)}")
 
     print("A2 aktualit")
     dateien = [SKRIPT, BLOCKTYPEN, *sorted(JAHRE.glob("*.js"))]
     treffer = [p.name for p in dateien if "aktualit" in p.read_text(encoding="utf-8")]
-    pruef(not treffer, f"„aktualit“ in keiner B4-Datei ({len(dateien)} Dateien geprüft){': ' + ', '.join(treffer) if treffer else ''}")
+    pruef(not treffer, f"„aktualit“ in keiner B4-Datei ({len(dateien)} Dateien geprüft)"
+                       f"{': ' + ', '.join(treffer) if treffer else ''}")
 
     print("A3/A4 Bericht")
     b = BERICHT.read_text(encoding="utf-8") if BERICHT.exists() else ""
     pruef("Je Stufe:" in b and "Je bekannter Bauzeit" in b and "Median Abstand" in b,
           "Rücktest je Stufe und je Bauzeit mit Median")
     pruef(b.count("| n |") >= 4, "Tabellen nennen n (mindestens 4 Tabellen)")
-    pruef("Geprüft werden die Stufen 1 bis 3" in b and "prüft nichts" in b, "Summenprüfung nur Stufen 1–3, Stufe 4 tautologisch")
-    pruef("(H4) ist blockiert" in b, "H4 als blockiert genannt")
+    pruef("Geprüft werden die Stufen 1 bis 3" in b and "prüft nichts" in b,
+          "Summenprüfung nur Stufen 1–3, Stufe 4 tautologisch")
+    pruef("## Plausibilität: Baualter-Statistik der LHP (H4)" in b and "LHP 2022" in b and "LHP 2025" in b,
+          "H4: Stadtsummen gegen die Baualter-Statistik der LHP")
+
+    print("N3 Holdout")
+    pruef("**ohne Stufe 1**" in b, "Rücktest-Lauf ohne Stufe 1 (Holdout sieht keine genauen Jahre)")
+    pruef("### Wikidata, genaue Jahre (Stufe 1, im Rücktest zurückgehalten):" in b, "Prüfsatz Wikidata im Bericht")
+    rt = b.split("## Rücktest", 1)[-1].split("## Summenprüfung", 1)[0]
+    pruef("| 1 genaues Jahr" not in rt, "keine Rücktest-Zeile aus Stufe 1")
+    stufe1 = sum(1 for z in zeilen.values() if z[4] == 1)
+    pruef(stufe1 > 0, f"Stufe 1 (freigegebene genaue Jahre): {stufe1} Gebäude")
     pruef(not re.search(r"DEBBAL[0-9A-Za-z]{8,}", b), "Bericht ohne Gebäudekennungen")
 
     print("A5 keine OSM-, Wikipedia- oder BLDAM-Werte")
     pruef(fremd == 0, f"Zeilen mit OSM/Wikipedia/BLDAM als Quelle: {fremd}")
 
     print("K6 Einzeljahre")
-    pruef(jahr_wohn <= denkmal_frei,
-          f"Gebäude mit Wohnraum mit Einzeljahr: {jahr_wohn}, höchstens freigegebene Denkmale: {denkmal_frei}")
+    pruef(jahr_wohn == 0, f"Gebäude mit Wohnraum mit Einzeljahr: {jahr_wohn} (erlaubt 0; freigegebene Denkmale "
+                          f"{denkmal_frei}, Wohneinheiten unbekannt)")
+    pruef(all(z[0] is None or z[4] == 1 for z in zeilen.values()), "Einzeljahr nur aus Stufe 1")
 
     print("A6 und Daten je Stadtteil")
     teile = sorted(JAHRE.glob("*.js"))
@@ -134,7 +151,8 @@ def main() -> int:
                             and "https://www.govdata.de/dl-de/by-2-0" in q["vermerk"])
             if dl_de and not vollstaendig:
                 pruef(False, f"{p.name}: Vermerk {k} ohne Bearbeitungshinweis oder Lizenzlink")
-        if "nichts Sicheres über ein einzelnes Gebäude oder Grundstück" not in inh["hinweis"] or "Geheimhaltung" not in inh["hinweis"]:
+        if ("nichts Sicheres über ein einzelnes Gebäude oder Grundstück" not in inh["hinweis"]
+                or "Geheimhaltung" not in inh["hinweis"]):
             pruef(False, f"{p.name}: Hinweis zur Unsicherheit fehlt")
         if inh["klassen"] != KLASSEN:
             pruef(False, f"{p.name}: Klassen weichen ab")

@@ -1,8 +1,8 @@
 # A5b: Übergabe an A6, A8 und I1
 
-Stand 05.11.2026. Code fertig und getestet, **echte Werte fehlen**: Das OSM-Wegenetz (`auswertung.netz_*`) ist leer,
-weil die OSM-PBF (H5) noch nicht von Hand geladen ist. Ohne Netz bricht `rechnen` mit einer klaren Meldung ab und
-schreibt nichts.
+Stand 05.11.2026. Code fertig und getestet. **Nachlauf N1 (05.11.2026):** auf dem echten Netz (OSM Stand 31.10.2026)
+gerechnet, `14b_fussweg.sh pruefen` K1–K4 und E7 erfüllt, Median Fußweg/Luftlinie 1,37; die Dateien `*_odbl.js` sind
+erzeugt. Zahlen in `belege/N1_osm_fussweg_20261105.md`. Offen 1 (H5) und 3 sind damit erledigt.
 
 ## Ablauf, sobald A3 mit der PBF gelaufen ist
 

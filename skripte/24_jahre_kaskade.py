@@ -53,6 +53,9 @@ BLOCKTYPEN = WURZEL / "config" / "blocktypen.geojson"
 BERICHT = WURZEL / "berichte" / "B4_holdout.md"
 KIEZ_DATEN = Path(os.environ.get("KIEZ_DATEN") or (WURZEL.parent / "kiezatlas-daten"))
 REFERENZ_B3 = KIEZ_DATEN / "luftbild_lgb" / "2026-11-05" / "referenz" / "referenz.csv"
+BAUALTER_LHP = KIEZ_DATEN / "eingang" / "gebaude-nach-baualter-in-der-lhp-seit-1999.csv"
+LHP_VERMERK = ("© Landeshauptstadt Potsdam, Gebäude nach Baualter seit 1999 (Open-Data-Portal), dl-de/by-2-0 "
+               "(https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung: Gruppen zusammengefasst)")
 SNAPSHOT = "auswertung.gebaeude_stand_20261105"
 
 # Bauzeitklassen: Mikrozensus-Klassen des Zensus 2022 (wie daten/jahre_zellen.js und die Fixture für B5)
@@ -89,12 +92,22 @@ Q_TEXT = {
 LGB = ("© GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)")
 ZENSUS = ("© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 "
           "(https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)")
+WIKIDATA_URL = "https://www.wikidata.org/"
 QUELLEN_JS = {
-    "zensus": {"quelle": "Zensus 2022, Gebäude mit Wohnraum nach Baujahr (Mikrozensus-Klassen), 100-m- und 1-km-Gitter, "
+    "beleg": {"quelle": "Wikidata, Erstellungsjahr (P571) von Potsdamer Baudenkmalen, Handexport aus dem Wikidata "
+                        "Query Service vom 05.11.2026; nur genaue Jahre, nur Gebäude, zugeordnet über die "
+                        "Koordinate des Wikidata-Objekts",
+              "lizenz": "CC0 1.0",
+              "vermerk": "Wikidata, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/deed.de); Zuordnung "
+                         "zum Gebäude eigene Berechnung",
+              "url": WIKIDATA_URL, "stand": "2026-11-05"},
+    "zensus": {"quelle": "Zensus 2022, Gebäude mit Wohnraum nach Baujahr (Mikrozensus-Klassen), "
+                         "100-m- und 1-km-Gitter, "
                          "je Zelle auf die Gebäude verteilt nach Gebäudeform aus ALKIS",
                "lizenz": "dl-de/by-2-0", "vermerk": f"{ZENSUS}; Gebäudeform {LGB}",
                "url": "https://www.zensus2022.de/", "stand": "2022-05-15"},
-    "blocktyp": {"quelle": "Bauzeit der Großsiedlung nach Landeshauptstadt Potsdam, Broschüre „Potsdamer Platte“ (2008), "
+    "blocktyp": {"quelle": "Bauzeit der Großsiedlung nach Landeshauptstadt Potsdam, "
+                           "Broschüre „Potsdamer Platte“ (2008), "
                            "S. 72; Gebietsgrenzen eigene Abgrenzung aus ALKIS (config/blocktypen.geojson)",
                  "lizenz": "Bauzeiten als Fakten übernommen; Gebäude dl-de/by-2-0",
                  "vermerk": f"Bauzeiten: Landeshauptstadt Potsdam, „Potsdamer Platte“, Juli 2008; Gebäude {LGB}"},
@@ -106,7 +119,8 @@ QUELLEN_JS = {
 HINWEIS = ("Bauzeit je Gebäude als Klasse. Fast alle Angaben sind Schätzungen: Zensus 2022 je 100-m-Zelle nach "
            "Gebäudeform auf die Gebäude verteilt, belegte Bauzeiten der Großsiedlungen, Nachbargebäude. Sie sagen "
            "nichts Sicheres über ein einzelnes Gebäude oder Grundstück. Die Zensuswerte sind durch das "
-           "Geheimhaltungsverfahren leicht verändert. Wohngebäude tragen kein Einzeljahr. Nebengebäude (Garagen, "
+           "Geheimhaltungsverfahren leicht verändert. Belegt ist die Bauzeit nur bei einigen Baudenkmalen mit "
+           "genauem Erstellungsjahr in Wikidata (CC0). Wohngebäude tragen kein Einzeljahr. Nebengebäude (Garagen, "
            "Lauben, Schuppen) sind nicht datiert. Trefferquoten des Rücktests stehen auf der Methodenseite.")
 
 
@@ -167,7 +181,8 @@ GEBIETE = [
 # Historischen Innenstadt zwischen älteren und neueren Bauten gleicher Form; eine Grenze lässt sich aus
 # den Gebäudedaten nicht sicher ziehen. Sie bleiben bei Stufe 4 (Zensus).
 
-NAS_BESTE = ("(SELECT DISTINCT ON (oid_bezug) oid_bezug, dachform, bauweise, objekthoehe FROM auswertung.alkis_nas_gebaeude "
+NAS_BESTE = ("(SELECT DISTINCT ON (oid_bezug) oid_bezug, dachform, bauweise, objekthoehe "
+             "FROM auswertung.alkis_nas_gebaeude "
              "WHERE oid_bezug IS NOT NULL ORDER BY oid_bezug, ueberlappung DESC NULLS LAST, gml_id)")
 
 
@@ -193,10 +208,12 @@ def blocktypen_ziehen() -> None:
                            JOIN {NAS_BESTE} n ON n.oid_bezug = s.oid
                            WHERE {bed}),
                      c AS (SELECT g, ST_ClusterDBSCAN(g, eps := 40, minpoints := 1) OVER () AS cl FROM k),
-                     h AS (SELECT cl, count(*) AS n, ST_Buffer(ST_Union(ST_ConcaveHull(ST_Collect(g), 0.3), ST_Union(g)), 15) AS hg
+                     h AS (SELECT cl, count(*) AS n,
+                                  ST_Buffer(ST_Union(ST_ConcaveHull(ST_Collect(g), 0.3), ST_Union(g)), 15) AS hg
                            FROM c GROUP BY cl HAVING count(*) >= 4),
                      u AS (SELECT ST_Intersection(ST_Union(hg),
-                                  (SELECT ST_Transform(ST_Union(geom), 25833) FROM public.stadtteil WHERE nr = ANY(%s))) AS ug,
+                                  (SELECT ST_Transform(ST_Union(geom), 25833) FROM public.stadtteil
+                                   WHERE nr = ANY(%s))) AS ug,
                                   sum(n) AS n, count(*) AS cluster FROM h)
                 SELECT ST_AsGeoJSON(ST_Transform(ST_Multi(ST_CollectionExtract(ug, 3)), 4326), 6),
                        round((ST_Area(ug) / 10000.0)::numeric, 1), n, cluster FROM u""",
@@ -305,7 +322,8 @@ def zensus_laden(cur) -> tuple[dict, dict, set]:
                         k AS (SELECT DISTINCT gitter_id FROM auswertung.zensus_gebaeude_jahr WHERE raster = '1km')
                    SELECT k.gitter_id FROM k, s WHERE ST_Within(ST_MakeEnvelope(
                         substring(k.gitter_id from 'E([0-9]+)')::int, substring(k.gitter_id from 'N([0-9]+)')::int,
-                        substring(k.gitter_id from 'E([0-9]+)')::int + 1000, substring(k.gitter_id from 'N([0-9]+)')::int + 1000,
+                        substring(k.gitter_id from 'E([0-9]+)')::int + 1000,
+                        substring(k.gitter_id from 'N([0-9]+)')::int + 1000,
                         3035), s.g)""")
     innen = {r[0] for r in cur.fetchall()}
     return z100, z1k, innen
@@ -466,8 +484,10 @@ def nachbarn(geb: dict, datiert: dict[str, int], kandidaten: list[str]) -> dict[
 # ------------------------------------------------------------------------------------------ Kaskade
 def blocktyp_zuordnen(cur) -> dict[str, tuple[int, str]]:
     daten = json.loads(BLOCKTYPEN.read_text(encoding="utf-8"))
-    cur.execute("CREATE TEMP TABLE b4_blocktyp (gebiet text, klasse int, geom geometry(MultiPolygon, 4326), "
-                "hoehe_min numeric, flach boolean, dach text) ON COMMIT DROP")
+    # IF NOT EXISTS und leeren: der Rücktest rechnet die Kaskade zweimal in einer Transaktion (Nachtrag N3)
+    cur.execute("CREATE TEMP TABLE IF NOT EXISTS b4_blocktyp (gebiet text, klasse int, "
+                "geom geometry(MultiPolygon, 4326), hoehe_min numeric, flach boolean, dach text) ON COMMIT DROP")
+    cur.execute("TRUNCATE b4_blocktyp")
     for f in daten["features"]:
         p = f["properties"]
         cur.execute("INSERT INTO b4_blocktyp VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326), %s, %s, %s)",
@@ -500,7 +520,8 @@ def stufen_1_2(cur, geb: dict) -> tuple[dict, dict, set]:
         if k is not None:
             s1[oid] = (von if von == bis else None, k, rows[0][2])
     cur.execute("""SELECT DISTINCT oid_bezug FROM auswertung.jahr_beleg
-                   WHERE NOT nur_pruefung AND quelle ~* '(denkmal|bldam|ddb)' AND lizenz !~* '(ungeklärt|by-sa|odbl)'""")
+                   WHERE NOT nur_pruefung AND quelle ~* '(denkmal|bldam|ddb)'
+                     AND lizenz !~* '(ungeklärt|by-sa|odbl)'""")
     denkmal = {r[0] for r in cur.fetchall()}
     cur.execute("""SELECT oid_bezug, nicht_vor, nicht_nach, quelle FROM auswertung.jahr_klammer
                    WHERE quelle !~* 'nicht ausgerollt'""")
@@ -512,13 +533,16 @@ def stufen_1_2(cur, geb: dict) -> tuple[dict, dict, set]:
     return s1, s2, denkmal
 
 
-def kaskade(cur) -> dict:
+def kaskade(cur, ohne_stufe1: bool = False) -> dict:
+    """ohne_stufe1: Rücktest-Lauf (Protokoll, Nachtrag N3), die genauen Jahre bleiben zurückgehalten."""
     geb = gebaeude_laden(cur)
     z100, z1k, innen = zensus_laden(cur)
     anteile, herkunft = zellanteile(z100, z1k, innen)
     zensus_t = {gid: z["T"] for gid, z in z100.items()}
     modell = Formmodell(geb, z100, anteile)
     s1, s2, denkmal = stufen_1_2(cur, geb)
+    if ohne_stufe1:
+        s1 = {}
     s3_roh = blocktyp_zuordnen(cur)
     s3 = {oid: v for oid, v in s3_roh.items() if oid in geb and oid not in s1 and oid not in s2}
 
@@ -543,7 +567,9 @@ def kaskade(cur) -> dict:
     for oid, b in geb.items():
         if oid in s1:
             j, k, q = s1[oid]
-            jahr_frei = j if (not b["wohnraum"] or oid in denkmal) else None
+            # Kein Einzeljahr bei Wohnraum, auch nicht bei Denkmalen: ALKIS führt keine Wohneinheiten, „weniger als
+            # 3“ ist nicht entscheidbar (Korrektur 6, Nachlauf N3; pruefen/B4_kaskade.py K6 prüft dasselbe)
+            jahr_frei = j if not b["wohnraum"] else None
             zeilen[oid] = (jahr_frei, k, True, f"{Q_TEXT['beleg']}: {q}", 1)
         elif oid in s2:
             zeilen[oid] = (None, s2[oid][0], False, f"{Q_TEXT['klammer']}: {s2[oid][1]}", 2)
@@ -625,6 +651,14 @@ def referenzen(cur, geb: dict) -> list[dict]:
     for oid, von, bis in cur.fetchall():
         if oid in geb and von is not None and bis - von <= 20:
             ref.append({"oid": oid, "von": von, "bis": bis, "satz": "Wikipedia-Denkmalliste (Prüfspalte B2)"})
+    # Nachtrag N3: die freigegebenen genauen Jahre (Stufe 1), im Rücktest-Lauf zurückgehalten
+    cur.execute("""SELECT oid_bezug, min(jahr_von), max(coalesce(jahr_bis, jahr_von)) FROM auswertung.jahr_beleg
+                   WHERE quelle = 'Wikidata' AND art = 'bau' AND genau AND oid_bezug IS NOT NULL
+                   GROUP BY oid_bezug""")
+    for oid, von, bis in cur.fetchall():
+        if oid in geb and von is not None and bis - von <= 20:
+            ref.append({"oid": oid, "von": von, "bis": bis,
+                        "satz": "Wikidata, genaue Jahre (Stufe 1, im Rücktest zurückgehalten)"})
     if REFERENZ_B3.exists():
         with REFERENZ_B3.open(encoding="utf-8", newline="") as f:
             for r in csv.DictReader(f):
@@ -637,6 +671,13 @@ def referenzen(cur, geb: dict) -> list[dict]:
                 ref.append({"oid": r["oid"], "von": von, "bis": FLUEGE[k],
                             "satz": "Sichtprüfung Luftbilder Bornstedt (B3-Referenz)"})
     return ref
+
+
+def baualter_lhp() -> dict[int, dict[str, int]]:
+    """eingang/gebaude-nach-baualter-in-der-lhp-seit-1999.csv (Semikolon, BOM): {Jahr: {Spalte: Anzahl}}."""
+    with BAUALTER_LHP.open(encoding="utf-8-sig", newline="") as f:
+        return {int(r["Jahr"]): {k: int(v) for k, v in r.items() if k != "Jahr"}
+                for r in csv.DictReader(f, delimiter=";")}
 
 
 def wahr_klasse(von, bis) -> str:
@@ -675,7 +716,14 @@ def ruecktest() -> None:
     with verbinden() as conn, conn.cursor() as cur:
         e = kaskade(cur)
         geb, zeilen = e["geb"], e["zeilen"]
+        # Rücktest-Lauf ohne Stufe 1 (Protokoll, Nachtrag N3): die Prüfgebäude dürfen ihr Jahr nicht kennen
+        zeilen_h = kaskade(cur, ohne_stufe1=True)["zeilen"]
         ref = referenzen(cur, geb)
+        cur.execute("""SELECT b.oid_bezug, b.quelle, b.jahr_von, b.jahr_bis FROM auswertung.jahr_beleg b
+                       WHERE b.art = 'bau' AND b.genau AND (b.quelle = 'Wikidata' OR b.quelle ILIKE 'Wikipedia%%')""")
+        wd_wp = defaultdict(lambda: {"wd": [], "wp": []})
+        for oid, quelle, von, bis in cur.fetchall():
+            wd_wp[oid]["wd" if quelle == "Wikidata" else "wp"].append((von, bis if bis is not None else von))
         # Zensus je Stadtteil und Klasse (100-m-Zellen mit Mittelpunkt im Stadtteil), Mikrozensus und Jahrzehnte
         cur.execute("""SELECT t.nr, z.merkmal, z.klasse, sum(z.anzahl)
                        FROM auswertung.zensus_gebaeude_jahr z
@@ -720,10 +768,15 @@ def ruecktest() -> None:
                      ["Stufe", "Gebäude", "davon mit Wohnraum", "davon Nebengebäude"]))
     L.append("")
     mit_jahr = sum(1 for z in zeilen.values() if z[0] is not None)
+    jahr_wohn = sum(1 for o, z in zeilen.items() if z[0] is not None and geb[o]["wohnraum"])
+    s1_wohn = sum(1 for o, z in zeilen.items() if z[4] == 1 and geb[o]["wohnraum"])
     L.append(f"- Stufe 1: {stufe[1]} Gebäude, Stufe 2: {stufe[2]} Gebäude. Stufe 1 nimmt nur Zeilen aus "
-             "`auswertung.jahr_beleg` ohne `nur_pruefung` (OSM, Wikipedia und BLDAM-Liste sind Prüfwerte; DDB-API H8 "
-             "und Wikidata-Export H9 fehlen, BLDAM-Lizenz offen, E8). Stufe 2 nimmt nur ausgerollte Klammern "
-             f"(B3: nicht ausgerollt). Gebäude mit Einzeljahr `j`: {mit_jahr}.")
+             "`auswertung.jahr_beleg` ohne `nur_pruefung`; das sind derzeit nur die genauen Jahre aus dem "
+             "Wikidata-Export H9 (CC0). OSM, Wikipedia und BLDAM-Liste sind Prüfwerte, die DDB-API (H8) fehlt, "
+             "die BLDAM-Lizenz ist offen (E8). Stufe 2 nimmt nur ausgerollte Klammern (B3: nicht ausgerollt).")
+    L.append(f"- Gebäude mit Einzeljahr `j`: {mit_jahr}, davon mit Wohnraum {jahr_wohn}. ALKIS führt keine Zahl "
+             f"der Wohneinheiten (Spalte leer), deshalb tragen die {s1_wohn} Gebäude mit Wohnraum in Stufe 1 nur "
+             "die Klasse, auch Baudenkmale (Korrektur 6, Datenschutz: kein Jahr bei weniger als 3 Wohneinheiten).")
     L.append(f"- Wohngebäude in Zellen ohne Zensuswert: {e['wohn_ohne_zelle']}; Wohngebäude über der Zensuszahl ihrer "
              f"Zelle (mehr ALKIS-Umrisse als Zensus-Gebäude, auch Neubau nach dem 15.05.2022): {len(e['ueberzahl'])}. "
              "Beide gehen an Stufe 5.")
@@ -736,7 +789,10 @@ def ruecktest() -> None:
     # Rücktest
     L.append("## Rücktest\n")
     L.append("Die Prüfgebäude gehen in keine Stufe ein: Wikipedia-Jahre sind nur Prüfspalte (Korrektur 5), die "
-             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern. Gemessen wird die Klasse aus der Kaskade "
+             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern. Seit dem Wikidata-Export rechnet der "
+             "Rücktest die Kaskade ein zweites Mal **ohne Stufe 1** (Protokoll, Nachtrag N3): Kein Prüfgebäude "
+             "kennt dort sein genaues Jahr, die Wikidata-Jahre werden selbst zum dritten Prüfsatz. Die Stufen in den "
+             "Tabellen sind die dieses Laufs. Gemessen wird die Klasse aus der Kaskade "
              "gegen die bekannte Bauzeit. **Treffer** = geschätzte Klasse überschneidet die bekannte Spanne. "
              "**Abstand** = Jahre zwischen Klassenspanne und bekannter Spanne (0 bei Treffer; „vor 1919“ und "
              "„ab 2020“ sind nach einer Seite offen).\n")
@@ -747,10 +803,10 @@ def ruecktest() -> None:
         L.append("Je Stufe:\n")
         zeilen_t = []
         for s in range(1, 7):
-            paare = [(zeilen[r["oid"]][1], r) for r in rs if zeilen[r["oid"]][4] == s]
+            paare = [(zeilen_h[r["oid"]][1], r) for r in rs if zeilen_h[r["oid"]][4] == s]
             if paare:
                 zeilen_t.append([namen_st[s], *auswerten_gruppe(paare)])
-        alle = [(zeilen[r["oid"]][1], r) for r in rs]
+        alle = [(zeilen_h[r["oid"]][1], r) for r in rs]
         zeilen_t.append(["alle Stufen", *auswerten_gruppe(alle)])
         L.append(tabelle(zeilen_t, ["Stufe", "n", "ohne Klasse", "Treffer", "Median Abstand (J.)",
                                     "Median Abstand der Fehlgriffe (J.)"]))
@@ -763,6 +819,33 @@ def ruecktest() -> None:
                          ["bekannte Bauzeit", "n", "ohne Klasse", "Treffer", "Median Abstand (J.)",
                           "Median Abstand der Fehlgriffe (J.)"]))
         L.append("")
+    saetze = defaultdict(set)
+    for r in ref:
+        saetze[r["satz"]].add(r["oid"])
+    wd_s = next((v for k, v in saetze.items() if k.startswith("Wikidata")), set())
+    wp_s = next((v for k, v in saetze.items() if k.startswith("Wikipedia")), set())
+    L.append(f"Überschneidung: {len(wd_s & wp_s)} Gebäude stehen im Wikidata- und im Wikipedia-Satz; die beiden "
+             "Sätze sind nicht unabhängig.\n")
+    L.append("### Gegenprobe: Wikidata gegen Wikipedia an denselben Gebäuden\n")
+    L.append("Gebäude, die in beiden Quellen ein genaues Baujahr (`genau`, `art = 'bau'`) haben. Vergleich je Gebäude "
+             "über die Spanne [kleinstes Jahr, größtes Jahr]. Keine Schwelle; prüft die Zuordnung in B2, nicht die "
+             "Schätzung.\n")
+    gl, gk, ak = 0, 0, 0
+    for v in wd_wp.values():
+        if not v["wd"] or not v["wp"]:
+            continue
+        a = (min(x[0] for x in v["wd"]), max(x[1] for x in v["wd"]))
+        b = (min(x[0] for x in v["wp"]), max(x[1] for x in v["wp"]))
+        if a == b:
+            gl += 1
+        elif klasse_von_spanne(*a) is not None and klasse_von_spanne(*a) == klasse_von_spanne(*b):
+            gk += 1
+        else:
+            ak += 1
+    L.append(tabelle([[gl + gk + ak, gl, gk, ak]],
+                     ["Gebäude in beiden", "gleiches Jahr", "anderes Jahr, gleiche Klasse",
+                      "andere Klasse oder Spanne über Klassengrenze"]))
+    L.append("")
     # Stufe 4 frei an den Blocktyp-Gebäuden
     s3 = [o for o, z in zeilen.items() if z[4] == 3]
     paare = [(e["s4_frei"].get(o), {"von": SPANNE[zeilen[o][1]][0], "bis": SPANNE[zeilen[o][1]][1]}) for o in s3]
@@ -779,6 +862,10 @@ def ruecktest() -> None:
     L.append("**Lesart.** Die Quoten sind nicht mit Berlin vergleichbar und gelten nicht für die ganze Stadt:")
     L.append("- Die Wikipedia-Prüfgebäude sind Denkmale, fast alle vor 1919, meist in Altbau-Zellen, in denen der "
              "Zensus selbst fast nur „vor 1919“ zeigt. Dort ist die Klasse leicht zu treffen.")
+    L.append("- Der Wikidata-Satz sind ebenfalls Denkmale, darunter viele Schlösser, Kirchen und Parkbauten ohne "
+             "Wohnraum. Ohne Stufe 1 bekommen solche Gebäude oft keine Klasse (Stufe 6), weil der Zensus nur "
+             "Gebäude mit Wohnraum zählt; das zeigt, wofür Stufe 1 gebraucht wird, nicht wie gut sie ist. Er "
+             "überschneidet sich mit dem Wikipedia-Satz (Zahl oben).")
     L.append("- Die Bornstedter Referenz deckt nur einen Stadtteil ab; viele ihrer Spannen liegen über einer "
              "Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.")
     L.append("- Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude (1919–1948: wenige Wikipedia-Einträge, "
@@ -796,15 +883,17 @@ def ruecktest() -> None:
              "steht hier nur zur Information. Geprüft werden die Stufen 1 bis 3, die ohne Zensus entstehen: Je "
              "Stadtteil und Klasse darf ihre Zahl die Zensuszahl höchstens um 10 % übersteigen. Weil „–“-Werte "
              "als 0 zählen, gilt eine Überschreitung als erklärbar, wenn sie unter 110 % von Zensusklasse plus "
-             "Geheimhaltungslücke des Stadtteils bleibt. Der Vergleich mit der Potsdamer Baualter-Statistik (H4) "
-             "ist blockiert: Die Datei fehlt in `eingang/`.\n")
+             "Geheimhaltungslücke des Stadtteils bleibt. Gezählt werden nur Gebäude mit Wohnraum, denn nur diese "
+             "zählt der Zensus (Nachtrag N3; Schlösser und Kirchen aus Stufe 1 gehören nicht hinein). Der Vergleich "
+             "mit der Potsdamer Baualter-Statistik (H4) steht im nächsten Abschnitt.\n")
     rows, verletzt, erklaert, geprueft = [], 0, 0, 0
     for nr in sorted(namen):
         z = zst.get((nr, "mz_klassen"), {})
         if not z:
             continue
         luecke = max(0, z.get("insgesamt", 0) - sum(z.get(k, 0) for k in KLASSEN_DB))
-        n13 = Counter(zl[1] for o, zl in zeilen.items() if geb[o]["nr"] == nr and zl[4] in (1, 2, 3))
+        n13 = Counter(zl[1] for o, zl in zeilen.items()
+                      if geb[o]["nr"] == nr and zl[4] in (1, 2, 3) and geb[o]["wohnraum"])
         for k, n in sorted(n13.items()):
             geprueft += 1
             zk = z.get(KLASSEN_DB[k], 0)
@@ -861,22 +950,66 @@ def ruecktest() -> None:
              "verteilenden Plätze. Folge für die Karte: Bauten vor 1919 erscheinen häufiger, DDR-Bauten seltener als "
              "im Zensus.\n")
     zs = Counter()
-    for (nr, merkmal), z in zst.items():
+    for (_nr, merkmal), z in zst.items():
         if merkmal == "mz_klassen":
             for k in KLASSEN_DB:
                 zs[k] += z.get(k, 0)
     alle_k = Counter(zl[1] for o, zl in zeilen.items() if zl[1] is not None and geb[o]["wohnraum"])
-    je_stufe = {st: Counter(zl[1] for o, zl in zeilen.items() if zl[4] == st and geb[o]["wohnraum"]) for st in (3, 4, 5)}
+    je_stufe = {st: Counter(zl[1] for o, zl in zeilen.items() if zl[4] == st and geb[o]["wohnraum"])
+                for st in (3, 4, 5)}
 
     def zahl(v: int) -> str:
         return f"{v:,}".replace(",", ".")
 
     L.append(tabelle([[KLASSEN[i], runden10(zs[KLASSEN_DB[i]]), zahl(alle_k[i]),
-                       f"{100 * (alle_k[i] - zs[KLASSEN_DB[i]]) / zs[KLASSEN_DB[i]]:+.0f} %" if zs[KLASSEN_DB[i]] else "–",
+                       (f"{100 * (alle_k[i] - zs[KLASSEN_DB[i]]) / zs[KLASSEN_DB[i]]:+.0f} %"
+                        if zs[KLASSEN_DB[i]] else "–"),
                        zahl(je_stufe[3][i]), zahl(je_stufe[4][i]), zahl(je_stufe[5][i])] for i in range(8)],
                      ["Klasse", "Zensus (gerundet)", "Kaskade gesamt", "Abweichung", "davon Stufe 3", "Stufe 4",
                       "Stufe 5"]))
     L.append("")
+
+    # Nachtrag N3: Baualter-Statistik der LHP (H4)
+    L.append("## Plausibilität: Baualter-Statistik der LHP (H4)\n")
+    lhp = baualter_lhp()
+    gruppen = [("vor 1949", (0, 1), "vor 1949"), ("1949–1990", (2, 3), ("1949 bis 1970", "1971 bis 1990")),
+               ("ab 1991", (4, 5, 6, 7), "ab 1991")]
+
+    def lhp_wert(jahr: int, spalten) -> int:
+        spalten = (spalten,) if isinstance(spalten, str) else spalten
+        return sum(lhp[jahr][s] for s in spalten)
+
+    L.append("Die Landeshauptstadt führt eine Reihe „Gebäude nach Baualter“ (Wohngebäude, Stand jeweils 31.12.) in "
+             "vier Gruppen: vor 1949, 1949 bis 1970, 1971 bis 1990, ab 1991. Die Mikrozensus-Klassen passen nur in "
+             "drei Gruppen darauf (die Klasse 1949–1978 schneidet die Grenze 1970/71). Verglichen werden die "
+             "Stadtsummen: Zensus 2022 (Summe der Klassen über die 100-m-Zellen, ohne Geheimhaltungslücke) gegen die "
+             "LHP-Zeile 2022, die Kaskade (alle Stufen, Gebäude mit Wohnraum, ALKIS-Snapshot 2026) gegen die "
+             "LHP-Zeile 2025. Nur zur Plausibilität, keine Schwelle: Die Zählweisen unterscheiden sich (Wohngebäude, "
+             "Gebäude mit Wohnraum, ALKIS-Umrisse).\n")
+    rows = []
+    for name, ks, sp in gruppen:
+        z22 = sum(zs[KLASSEN_DB[k]] for k in ks)
+        l22, l25 = lhp_wert(2022, sp), lhp_wert(2025, sp)
+        ka = sum(alle_k[k] for k in ks)
+        rows.append([name, zahl(l22), runden10(z22), f"{100 * (z22 - l22) / l22:+.0f} %", zahl(l25), zahl(ka),
+                     f"{100 * (ka - l25) / l25:+.0f} %"])
+    l22g, l25g = lhp[2022]["Gebäude Insgesamt"], lhp[2025]["Gebäude Insgesamt"]
+    z22g = sum(zs[k] for k in KLASSEN_DB)
+    kag = sum(alle_k.values())
+    rows.append(["zusammen", zahl(l22g), runden10(z22g), f"{100 * (z22g - l22g) / l22g:+.0f} %", zahl(l25g),
+                 zahl(kag), f"{100 * (kag - l25g) / l25g:+.0f} %"])
+    L.append(tabelle(rows, ["Gruppe", "LHP 2022", "Zensus 2022 (gerundet)", "Zensus zu LHP", "LHP 2025",
+                            "Kaskade (mit Klasse)", "Kaskade zu LHP"]))
+    mitte = (sum(alle_k[k] for k in (2, 3)) - lhp_wert(2025, ("1949 bis 1970", "1971 bis 1990"))) \
+        / lhp_wert(2025, ("1949 bis 1970", "1971 bis 1990"))
+    L.append(f"\n**Lesart.** In der Gruppe 1949–1990 liegt die Kaskade {100 * mitte:+.0f} % neben der Statistik der "
+             "LHP. Das ist dieselbe Schieflage wie gegen den Zensus (Abschnitt davor): Plattenbauten sind oft ein "
+             "ALKIS-Umriss, aber mehrere gezählte Gebäude, und Stufe 5 füllt Altbau-Blöcke mit „vor 1919“ auf. "
+             "Auf der Karte erscheinen DDR-Bauten daher seltener, Altbauten häufiger, als es Gebäude gibt.")
+    wohn_alle = sum(1 for b in geb.values() if b["wohnraum"])
+    wohn_nd = sum(1 for o, z in zeilen.items() if z[4] == 6 and geb[o]["wohnraum"])
+    L.append(f"\nGebäude mit Wohnraum im ALKIS-Snapshot: {zahl(wohn_alle)}, davon ohne Klasse (Stufe 6): "
+             f"{zahl(wohn_nd)}. Quelle: {LHP_VERMERK}.\n")
     BERICHT.parent.mkdir(parents=True, exist_ok=True)
     BERICHT.write_text("\n".join(L) + "\n", encoding="utf-8")
     print(f"geschrieben: {BERICHT.relative_to(WURZEL)} ({len(ref)} Prüfgebäude)", file=sys.stderr)

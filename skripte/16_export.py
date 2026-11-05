@@ -483,8 +483,10 @@ def kurzname(w: dict) -> str:
 def titel_kennzahl(w: dict) -> str:
     k, art, zg = w["kennzahl"], w["art"], w.get("zielgruppe") or ""
     rw = w.get("richtwert") or {}
+    fuss = w.get("methode") == "fussweg"
     if k == "anteil_in_radius":
-        return f"{zg}: Anteil mit {ART.get(art, art)} bis {int(rw.get('wert', 0))} m Luftlinie"
+        weg = "Fußweg" if fuss else "Luftlinie"
+        return f"{zg}: Anteil mit {ART.get(art, art)} bis {int(rw.get('wert', 0))} m {weg}"
     if k == "plaetze_je_kind":
         return f"Plätze je Kind ({zg})"
     if k == "plaetze_je_bedarf":
@@ -498,7 +500,8 @@ def titel_kennzahl(w: dict) -> str:
     if k == "oepnv_takt":
         return "ÖPNV: Einwohner im Einzugsradius mit Soll-Takt"
     if k == "gruen_m2_je_ew":
-        return "Grünanlagen und Parks im 500-m-Kreis je Einwohner"
+        return "Grünanlagen und Parks bis 500 m Fußweg je Einwohner" if fuss else (
+            "Grünanlagen und Parks im 500-m-Kreis je Einwohner")
     return f"{k} ({art})"
 
 
@@ -1020,6 +1023,18 @@ kiezatlas_potsdam.gpkg und csv/ im selben Ordner wie dieser Steckbrief, Beschrei
 
 
 # ---------------------------------------------------------------------------------------------- Hauptteil
+ODBL_DATENQUELLEN = {"zensus", "mbjs", "lgb", "vbb", "planungsraum", "statbezirk"}
+
+
+def odbl_lizenz_zeile(name: str, quellen: dict) -> list:
+    """Lizenzzeile einer ODbL-Ebene: Datenbank unter ODbL, dazu die Vermerke aller übrigen Quellen der Datei
+    (etwa VBB, CC BY 4.0, bei Haltestellen als Ziel; Zensus und MBJS mit „Daten verändert“)."""
+    # nur Datenquellen; Richtwert-Dokumente (nvp, satzung, orientierung …) sind keine Inhalte der Datenbank
+    andere = [q["vermerk"] for k, q in sorted(quellen.items()) if k in ODBL_DATENQUELLEN and q.get("vermerk")]
+    lizenz = "ODbL 1.0" + ("; Inhalte teils CC BY 4.0 (VBB)" if "vbb" in quellen else "")
+    return [name, lizenz, "; ".join([VERMERK["osm"], *andere]), ODBL]
+
+
 def md5(p: Path) -> str:
     return hashlib.md5(p.read_bytes()).hexdigest()
 
@@ -1083,7 +1098,7 @@ def main() -> int:
             if fehlend and not fixture:
                 raise SystemExit(f"{len(fehlend)} Einrichtungen aus einrichtungen.js fehlen in auswertung.einrichtung")
             umger = punkte_umrechnen(cur, d["tab"], [tuple(f["geometry"]["coordinates"]) for f in fehlend])
-            for f, (x, y, nr) in zip(fehlend, umger):
+            for f, (x, y, nr) in zip(fehlend, umger, strict=True):
                 d["einrichtung"][f["properties"]["id"]] = {"x": x, "y": y, "raum": nr}
             odbl_punkte = punkte_umrechnen(
                 cur, d["tab"], [tuple(f["geometry"]["coordinates"]) for f in (ein_odbl or {}).get("features", [])]
@@ -1125,6 +1140,7 @@ def main() -> int:
         ("status", "TEXT"),
         ("in_potsdam", "BOOLEAN"),
         ("raum_nr", "TEXT"),
+        ("hinweis", "TEXT"),
         ("quelle", "TEXT"),
         ("stand", "TEXT"),
         ("lizenz", "TEXT"),
@@ -1146,6 +1162,7 @@ def main() -> int:
                 p["status"],
                 bool(p["in_potsdam"]),
                 g["raum"],
+                p.get("hinweis"),
                 p["q"],
                 ein["stand"],
                 (ein["quellen"].get(p["q"]) or {}).get("lizenz") or LIZENZ_KURZ[p["q"]],
@@ -1221,7 +1238,18 @@ def main() -> int:
         z = (quellen.get("zensus") or {}).get("vermerk") or VERMERK["zensus"]
         if w.get("q") != "zensus" and z not in teile:
             teile.append(z)
+        # Fußweg: das Wegenetz stammt aus OpenStreetMap, auch wenn das Ziel amtlich ist (MBJS, LGB)
+        o = (quellen.get("osm") or {}).get("vermerk") or VERMERK["osm"]
+        if w.get("methode") == "fussweg" and o not in teile:
+            teile.append(o)
         return "; ".join(teile) or None
+
+    def quelle_zeile(w: dict, q: dict) -> str | None:
+        """Quelle der Standorte; beim Fußweg mit amtlichem Ziel zusätzlich das OSM-Wegenetz."""
+        t = q.get("quelle", w.get("q"))
+        if w.get("methode") == "fussweg" and w.get("q") != "osm" and t:
+            t += "; Wegenetz: OpenStreetMap"
+        return t
 
     def versorgung_zeilen(pl: dict) -> list[list]:
         aus = []
@@ -1249,7 +1277,7 @@ def main() -> int:
                         (pl["quellen"].get(rwt.get("q"), {}) or {}).get("quelle", rwt.get("q")),
                         rwt.get("seite"),
                         w.get("unsicherheit"),
-                        q.get("quelle", w.get("q")),
+                        quelle_zeile(w, q),
                         w.get("stand"),
                         vermerk_zeile(w, q, pl["quellen"]),
                         json.dumps(w["prognose"], ensure_ascii=False) if w.get("prognose") else None,
@@ -1375,7 +1403,8 @@ def main() -> int:
         [
             "raumeinheit, versorgung (Werte)",
             "dl-de/by-2-0; ÖPNV-Werte CC BY 4.0",
-            f"{VERMERK['zensus']}; {VERMERK['mbjs']}; {VERMERK['lgb']}; {VERMERK['vbb']}",
+            f"{VERMERK['zensus']}; {VERMERK['mbjs']}; {VERMERK['lgb']}; {VERMERK['vbb']}"
+            + (f"; {planer['quellen']['statbezirk']['vermerk']}" if "statbezirk" in planer["quellen"] else ""),
             DLDE,
         ],
         ["einrichtung", "dl-de/by-2-0", f"{VERMERK['mbjs']}; {VERMERK['lgb']}", DLDE],
@@ -1426,6 +1455,7 @@ def main() -> int:
     odbl_pfad = ziel / "kiezatlas_potsdam_odbl.gpkg"
     odbl_ebenen = []
     odbl_stile: dict[str, str] = {}
+    odbl_quellen: dict[str, dict] = {}   # Ebene → quellen der _odbl.js-Datei, für die Lizenztabelle
     if ein_odbl and ein_odbl.get("features"):
         felder = [
             ("id", "TEXT"),
@@ -1445,11 +1475,12 @@ def main() -> int:
                 "ODbL 1.0",
                 (punkt_wkb(round(x, 2), round(y, 2)), None),
             ]
-            for f, (x, y, nr) in zip(ein_odbl["features"], odbl_punkte)
+            for f, (x, y, nr) in zip(ein_odbl["features"], odbl_punkte, strict=True)
         ]
         odbl_ebenen.append(
             ("einrichtung_odbl", "Einrichtungen aus OpenStreetMap (ohne Namen)", "POINT", felder, zeilen)
         )
+        odbl_quellen["einrichtung_odbl"] = ein_odbl.get("quellen") or {}
     if err_fuss:
         if (err_fuss["anzahl"], err_fuss["erste_id"], err_fuss["letzte_id"]) != (len(ids), ids[0], ids[-1]):
             raise SystemExit("erreichbar_fuss_odbl.js passt nicht zur Reihenfolge von zellen.js")
@@ -1467,6 +1498,7 @@ def main() -> int:
             for i, g in enumerate(ids)
         ]
         odbl_ebenen.append(("zelle_fuss_odbl", "Zellen: Fußweg zum nächsten Standort", "POLYGON", felder, zeilen))
+        odbl_quellen["zelle_fuss_odbl"] = err_fuss.get("quellen") or {}
     if planer_fuss:
         odbl_ebenen.append(
             (
@@ -1477,18 +1509,13 @@ def main() -> int:
                 versorgung_zeilen(planer_fuss),
             )
         )
+        odbl_quellen["versorgung_fuss_odbl"] = planer_fuss.get("quellen") or {}
     if odbl_ebenen:
         go = GPKG(odbl_pfad, d["srs"], stand)
         for name, titel, geom, felder, zeilen in odbl_ebenen:
             go.ebene(name, titel, f"Abgeleitet aus OpenStreetMap. {VERMERK['osm']}", geom, felder, zeilen)
-        go.ebene(
-            "lizenz",
-            "Lizenz",
-            "Open Database License 1.0",
-            None,
-            l_felder,
-            [[n, "ODbL 1.0", VERMERK["osm"], ODBL] for n, *_ in odbl_ebenen],
-        )
+        odbl_lizenz = [odbl_lizenz_zeile(n, odbl_quellen.get(n, {})) for n, *_ in odbl_ebenen]
+        go.ebene("lizenz", "Lizenz", "Open Database License 1.0", None, l_felder, odbl_lizenz)
         if ein_odbl and ein_odbl.get("features"):
             odbl_stile = {
                 "einrichtung_odbl": stile_bauen(
@@ -1497,7 +1524,8 @@ def main() -> int:
             }
         go.stile(odbl_stile, {n: g is not None for n, _, g, _, _ in odbl_ebenen})
         go.schliessen()
-        ebenen_csv(ziel / "csv_odbl", odbl_ebenen)
+        # Lizenzzeilen auch als CSV, damit die Vermerke (VBB, Zensus) die CSV-Weitergabe begleiten
+        ebenen_csv(ziel / "csv_odbl", [*odbl_ebenen, ("lizenz", "Lizenz", None, l_felder, odbl_lizenz)])
         for name, qml in odbl_stile.items():
             (ziel / "stile" / f"{name}.qml").write_text(qml, encoding="utf-8")
         meldungen.append(f"ODbL: {', '.join(n for n, *_ in odbl_ebenen)} geschrieben")
@@ -1645,6 +1673,20 @@ def readme_schreiben(
         else "| – | – | – | noch nicht erzeugt: OSM-Auswertung (A3) und Fußwegnetz (A5b) fehlen noch |"
     )
     beispiel = sorted(planer["raeume"])[0]
+    # Raumeinheiten, deren Grundschulwerte wegen eines Standorts mit strittiger Lage leer stehen (15_planer.py)
+    strittig_raeume = sorted(
+        nr for nr, r in planer["raeume"].items()
+        if any(w["art"] == "grundschule" and w.get("wert") is None
+               and (w.get("unsicherheit") or "").startswith("Bis zur Klärung") for w in r["werte"])
+    )
+    strittig_zellen = (
+        f" Die Zellwerte (`zelle.m_grundschule`, `zelle_fuss_odbl.fuss_grundschule_m`) sind ohne diesen Standort "
+        f"gerechnet und tragen kein eigenes Kennzeichen. In den Raumeinheiten {', '.join(strittig_raeume)} sind sie "
+        "deshalb nicht belastbar: Je nachdem, wo die Schule tatsächlich unterrichtet, sind sie in einer der "
+        "Raumeinheiten zu groß, am Stadtrand um Kilometer."
+        if strittig_raeume
+        else ""
+    )
     text = f"""# Kiezatlas Potsdam: Daten zum Weiterverwenden
 
 Stand der Auswertung {planer["stand"]}. Erzeugt mit `skripte/16_export.py` aus denselben Datendateien wie die
@@ -1687,6 +1729,9 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 - `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019.
 - `stadtteil`: die 32 Stadtteile mit Nummer, Name und Fläche, ohne Werte. In `zelle` steht der Stadtteil jeder
   Zelle in `stadtteil`, die Raumeinheit in `raum_nr`.
+- `einrichtung.hinweis`: nur bei Standorten mit strittiger Lage (Ortsangabe widerspricht den Koordinaten). Ein
+  solcher Standort zählt für keine Entfernung (`zelle`, `zelle_fuss_odbl`) und keine Kennzahl; die betroffenen
+  Grundschulwerte je Raumeinheit stehen leer mit Grund in `unsicherheit`.{strittig_zellen}
 
 ## Ebenen aus OpenStreetMap (`kiezatlas_potsdam_odbl.gpkg`, `csv_odbl/`)
 
@@ -1709,7 +1754,10 @@ Bei Weitergabe oder Veröffentlichung den Vermerk der genutzten Ebenen übernehm
 - **Kitas, Horte, Schulen:** {VERMERK["mbjs"]}
 - **Gemeinbedarf, Grünflächen:** {VERMERK["lgb"]}
 - **Haltestellen, ÖPNV-Werte:** {VERMERK["vbb"]}
-- **Ebenen mit _odbl:** {VERMERK["osm"]}
+- **Ebenen mit _odbl:** {VERMERK["osm"]}; dazu die amtlichen Vermerke oben und, für die Spalte
+  `fuss_haltestelle_m`, der VBB-Vermerk (Tabelle `lizenz` in der `_odbl.gpkg`, als CSV `csv_odbl/lizenz.csv`)
+- **ÖPNV-Gebietsklasse, soweit über die statistischen Bezirke bestimmt (steht in `unsicherheit`):**
+  © Landeshauptstadt Potsdam, Statistische Bezirke, dl-de/by-2-0 ({DLDE}), {VERAENDERT}
 
 Die Maßstäbe (Nahverkehrsplan 2019, Baulandmodell 2019, Schülerfahrtkostensatzung, Umweltatlas Berlin) sind als
 Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht unter Apache-2.0, die Daten nicht.

@@ -28,7 +28,7 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 |---|---|---|---|
 | `raumeinheit` | MULTIPOLYGON | 19 | `nr`, `name`, `raumebene`, `ew`, `flaeche_km2`, `zellen`, `anteil_kita_500m`, `anteil_grundschule_1000m`, `anteil_grundschule_2000m`, `anteil_gruen_500m`, `plaetze_je_kind_kita`, `plaetze_je_kind_hort`, `plaetze_je_bedarf_kita`, `schueler_je_kind_grundschule`, `ew_je_kita`, `ew_je_grundschule`, `ew_je_bibliothek`, `ew_je_sport`, `ew_je_feuerwehr`, `ew_je_sonstiger_gemeinbedarf`, `oepnv_erschliessung`, `oepnv_takt`, `gruen_m2_je_ew`, `stand`, `vermerk_grenze` |
 | `versorgung` | Tabelle | 323 | `raum_nr`, `raum_name`, `raumebene`, `spalte`, `kennzahl`, `art`, `titel`, `zielgruppe`, `wert`, `einheit`, `methode`, `status`, `vorlaeufig`, `richtwert`, `richtwert_einheit`, `richtwert_quelle`, `richtwert_fundstelle`, `unsicherheit`, `quelle`, `stand`, `vermerk`, `prognose` |
-| `einrichtung` | POINT | 679 | `id`, `art`, `art_text`, `unterart`, `name`, `plaetze`, `schueler`, `schueler_stand`, `status`, `in_potsdam`, `raum_nr`, `quelle`, `stand`, `lizenz` |
+| `einrichtung` | POINT | 679 | `id`, `art`, `art_text`, `unterart`, `name`, `plaetze`, `schueler`, `schueler_stand`, `status`, `in_potsdam`, `raum_nr`, `hinweis`, `quelle`, `stand`, `lizenz` |
 | `zelle` | POLYGON | 3443 | `gitter_id`, `stadtteil`, `raum_nr`, `ew`, `m_bibliothek`, `m_feuerwehr`, `m_foerderschule`, `m_gruen`, `m_grundschule`, `m_gymnasium`, `m_hort`, `m_kita`, `m_osz`, `m_sek1`, `m_sonstige_schule`, `m_sonstiger_gemeinbedarf`, `m_sport`, `stand`, `lizenz` |
 | `gruenflaeche` | MULTIPOLYGON | 4892 | `id`, `art`, `bez`, `flaeche_m2`, `zaehlt_gruenversorgung`, `quelle`, `stand`, `lizenz` |
 | `haltestelle` | POINT | 315 | `stop_id`, `name`, `verkehrsmittel`, `fahrten_hvz_je_richtung`, `klasse`, `in_potsdam`, `raum_nr`, `stand`, `lizenz` |
@@ -47,12 +47,17 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 - `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019.
 - `stadtteil`: die 32 Stadtteile mit Nummer, Name und Fläche, ohne Werte. In `zelle` steht der Stadtteil jeder
   Zelle in `stadtteil`, die Raumeinheit in `raum_nr`.
+- `einrichtung.hinweis`: nur bei Standorten mit strittiger Lage (Ortsangabe widerspricht den Koordinaten). Ein
+  solcher Standort zählt für keine Entfernung (`zelle`, `zelle_fuss_odbl`) und keine Kennzahl; die betroffenen
+  Grundschulwerte je Raumeinheit stehen leer mit Grund in `unsicherheit`. Die Zellwerte (`zelle.m_grundschule`, `zelle_fuss_odbl.fuss_grundschule_m`) sind ohne diesen Standort gerechnet und tragen kein eigenes Kennzeichen. In den Raumeinheiten 101, 103 sind sie deshalb nicht belastbar: Je nachdem, wo die Schule tatsächlich unterrichtet, sind sie in einer der Raumeinheiten zu groß, am Stadtrand um Kilometer.
 
 ## Ebenen aus OpenStreetMap (`kiezatlas_potsdam_odbl.gpkg`, `csv_odbl/`)
 
 | Ebene | Geometrie | Zeilen | Felder |
 |---|---|---|---|
-| – | – | – | noch nicht erzeugt: OSM-Auswertung (A3) und Fußwegnetz (A5b) fehlen noch |
+| `einrichtung_odbl` | POINT | 941 | `id`, `art`, `unterart`, `raum_nr`, `stand`, `lizenz` |
+| `zelle_fuss_odbl` | POLYGON | 3443 | `gitter_id`, `raum_nr`, `ew`, `fuss_apotheke_m`, `fuss_arzt_m`, `fuss_bibliothek_m`, `fuss_feuerwehr_m`, `fuss_foerderschule_m`, `fuss_gruen_m`, `fuss_grundschule_m`, `fuss_gymnasium_m`, `fuss_haltestelle_m`, `fuss_hort_m`, `fuss_kita_m`, `fuss_osz_m`, `fuss_pflege_m`, `fuss_sek1_m`, `fuss_sonstige_schule_m`, `fuss_sonstiger_gemeinbedarf_m`, `fuss_spielplatz_m`, `fuss_sport_m`, `fuss_supermarkt_m`, `stand`, `lizenz` |
+| `versorgung_fuss_odbl` | Tabelle | 190 | `raum_nr`, `raum_name`, `raumebene`, `spalte`, `kennzahl`, `art`, `titel`, `zielgruppe`, `wert`, `einheit`, `methode`, `status`, `vorlaeufig`, `richtwert`, `richtwert_einheit`, `richtwert_quelle`, `richtwert_fundstelle`, `unsicherheit`, `quelle`, `stand`, `vermerk`, `prognose` |
 
 Diese Ebenen sind aus OpenStreetMap abgeleitet und stehen unter der Open Database License 1.0
 (https://opendatacommons.org/licenses/odbl/1-0/), © OpenStreetMap-Mitwirkende. Wer sie verändert und weitergibt, gibt die veränderte Datenbank
@@ -69,7 +74,10 @@ Bei Weitergabe oder Veröffentlichung den Vermerk der genutzten Ebenen übernehm
 - **Kitas, Horte, Schulen:** © Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Gemeinbedarf, Grünflächen:** © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Haltestellen, ÖPNV-Werte:** VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Daten verändert (eigene Berechnung)
-- **Ebenen mit _odbl:** © OpenStreetMap-Mitwirkende, Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/), Daten verändert (eigene Berechnung)
+- **Ebenen mit _odbl:** © OpenStreetMap-Mitwirkende, Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/), Daten verändert (eigene Berechnung); dazu die amtlichen Vermerke oben und, für die Spalte
+  `fuss_haltestelle_m`, der VBB-Vermerk (Tabelle `lizenz` in der `_odbl.gpkg`, als CSV `csv_odbl/lizenz.csv`)
+- **ÖPNV-Gebietsklasse, soweit über die statistischen Bezirke bestimmt (steht in `unsicherheit`):**
+  © Landeshauptstadt Potsdam, Statistische Bezirke, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 
 Die Maßstäbe (Nahverkehrsplan 2019, Baulandmodell 2019, Schülerfahrtkostensatzung, Umweltatlas Berlin) sind als
 Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht unter Apache-2.0, die Daten nicht.

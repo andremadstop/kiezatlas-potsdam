@@ -29,7 +29,23 @@
   "regel_feld_zusatz": 18
  },
  "wikidata": {
-  "blockiert": "H9, fehlt ../kiezatlas-daten/eingang/wikidata_potsdam_baujahr.csv"
+  "zeilen": 189,
+  "objekte": 176,
+  "zugeordnet_Koordinate": 161,
+  "genau": 111,
+  "pruefspalte_ID": 96,
+  "nicht_genau": 50,
+  "id_kleinbau_ohne_jahr": 2,
+  "ohne_koordinate": 6,
+  "ohne_gebaeude": 27,
+  "id_widerspricht_ort": 3,
+  "koordinate_weicht_von_ID_ab": 8,
+  "punkt_nur_bei_kleinem_bau": 7,
+  "id_ensemble": 4,
+  "ausgeschlossen": 1,
+  "gebaeude": 150,
+  "gebaeude_genau": 106,
+  "pruefspalte_ID_gebaeude": 108
  },
  "ddb": {
   "blockiert": "H8, fehlt ../kiezatlas-daten/eingang/ddb-key"

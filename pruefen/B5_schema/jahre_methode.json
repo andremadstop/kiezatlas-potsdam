@@ -339,6 +339,69 @@
      "minimum": 0
     }
    }
+  },
+  "lhp": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "vermerk",
+    "gruppen"
+   ],
+   "description": "Baualter-Statistik der LHP (H4) gegen Zensus und Kaskade, Stadtsummen in drei Gruppen (Nachtrag N3); nur zur Plausibilität",
+   "properties": {
+    "vermerk": {
+     "type": "string",
+     "minLength": 10
+    },
+    "gruppen": {
+     "type": "array",
+     "minItems": 2,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "gruppe",
+       "lhp_2022",
+       "zensus_2022",
+       "zensus_abw",
+       "lhp_2025",
+       "kaskade",
+       "kaskade_abw"
+      ],
+      "properties": {
+       "gruppe": {
+        "type": "string"
+       },
+       "lhp_2022": {
+        "type": "integer"
+       },
+       "zensus_2022": {
+        "type": "integer"
+       },
+       "zensus_abw": {
+        "type": [
+         "integer",
+         "number",
+         "null"
+        ]
+       },
+       "lhp_2025": {
+        "type": "integer"
+       },
+       "kaskade": {
+        "type": "integer"
+       },
+       "kaskade_abw": {
+        "type": [
+         "integer",
+         "number",
+         "null"
+        ]
+       }
+      }
+     }
+    }
+   }
   }
  },
  "$defs": {

@@ -92,14 +92,77 @@ oepnv:
       ohne_klasse: [Forst Potsdam Süd, Wildpark]
       we: {Bornstedter Feld: II, Babelsberg Süd: II, Am Stern: II, Golm Ost: III, Golm West: III, Industriegelände: III}
     widerspruch: "Waldstadt I steht in Tab. 4.1 unter Klasse II, im Text S. 56 im Klasse-I-Korridor und in Anlage 4 unter Klasse I."
-    # Abbildung auf die 32 Stadtteile (public.stadtteil.nr). Genau geht es nur mit den Geometrien der NVP-Ortsteile bzw.
-    # statistischen Bezirke (Anlage 2 nennt deren Nummern) → wartet auf H1 (statistische-bezirke-in-potsdam).
+    # Nachlauf N2 (05.11.2026): NVP-Ortsteil und Gebietsklasse je statistischem Bezirk für die 9 Stadtteile, die
+    # nach Namen gemischt oder offen waren. Geometrie: $KIEZ_DATEN/eingang/statistische-bezirke-in-potsdam.geojson
+    # (LHP, Stand 31.12.2021, dl-de/by-2-0, sha256 e5949434…), nur intern gerechnet; keine Bezirksgeometrie in daten/.
+    # Die daraus abgeleitete Stadtteilklasse (43, 44) geht über 15_planer.py (A6) in daten/planer.js ein und braucht
+    # dort den Vermerk „Statistische Bezirke © LHP, dl-de/by-2-0, Daten verändert“ (A6 und QUELLEN.md, nicht N2).
+    # Der NVP hat keine Karte der Ortsteilgrenzen als Datei; Anlage 2 listet die Einwohner je statistischem Bezirk
+    # (Nummern von 2017). Die ersten zwei Ziffern der Bezirksnummer bilden die Ortsteilgruppe; Tab. 4.1 teilt einige
+    # Gruppen weiter (z. B. 13 in Bornstedter Feld, Bornstedter Ortslage, Das kurze Feld).
+    # Umnummerierung 2017 → 2021 (nach Namen): 330 Wildpark → 324, 421 Brauhausberg Nord → 441, 422 Hauptbahnhof → 442,
+    # 423 Zentrum Ost → 431 (+ 432 Nuthepark), 660 Industriegelände → 644, 670 Forst Potsdam Süd → 613,
+    # 841 Fahrland Ortslage → 844, 842 Krampnitz → 845 (dazu neu 842 Krampnitz Ortslage).
+    # grundlage: name = Bezirksname gleich NVP-Ortsteil; anker = Haltestellen, die der NVP (Anlage 3/4) unter diesem
+    #   Ortsteil bzw. dieser Klasse führt, liegen im Bezirk (Gegenprobe pruefen/a4_gebietsklassen.py); nummer = Ortsteil
+    #   aus der Nummerngruppe der Anlage 2; ausschluss = einziger übrig bleibender Ortsteil der Gruppe.
+    # klasse null + moeglich = nicht eindeutig (Widerspruch im NVP oder zwei Ortsteile in einem Bezirk).
+    statistische_bezirke:
+      "111": {name: Bornim Nord, nvp: Institut Bornim, klasse: III, grundlage: anker, anker: [Institut für Agrartechnik],
+              hinweis: "Namensschluss: Haltestelle Institut für Agrartechnik liegt im Bezirk; NVP nennt keine Haltestelle für Institut Bornim"}
+      "112": {name: Bornim Ortslage, nvp: Bornim, klasse: II, grundlage: name, anker: [Kirche Bornim]}
+      "113": {name: Katharinenholz, nvp: Bornim, klasse: II, grundlage: ausschluss,
+              hinweis: "kein Anker; Gruppe 11 kennt nur Bornim und Institut Bornim"}
+      "114": {name: Schlangenbruch, nvp: Institut Bornim, klasse: III, grundlage: anker, anker: [Heineberg, Sacrow-Paretzer Kanal],
+              hinweis: "Anlage 3 und 4 führen beide Haltestellen in der Tabelle Klasse III (Zeilenkopf „Bornim“); in Tab. 4.1 ist im Raum Bornim nur Institut Bornim Klasse III"}
+      "131": {name: Das Kurze Feld, nvp: Das kurze Feld, klasse: III, grundlage: name}
+      "132": {name: Bornstedter Feld, nvp: Bornstedter Feld, klasse: I, grundlage: name}
+      "133": {name: Bornstedter Ortslage, nvp: Bornstedter Ortslage, klasse: II, grundlage: name}
+      "321": {name: Potsdam West Zentrum, nvp: Potsdam West, klasse: I, grundlage: name}
+      "322": {name: Luftschiffhafen, nvp: Potsdam West, klasse: I, grundlage: ausschluss,
+              hinweis: "Gruppe 32 (Anlage 2: 321–323) ohne eigenen NVP-Ortsteil Luftschiffhafen"}
+      "323": {name: Forststraße, nvp: Forststraße, klasse: III, grundlage: name}
+      "324": {name: Wildpark, nvp: Wildpark, klasse: null, grundlage: name, hinweis: "Tab. 4.1: keiner Klasse zugeordnet (2017: Bezirk 330)"}
+      "431": {name: Zentrum Ost, nvp: Südliche Innenstadt, klasse: I, grundlage: nummer,
+              hinweis: "2017 Bezirk 423 in Gruppe 42 (Südliche Innenstadt)"}
+      "432": {name: Nuthepark, nvp: Südliche Innenstadt, klasse: I, grundlage: nummer,
+              hinweis: "2021 aus Zentrum Ost (2017: 423) herausgelöst"}
+      "441": {name: Brauhausberg Nord, nvp: Südliche Innenstadt, klasse: I, grundlage: nummer, anker: [Am Havelblick],
+              hinweis: "2017 Bezirk 421; Anlage 4 führt Am Havelblick unter Klasse I (Zeile Teltower Vorstadt, ebenfalls I)"}
+      "442": {name: Hauptbahnhof, nvp: Südliche Innenstadt, klasse: I, grundlage: nummer, anker: [Schlaatzstr.],
+              hinweis: "2017 Bezirk 422; Anlage 4 führt Schlaatzstr. unter Klasse I (Zeile Teltower Vorstadt, ebenfalls I)"}
+      "641": {name: Waldstadt I Nord, nvp: Waldstadt I, klasse: null, moeglich: [I, II], grundlage: anker,
+              anker: [Unter den Eichen, Drewitzer Str./Erich-Weinert-Str.], hinweis: "Anlage 3/4 bewerten diese Haltestellen als Klasse I; Tab. 4.1 sagt II"}
+      "642": {name: Stadtrandsiedlung, nvp: Waldstadt I, klasse: null, moeglich: [I, II], grundlage: anker, anker: [Am Fenn]}
+      "643": {name: Waldstadt I Süd, nvp: Waldstadt I, klasse: null, moeglich: [I, II], grundlage: name}
+      "644": {name: Industriegelände, nvp: Industriegelände, klasse: II, grundlage: name, hinweis: "2017 Bezirk 660"}
+      "721": {name: Drewitz Ortslage, nvp: Alt Drewitz, klasse: III, grundlage: name, anker: [Drewitz-Ort],
+              hinweis: "Namensschluss: Ortslage = alter Ortskern (Alt Drewitz), Haltestelle Drewitz-Ort; NVP nennt keine Haltestelle für Alt Drewitz"}
+      "722": {name: Gewerbegebiet Drewitz, nvp: Drewitz, klasse: I, grundlage: ausschluss}
+      "723": {name: Drewitz I, nvp: Drewitz, klasse: I, grundlage: name}
+      "724": {name: Drewitz II, nvp: Drewitz, klasse: I, grundlage: name}
+      "725": {name: Drewitzer Nuthewiesen, nvp: Drewitz, klasse: I, grundlage: ausschluss, hinweis: "2021 neu"}
+      "842": {name: Krampnitz Ortslage, nvp: Krampnitz Ort, klasse: III, grundlage: anker, anker: [Rotkehlchenweg],
+              hinweis: "Anlage 3, Klasse III, Zeile Krampnitz Ort"}
+      "843": {name: Kartzow, nvp: Kartzow, klasse: III, grundlage: name}
+      "844": {name: Fahrland Ortslage, nvp: Fahrland, klasse: II, grundlage: anker,
+              anker: [An der Windmühle, Schule Fahrland, Kaiserplatz, Kienhorststr., Am Upstall, Eisbergstücke],
+              hinweis: "Anlage 4, Klasse II, Zeile Fahrland; 2017 Bezirk 841"}
+      "845": {name: Krampnitz, nvp: Kaserne Krampnitz, klasse: II, grundlage: anker, anker: [Fahrländer See],
+              hinweis: "Anlage 4, Klasse II, Zeile Krampnitz Kaserne; 2017 Bezirk 842"}
+      "860": {name: Groß Glienicke, nvp: [Groß Glienicke, Waldsiedlung Groß Glienicke], klasse: null, moeglich: [II, III],
+              grundlage: anker, anker: [Theodor-Fontane-Str., Landesumweltamt, Waldsiedlung Groß Glienicke],
+              hinweis: "ein Bezirk, zwei NVP-Ortsteile: Theodor-Fontane-Str. (Anlage 4, Klasse II) und Landesumweltamt, Waldsiedlung (Anlage 3, Klasse III) liegen beide darin; ohne feinere Grenze nicht trennbar"}
+    # Abbildung auf die 32 Stadtteile (public.stadtteil.nr). Die 9 Stadtteile mit `bezirke_geprueft` sind seit N2 über
+    # die statistischen Bezirke oben bestimmt: klasse gesetzt nur, wenn alle bewohnten Bezirke (Zensus 2022) dieselbe
+    # Klasse haben; sonst bleibt klasse null, anteil_ew_prozent zeigt die Einwohneranteile je Klasse (a4_gebietsklassen.py).
     # zuordnung: eindeutig = gleichnamig; zusammengesetzt = alle Bestandteile gleiche Klasse (Bestandteile aus dem Namen
-    # abgeleitet); gemischt = Bestandteile mit verschiedenen Klassen; offen = kein gleichnamiger Eintrag.
+    # abgeleitet); bezirke = über die statistischen Bezirke bestimmt; gemischt = Bestandteile mit verschiedenen Klassen;
+    # offen = kein gleichnamiger Eintrag.
     stadtteile:
-      "11": {klasse: null, zuordnung: gemischt, teile: {Bornim: II, Institut Bornim: III}}
+      "11": {klasse: null, zuordnung: gemischt, teile: {Bornim: II, Institut Bornim: III}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {II: 83, III: 17}}
       "12": {klasse: III, zuordnung: eindeutig}
-      "13": {klasse: null, zuordnung: gemischt, teile: {Bornstedter Feld: I, Bornstedter Ortslage: II, Das kurze Feld: III}}
+      "13": {klasse: null, zuordnung: gemischt, teile: {Bornstedter Feld: I, Bornstedter Ortslage: II, Das kurze Feld: III}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I: 73, II: 13, III: 15}}
       "14": {klasse: III, zuordnung: eindeutig}
       "15": {klasse: II, zuordnung: eindeutig}
       "16": {klasse: III, zuordnung: eindeutig}
@@ -108,27 +171,27 @@ oepnv:
       "22": {klasse: II, zuordnung: eindeutig}
       "23": {klasse: II, zuordnung: eindeutig}
       "31": {klasse: I, zuordnung: eindeutig}
-      "32": {klasse: null, zuordnung: gemischt, teile: {Potsdam West: I, Forststraße: III, Wildpark: null}}
+      "32": {klasse: null, zuordnung: gemischt, teile: {Potsdam West: I, Forststraße: III, Wildpark: null}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I: 85, III: 14, ohne: 1}}
       "41": {klasse: I, zuordnung: zusammengesetzt, teile: {Nördliche Innenstadt: I, Südliche Innenstadt: I}}
-      "43": {klasse: null, zuordnung: offen, hinweis: "Zentrum Ost/Nuthepark ohne gleichnamigen NVP-Ortsteil"}
-      "44": {klasse: null, zuordnung: offen, hinweis: "Hauptbahnhof/Brauhausberg Nord ohne gleichnamigen NVP-Ortsteil"}
+      "43": {klasse: I, zuordnung: bezirke, teile: {Südliche Innenstadt: I}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I: 100}, hinweis: "Bezirke 431, 432 = 2017 Bezirk 423 der Gruppe 42 (Südliche Innenstadt)"}
+      "44": {klasse: I, zuordnung: bezirke, teile: {Südliche Innenstadt: I}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I: 100}, hinweis: "Bezirke 441, 442 = 2017 Bezirke 421, 422 der Gruppe 42 (Südliche Innenstadt); Anlage 4 führt Am Havelblick und Schlaatzstr. unter Klasse I"}
       "51": {klasse: III, zuordnung: eindeutig}
       "52": {klasse: II, zuordnung: eindeutig}
       "53": {klasse: I, zuordnung: zusammengesetzt, teile: {Babelsberg Süd: I, Babelsberg Zentrum: I}}
       "61": {klasse: II, zuordnung: zusammengesetzt, teile: {Templiner Vorstadt: II, Hermannswerder: II}}
       "62": {klasse: I, zuordnung: eindeutig}
       "63": {klasse: I, zuordnung: eindeutig}
-      "64": {klasse: null, zuordnung: gemischt, teile: {Waldstadt I: "II laut Tab. 4.1, I laut Text und Anlage 4", Industriegelände: II}}
+      "64": {klasse: null, zuordnung: gemischt, teile: {Waldstadt I: "II laut Tab. 4.1, I laut Text und Anlage 4", Industriegelände: II}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I/II: 98, II: 2}, hinweis: "Nach Tab. 4.1 wäre der ganze Stadtteil Klasse II, nach Text und Anlage 4 zu 98 % Klasse I; der Widerspruch im NVP ist nicht aufgelöst"}
       "65": {klasse: I, zuordnung: eindeutig}
       "71": {klasse: I, zuordnung: eindeutig, hinweis: "NVP: Am Stern"}
-      "72": {klasse: null, zuordnung: gemischt, teile: {Drewitz: I, Alt Drewitz: III}}
+      "72": {klasse: null, zuordnung: gemischt, teile: {Drewitz: I, Alt Drewitz: III}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {I: 83, III: 17}}
       "73": {klasse: I, zuordnung: eindeutig}
       "81": {klasse: III, zuordnung: eindeutig}
       "82": {klasse: III, zuordnung: eindeutig}
       "83": {klasse: III, zuordnung: zusammengesetzt, teile: {Satzkorn: III, Friedrichspark: III}, hinweis: "Lage Friedrichspark nicht geprüft"}
-      "84": {klasse: null, zuordnung: gemischt, teile: {Fahrland: II, Kaserne Krampnitz: II, Krampnitz Ort: III, Kartzow: III}}
+      "84": {klasse: null, zuordnung: gemischt, teile: {Fahrland: II, Kaserne Krampnitz: II, Krampnitz Ort: III, Kartzow: III}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {II: 96, III: 4}}
       "85": {klasse: II, zuordnung: eindeutig, hinweis: "Campus Jungfernsee (II) vermutlich hier oder in Nedlitz, nicht geprüft"}
-      "86": {klasse: null, zuordnung: gemischt, teile: {Groß Glienicke: II, Waldsiedlung Groß Glienicke: III}}
+      "86": {klasse: null, zuordnung: gemischt, teile: {Groß Glienicke: II, Waldsiedlung Groß Glienicke: III}, bezirke_geprueft: 2026-11-05, anteil_ew_prozent: {II/III: 100}, hinweis: "Ein statistischer Bezirk (860) mit beiden NVP-Ortsteilen; ohne feinere Grenze nicht trennbar"}
 # A4 Ende
 
 # ---------------------------------------------------------------------------------- Nahversorgung

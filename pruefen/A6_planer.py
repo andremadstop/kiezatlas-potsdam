@@ -38,7 +38,7 @@ H1_DATEI = PLANER.H1_DATEI
 def im_ring(x: float, y: float, ring: list) -> bool:
     """Strahlverfahren (gerade-ungerade) für einen Ring aus [lon, lat]-Paaren."""
     drin = False
-    for (x1, y1), (x2, y2) in zip(ring, ring[1:] + ring[:1]):
+    for (x1, y1), (x2, y2) in zip(ring, ring[1:] + ring[:1], strict=True):
         if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
             drin = not drin
     return drin
@@ -70,6 +70,20 @@ def werte(P):
     for nr, r in P["raeume"].items():
         for w in r["werte"]:
             yield nr, r, w
+
+
+def strittige_raeume(aus: list[str], cur, tab: str, par: dict | None) -> set[str]:
+    """Raumeinheiten des strittigen Punkts und des genannten Ortsteils (wie ort_abweichung in 15_planer.py)."""
+    cur.execute(
+        f"""SELECT r.nr FROM auswertung.einrichtung e JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
+            WHERE e.id = ANY(%(aus)s)
+            UNION
+            SELECT r.nr FROM public.mbjs_schule m JOIN public.stadtteil s
+                   ON s.name = substr(m.ort, length('Potsdam/OT ') + 1)
+            JOIN {tab} r ON ST_Contains(r.geom, ST_PointOnSurface(s.geom)) WHERE m.schul_nr = ANY(%(aus)s)""",
+        {**(par or {}), "aus": aus},
+    )
+    return {str(r[0]) for r in cur.fetchall()}
 
 
 def main() -> int:
@@ -377,11 +391,52 @@ def main() -> int:
                 f"{sum(v is None for v in erwartet.values())} ohne Wert (über {grenze} % ohne Klasse) "
                 f"({abw[:3] or 'alle gleich'})",
             )
-    cur.execute("""SELECT gitter_id, art, meter FROM auswertung.zelle_erreichbar WHERE methode = 'luftlinie'""")
-    db = {(g, a): float(m) for g, a, m in cur.fetchall() if m is not None}
+    print("A6-12 Entfernungen gegen die Tabelle; strittige Lage (Pestalozza-Fall, N4)")
+    # Standorte mit strittiger Lage (Feld hinweis in einrichtungen.js) zählen für keine Entfernung. Zweiter Weg:
+    # nächstes Ziel je Zelle ganz in SQL ohne diese IDs; wo das Ziel der Tabelle nicht strittig ist, muss es
+    # dasselbe sein wie in auswertung.zelle_erreichbar (Methode von A5a nachgebaut).
+    strittig: dict[str, list[str]] = {}
+    for f in N["features"]:
+        if f["properties"].get("hinweis"):
+            strittig.setdefault(f["properties"]["art"], []).append(f["properties"]["id"])
+    cur.execute("""SELECT gitter_id, art, methode, meter, ziel_id FROM auswertung.zelle_erreichbar""")
+    db, ziel = {}, {}
+    for g, a, m_, me, z in cur.fetchall():
+        ziel[(g, a, m_)] = z
+        if me is not None:
+            db[(g, a, m_)] = float(me)
+    ohne = {}
+    for a, aus in strittig.items():
+        cur.execute(
+            """SELECT z.gitter_id, round(ST_Distance(ST_Transform(z.geom, 25833), n.geom)::numeric, 1)
+               FROM public.zensus_zelle z JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
+               CROSS JOIN LATERAL (SELECT e.geom FROM auswertung.einrichtung e
+                                   WHERE e.art = %s AND e.id <> ALL(%s::text[])
+                                   ORDER BY e.geom <-> ST_Transform(z.geom, 25833), e.id LIMIT 1) n
+               WHERE z.ew IS NOT NULL""",
+            (a, aus),
+        )
+        for g, me in cur.fetchall():
+            ohne[(g, a)] = float(me)
+        gleich = [k for k in ohne if k[1] == a and ziel.get((k[0], a, "luftlinie")) not in aus]
+        abw_n = sum(1 for k in gleich if abs(ohne[k] - db[(k[0], a, "luftlinie")]) > 0.05)
+        pruef(
+            gleich and abw_n == 0,
+            f"Strittige Lage {a} {aus}: SQL ohne strittige Standorte = Tabelle in {len(gleich)} nicht betroffenen "
+            f"Zellen ({abw_n} Abweichungen)",
+        )
+        raeume_s = strittige_raeume(aus, cur, tab, par)
+        offen = [(nr, v["kennzahl"]) for nr, _, v in werte(P)
+                 if nr in raeume_s and (v["kennzahl"], v["art"]) in PLANER.GS_KENNZAHLEN and v["art"] == a
+                 and v["wert"] is not None]
+        pruef(
+            bool(raeume_s) and not offen,
+            f"Strittige Lage {a}: Werte in den Raumeinheiten {sorted(raeume_s)} gesperrt ({offen[:3] or 'alle'})",
+        )
     ids = re.findall(r'"id":"(CRS3035RES100m[^"]+)"', (DATEN / "zellen.js").read_text(encoding="utf-8"))
     ew = [json.loads(x) for x in re.findall(r'"ew":(\d+|null)', (DATEN / "zellen.js").read_text(encoding="utf-8"))]
-    abw = n = 0
+    toleranz = rw["planer"]["rundung_meter"] / 2 + 0.05
+    abw = n = neu_n = 0
     for a, liste in E["werte"].items():
         for i, v in enumerate(liste):
             if v is None:
@@ -389,12 +444,59 @@ def main() -> int:
                     abw += 1
                 continue
             n += 1
-            if abs(v - db[(ids[i], a)]) > rw["planer"]["rundung_meter"] / 2 + 0.05:
+            betroffen = ziel.get((ids[i], a, "luftlinie")) in strittig.get(a, [])
+            soll = ohne[(ids[i], a)] if betroffen else db[(ids[i], a, "luftlinie")]
+            neu_n += betroffen
+            if abs(v - soll) > toleranz:
                 abw += 1
     pruef(
         abw == 0 and n > 0 and len(ids) == E["anzahl"],
-        f"erreichbar.js: {n} Werte gegen die Tabelle, {abw} Abweichungen",
+        f"erreichbar.js: {n} Werte gegen die Tabelle, davon {neu_n} ohne strittige Standorte, {abw} Abweichungen",
     )
+    EF, _ = js("erreichbar_fuss_odbl.js")
+    if EF is None:
+        print("        erreichbar_fuss_odbl.js nicht vorhanden (Quelle leer)")
+    else:
+        abw = n = neu_n = 0
+        for a, liste in EF["werte"].items():
+            for i, v in enumerate(liste):
+                if v is None or not ew[i]:
+                    continue
+                n += 1
+                if ziel.get((ids[i], a, "fussweg")) in strittig.get(a, []):
+                    # neu gerechnet (A5b-Verfahren in 15_planer.py): nie unter der Luftlinie ohne strittige Standorte
+                    neu_n += 1
+                    if v + toleranz < ohne[(ids[i], a)]:
+                        abw += 1
+                elif abs(v - db[(ids[i], a, "fussweg")]) > toleranz:
+                    abw += 1
+        pruef(
+            abw == 0 and n > 0 and EF["anzahl"] == len(ids),
+            f"erreichbar_fuss_odbl.js: {n} Werte gegen die Tabelle, {neu_n} ohne strittige Standorte neu "
+            f"(≥ Luftlinie), {abw} Abweichungen",
+        )
+        pruef(
+            "vbb" in EF["quellen"] or "haltestelle" not in EF["arten"],
+            "erreichbar_fuss_odbl.js: Quelle vbb genannt, weil Haltestellen Ziele sind (N1)",
+        )
+        # Treue des Fußweg-Nachbaus: mit allen Zielen muss fussweg_ohne die A5b-Tabelle genau treffen
+        if strittig:
+            try:
+                import numpy  # noqa: F401
+                import scipy  # noqa: F401
+            except ImportError:
+                print("        Hinweis: Fußweg-Nachbau nicht geprüft, numpy/scipy fehlen "
+                      "(Aufruf mit uv --with numpy --with scipy)")
+            else:
+                for a in strittig:
+                    alle = PLANER.fussweg_ohne(cur, a, [])
+                    abw_n = sum(
+                        1 for (g, a2, m_), v in ziel.items() if a2 == a and m_ == "fussweg"
+                        and ((alle.get(g) is None) != ((g, a, "fussweg") not in db)
+                             or ((g, a, "fussweg") in db and abs(alle[g] - db[(g, a, "fussweg")]) > 0.05))
+                    )
+                    pruef(abw_n == 0, f"Fußweg-Nachbau {a} mit allen Zielen = auswertung.zelle_erreichbar "
+                                      f"({abw_n} Abweichungen)")
     con.close()
     print(f"\n{len(befunde)} Befund(e)" if befunde else "\n0 Befunde")
     return 1 if befunde else 0

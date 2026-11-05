@@ -5,7 +5,7 @@ Paket A3 (OSM-Einrichtungen und Fußwegnetz), Stand 05.11.2026. Wird in der Inte
 
 | # | Quelle | Paket | URL | Lizenz | Vermerk | Weg | Stand / Abruf |
 |---|---|---|---|---|---|---|---|
-| 11 | OpenStreetMap-Auszug (PBF) für Einrichtungen und Fußwegnetz | A3, A5b, B2 (nur Prüfspalte) | Handdownload H5: BBBike-Auszug Potsdam oder Geofabrik Brandenburg | ODbL 1.0 | © OpenStreetMap-Mitwirkende, ODbL 1.0 (https://opendatacommons.org/licenses/odbl/1-0/) | H (automatisch verboten), danach offline mit `skripte/12_osm.sh laden` | fehlt (05.11.2026) |
+| 11 | OpenStreetMap-Auszug (PBF) für Einrichtungen und Fußwegnetz | A3, A5b, B2 (nur Prüfspalte) | Handdownload H5: BBBike-Auszug Potsdam oder Geofabrik Brandenburg | ODbL 1.0 | © OpenStreetMap-Mitwirkende, ODbL 1.0 (https://opendatacommons.org/licenses/odbl/1-0/) | H (automatisch verboten), danach offline mit `skripte/12_osm.sh laden` | BBBike-Auszug Potsdam, Stand 31.10.2026, geladen 05.11.2026 (N1) |
 
 ## Was aus OSM wird und wo es landet
 

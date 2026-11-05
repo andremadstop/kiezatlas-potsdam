@@ -1,0 +1,86 @@
+1. Rohdaten und Abruf
+  ok    HERKUNFT.md nennt den robots-Befund (Crawl-delay 30)
+  ok    Alter_in_infrastrukturellen_Altersgruppen.zip: SHA256 wie in HERKUNFT.md (b6ffd5604ec1…)
+  ok    Zensus2022_Groesse_des_privaten_Haushalts_in_Gitterzellen.zip: SHA256 wie in HERKUNFT.md (fdb709378848…)
+  ok    Typ_des_privaten_Haushalts_Familien.zip: SHA256 wie in HERKUNFT.md (2f82dde15885…)
+  ok    Typ_der_Kernfamilie_nach_Kindern.zip: SHA256 wie in HERKUNFT.md (bbb060be92d6…)
+  ok    Seniorenstatus_eines_privaten_Haushalts.zip: SHA256 wie in HERKUNFT.md (c0594cf16eb3…)
+  ok    Zensus2022_Staatsangehoerigkeit_Gruppen_in_Gitterzellen.zip: SHA256 wie in HERKUNFT.md (cd377ccd48eb…)
+  ok    Zensus2022_Durchschn_Nettokaltmiete.zip: SHA256 wie in HERKUNFT.md (8b8f2f548e88…)
+  ok    Leerstandsquote_in_Gitterzellen.zip: SHA256 wie in HERKUNFT.md (35d02a9f37b2…)
+  ok    Durchschnittliche_Wohnflaeche_je_Bewohner_in_Gitterzellen.zip: SHA256 wie in HERKUNFT.md (eddbb28ee48a…)
+  ok    Abrufprotokoll: 12 Anfragen an www.destatis.de, kleinster Abstand 31.0 s (Mindestwert 30 s)
+2. Schlüssel gegen zensus_zelle
+  ok    public.zensus_struktur hat 6.334 Zellen
+  ok    6.332 von 6.334 gitter_id stehen in zensus_zelle; 2 Ausnahme(n) nur mit Haushalten, ohne Personen (Cell-Key), 0 unerklärt
+        Ausnahme CRS3035RES100mN3252600E4524100: 3 Haushalte, 0 Personen, in Potsdam: nein
+        Ausnahme CRS3035RES100mN3262200E4521200: 3 Haushalte, 0 Personen, in Potsdam: ja
+  ok    keine doppelte gitter_id
+3. Abdeckung in Potsdam (Mittelpunkt im Stadtteil, bewohnte Zellen aus zensus_zelle)
+        Bezug: 3.411 bewohnte Zellen, 182.673 Einwohner
+        Altersgruppen                i_ges        3.411 Zellen (100.0 %),  182.673 EW (100.0 %)
+        Staatsangehörigkeit          st_ges       3.411 Zellen (100.0 %),  182.673 EW (100.0 %)
+        Haushaltsgröße               hh_ges       3.080 Zellen ( 90.3 %),  180.041 EW ( 98.6 %)
+        Haushaltstyp                 ht_ges       3.080 Zellen ( 90.3 %),  180.041 EW ( 98.6 %)
+        Seniorenstatus               sen_ges      3.080 Zellen ( 90.3 %),  180.041 EW ( 98.6 %)
+        Kernfamilie                  kf_ges       2.859 Zellen ( 83.8 %),  177.034 EW ( 96.9 %)
+        Nettokaltmiete (€/m²)        miete_qm     2.039 Zellen ( 59.8 %),  160.248 EW ( 87.7 %)
+        Leerstandsquote (%)          leer_quote   3.073 Zellen ( 90.1 %),  178.443 EW ( 97.7 %)
+        Wohnfläche je Bewohner (m²)  wfl_je_bew   3.078 Zellen ( 90.2 %),  180.033 EW ( 98.6 %)
+  ok    Zählthemen erreichen je mindestens 95 % der Einwohner (Rest: Zellen ohne Haushalte/Familien)
+4. Summen je Thema in Potsdam, je Thema eigener Bezugswert
+        Altersgruppen: Insgesamt 182.673 Personen, Summe der Klassen 180.891 (-1.0 %)
+  ok    Altersgruppen: 182.673 gegen 182.673 (Einwohner im Bevölkerungsgitter (zensus_zelle.ew)), Abweichung +0.00 %
+  ok    Altersgruppen: gegen Gemeindeergebnis 182.806 (Zensusdatenbank 1000A-1004, Potsdam 12054, Stichtag 15.05.2022), Abweichung -0.07 %
+        Staatsangehörigkeit: Insgesamt 182.673 Personen, Summe der Klassen 182.669 (-0.0 %)
+  ok    Staatsangehörigkeit: 182.673 gegen 182.673 (Einwohner im Bevölkerungsgitter (zensus_zelle.ew)), Abweichung +0.00 %
+  ok    Staatsangehörigkeit: gegen Gemeindeergebnis 182.806 (Zensusdatenbank 1000A-1020, Potsdam 12054, Stichtag 15.05.2022), Abweichung -0.07 %
+          Klasse st_de        Gitter  164.133  Gemeinde  164.263  (-0.1 %)
+          Klasse st_ausland   Gitter   18.536  Gemeinde   18.544  (-0.0 %)
+        Haushaltsgröße: Insgesamt 96.954 Haushalte, Summe der Klassen 95.355 (-1.6 %)
+  ok    Haushaltsgröße: 96.954 gegen 96.954 (Haushalte laut Haushaltstyp-Datei), Abweichung +0.00 %
+  ok    Haushaltsgröße: gegen Gemeindeergebnis 97.599 (Zensusdatenbank 5000H-1001, Potsdam 12054, Stichtag 15.05.2022), Abweichung -0.66 %
+          Klasse hh_1         Gitter   49.213  Gemeinde   49.853  (-1.3 %)
+          Klasse hh_2         Gitter   26.315  Gemeinde   26.962  (-2.4 %)
+          Klasse hh_3         Gitter   10.216  Gemeinde   10.677  (-4.3 %)
+          Klasse hh_4         Gitter    6.716  Gemeinde    6.973  (-3.7 %)
+          Klasse hh_5         Gitter    1.940  Gemeinde    2.059  (-5.8 %)
+          Klasse hh_6p        Gitter      955  Gemeinde    1.071  (-10.8 %)
+        Haushaltstyp: Insgesamt 96.954 Haushalte, Summe der Klassen 95.789 (-1.2 %)
+  ok    Haushaltstyp: 96.954 gegen 96.954 (Haushalte laut Seniorenstatus-Datei), Abweichung +0.00 %
+  ok    Haushaltstyp: gegen Gemeindeergebnis 97.599 (Zensusdatenbank 5000H-1006, Potsdam 12054, Stichtag 15.05.2022), Abweichung -0.66 %
+          Klasse ht_single    Gitter   49.279  Gemeinde   49.853  (-1.2 %)
+          Klasse ht_paar_ohne Gitter   20.301  Gemeinde   20.714  (-2.0 %)
+          Klasse ht_paar_mit  Gitter   15.693  Gemeinde   16.035  (-2.1 %)
+          Klasse ht_alleinerz Gitter    7.901  Gemeinde    8.253  (-4.3 %)
+          Klasse ht_mehrpers  Gitter    2.615  Gemeinde    2.742  (-4.6 %)
+        Seniorenstatus: Insgesamt 96.954 Haushalte, Summe der Klassen 96.426 (-0.5 %)
+  ok    Seniorenstatus: 96.954 gegen 96.954 (Haushalte laut Haushaltsgrößen-Datei), Abweichung +0.00 %
+  ok    Seniorenstatus: gegen Gemeindeergebnis 97.599 (Zensusdatenbank 5000H-1004, Potsdam 12054, Stichtag 15.05.2022), Abweichung -0.66 %
+          Klasse sen_nur      Gitter   21.577  Gemeinde   21.827  (-1.1 %)
+          Klasse sen_mit      Gitter    4.596  Gemeinde    4.822  (-4.7 %)
+          Klasse sen_ohne     Gitter   70.253  Gemeinde   70.950  (-1.0 %)
+        Kernfamilie: Insgesamt 44.366 Familien, Summe der Klassen 41.547 (-6.4 %)
+  ok    Kernfamilie: 44.366 gegen 43.895 (Haushalte mit Kernfamilie (Paare ohne/mit Kind + Alleinerziehende)), Abweichung +1.07 %
+  ok    Kernfamilie: gegen Gemeindeergebnis 45.003 (Zensusdatenbank 6000F-1002, Potsdam 12054, Stichtag 15.05.2022), Abweichung -1.42 %
+  ok    Gemeindeergebnis deckt alle sechs Zählthemen ab
+  ok    zensus2022_gemeinde_potsdam.csv: SHA256 wie in eingang/HERKUNFT.md (6367660737aa…)
+        Mittelwerte (nach Einwohnern gewichtet, nur Orientierung): Nettokaltmiete 8.02 €/m² (2042 Zellen, davon 17 „unsicher“), Wohnfläche 47.6 m² je Bewohner; Leerstandsquote in 3098 Zellen, davon 259 „unsicher“
+5. Geheimhaltung: keine Strukturfelder in daten/
+  ok    keine daten/-Datei mit Feldern aus zensus_struktur (keine Treffer)
+6. Paketgrenze (git diff gegen ausbau/integration, eingecheckt und offen)
+        Nachlauf: erlaubt sind A1 und N2 (NACHLAUF_PFADE)
+        geändert/neu: belege/A1_gemeindeabgleich_20261105.md, belege/A1_zensus_n2_20261105.txt, belege/a4_gebietsklassen_20261105.txt, config/richtwerte.yaml, pruefen/A1_zensus.py, pruefen/a4_gebietsklassen.py, pruefen/a4_nvp_lesung.md, pruefen/b1_jahre.py, quellen-a1.md, quellen-a4.md
+  ok    nur erlaubte Dateien berührt (keine fremden)
+7. Planungsräume
+        public.planungsraum ist leer (H1 fehlt); A6 aggregiert bis dahin auf die 32 Stadtteile.
+
+Hinweise (kein Befund):
+  - Kernfamilie: Summe der Klassen -6.4 % gegen Insgesamt; Klassensummen unterschätzen auf Stadtebene, Anteile nur mit Unsicherheitshinweis zeigen
+
+0 Befund(e)
+--- Bereich ausbau/p0...ausbau/a1:
+6. Paketgrenze (git diff ausbau/p0...ausbau/a1: nur die Commits von ausbau/a1, ohne offenen Stand)
+        geändert/neu: belege/20261105T101043Z.json, belege/20261105T101043Z.txt, belege/A1_zensus_20261105.txt, pruefen/A1_zensus.py, quellen-a1.md, skripte/01_vorbereiten.py
+  ok    nur erlaubte Dateien berührt (keine fremden)
+7. Planungsräume

@@ -29,7 +29,8 @@ PROTOKOLL = KIEZ_DATEN / "abrufprotokoll.tsv"
 SNAPSHOT = "auswertung.gebaeude_stand_20261105"
 GESPERRT = re.compile(r"/w/|/sparql|/search|/api/|api\.github\.com|raw\.githubusercontent\.com|overpass-api|"
                       r"opendata\.potsdam\.de|nominatim|taginfo|geofabrik|bbbike")
-B2_DATEIEN = [*sorted((WURZEL / "berichte").glob("B2_*")), WURZEL / "quellen-b2.md"]
+B2_DATEIEN = [*sorted((WURZEL / "berichte").glob("B2_*")), WURZEL / "quellen-b2.md",
+              *sorted((WURZEL / "belege").glob("N3_*"))]
 ADRESSE = re.compile(r"\b[A-ZÄÖÜ][a-zäöüß-]+(straße|str\.|allee|weg|platz|ring|damm|gasse|ufer|chaussee)\s+\d+",
                      re.IGNORECASE)
 
@@ -81,6 +82,22 @@ def main() -> int:
                                         OR jahr_bis - jahr_von > 3)""")
         pruefe(cur.fetchone()[0] == 0, "genau nur bei art 'bau' mit Spanne ≤ 3 Jahre")
 
+        # 2b. Wikidata (N3): Ensemble-Regel nur am Anfang der Bezeichnung, mehrere Jahre je Objekt nie genau,
+        # Zeilen CC0 und in der Kaskade zugelassen
+        ens = {"Louis-Nathan-Allee 5": False, "Allee nach Sanssouci 7": False, "Sparkasse Luisenplatz": False,
+               "Park Babelsberg": True, "Friedhof Bornstedt": True, "Muschelgrotte im Neuen Garten": False}
+        falsch = [k for k, soll in ens.items() if bool(regeln.WD_ENSEMBLE.search(k)) != soll]
+        pruefe(not falsch, f"Wikidata-Ensembleregel an {len(ens)} festen Fällen: {falsch or 'alle richtig'}")
+        cur.execute("""SELECT count(*), count(*) FILTER (WHERE nur_pruefung OR lizenz <> 'CC0 1.0'
+                                                         OR beleg_url !~ '^http://www\\.wikidata\\.org/entity/Q[0-9]+$')
+                       FROM auswertung.jahr_beleg WHERE quelle = 'Wikidata'""")
+        n_wd, schlecht = cur.fetchone()
+        pruefe(n_wd > 0 and schlecht == 0, f"Wikidata: {n_wd} Zeilen, {schlecht} nicht CC0/zugelassen/mit Objekt-URL")
+        cur.execute("""SELECT count(*) FROM (SELECT beleg_url FROM auswertung.jahr_beleg WHERE quelle = 'Wikidata'
+                       GROUP BY beleg_url HAVING bool_or(genau)
+                          AND count(DISTINCT (jahr_von, jahr_bis)) > 1) x""")
+        pruefe(cur.fetchone()[0] == 0, "Wikidata: kein Objekt mit mehreren Jahren trägt ein genaues Jahr")
+
         # 3. Zahl genau datierter Gebäude
         cur.execute("""SELECT count(DISTINCT oid_bezug) FILTER (WHERE nur_pruefung),
                               count(DISTINCT oid_bezug) FILTER (WHERE NOT nur_pruefung)
@@ -102,7 +119,8 @@ def main() -> int:
         adr = ADRESSE.findall(t)
         pruefe(not adr, f"{d.relative_to(WURZEL)}: {len(adr)} Adressmuster")
         pruefe("Baumeister:" not in t and "Baujahr:" not in t, f"{d.relative_to(WURZEL)}: keine Beschreibungstexte")
-    b2_daten = [p for p in (WURZEL / "daten").rglob("*") if p.is_file() and re.search(r"beleg|denkmal|jahr_genau", p.name)]
+    b2_daten = [p for p in (WURZEL / "daten").rglob("*")
+                if p.is_file() and re.search(r"beleg|denkmal|jahr_genau", p.name)]
     pruefe(not b2_daten, f"keine B2-Ausgabe unter daten/ ({len(b2_daten)} Dateien)")
 
     print(f"\n{len(fehler)} Fehler")

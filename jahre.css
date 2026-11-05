@@ -189,6 +189,9 @@
 #j-m-ruecktest .j-tabelle th:first-child{white-space:normal}
 #j-m-ruecktest .j-tabelle :is(th,td)+:is(th,td){padding-left:12px}
 @media (max-width:860px){#j-m-ruecktest .j-tabelle{font-size:.8125rem}#j-m-ruecktest .j-tabelle thead th{font-size:.75rem}}
+/* LHP-Gegenprobe (6 Spalten): Abstand zwischen den Spalten, am Handy kleiner */
+#j-m-lhp :is(th,td)+:is(th,td){padding-left:10px}
+@media (max-width:860px){#j-m-lhp{font-size:.8125rem}#j-m-lhp thead th{font-size:.75rem;hyphens:auto}#j-m-lhp :is(th,td)+:is(th,td){padding-left:6px}}
 
 /* Reduzierte Bewegung: auf den Bauzeit-Seiten keine Übergänge und keine Animation, auch nicht aus atlas.css */
 @media (prefers-reduced-motion:reduce){
