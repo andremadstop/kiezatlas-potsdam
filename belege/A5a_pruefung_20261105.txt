@@ -1,4 +1,4 @@
-Prüfung A5a, 2026-11-05T10:33:17Z
+Prüfung A5a, 2026-11-05T10:51:39Z
 Zellen mit Mittelpunkt in Potsdam: 3443, davon bewohnt: 3411; Arten: ['bibliothek', 'feuerwehr', 'foerderschule', 'grundschule', 'gymnasium', 'hort', 'kita', 'osz', 'sek1', 'sonstige_schule', 'sonstiger_gemeinbedarf', 'sport'] + gruen
 [ok] 1a Abdeckung bewohnte Zellen × Arten: 3411 Zellen × 13 Arten = 44343 erwartet, fehlend 0
 [ok] 1b Abdeckung Zellen von zellen.js: 3443 Zellen, fehlend 0, Luftlinie-Zeilen 44759
