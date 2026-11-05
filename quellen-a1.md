@@ -52,7 +52,12 @@ eine Stimmigkeitsprüfung); Familien gegen Haushalte mit Kernfamilie (43.895, +1
 Zensus-Gemeindeergebnis Potsdam fehlt noch (Handdownload, siehe unten). `pruefen/A1_zensus.py` prüft es, sobald
 `$KIEZ_DATEN/eingang/zensus2022_gemeinde_potsdam.csv` (Spalten `merkmal;wert;quelle`) vorliegt.
 
+Nenner der Abdeckung: 3.411 Zellen mit Einwohnern. Die 3.443 Zellen aus `pruefen/INVENTAR.md` (D1) zählen 32 Zellen
+mit Mittelpunkt in Potsdam, aber 0 Einwohnern, mit.
+
 ## Für A6 (Aggregation)
+
+- Nicht per INNER JOIN an `zensus_zelle` hängen: Das ließe die Potsdamer Zelle mit 3 Haushalten ohne Personen weg.
 
 - Feine Klassen nie je Zelle in `daten/` (prüfen `pruefen/daten.py` und `pruefen/A1_zensus.py`).
 - Klassensummen unterschätzen auf Stadtebene: Altersgruppen −1,0 %, Haushalte −0,5 bis −1,6 %, Kernfamilien −6,4 %.
@@ -64,6 +69,12 @@ Zensus-Gemeindeergebnis Potsdam fehlt noch (Handdownload, siehe unten). `pruefen
 - Stichtag 15.05.2022: Neubaugebiete (Krampnitz, Bornstedter Feld, Golm) fehlen teilweise.
 
 ## Offen
+
+- **Kommentar in `sql/002_ausbau.sql` (P0) angleichen:** Dort steht zu den Mittelwerten „leer = geheim oder ohne Wert,
+  nie 0“. A1 schreibt beim Leerstand `–` als 0,00 mit Eintrag in `geaendert`, weil Destatis `–` als „genau Null oder
+  auf Null geändert“ definiert. Leer bleibt eine Zelle nur, wenn sie in der Datei fehlt. Für P0 bzw. I1.
+- **Kernfamilien:** Die Summe der 13 Klassen liegt 6,4 % unter „Insgesamt“ (Grenze 3 %). Das sind die Daten
+  (viele kleine Klassen mit `–`), kein Ladefehler. A6 zeigt Familienanteile nur gegen die Klassensumme und mit Hinweis.
 
 - **Zensus-Gemeindeergebnis Potsdam (12054000)** als unabhängiger Bezugswert je Thema: Personen nach Alter, private
   Haushalte nach Größe/Typ/Seniorenstatus, Familien, Staatsangehörigkeit. Liegt in der Zensusdatenbank

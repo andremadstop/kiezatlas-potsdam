@@ -115,6 +115,9 @@ MITTELWERTE = {"miete_qm", "leer_quote", "wfl_je_bew"}  # in config/potsdam.yaml
 def struktur_lesen(minx: float, miny: float, maxx: float, maxy: float) -> None:
     """Paket A1: Strukturmerkmale aus den Destatis-Zips nach vorbereitet/zensus_struktur.csv."""
     ordner = KIEZ_DATEN / STRUKTUR_ORDNER
+    if not ordner.is_dir():  # z. B. frischer Klon ohne Rohdaten: Bestand bleibt lauffähig
+        print(f"Zensus-Struktur übersprungen: {STRUKTUR_ORDNER} fehlt unter KIEZ_DATEN", file=sys.stderr)
+        return
     zellen: dict[str, dict] = {}
     for thema, (datei, muster, spalten) in STRUKTUR.items():
         with zipfile.ZipFile(ordner / datei) as z:
