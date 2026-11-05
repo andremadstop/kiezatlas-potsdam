@@ -63,7 +63,7 @@ def main() -> int:
             FROM p""")
         n, zu = cur.fetchone()
         pruefe(n == GEBAEUDE_IN_POTSDAM, f"Snapshot-Gebäude in Potsdam: {n} (erwartet {GEBAEUDE_IN_POTSDAM})")
-        pruefe(zu >= 0.98 * n, f"zugeordnet: {zu} von {n} = {100 * zu / n:.2f} % (Schwelle 98 %)")
+        pruefe(zu >= 0.98 * n, f"zugeordnet: {zu} von {n} = {100 * zu / max(n, 1):.2f} % (Schwelle 98 %)")
         cur.execute("""SELECT count(*) FROM auswertung.alkis_nas_gebaeude a
                        WHERE oid_bezug IS NOT NULL AND NOT EXISTS (
                            SELECT 1 FROM auswertung.gebaeude_stand_20261105 g WHERE g.oid = a.oid_bezug)""")
