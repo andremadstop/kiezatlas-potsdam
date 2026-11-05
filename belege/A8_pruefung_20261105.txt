@@ -1,0 +1,227 @@
+# Prüfung A8 (GIS-Export), 05.11.2026, nach der Gegenprobe (/code-review medium, 10 Funde behoben)
+
+$ skripte/16_export.py (zweimal, MD5 aller Dateien verglichen)
+  gleich: 47 Dateien, zweiter Lauf bytegleich
+
+$ python -I pruefen/A8_export.py
+  ok    kiezatlas_potsdam.gpkg vorhanden
+
+[1] GeoPackage kiezatlas_potsdam.gpkg
+  ok    application_id = GPKG
+  ok    user_version 1.2 bis 1.4
+  ok    integrity_check ok
+  ok    foreign_key_check leer
+  ok    Pflichttabelle gpkg_spatial_ref_sys
+  ok    Pflichttabelle gpkg_contents
+  ok    Pflichttabelle gpkg_geometry_columns
+  ok    SRS -1, 0, 4326, 25833 eingetragen
+  ok    jede Zeile in gpkg_contents hat eine Tabelle
+  ok    einrichtung: SRS 25833 in gpkg_contents und geometry_columns
+  ok    einrichtung: 679 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+  ok    einrichtung: Hülle im Kopf = Hülle der Koordinaten
+  ok    einrichtung: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    einrichtung: Hülle in gpkg_contents umfasst alle Objekte
+  ok    gruenflaeche: SRS 25833 in gpkg_contents und geometry_columns
+  ok    gruenflaeche: 4892 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+  ok    gruenflaeche: Hülle im Kopf = Hülle der Koordinaten
+  ok    gruenflaeche: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    gruenflaeche: Hülle in gpkg_contents umfasst alle Objekte
+  ok    haltestelle: SRS 25833 in gpkg_contents und geometry_columns
+  ok    haltestelle: 315 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+  ok    haltestelle: Hülle im Kopf = Hülle der Koordinaten
+  ok    haltestelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    haltestelle: Hülle in gpkg_contents umfasst alle Objekte
+  ok    raumeinheit: SRS 25833 in gpkg_contents und geometry_columns
+  ok    raumeinheit: 32 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+  ok    raumeinheit: Hülle im Kopf = Hülle der Koordinaten
+  ok    raumeinheit: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    raumeinheit: Hülle in gpkg_contents umfasst alle Objekte
+  ok    zelle: SRS 25833 in gpkg_contents und geometry_columns
+  ok    zelle: 3443 Geometrien mit GP-Kopf, SRS 25833, WKB POLYGON
+  ok    zelle: Hülle im Kopf = Hülle der Koordinaten
+  ok    zelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    zelle: Hülle in gpkg_contents umfasst alle Objekte
+
+[2] Inhalt gegen die Quelldateien
+  ok    raumeinheit: 32 Zeilen, Quelle 32
+  ok    versorgung: 544 Zeilen, Quelle 544
+  ok    einrichtung: 679 Zeilen, Quelle 679
+  ok    zelle: 3443 Zeilen, Quelle 3443
+  ok    versorgung: alle 544 Werte mit Status, vorläufig, Maßstab, Unsicherheit wie planer.js
+  ok    versorgung: Status nur amtlich/orientierung
+  ok    versorgung: 128 Grundschulwerte alle vorläufig (ohne H2)
+  ok    versorgung: jeder Wert mit Unsicherheitshinweis
+  ok    raumeinheit: Name, Einwohner und jede Kennzahlspalte wie versorgung bzw. planer.js
+  ok    raumeinheit: Einwohner auf 10 gerundet
+  ok    einrichtung: alle Felder wie einrichtungen.js
+  ok    einrichtung: ALKIS-Lagen ohne Namen
+  ok    zelle: gitter_id, Einwohner, Stadtteil und 13 Entfernungen je Zelle wie zellen.js/erreichbar.js
+  ok    csv/einrichtung.csv vorhanden
+  ok    csv/einrichtung.csv: Spalten wie GPKG
+  ok    csv/einrichtung.csv: 679 Zeilen wie GPKG
+  ok    csv/einrichtung.csv: Werte wie GPKG
+  ok    csv/gruenflaeche.csv vorhanden
+  ok    csv/gruenflaeche.csv: Spalten wie GPKG
+  ok    csv/gruenflaeche.csv: 4892 Zeilen wie GPKG
+  ok    csv/gruenflaeche.csv: Werte wie GPKG
+  ok    csv/haltestelle.csv vorhanden
+  ok    csv/haltestelle.csv: Spalten wie GPKG
+  ok    csv/haltestelle.csv: 315 Zeilen wie GPKG
+  ok    csv/haltestelle.csv: Werte wie GPKG
+  ok    csv/lizenz.csv vorhanden
+  ok    csv/lizenz.csv: Spalten wie GPKG
+  ok    csv/lizenz.csv: 6 Zeilen wie GPKG
+  ok    csv/lizenz.csv: Werte wie GPKG
+  ok    csv/raumeinheit.csv vorhanden
+  ok    csv/raumeinheit.csv: Spalten wie GPKG
+  ok    csv/raumeinheit.csv: 32 Zeilen wie GPKG
+  ok    csv/raumeinheit.csv: Werte wie GPKG
+  ok    csv/versorgung.csv vorhanden
+  ok    csv/versorgung.csv: Spalten wie GPKG
+  ok    csv/versorgung.csv: 544 Zeilen wie GPKG
+  ok    csv/versorgung.csv: Werte wie GPKG
+  ok    csv/zelle.csv vorhanden
+  ok    csv/zelle.csv: Spalten wie GPKG
+  ok    csv/zelle.csv: 3443 Zeilen wie GPKG
+  ok    csv/zelle.csv: Werte wie GPKG
+  ok    gruenflaeche: 4892 Zeilen, Datenbank 4892
+  ok    haltestelle: 315 Zeilen, Datenbank 315
+  ok    einrichtung: 679 Zeilen, Datenbank 679
+  ok    einrichtung: Lage weicht höchstens 0.64 m von einrichtungen.js ab (Rundung 5 Stellen)
+
+[3] Keine Adresse, keine Kontakte, kein Personenbezug
+  ok    keine Adress- oder Kontaktspalte ([])
+  ok    Ausnahmen amtlicher Einrichtungsnamen stimmen (2 Stück)
+  ok    kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail ([]); Ausnahme nur die 2 amtlichen Namen ['Hort"Am Schulplatz 1"', 'KinderGarten Schulplatz 1']
+  ok    keine Einrichtungsnamen mit Personenbezug ([])
+
+[4] Keine feinere Altersklasse je Zelle
+  ok    zelle: Spalten exakt 21 nach Positivliste (fremd: [])
+  ok    csv/zelle.csv: nur erlaubte Spalten
+  ok    kein Feldname einer feinen Zensusklasse in GPKG oder CSV ([])
+  ok    zelle: auch keine der fünf Altersklassen je Zelle
+
+[5] Kein OSM in den Dateien ohne _odbl
+  ok    kiezatlas_potsdam.gpkg: kein OpenStreetMap, ODbL, fussweg, osm_id
+  ok    einrichtung: Quellen nur mbjs und lgb (Fixtures: nicht osm)
+  ok    versorgung: Methode nur luftlinie
+  ok    csv/: kein OSM-Wert ([])
+  ok    steckbriefe/: kein OSM-Wert ([])
+  ok    csv/ ohne _odbl-Datei
+  --    keine _odbl-Datei (A3/A5b leer); ODbL-Pfad mit --odbl-erwartet gegen Fixtures prüfen
+
+[6] Vermerke
+  ok    lizenz raumeinheit, versorgung (Werte): jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz raumeinheit, versorgung (Werte): CC-BY-Vermerk mit Link
+  ok    lizenz einrichtung: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz zelle: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz gruenflaeche: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz haltestelle: CC-BY-Vermerk mit Link
+  ok    README nennt „Statistische Ämter des Bundes und der Länder“
+  ok    README nennt „Ministerium für Bildung, Jugend und Sport“
+  ok    README nennt „GeoBasis-DE/LGB“
+  ok    README nennt „VBB Verkehrsverbund“
+  ok    README nennt „OpenStreetMap-Mitwirkende“
+  ok    README nennt „Daten verändert (eigene Berechnung)“
+  ok    README nennt „https://www.govdata.de/dl-de/by-2-0“
+  ok    README nennt „EPSG:25833“
+  ok    README nennt „Cell-Key“
+  ok    README nennt „15.05.2022“
+  ok    README nennt „orientierung“
+  ok    README nennt „vorlaeufig“
+  ok    README nennt „Keine Adressen“
+  ok    Lizenzkürzel je Zeile nur dl-de/by-2-0 und CC BY 4.0 (['CC BY 4.0', 'dl-de/by-2-0'])
+
+[7] QGIS-Projekt und Stile
+  ok    .qgz enthält genau ein .qgs (['kiezatlas_potsdam.qgs'])
+  ok    .qgs wohlgeformt
+  ok    Projekt-KBS EPSG:25833
+  ok    relative Pfade
+  ok    7 Ebenen im Baum und in projectlayers
+  ok    Ebene einrichtung: Klassenfeld art vorhanden
+  ok    Ebene einrichtung: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene einrichtung: eigene Farbe je Kategorie
+  ok    Ebene Einrichtungen: ./kiezatlas_potsdam.gpkg|layername=einrichtung vorhanden
+  ok    Ebene haltestelle: Klassenfeld klasse vorhanden
+  ok    Ebene haltestelle: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene haltestelle: eigene Farbe je Kategorie
+  ok    Ebene Haltestellen (NVP-Klasse): ./kiezatlas_potsdam.gpkg|layername=haltestelle vorhanden
+  ok    Ebene Raumeinheiten: ./kiezatlas_potsdam.gpkg|layername=raumeinheit vorhanden
+  ok    Ebene zelle: Klassenfeld ew vorhanden
+  ok    Ebene Zensus-Zellen (Einwohner): ./kiezatlas_potsdam.gpkg|layername=zelle vorhanden
+  ok    Ebene gruenflaeche: Klassenfeld art vorhanden
+  ok    Ebene gruenflaeche: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene gruenflaeche: eigene Farbe je Kategorie
+  ok    Ebene Grünflächen: ./kiezatlas_potsdam.gpkg|layername=gruenflaeche vorhanden
+  ok    Ebene Versorgung (Tabelle): ./kiezatlas_potsdam.gpkg|layername=versorgung vorhanden
+  ok    Ebene Lizenzen (Tabelle): ./kiezatlas_potsdam.gpkg|layername=lizenz vorhanden
+  ok    stile/einrichtung.qml wohlgeformt
+  ok    stile/gruenflaeche.qml wohlgeformt
+  ok    stile/haltestelle.qml wohlgeformt
+  ok    stile/raumeinheit.qml wohlgeformt
+  ok    stile/zelle.qml wohlgeformt
+  ok    GPKG: Tabelle layer_styles
+  ok    layer_styles raumeinheit: Standardstil = stile/raumeinheit.qml
+  ok    layer_styles zelle: Standardstil = stile/zelle.qml
+  ok    layer_styles gruenflaeche: Standardstil = stile/gruenflaeche.qml
+  ok    layer_styles einrichtung: Standardstil = stile/einrichtung.qml
+  ok    layer_styles haltestelle: Standardstil = stile/haltestelle.qml
+  ok    keine Orange- oder Gelbtöne in Stilen (Dateien, layer_styles), Projekt und Steckbriefen ([])
+
+[8] Steckbriefe
+  ok    32 Steckbriefe, einer je Raumeinheit
+  ok    keine Platzhalter, Karte und @page vorhanden ([])
+  HINWEIS planer.js (A6) enthält Platzhalter in unsicherheit, wörtlich übernommen: ['32:oepnv_erschliessung', '32:oepnv_takt']
+  ok    keine Gedankenstriche oder Strich-Ketten ([])
+  ok    jede Zahl aus planer.js steht im Steckbrief ([])
+
+0 Befunde
+
+$ python -I pruefen/A8_test_pfade.py
+[1] Fixtures nie nach daten/export
+  ok    Abbruch mit Hinweis auf fixture
+  ok    daten/export ohne _odbl-Datei
+  ok    auch kein Unterordner von daten/export (Abbruch, nichts angelegt)
+[2] ODbL-Pfad gegen Fixtures
+  ok    Export der Fixtures läuft ()
+  ok    kiezatlas_potsdam_odbl.gpkg geschrieben
+  ok    csv_odbl/ mit drei Ebenen
+  ok    A8_export.py --odbl-erwartet gegen den Fixture-Export: 0 Befunde
+  ok    Lauf ohne ODbL-Daten in denselben Ordner räumt _odbl.gpkg, csv_odbl/ und den ODbL-Stil ab
+[3] Gegenproben: verdorbene Kopie des echten Exports
+  ok    Altersklasse je Zelle: gemeldet (FEHLT zelle: Spalten exakt 21 nach Positivliste (fremd: ['i_u3']))
+  ok    Adresse im Namen: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['straße 12']); Ausnahme nur die 2 amtlichen Namen [)
+  ok    PLZ im Namen: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['14467 Potsdam']); Ausnahme nur die 2 amtlichen Nam)
+  ok    OSM-Vermerk: gemeldet (FEHLT kiezatlas_potsdam.gpkg: kein OpenStreetMap, ODbL, fussweg, osm_id)
+  ok    Fußweg-Methode: gemeldet (FEHLT versorgung: Methode nur luftlinie)
+  ok    Kontaktspalte: gemeldet (FEHLT keine Adress- oder Kontaktspalte (['telefon']))
+  ok    Wert verändert: gemeldet (FEHLT versorgung: alle 544 Werte mit Status, vorläufig, Maßstab, Unsicherheit wie planer.js)
+  ok    falsches SRS: gemeldet (FEHLT zelle: SRS 25833 in gpkg_contents und geometry_columns)
+  ok    Orange im Stil: gemeldet (FEHLT keine Orange- oder Gelbtöne in Stilen (Dateien, layer_styles), Projekt und Steckbriefen (['e67814']))
+[4] Gegenproben in CSV und Steckbriefen
+  ok    Adresse in CSV: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['straße 5']); Ausnahme nur die 2 amtlichen Namen [')
+  ok    OSM in CSV: gemeldet (FEHLT csv/: kein OSM-Wert (['gruenflaeche.csv']))
+  ok    Zahl fehlt in CSV: gemeldet (FEHLT csv/zelle.csv: Werte wie GPKG)
+  ok    OSM im Steckbrief: gemeldet (FEHLT steckbriefe/: kein OSM-Wert (['13.html']))
+  ok    Platzhalter im Steckbrief: gemeldet (FEHLT keine Platzhalter, Karte und @page vorhanden (['13.html']))
+  ok    Telefon im Steckbrief: gemeldet (FEHLT kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail (['0331 2891234']); Ausnahme nur die 2 amtlichen Name)
+
+0 Befunde
+
+$ python -I pruefen/daten.py (P0)
+0 Abweichungen
+
+$ ruff check --select E,F,W --line-length 120; ruff format --check
+All checks passed!
+3 files already formatted
+
+$ WeasyPrint (pipx-venv weasyprint, FontConfiguration): alle 32 Steckbriefe gerendert
+  32 Steckbriefe, je 5 bis 5 Seiten A4
+$ pdffonts 13.pdf (nur Barlow, keine Ersatzschrift)
+  name                                 type              encoding         emb sub uni object ID
+  ------------------------------------ ----------------- ---------------- --- --- --- ---------
+  MFLKGA+Barlow-Semi-Condensed,-Semi-Bold-Semi-Condensed CID TrueType      Identity-H       yes yes yes     27  0
+  VHAIOC+Barlow                        CID TrueType      Identity-H       yes yes yes     31  0
+  OODLLZ+Barlow-Semi-Condensed,-Medium-Semi-Condensed CID TrueType      Identity-H       yes yes yes     35  0
+
+Nicht geprüft: Öffnen in QGIS (kein QGIS auf der Workstation); geprüft sind XML, Pfade, Klassenfelder, Kategorien, layer_styles.

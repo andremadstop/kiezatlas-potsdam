@@ -34,25 +34,106 @@ raumebene:
 # ---------------------------------------------------------------------------------- ÖPNV
 # A4 Anfang
 oepnv:
-  quelle: "Nahverkehrsplan Landeshauptstadt Potsdam 2019, Kap. 4.1.3, Tab. 4.2/4.3"
+  # Gelesen am 05.11.2026 im NVP 2019 (PDF, sha256 3e9a83e1…, $KIEZ_DATEN/nvp_potsdam/2019/), Protokoll: pruefen/a4_nvp_lesung.md.
+  # Seitenzahlen = Druckseiten des NVP. Der NVP misst in Luftlinie.
+  quelle: "Nahverkehrsplan 2019 für die Landeshauptstadt Potsdam (VerkehrsConsult Dresden-Berlin), Kap. 4.1.1–4.1.3, Anlage 4"
   url: https://www.potsdam.de/system/files/documents/2020-09-29_nvp_potsdam_mit_anlagen.pdf
-  seite: "S. 58–59"
-  geprueft: null
+  geprueft: 2026-11-05
   methode: luftlinie
+  aktualitaet:
+    gilt_fuer: "2019 bis 2023 (Kap. 4.1, S. 54)"
+    befund: "formal abgelaufen; Nachfolger in zwei Websuchen am 05.11.2026 nicht gefunden, bei der Stadt nicht nachgefragt"
+    status: offen
+  # Kernbefund (Prüfbericht Korrektur 11): Die Klasse I/II/III ist eine Eigenschaft des Ortsteils (Nutzungsdichte,
+  # Tab. 4.1), nicht der Haltestelle. Einzugsradius und Soll-Takt folgen aus der Ortsteilklasse.
   einzugsradius_m:
-    # Zuordnung zu Bedienungsklasse bzw. Raumtyp laut NVP vor A4 nachlesen (Prüfbericht 11)
-    bus: {werte: [300, 400, 500], status: amtlich}
-    tram: {werte: [350, 450], status: amtlich}
-  erschliessung_anteil_prozent: {wert: 80, status: amtlich, gilt_fuer: "Teilflächen mit mehr als 200 EW"}
+    seite: "Tab. 4.2, S. 59"
+    status: amtlich
+    # Schlüssel: Verkehrsmittel → Ortsteilklasse (gebietsklasse), nicht Taktklasse
+    tram: {I: 350, II: 450, III: null}
+    bus: {I: 300, II: 400, III: 500}
+    spnv: {I: null, II: null, III: null, hinweis: "Tab. 4.2 nennt keinen Wert; Abb. 4.2 (S. 61) zeichnet SPNV ohne Radiusangabe. Nicht erfinden; A5 kennzeichnet SPNV getrennt."}
+    faehre: {I: null, II: null, III: null, hinweis: "nicht in Tab. 4.2"}
+  erschliessung:
+    seite: "Kap. 4.1.3, S. 58"
+    status: amtlich
+    teilflaeche_min_ew: 200        # Teilflächen mit mehr als 200 EW sollen erschlossen sein
+    anteil_ew_prozent: 80          # erschlossen, wenn 80 % der EW im Einzugsbereich liegen
+    hinweis: "„Teilfläche“ ist im NVP nicht als Geometrie definiert; Abb. 4.2 bewertet auf Ortsteilen. A6 rechnet auf Planungsraum bzw. Stadtteil und benennt die Abweichung."
   taktklassen:
-    # Grenzen (Fahrten je Richtung in der Hauptverkehrszeit) aus Tab. 4.2/4.3 übernehmen
-    I: {fahrten_hvz_je_richtung_min: null, status: offen}
-    II: {fahrten_hvz_je_richtung_min: null, status: offen}
-    III: {fahrten_hvz_je_richtung_min: null, status: offen}
+    # Tab. 4.3, S. 59: Soll-Fahrten je Stunde und Richtung in der HVZ, je Ortsteilklasse. A4 leitet daraus eine
+    # Taktklasse je Haltestelle ab (erreichter Takt gemessen an den Untergrenzen). Das ist eine eigene Lesart:
+    # Werte zwischen 3 und 6 Fahrten zählt der NVP keiner Klasse zu, hier gelten sie als II.
+    seite: "Tab. 4.3, S. 59"
+    status: amtlich
+    eigene_festlegung: "Zuordnung nach Untergrenzen; > 3 und < 6 Fahrten = II; unter 1 Fahrt = „unter III“"
+    I: {fahrten_hvz_je_richtung_min: 6, soll_hvz: "6 bis 12"}
+    II: {fahrten_hvz_je_richtung_min: 2, soll_hvz: "2 bis 3"}
+    III: {fahrten_hvz_je_richtung_min: 1, soll_hvz: "1"}
+  messung:
+    # Wie 13_oepnv.py den Takt misst (eigene Festlegung, im Lese-Protokoll begründet)
+    stichtag: 2026-11-10        # Dienstag, Schultag (Herbstferien Brandenburg 19.–30.10.2026)
+    hvz_fenster: ["06:00", "09:00"]   # morgendliche HVZ Mo–Fr Klasse I und II (Abb. 4.1, S. 57); Mittel je Stunde
+    hvz_fenster_nvp_anlage4: {I: ["06:00", "08:00"], II: ["07:00", "09:00"], III: ["07:00", "09:00"]}
+    richtung: "Abfahrten (pickup_type ≠ 1, ohne Endhalt der Fahrt), alle Linien zusammen, je direction_id gezählt; Wert = größere der beiden Richtungen"
+    randpuffer_m: 1000          # Haltestellen bis 1 km außerhalb der Stadtgrenze (Brandenburg, E7), Berlin nicht
+  gebietsklassen:
+    # Tab. 4.1, S. 55–56, wörtlich (NVP-Ortsteile). we = Klasse am Wochenende.
+    nvp_ortsteile:
+      I: [Bornstedter Feld, Golm Ost, Golm West, Brandenburger Vorstadt, Potsdam West, Nördliche Innenstadt,
+          Südliche Innenstadt, Babelsberg Süd, Babelsberg Zentrum, Teltower Vorstadt, Schlaatz, Waldstadt II,
+          Am Stern, Drewitz, Kirchsteigfeld]
+      II: [Bornim, Bornstedter Ortslage, Eiche, Jägervorstadt, Berliner Vorstadt, Babelsberg Nord, Templiner Vorstadt,
+           Hermannswerder, Waldstadt I, Industriegelände, Fahrland, Kaserne Krampnitz, Neu Fahrland, Groß Glienicke,
+           Campus Jungfernsee]
+      III: [Institut Bornim, Nedlitz, Sacrow, Grube, Nauener Vorstadt, Forststraße, Klein Glienicke, Alt Drewitz,
+            Uetz-Paaren, Marquardt, Friedrichspark, Satzkorn, Kartzow, Krampnitz Ort, Waldsiedlung Groß Glienicke,
+            Das kurze Feld]
+      ohne_klasse: [Forst Potsdam Süd, Wildpark]
+      we: {Bornstedter Feld: II, Babelsberg Süd: II, Am Stern: II, Golm Ost: III, Golm West: III, Industriegelände: III}
+    widerspruch: "Waldstadt I steht in Tab. 4.1 unter Klasse II, im Text S. 56 im Klasse-I-Korridor und in Anlage 4 unter Klasse I."
+    # Abbildung auf die 32 Stadtteile (public.stadtteil.nr). Genau geht es nur mit den Geometrien der NVP-Ortsteile bzw.
+    # statistischen Bezirke (Anlage 2 nennt deren Nummern) → wartet auf H1 (statistische-bezirke-in-potsdam).
+    # zuordnung: eindeutig = gleichnamig; zusammengesetzt = alle Bestandteile gleiche Klasse (Bestandteile aus dem Namen
+    # abgeleitet); gemischt = Bestandteile mit verschiedenen Klassen; offen = kein gleichnamiger Eintrag.
+    stadtteile:
+      "11": {klasse: null, zuordnung: gemischt, teile: {Bornim: II, Institut Bornim: III}}
+      "12": {klasse: III, zuordnung: eindeutig}
+      "13": {klasse: null, zuordnung: gemischt, teile: {Bornstedter Feld: I, Bornstedter Ortslage: II, Das kurze Feld: III}}
+      "14": {klasse: III, zuordnung: eindeutig}
+      "15": {klasse: II, zuordnung: eindeutig}
+      "16": {klasse: III, zuordnung: eindeutig}
+      "17": {klasse: I, zuordnung: zusammengesetzt, teile: {Golm Ost: I, Golm West: I}}
+      "21": {klasse: III, zuordnung: eindeutig}
+      "22": {klasse: II, zuordnung: eindeutig}
+      "23": {klasse: II, zuordnung: eindeutig}
+      "31": {klasse: I, zuordnung: eindeutig}
+      "32": {klasse: null, zuordnung: gemischt, teile: {Potsdam West: I, Forststraße: III, Wildpark: null}}
+      "41": {klasse: I, zuordnung: zusammengesetzt, teile: {Nördliche Innenstadt: I, Südliche Innenstadt: I}}
+      "43": {klasse: null, zuordnung: offen, hinweis: "Zentrum Ost/Nuthepark ohne gleichnamigen NVP-Ortsteil"}
+      "44": {klasse: null, zuordnung: offen, hinweis: "Hauptbahnhof/Brauhausberg Nord ohne gleichnamigen NVP-Ortsteil"}
+      "51": {klasse: III, zuordnung: eindeutig}
+      "52": {klasse: II, zuordnung: eindeutig}
+      "53": {klasse: I, zuordnung: zusammengesetzt, teile: {Babelsberg Süd: I, Babelsberg Zentrum: I}}
+      "61": {klasse: II, zuordnung: zusammengesetzt, teile: {Templiner Vorstadt: II, Hermannswerder: II}}
+      "62": {klasse: I, zuordnung: eindeutig}
+      "63": {klasse: I, zuordnung: eindeutig}
+      "64": {klasse: null, zuordnung: gemischt, teile: {Waldstadt I: "II laut Tab. 4.1, I laut Text und Anlage 4", Industriegelände: II}}
+      "65": {klasse: I, zuordnung: eindeutig}
+      "71": {klasse: I, zuordnung: eindeutig, hinweis: "NVP: Am Stern"}
+      "72": {klasse: null, zuordnung: gemischt, teile: {Drewitz: I, Alt Drewitz: III}}
+      "73": {klasse: I, zuordnung: eindeutig}
+      "81": {klasse: III, zuordnung: eindeutig}
+      "82": {klasse: III, zuordnung: eindeutig}
+      "83": {klasse: III, zuordnung: zusammengesetzt, teile: {Satzkorn: III, Friedrichspark: III}, hinweis: "Lage Friedrichspark nicht geprüft"}
+      "84": {klasse: null, zuordnung: gemischt, teile: {Fahrland: II, Kaserne Krampnitz: II, Krampnitz Ort: III, Kartzow: III}}
+      "85": {klasse: II, zuordnung: eindeutig, hinweis: "Campus Jungfernsee (II) vermutlich hier oder in Nedlitz, nicht geprüft"}
+      "86": {klasse: null, zuordnung: gemischt, teile: {Groß Glienicke: II, Waldsiedlung Groß Glienicke: III}}
 # A4 Ende
 
 # ---------------------------------------------------------------------------------- Nahversorgung
 nahversorgung:
+  # Werte aus der Erkundung (Fundstelle nicht selbst gelesen). Gebraucht erst mit OSM-Märkten (A3, *_odbl).
   quelle: "Einzelhandelskonzept (EHK) Landeshauptstadt Potsdam 2014"
   geprueft: null
   methode: luftlinie
@@ -64,7 +145,7 @@ schulweg:
   quelle: "Schülerfahrtkostensatzung Landeshauptstadt Potsdam 2016"
   geprueft: null
   methode: luftlinie
-  hinweis: "Anspruchsschwelle für die Fahrtkostenerstattung, kein Versorgungsrichtwert"
+  hinweis: "Anspruchsschwelle für die Fahrtkostenerstattung, kein Versorgungsrichtwert. Wert und Messart (Luftlinie oder Schulweg) stammen aus der Erkundung, die Satzung ist nicht selbst gelesen."
   primarstufe_km: {wert: 2.0, status: amtlich}
   sek1_km: {wert: 4.5, status: amtlich}
   sek2_km: {wert: 6.0, status: amtlich}
@@ -77,28 +158,34 @@ kita:
   hinweis: "In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind auf die Raumeinheit beziehen, nicht auf einen Radius."
   radius_orientierung_m: {wert: 500, status: orientierung}
   platz_kind_relation:
-    plaetze: "Kapazität laut MBJS (Betriebserlaubnis), nicht belegte Plätze; je id_kita einmal"
+    plaetze: "Kapazität laut MBJS (Betriebserlaubnis), nicht belegte Plätze; je id_kita einmal (weitere Häuser ohne Plätze)"
     kinder_krippe_kita: "Zensus i_u3 + i_3_5"
     kinder_hort: "Zensus i_6_9"
-    kombinierte_einrichtungen: "Kapazität nach altersstruktur aufteilen oder getrennt ausweisen (Prüfbericht 9)"
+    kombinierte_einrichtungen: "Kapazität nicht nach Altersbereich aufteilbar. A6 weist drei Kennzahlen aus: Kita ohne Hortanteil gegen Kinder unter 6, reine Horte gegen 6 bis 9, alle Plätze gegen den Bedarf nach Baulandmodell (Prüfbericht 9)"
     tagespflege: "fehlt bewusst (personenbezogen); unterschätzt die Versorgung unter 3 Jahren"
   versorgungsquoten:
-    # Potsdamer Kita-Bedarfsplanung bzw. Baulandmodell; Werte noch nicht gelesen
-    quelle: "Integrierte Kita- und Schulentwicklungsplanung 2021–2026; Potsdamer Baulandmodell, Fortschreibung 2019, Anlage B"
-    krippe: {wert: null, status: offen}
-    kita: {wert: null, status: offen}
-    hort: {wert: null, status: offen}
+    # Die Quoten des Kita-Bedarfsplans 2016 stehen (um Kapazitätsreserven vermindert) im Baulandmodell, Anlage C.
+    # Werte nur dort führen, nicht doppelt.
+    siehe: baulandmodell.quoten
 
 baulandmodell:
-  # Prüfbericht 8: Versorgungsquoten für Krippe, Kita, Hort und Grundschule je Wohneinheit (Potsdamer Norm für Gemeinbedarf)
-  quelle: "Potsdamer Baulandmodell, Fortschreibung 2019, Anlage B"
-  url: https://potsdam.de/system/files/documents/anlage1potsdamerbaulandmodell-fortschreibung2019.pdf
-  geprueft: null
-  je_wohneinheit:
-    krippe: {wert: null, status: offen}
-    kita: {wert: null, status: offen}
-    hort: {wert: null, status: offen}
-    grundschule: {wert: null, status: offen}
+  # Prüfbericht 8. Gelesen am 05.11.2026 (Paket A6) im PDF $KIEZ_DATEN/baulandmodell/2019/ (sha256 79788c1e…, HERKUNFT.md).
+  # Die Quoten gelten je Altersjahrgang (Anlage C), nicht je Wohneinheit; je Wohneinheit rechnet nur Nr. 3.4.3 für Neubau.
+  quelle: "Richtlinie zur sozialgerechten Baulandentwicklung in der Landeshauptstadt Potsdam (Potsdamer Baulandmodell 2019), Stand 20.11.2019"
+  url: https://www.potsdam.de/system/files/documents/anlage1potsdamerbaulandmodell-fortschreibung2019.pdf
+  geprueft: 2026-11-05
+  seite: "Anlage C, S. 38"
+  status: amtlich
+  methode: quote
+  hinweis: "Rechnerischer Bedarf: Die Quoten des Kita-Bedarfsplans (SVV Dezember 2016) sind um Kapazitätsreserven vermindert (Hinweis zu Anlage C), bei der Fortschreibung 2019 bestätigt. Plätze und Prognose werden je Planungsraum abgeglichen, angrenzende Planungsräume zählen mit (Nr. 3.4.4, S. 14–15)."
+  quoten:
+    krippe: {alter_von: 0, alter_bis_unter: 3, quote_prozent: 75}
+    kindergarten: {alter_von: 3, alter_bis_unter: 6, quote_prozent: 100}
+    hort: {alter_von: 6, alter_bis_unter: 12, quote_prozent: 70}
+    grundschule: {alter_von: 6, alter_bis_unter: 12, quote_prozent: 100}
+  # Zensus 2022 hat 6–9 und 10–15 Jahre (infrastrukturelle Altersgruppen). 6 bis unter 12 = i_6_9 plus der Anteil
+  # 10–11 an i_10_15, geschätzt als gleich verteilt (2 von 6 Jahrgängen). Eigene Festlegung von A6, steht an jedem Wert.
+  zensus_6_bis_unter_12: {i_6_9: 1.0, i_10_15: 0.3333}
 
 # ---------------------------------------------------------------------------------- Spielplatz
 spielplatz:
@@ -107,6 +194,7 @@ spielplatz:
 
 # ---------------------------------------------------------------------------------- Grün
 gruen:
+  # Die Methode stammt aus Berlin, nicht aus Potsdam. In planer.js deshalb status orientierung, Text „Berliner Methode“.
   quelle: "Umweltatlas Berlin, Versorgung mit öffentlichen, wohnungsnahen Grünanlagen 2020 (Methode)"
   url: https://www.berlin.de/umweltatlas/nutzung/oeffentliche-gruenanlagen/2020/methode/
   geprueft: null
@@ -114,24 +202,77 @@ gruen:
   radius_m: {wert: 500, status: berliner_methode}
   methode: luftlinie
 gruen_definition:
-  # Prüfbericht 14: Was als Grünfläche zählt, entscheidet A2 mit A6 und trägt es hier ein (status bleibt offen bis dahin)
-  status: offen
+  # Prüfbericht 14. Festgelegt von A6 am 05.11.2026: Es zählen Grünanlage und Park aus der ALKIS-Nutzung (Vorschlag A2,
+  # so von A5a gerechnet). Nicht gezählt: Erholungs- und Freizeitflächen, Kleingärten, Friedhöfe, Wald, Straßengrün.
+  # Abweichungen von der Berliner Methode: keine Mindestgröße (ALKIS vereinfacht ohne Namen, SPSG-Parks nicht
+  # trennbar, sie zählen also mit) und Einwohner im Kreis statt Einzugsbereich. Ändert jemand ein zaehlt-Flag,
+  # muss A5a (skripte/14_erreichbarkeit.py) neu laufen.
+  status: festgelegt
+  festgelegt: 2026-11-05
   quelle_daten: "public.alkis_nutzung (ALKIS vereinfacht, ave:Nutzung)"
   vorschlag_zaehlt: {nutzart: ["Sport-, Freizeit- und Erholungsfläche"], bez: ["Grünanlage", "Park"]}
   vorschlag_getrennt: {bez: ["Kleingarten", "Friedhof"], nutzart: ["Wald"]}
   mindestflaeche_m2: null
-  offen: "SPSG-Parks (Sanssouci, Neuer Garten, Babelsberg) zählen mit oder getrennt? Straßengrün? Spielplätze stehen nicht in bez (Abfrage 05.11.2026)."
+  offen: "SPSG-Parks (Sanssouci, Neuer Garten, Babelsberg) lassen sich in ALKIS vereinfacht nicht abgrenzen und zählen mit. Straßengrün nicht enthalten. Spielplätze stehen nicht in bez (Abfrage 05.11.2026)."
+  # Ergänzt von A2 (05.11.2026): Zuordnung ALKIS-Nutzung → auswertung.gruenflaeche.art. skripte/11_einrichtungen.py
+  # liest nur `arten`, skripte/14_erreichbarkeit.py liest `zaehlt_vorschlag` (nur true zählt).
+  # Befunde: ALKIS vereinfacht führt bei Parks keinen Namen (SPSG-Parks nicht kennzeichenbar); größte Park-Objekte
+  # 90 und 85 ha; Straßengrün steckt in „Straßenverkehr / Begleitfläche Straßenverkehr“ und ist nicht aufgenommen.
+  arten:
+    gruenanlage: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Grünanlage", zaehlt_vorschlag: true}
+    park: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Park", zaehlt_vorschlag: true}
+    freizeit: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: ["Erholungsfläche", "Freizeitanlage"],
+               zaehlt_vorschlag: false, entscheidung: "A6 05.11.2026: nicht gezählt (Erholungs- und Freizeitanlagen sind nicht durchweg öffentliche Grünanlagen)"}
+    kleingarten: {nutzart: "Sport-, Freizeit- und Erholungsfläche", bez: "Kleingarten", zaehlt_vorschlag: false}
+    friedhof: {nutzart: "Friedhof", zaehlt_vorschlag: false}
+    wald: {nutzart: "Wald", zaehlt_vorschlag: false}
 
 # ---------------------------------------------------------------------------------- Ärzte, Pflege
 gesundheit:
   hinweis: "Die KV plant auf Mittelbereichsebene, OSM ist ohne Kapazität: nur Entfernung und Lage, keine Versorgungsaussage (Prüfbericht 13)"
   versorgungsaussage: false
+  arten_nur_lage: [arzt, apotheke, pflege]
 
 # ---------------------------------------------------------------------------------- Prognose
 prognose:
-  # Prüfbericht 8, H11: Bevölkerungsprognose je Planungsraum (Handdownload), Spalte „Prognose 2030/2035“ in A6
+  # Prüfbericht 8, H11: Bevölkerungsprognose je Planungsraum (Handdownload von Andre). skripte/15_planer.py liest die
+  # Datei, sobald sie da ist, und hängt an die Kennzahlen mit Zielgruppe ein Feld `prognose` an.
+  # Erwartete Datei: $KIEZ_DATEN/eingang/prognose_planungsraum.csv, UTF-8, Trennzeichen ;, Kopfzeile
+  #   raum;raumebene;jahr;altersgruppe;personen;quelle
+  #   raum = Planungsraum-Nr. wie in public.planungsraum bzw. Stadtteil-Nr.; raumebene = planungsraum | stadtteil
+  #   (nur Zeilen der aktuellen Raumebene zählen, die anderen werden gemeldet); personen = ganze Zahl,
+  #   mehrere Zeilen je raum/jahr/altersgruppe werden addiert
+  #   altersgruppe = u3 | 3_5 | 6_9 | 6_11 | ges (andere Werte werden ignoriert und gemeldet)
+  datei: eingang/prognose_planungsraum.csv
   quelle: null
+  lizenz: null
   jahre: [2030, 2035]
   status: offen
+
+# ---------------------------------------------------------------------------------- Kennzahlen der Planer-Ebene (A6)
+planer:
+  # Was skripte/15_planer.py je Raumeinheit ausgibt. Zielgruppen aus public.zensus_struktur (A1), Summe der Klassen.
+  zielgruppen:
+    u6: {felder: [i_u3, i_3_5], text: "Kinder unter 6"}
+    u3: {felder: [i_u3], text: "Kinder unter 3"}
+    k6_9: {felder: [i_6_9], text: "Kinder 6 bis 9"}
+    ew: {felder: null, text: "Einwohner"}
+  # Anteil der Zielgruppe mit Einrichtung im Radius (Zellmittelpunkt, Luftlinie, auswertung.zelle_erreichbar)
+  anteil_in_radius:
+    - {art: kita, zielgruppe: u6, richtwert: kita.radius_orientierung_m}
+    - {art: grundschule, zielgruppe: k6_9, richtwert: grundschule.radius_orientierung_m}
+    - {art: grundschule, zielgruppe: k6_9, richtwert: schulweg.primarstufe_km}
+    - {art: gruen, zielgruppe: ew, richtwert: gruen.radius_m}
+  # Einwohner je Standort in der Raumeinheit (nur Lage, keine Kapazität beim Gemeinbedarf)
+  ew_je_einrichtung: [kita, grundschule, bibliothek, sport, feuerwehr, sonstiger_gemeinbedarf,
+                      jugendfreizeit, seniorenfreizeit, buerger_vereinshaus]
+  # ÖPNV: eine Haltestelle mit Bus und Tram gilt als Bushalt (Radius Bus) und als Tramhalt (Radius Tram); erschlossen
+  # ist eine Zelle, wenn einer der beiden Radien greift. SPNV und Fähre haben im NVP keinen Radius und zählen nicht.
+  # Eigene Festlegung A6, steht im Hinweis des Werts.
+  oepnv_verkehrsmittel_mit_radius: [bus, tram]
+  # Werte gelten erst ab dieser Größe der Zielgruppe in der Raumeinheit als aussagefähig (sonst wert null)
+  min_zielgruppe: 20
+  # Erreichbarkeit je Zelle in erreichbar.js auf so viele Meter runden (aussagekräftig rund 50 m, A5a)
+  rundung_meter: 10
 
 geschwindigkeit_fuss_kmh: 4.8
