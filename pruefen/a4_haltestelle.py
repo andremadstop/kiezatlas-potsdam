@@ -52,8 +52,10 @@ def main() -> int:
             fehler.append("stop_id nicht eindeutig")
         for sid, name, f, klasse in db.execute(
                 "SELECT stop_id, name, fahrten_hvz_je_richtung, klasse FROM auswertung.haltestelle"):
+            # Tabellenwert ist auf 0,1 gerundet, 13_oepnv.py ordnet ungerundet ein: an einer Grenze beide Seiten gelten lassen
+            moeglich = {next((k for k, g in grenzen if float(f) + d >= g), "unter III") for d in (-0.05, 0, 0.05)}
             soll = next((k for k, g in grenzen if float(f) >= g), "unter III")
-            if klasse != soll:
+            if klasse not in moeglich:
                 fehler.append(f"{sid} {name}: {f} Fahrten → {soll}, eingetragen {klasse}")
         n = db.execute("SELECT count(*) FROM auswertung.haltestelle WHERE stop_id LIKE 'de:11000:%'").fetchone()[0]
         if n:

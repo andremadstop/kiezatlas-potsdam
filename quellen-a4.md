@@ -28,3 +28,15 @@ Paket A4, 05.11.2026. Führt die Integration (I1) in `QUELLEN.md` zusammen (Zeil
 
 Hinweis für I1: In Zeile 17 von `QUELLEN.md` steht „Erkundung 05.11.2026“. Richtig ist jetzt „gelesen 05.11.2026 (A4),
 Geltung 2019–2023, Nachfolger ungeprüft“.
+
+## Geänderte Schlüssel in `config/richtwerte.yaml` (für A5, A6, I1)
+
+Das Grundgerüst von P0 hatte im Abschnitt `oepnv` andere Schlüssel. Am 05.11.2026 las niemand sie (grep über alle Worktrees).
+
+| vorher (P0) | jetzt (A4) |
+|---|---|
+| `einzugsradius_m.bus.werte: [300, 400, 500]` | `einzugsradius_m.bus: {I: 300, II: 400, III: 500}` (Schlüssel = Gebietsklasse) |
+| `einzugsradius_m.tram.werte: [350, 450]` | `einzugsradius_m.tram: {I: 350, II: 450, III: null}`; neu `spnv`, `faehre` mit `null` |
+| `erschliessung_anteil_prozent.wert: 80` | `erschliessung.anteil_ew_prozent: 80`, `erschliessung.teilflaeche_min_ew: 200` |
+| `taktklassen.<K>.fahrten_hvz_je_richtung_min: null` | Werte 6 / 2 / 1, dazu `soll_hvz` |
+| – | neu: `aktualitaet`, `messung`, `gebietsklassen` (Tab. 4.1 und Zuordnung der 32 Stadtteile) |

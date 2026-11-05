@@ -1,3 +1,4 @@
+# Ausgabe pruefen/a4_haltestelle.py, 05.11.2026. Grundlage: VBB-GTFS, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Daten verändert (eigene Berechnung).
 Haltestellen 315, davon in Potsdam 283, ohne Klasse 0, stop_id eindeutig 315
   Potsdam Klasse I         112
   Potsdam Klasse II        138

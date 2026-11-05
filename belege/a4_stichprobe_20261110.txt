@@ -1,3 +1,5 @@
+# Abfahrten aus dem VBB-GTFS (Fahrplan ab 03.11.2026), Ausgabe von pruefen/a4_stichprobe.py.
+# VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Daten verändert (Auszug, eigene Auswahl).
 
 == de:12054:900230037 Potsdam, Spindelstr.  (2026-11-10, 06:00–09:00)
   06:09  694  1  Potsdam, Küsselstr.  de:12054:900230037::2    

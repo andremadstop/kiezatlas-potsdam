@@ -1,3 +1,4 @@
+# Lauf skripte/13_oepnv.py, 05.11.2026. Grundlage: VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Daten verändert (eigene Berechnung).
 Stichtag Tue 10.11.2026, Fenster 06:00–09:00, 937 Dienste, 71250 Fahrten, 438 Haltestellen mit Abfahrten im Rechteck
   Potsdam  Klasse I          112
   Potsdam  Klasse II         138
