@@ -161,7 +161,7 @@ DOKUMENTE = {
         ),
     },
     "orientierung": {
-        "quelle": "ohne Primärbeleg (Entscheidung E6: Orientierung, kein Richtwert)",
+        "quelle": "ohne Primärbeleg (Orientierung, kein Richtwert)",
         "lizenz": "eigene Festlegung",
         "vermerk": "Orientierungswert ohne Primärbeleg, kein amtlicher Richtwert",
     },
@@ -357,6 +357,26 @@ def lesen(cur) -> dict:
     d["einrichtungen"] = [dict(zip(spalten, r)) for r in cur.fetchall()]
     for e in d["einrichtungen"]:
         e["raum"] = None if e["raum"] is None else str(e["raum"])
+    # Schulen mit Ortsangabe „Potsdam/OT …“, deren Punkt in einem anderen Stadtteil liegt (Geokodierung oder
+    # Interimsstandort, aus den Daten nicht entscheidbar). Betroffen sind die Raumeinheit des Punkts und die des
+    # genannten Ortsteils; dort werden die Grundschulwerte bis zur Klärung nicht ausgewiesen.
+    cur.execute(
+        f"""SELECT e.id, e.name, substr(m.ort, length('Potsdam/OT ') + 1) AS ot, s.name, r.nr,
+                   (SELECT r2.nr FROM {tab} r2 JOIN public.stadtteil s2 ON ST_Contains(r2.geom, ST_PointOnSurface(s2.geom))
+                    WHERE s2.name = substr(m.ort, length('Potsdam/OT ') + 1) LIMIT 1)
+            FROM auswertung.einrichtung e
+            JOIN public.mbjs_schule m ON m.schul_nr = e.id
+            LEFT JOIN public.stadtteil s ON ST_Contains(s.geom, ST_Transform(e.geom, 4326))
+            LEFT JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
+            WHERE m.ort LIKE 'Potsdam/OT %%' AND s.name IS DISTINCT FROM substr(m.ort, length('Potsdam/OT ') + 1)
+            ORDER BY e.id""",
+        par or None,
+    )
+    d["ort_abweichung"] = [
+        {"id": i, "name": n, "ot": ot, "stadtteil": st, "raum": None if r1 is None else str(r1),
+         "raum_ot": None if r2 is None else str(r2)}
+        for i, n, ot, st, r1, r2 in cur.fetchall()
+    ]
     cur.execute("""SELECT stop_id, verkehrsmittel, klasse, ST_X(geom), ST_Y(geom) FROM auswertung.haltestelle""")
     d["haltestellen"] = [
         {"id": s, "vm": set((vm or "").split("+")), "klasse": k, "x": x, "y": y} for s, vm, k, x, y in cur.fetchall()
@@ -729,7 +749,7 @@ def ew_je(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             "kennzahl": "ew_je_einrichtung",
             "art": art,
             "zielgruppe": "Einwohner",
-            "wert": rund(ew / n, r.rd_ew) if n and ew else None,
+            "wert": rund(ew / n, r.rd_ew) if n and ew and ew >= r.min_zg else None,
             "einheit": "Einwohner je Standort",
             "methode": "luftlinie",
             "status": "amtlich",
@@ -738,6 +758,7 @@ def ew_je(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
         }
         txt = [
             (f"{n} Standort in der Raumeinheit." if n == 1 else f"{n} Standorte in der Raumeinheit.")
+            + (f" Weniger als {r.min_zg} Einwohner: keine belastbare Relation." if n and ew < r.min_zg else "")
             if n
             else "Kein Standort in der Raumeinheit.",
             f"Einwohner auf {r.rd_ew} gerundet.",
@@ -807,13 +828,17 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
         else:
             w["wert"] = None
             txt = "Keine Gebietsklasse zugeordnet (" + (gk.get("hinweis") or "offen") + "). "
+        klein = oepnv_kleinraum(r, raum, w)
         w["unsicherheit"] = (
-            txt + basis + zusatz + " NVP-Geltung 2019 bis 2023, Nachfolger ungeprüft." + r.neubau(raum, ebene)
+            klein + txt + basis + zusatz + NVP_GELTUNG + r.neubau(raum, ebene)
         ).strip()
         aus.append(w)
     return aus
 
 
+NVP_GELTUNG = (
+    " NVP-Geltung 2019 bis 2023 abgelaufen, Nachfolger ungeprüft: deshalb Orientierung, kein geltender Richtwert."
+)
 OEPNV_KENNZAHLEN = (
     ("oepnv_erschliessung", False, ""),
     (
@@ -842,12 +867,20 @@ def oepnv_rahmen(r: Rechner, raum: str) -> tuple[dict, str]:
         f"{o['erschliessung']['teilflaeche_min_ew']} EW, hier die ganze Raumeinheit. Brandenburger Haltestellen "
         "bis 1 km außerhalb zählen mit, Berliner nicht. Anteil der Einwohner, ganzzahlig."
     )
-    if r.ew_roh[raum] <= o["erschliessung"]["teilflaeche_min_ew"]:
-        basis += (
-            f" Raumeinheit mit höchstens {o['erschliessung']['teilflaeche_min_ew']} EW: "
-            "der NVP fordert hier keine Erschließung."
-        )
     return rwobj, basis
+
+
+def oepnv_kleinraum(r: Rechner, raum: str, w: dict) -> str:
+    """Raumeinheit mit höchstens teilflaeche_min_ew Zensus-Einwohnern: kein Wert. Der NVP bewertet Teilflächen über
+    dieser Schwelle; aus dem Zensus-Stichtag 2022 folgt keine Aussage, dass er hier keine Erschließung fordert."""
+    grenze = r.rw["oepnv"]["erschliessung"]["teilflaeche_min_ew"]
+    if r.ew_roh[raum] > grenze:
+        return ""
+    w["wert"] = None
+    return (
+        f"Raumeinheit mit höchstens {grenze} Einwohnern laut Zensus 2022: kein Wert, die Einwohnerbasis ist zu klein "
+        "bzw. veraltet (Neubau nach dem Stichtag fehlt). "
+    )
 
 
 def oepnv_wert(r: Rechner, kennzahl: str, rwobj: dict) -> dict:
@@ -857,7 +890,8 @@ def oepnv_wert(r: Rechner, kennzahl: str, rwobj: dict) -> dict:
         "zielgruppe": "Einwohner",
         "einheit": "%",
         "methode": "luftlinie",
-        "status": "amtlich",
+        # NVP 2019 mit gelesener Fundstelle, aber Geltung 2019 bis 2023 abgelaufen: Orientierung
+        "status": "orientierung",
         "richtwert": rwobj,
         "q": "vbb",
         "stand": f"Einwohner: {r.stand_zensus}; Fahrplan Stichtag 10.11.2026",
@@ -928,9 +962,9 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
                     f"Spanne über die möglichen Klassen der gemischten Stadtteile ({prozent(n2, ew_ges)} % der "
                     f"Einwohner): {prozent(unten, n2)} bis {prozent(oben, n2)} %. "
                 )
+        klein = oepnv_kleinraum(r, raum, w)
         w["unsicherheit"] = (
-            txt + grund + basis + zusatz + " NVP-Geltung 2019 bis 2023, Nachfolger ungeprüft."
-            + r.neubau(raum, "planungsraum")
+            klein + txt + grund + basis + zusatz + NVP_GELTUNG + r.neubau(raum, "planungsraum")
         ).strip()
         aus.append(w)
     return aus
@@ -1089,6 +1123,11 @@ def einrichtungen_datei(d: dict) -> dict:
         "hinweis": (
             "Kitas, Horte und Schulen laut MBJS (Plätze je Kita einmal am Hauptstandort, weitere Häuser "
             "ohne Plätze), Gemeinbedarf aus ALKIS nur als Lage ohne Kapazität. Ohne Adresse und Kontakt."
+            + "".join(
+                f" {a['name']} (MBJS {a['id']}): Ortsangabe „Potsdam/OT {a['ot']}“, Lage laut Koordinaten im "
+                f"Stadtteil {a['stadtteil'] or 'außerhalb'}; ungeklärt."
+                for a in d.get("ort_abweichung", [])
+            )
         ),
         "quellen": {k: QUELLEN[k] for k in ("mbjs", "lgb")},
         "features": feats,
@@ -1115,6 +1154,33 @@ def einrichtungen_odbl_datei(d: dict) -> dict | None:
     }
 
 
+GS_KENNZAHLEN = {("anteil_in_radius", "grundschule"), ("schueler_je_kind", "grundschule"),
+                 ("ew_je_einrichtung", "grundschule")}
+
+
+def ort_abweichung_anwenden(d: dict, raeume: dict, meldungen: list) -> None:
+    """Grundschulwerte in Raumeinheiten sperren, die eine Schule mit widersprüchlicher Ortsangabe betrifft."""
+    for a in d.get("ort_abweichung", []):
+        betroffen = sorted({x for x in (a["raum"], a["raum_ot"]) if x and x in raeume})
+        if not betroffen:
+            continue
+        lage = " und ".join(f"{nr} {raeume[nr]['name']}" for nr in betroffen)
+        txt = (
+            f"Bis zur Klärung kein Wert: Die {a['name']} (MBJS {a['id']}) hat die Ortsangabe „Potsdam/OT {a['ot']}“, "
+            f"liegt laut Koordinaten aber im Stadtteil {a['stadtteil'] or 'außerhalb'}. Ob die Quelle falsch verortet "
+            f"oder es ein Interimsstandort ist, ist offen; betroffen sind die Raumeinheiten {lage}. "
+        )
+        n = 0
+        for nr in betroffen:
+            for w in raeume[nr]["werte"]:
+                if (w["kennzahl"], w["art"]) in GS_KENNZAHLEN:
+                    w["wert"] = None
+                    w["unsicherheit"] = txt + w["unsicherheit"]
+                    n += 1
+        meldungen.append(f"Ortsangabe widerspricht Lage: MBJS {a['id']} ({a['ot']} ≠ {a['stadtteil']}), "
+                         f"{n} Grundschulwerte in {', '.join(betroffen)} gesperrt")
+
+
 def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldungen: list) -> dict | None:
     if methode == "fussweg" and not d["erreichbar"]["fussweg"]:
         return None
@@ -1125,6 +1191,7 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         werte = kennzahlen_luftlinie(r, nr, ebene) if methode == "luftlinie" else kennzahlen_fussweg(r, nr, ebene)
         prognose_anhaengen(werte, nr, prog)
         raeume[nr] = {"name": name, "ew": rund(r.ew_roh[nr], r.rd_ew), "werte": werte}
+    ort_abweichung_anwenden(d, raeume, meldungen)
     meldungen.append(
         f"{methode}: {len(raeume)} Raumeinheiten, {sum(len(x['werte']) for x in raeume.values())} Werte, "
         f"{r.geheim_null} Werte wegen Geheimhaltung null"
@@ -1145,9 +1212,9 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         "Kinder und Einwohner: Zensus 2022, Stichtag 15.05.2022; Neubaugebiete danach (u. a. Krampnitz, "
         "Bornstedter Feld, Golm) fehlen. Einwohner auf "
         f"{rw['geheimhaltung']['rundung_ew']} gerundet; Werte aus feinen Altersklassen nur bei Raumeinheiten ab "
-        f"{rw['geheimhaltung']['min_ew_raumeinheit']} Einwohnern. Status amtlich: Maßstab aus einem Potsdamer "
+        f"{rw['geheimhaltung']['min_ew_raumeinheit']} Einwohnern. Status amtlich: Maßstab aus einem geltenden Potsdamer "
         "Dokument mit gelesener Fundstelle bzw. bei Werten ohne Maßstab nur amtliche Daten; orientierung: "
-        "Maßstab ohne Primärbeleg, ungelesene Fundstelle oder Berliner Methode."
+        "Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung (NVP 2019) oder Berliner Methode."
     )
     if methode == "luftlinie":
         hinweis += " Fußweg-Werte stehen in einer eigenen Datei unter eigener Lizenz."

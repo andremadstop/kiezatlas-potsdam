@@ -105,13 +105,21 @@ def main() -> int:
     pruef(set(E["werte"]) == set(E["arten"]), "erreichbar.js: Werte nur je Einrichtungsart, keine Strukturfelder")
 
     print("A6-3 Status orientierung, wo der Maßstab keine gelesene Potsdamer Fundstelle hat")
-    amtlich_dok = {"nvp", "baulandmodell"}
+    amtlich_dok = {"baulandmodell"}  # NVP 2019: Fundstelle gelesen, Geltung bis 2023 abgelaufen → orientierung
     falsch = [
         (nr, w["kennzahl"], w["art"])
         for nr, _, w in werte(P)
         if "richtwert" in w and (w["richtwert"]["q"] in amtlich_dok) != (w["status"] == "amtlich")
     ]
     pruef(not falsch, f"Status passt zum Dokument des Richtwerts ({len(falsch)} Abweichungen {falsch[:3]})")
+    norm = [(nr, w["kennzahl"]) for nr, _, w in werte(P) if "fordert hier keine" in (w.get("unsicherheit") or "")]
+    pruef(not norm, f"keine Normaussage „NVP fordert hier keine Erschließung“ ({norm[:3]})")
+    klein = [
+        (nr, w["kennzahl"])
+        for nr, r, w in werte(P)
+        if w["art"] == "oepnv" and w.get("wert") is not None and "höchstens 200 Einwohnern" in w["unsicherheit"]
+    ]
+    pruef(not klein, f"ÖPNV-Werte in Raumeinheiten bis 200 EW ohne Wert ({klein[:3]})")
     orient_werte = {
         (rw["kita"]["radius_orientierung_m"]["wert"], "kita"),
         (rw["grundschule"]["radius_orientierung_m"]["wert"], "grundschule"),

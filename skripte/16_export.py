@@ -502,6 +502,26 @@ def titel_kennzahl(w: dict) -> str:
     return f"{k} ({art})"
 
 
+# Quoten je Raumeinheit ohne Entfernungsbezug: Messart „raumeinheit“ statt „luftlinie“ im Export
+OHNE_WEG = {"plaetze_je_kind", "plaetze_je_bedarf", "schueler_je_kind", "ew_je_einrichtung"}
+
+
+def methode_export(w: dict) -> str | None:
+    return "raumeinheit" if w["kennzahl"] in OHNE_WEG else w.get("methode")
+
+
+def status_text(w: dict) -> str:
+    """Abzeichentext wie im Planer (planer.js statusText)."""
+    if w.get("status") == "orientierung":
+        return "Orientierung, kein Richtwert"
+    return "amtlicher Maßstab" if w.get("richtwert") else "amtliche Daten, kein Maßstab"
+
+
+def datum_de(iso: str) -> str:
+    teile = str(iso).split("-")
+    return ".".join(reversed(teile)) if len(teile) == 3 else str(iso)
+
+
 def richtwert_text(w: dict, quellen: dict) -> str:
     rw = w.get("richtwert")
     if not rw:
@@ -912,7 +932,7 @@ def steckbrief(
         q = quellen.get(w.get("q"), {})
         status = escape(w.get("status") or "")
         zeilen.append(
-            f'<tr><td><b>{escape(titel)}</b><br><span class="status {status}">{status}'
+            f'<tr><td><b>{escape(titel)}</b><br><span class="status {status}">{escape(status_text(w))}'
             f'{zusatz}</span><br><span class="hinweis">{escape(w.get("unsicherheit") or "")}</span></td>'
             f'{wert_html}<td class="hinweis">{escape(richtwert_text(w, quellen))}</td>'
             f'<td class="hinweis">{escape(q.get("quelle", w.get("q", "")))}<br>'
@@ -958,7 +978,7 @@ def steckbrief(
 <h1><span class="nr">{escape(nr)}</span>{escape(raum["name"])}</h1>
 <p class="lede">{escape(ebene_text)} der Landeshauptstadt Potsdam. Versorgung mit Kita, Schule, Gemeinbedarf, ÖPNV
 und Grün in Luftlinie, berechnet aus offenen amtlichen Daten. Jeder Wert steht mit Status, Maßstab, Quelle und
-Unsicherheit. Stand der Auswertung {escape(planer["stand"])}.</p>
+Unsicherheit. Stand der Auswertung {escape(datum_de(planer["stand"]))}.</p>
 <div class="zahlen">
 <div><b>{zahl(raum["ew"])}</b><span>Einwohner (Zensus 15.05.2022, auf 10 gerundet)</span></div>
 <div><b>{zahl(kopf_zahlen["km2"])}</b><span>Fläche in km²</span></div>
@@ -981,9 +1001,10 @@ EPSG:25833.</figcaption></figure>
 <p class="hinweis">Plätze laut Betriebserlaubnis (MBJS), je Kita einmal am Hauptstandort. Gemeinbedarf aus
 ALKIS-Gebäudefunktionen nur als Lage, ohne Kapazität. Ohne Adressen.</p>
 <h2>Lesehilfe</h2>
-<p class="hinweis"><b>amtlich</b>: Maßstab aus einem Potsdamer Dokument mit gelesener Fundstelle, bei Werten ohne
-Maßstab nur amtliche Daten. <b>orientierung</b>: Maßstab ohne Primärbeleg, ungelesene Fundstelle oder Berliner
-Methode, kein Richtwert. <b>vorläufig</b>: Grundschulwerte ohne Schulbezirk. <b>keine Aussage</b>: der Grund
+<p class="hinweis"><b>amtlicher Maßstab</b>: Maßstab aus einem geltenden Potsdamer Dokument mit gelesener
+Fundstelle. <b>amtliche Daten, kein Maßstab</b>: Zahl aus amtlichen Quellen, für die es keine Norm gibt.
+<b>Orientierung, kein Richtwert</b>: Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung
+(Nahverkehrsplan 2019) oder Berliner Methode. <b>vorläufig</b>: Grundschulwerte ohne Schulbezirk. <b>keine Aussage</b>: der Grund
 steht im ersten Satz des Hinweises daneben. Einwohner und Kinder stammen aus dem
 Zensus 2022 (Stichtag 15.05.2022, Cell-Key-Verfahren: kleine Werte sind verändert, Summen vieler Zellen weichen
 ab); Neubau danach fehlt. Entfernungen in Luftlinie vom Zellmittelpunkt, aussagekräftig auf rund 50 m.
@@ -992,7 +1013,7 @@ Aussage.</p>
 <h2>Quellen und Lizenzen</h2>
 <ul class="quellen">{q_html}</ul>
 <p class="fuss">Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt). Erzeugt mit
-skripte/16_export.py aus daten/planer.js (Stand {escape(planer["stand"])}). Daten zum Weiterverwenden:
+skripte/16_export.py aus daten/planer.js (Stand {escape(datum_de(planer["stand"]))}). Daten zum Weiterverwenden:
 kiezatlas_potsdam.gpkg und csv/ im selben Ordner wie dieser Steckbrief, Beschreibung in README.md.</p>
 </div></body></html>
 """  # noqa: E501
@@ -1193,6 +1214,15 @@ def main() -> int:
         ("prognose", "TEXT"),
     ]
 
+    def vermerk_zeile(w: dict, q: dict, quellen: dict) -> str | None:
+        """Vermerk der Einrichtungs- bzw. Datenquelle; jede Kennzahl ist gegen Zensus-Einwohner oder -Zielgruppen
+        gerechnet, deshalb steht der Zensus-Vermerk immer mit dabei (dl-de/by-2-0 Namensnennung)."""
+        teile = [q.get("vermerk")] if q.get("vermerk") else []
+        z = (quellen.get("zensus") or {}).get("vermerk") or VERMERK["zensus"]
+        if w.get("q") != "zensus" and z not in teile:
+            teile.append(z)
+        return "; ".join(teile) or None
+
     def versorgung_zeilen(pl: dict) -> list[list]:
         aus = []
         for nr, r in pl["raeume"].items():
@@ -1211,7 +1241,7 @@ def main() -> int:
                         w.get("zielgruppe"),
                         w.get("wert"),
                         w.get("einheit"),
-                        w.get("methode"),
+                        methode_export(w),
                         w.get("status"),
                         bool(w.get("vorlaeufig", False)),
                         rwt.get("wert"),
@@ -1221,7 +1251,7 @@ def main() -> int:
                         w.get("unsicherheit"),
                         q.get("quelle", w.get("q")),
                         w.get("stand"),
-                        q.get("vermerk"),
+                        vermerk_zeile(w, q, pl["quellen"]),
                         json.dumps(w["prognose"], ensure_ascii=False) if w.get("prognose") else None,
                     ]
                 )
@@ -1697,9 +1727,14 @@ Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht un
 - **ÖPNV:** Die Gebietsklasse des Nahverkehrsplans gilt für Ortsteile; jede Zelle bekommt die Klasse ihres
   Stadtteils. Zellen mit gemischter oder offener Klasse zählen nicht mit; wohnt dort mehr als die Hälfte der
   Einwohner einer Raumeinheit, steht statt eines Werts ein Hinweis in `unsicherheit`.
-- **Status:** `amtlich` = Maßstab aus einem Potsdamer Dokument mit gelesener Fundstelle, bei Werten ohne Maßstab
-  nur amtliche Daten. `orientierung` = Maßstab ohne Primärbeleg, Fundstelle nicht gelesen oder Berliner Methode;
-  kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
+- **Status:** `amtlich` mit `richtwert` = amtlicher Maßstab aus einem geltenden Potsdamer Dokument mit gelesener
+  Fundstelle; `amtlich` ohne `richtwert` = amtliche Daten, kein Maßstab. `orientierung` = Maßstab ohne
+  Primärbeleg, Fundstelle nicht gelesen, abgelaufene Geltung (Nahverkehrsplan 2019, Geltung bis 2023) oder
+  Berliner Methode; kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
+- **Methode:** `luftlinie` = Entfernung bzw. Radius in Luftlinie; `raumeinheit` = Quote je Raumeinheit ohne
+  Entfernungsbezug (Plätze je Kind, Plätze je Bedarfsplatz, Schüler je Kind, Einwohner je Standort).
+- **Vermerk:** `vermerk` nennt die Quelle der Einrichtungen bzw. Daten und immer den Zensus, weil jede Kennzahl
+  gegen Zensus-Einwohner oder -Zielgruppen gerechnet ist.
 - **Kita:** Kapazität laut Betriebserlaubnis, nicht Belegung; Kinder 2022, Plätze 2026. Tagespflege fehlt.
 - **Grün:** vereinfachte Berliner Methode (Grünanlagen und Parks aus ALKIS im 500-m-Kreis je Einwohner), ohne
   Mindestgröße; SPSG-Parks lassen sich nicht abgrenzen und zählen mit.

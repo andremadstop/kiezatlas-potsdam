@@ -101,6 +101,12 @@ var KENNZAHL = {
 function kennzahlText(w) { return KENNZAHL[w.kennzahl] ? KENNZAHL[w.kennzahl](w) : wort(w.kennzahl) + ", " + art(w.art).kurz; }
 function zahl(v) { return v == null ? "k. A." : (Math.abs(v) < 10 && v % 1 ? zahl2 : fmt1).format(v).replace(/,0$/, ""); }
 var METHODE = { luftlinie: "Luftlinie", fussweg: "Fußweg" };
+// Flächenquoten je Raumeinheit haben keinen Entfernungsbezug: dort kein Etikett zur Messart
+var OHNE_WEG = { plaetze_je_kind: 1, plaetze_je_bedarf: 1, schueler_je_kind: 1, ew_je_einrichtung: 1 };
+function wegText(w) { return OHNE_WEG[w.kennzahl] ? "" : (METHODE[w.methode] || w.methode); }
+// Status: amtlich mit Richtwert = amtlicher Maßstab; amtlich ohne Richtwert = nur amtliche Daten
+function statusText(w) { return w.status === "orientierung" ? "Orientierung, kein Richtwert" : w.richtwert ? "amtlicher Maßstab" : "amtliche Daten, kein Maßstab"; }
+function statusKlasse(w) { return w.status === "orientierung" ? "orientierung" : w.richtwert ? "amtlich" : "daten"; }
 var NUR_LAGE = { arzt: 1, apotheke: 1, pflege: 1, spielplatz: 1, supermarkt: 1 };
 
 if (SEITE === "methode") { methode(); return; }
@@ -281,7 +287,10 @@ function zuBauen() {
   });
   document.querySelectorAll('#weg input').forEach(function (r) {
     r.checked = r.value === S.weg;
-    if (r.value === "fuss" && !FUSS_DA) { r.disabled = true; r.parentNode.classList.add("chip--aus"); r.parentNode.title = "Fußweg folgt: Der OpenStreetMap-Auszug für das Wegenetz ist noch nicht eingebunden."; }
+    if (r.value === "fuss" && !FUSS_DA) {
+      r.disabled = true; r.parentNode.classList.add("chip--aus"); r.parentNode.title = "Fußweg folgt: Der OpenStreetMap-Auszug für das Wegenetz ist noch nicht eingebunden.";
+      var sp = r.parentNode.querySelector("span"); if (sp) sp.textContent = "Fußweg folgt";   // Sperre sichtbar, nicht nur im title (Touch)
+    }
   });
 }
 $("zu").addEventListener("change", function (e) { if (e.target.name === "zu") { S.zu = e.target.value; zuAnwenden(); } });
@@ -338,7 +347,7 @@ function legende() {
   var d = window[S.weg === "fuss" ? "KIEZ_ERREICHBAR_FUSS" : "KIEZ_ERREICHBAR"];
   if (S.zu && d && map.getLayoutProperty("zellen", "visibility") === "visible") {
     var k = d.einheit === "min" ? KL_MIN : KL_M, ein = d.einheit === "min" ? "min" : "m";
-    L.appendChild(el("p", "legende__titel", "Entfernung zur nächsten " + art(S.zu).kurz));
+    L.appendChild(el("p", "legende__titel", "Entfernung zur nächsten " + art(S.zu).kurz + " · " + METHODE[d.methode]));
     L.appendChild(el("p", "legende__weg", METHODE[d.methode] + ", " + ein + " je bewohnter 100-m-Zelle"));
     var st = el("div", "stufen stufen--flach"); st.setAttribute("aria-hidden", "true");
     T.STUFEN.forEach(function (f) { var x = el("span"); x.style.background = f; st.appendChild(x); }); L.appendChild(st);
@@ -440,16 +449,18 @@ function versorgung() {
   var ul = el("ul", "vs-liste"); ul.setAttribute("aria-label", "Versorgung " + p.name);
   R.werte.forEach(function (w) {
     var li = el("li", "vs-zeile" + (w.status === "orientierung" ? " vs-zeile--orientierung" : ""));
+    li.dataset.kennzahl = w.kennzahl;
     li.appendChild(el("h3", "vs-titel", kennzahlText(w)));
     var z = el("p", "vs-wert"); z.appendChild(el("span", "vs-zahl", w.wert == null ? "k. A." : zahl(w.wert) + NB + w.einheit));
-    z.appendChild(el("span", "marke-weg", METHODE[w.methode] || w.methode)); li.appendChild(z);
+    if (wegText(w)) z.appendChild(el("span", "marke-weg", wegText(w)));
+    li.appendChild(z);
     var st = el("p", "vs-status");
-    st.appendChild(el("span", "abzeichen abzeichen--" + w.status, w.status === "orientierung" ? "Orientierung, kein Richtwert" : "amtlicher Maßstab"));
+    st.appendChild(el("span", "abzeichen abzeichen--" + statusKlasse(w), statusText(w)));
     if (w.vorlaeufig) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", "vorläufig, ohne Schulbezirk"));
     if (NUR_LAGE[w.art]) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", "nur Lage, keine Versorgungsaussage"));
     li.appendChild(st);
     if (w.richtwert) {
-      var rw = el("p", "vs-richt", (w.status === "orientierung" ? "Orientierungswert: " : "Richtwert: ") + zahl(w.richtwert.wert) + NB + w.richtwert.einheit + " " + (METHODE[w.methode] || ""));
+      var rw = el("p", "vs-richt", (w.status === "orientierung" ? "Orientierungswert: " : "Richtwert: ") + zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : ""));
       rw.appendChild(el("sup", null, "[" + qnr(w.richtwert.q) + "]")); if (w.richtwert.seite) rw.appendChild(document.createTextNode(", " + w.richtwert.seite)); li.appendChild(rw);
     }
     var q = el("p", "vs-q"); q.appendChild(document.createTextNode("Quelle [" + qnr(w.q) + "] " + ((P.quellen[w.q] || {}).quelle || w.q) + ". Stand: " + w.stand + ". " + w.unsicherheit));
@@ -600,7 +611,7 @@ function methode() {
     var gesehen = {}, zeilen = [];
     Object.keys(P.raeume).forEach(function (k) {
       P.raeume[k].werte.forEach(function (w) {
-        var key = [w.kennzahl, w.art, w.status, w.richtwert ? w.richtwert.wert + w.richtwert.einheit : "-"].join("|");
+        var key = [w.kennzahl, w.art, statusKlasse(w), w.richtwert ? w.richtwert.wert + w.richtwert.einheit : "-"].join("|");
         if (gesehen[key]) return; gesehen[key] = 1; zeilen.push(w);
       });
     });
@@ -610,8 +621,8 @@ function methode() {
     zeilen.forEach(function (w) {
       var tr = el("tr");
       tr.appendChild(el("td", null, kennzahlText(w)));
-      tr.appendChild(el("td", null, w.richtwert ? zahl(w.richtwert.wert) + NB + w.richtwert.einheit + " " + (METHODE[w.methode] || "") : "ohne festen Wert"));
-      tr.appendChild(el("td", null, (w.status === "orientierung" ? "Orientierung, kein Richtwert" : "amtlicher Maßstab") + (w.vorlaeufig ? "; vorläufig, ohne Schulbezirk" : "")));
+      tr.appendChild(el("td", null, w.richtwert ? zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : "") : "ohne festen Wert"));
+      tr.appendChild(el("td", null, statusText(w) + (w.vorlaeufig ? "; vorläufig, ohne Schulbezirk" : "")));
       var td = el("td"), Q = P.quellen[(w.richtwert || w).q] || { vermerk: (w.richtwert || w).q };
       td.appendChild(vermerkKnoten(Q.vermerk)); if (w.richtwert && w.richtwert.seite) td.appendChild(document.createTextNode(", " + w.richtwert.seite));
       // Maßstab aus einem Dokument ohne Lizenz: dazu die Quelle der Daten mit ihrem Vermerk (Lizenz)

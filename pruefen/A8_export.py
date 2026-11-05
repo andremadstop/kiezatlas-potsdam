@@ -462,9 +462,18 @@ def main() -> int:
         ),
         "einrichtung: Quellen nur mbjs und lgb (Fixtures: nicht osm)",
     )
+    vsp = T["versorgung"][0]
+    ohne_weg = {"plaetze_je_kind", "plaetze_je_bedarf", "schueler_je_kind", "ew_je_einrichtung"}
     pruef(
-        all(z[T["versorgung"][0].index("methode")] == "luftlinie" for z in T["versorgung"][1]),
-        "versorgung: Methode nur luftlinie",
+        all(
+            z[vsp.index("methode")] == ("raumeinheit" if z[vsp.index("kennzahl")] in ohne_weg else "luftlinie")
+            for z in T["versorgung"][1]
+        ),
+        "versorgung: Methode luftlinie, Quoten je Raumeinheit raumeinheit",
+    )
+    pruef(
+        all("Zensus 2022" in (z[vsp.index("vermerk")] or "") for z in T["versorgung"][1]),
+        "versorgung: jeder Zeilenvermerk nennt den Zensus 2022",
     )
     osm_csv = [p.name for p in (ziel / "csv").glob("*.csv") if OSM_MUSTER.search(p.read_text(encoding="utf-8-sig"))]
     pruef(not osm_csv, f"csv/: kein OSM-Wert ({osm_csv})")

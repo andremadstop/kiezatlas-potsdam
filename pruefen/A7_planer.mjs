@@ -76,7 +76,12 @@ async function zahlenPruefen(page) {
     document.querySelectorAll(".vs-zeile").forEach((z) => {
       out.zeilen++;
       const q = z.querySelector(".vs-q"); if (!q || !/Quelle \[\d+\]/.test(q.textContent)) out.ohneQuelle++;
-      const m = z.querySelector(".marke-weg"); if (!m || !/^(Luftlinie|Fußweg)$/.test(m.textContent)) out.ohneMethode++;
+      // Quoten je Raumeinheit (ohne Entfernung) tragen keine Messart, alle anderen genau eine
+      const ohneWeg = /^(plaetze_je_kind|plaetze_je_bedarf|schueler_je_kind|ew_je_einrichtung)$/.test(z.dataset.kennzahl || "");
+      const m = z.querySelector(".marke-weg");
+      if (ohneWeg ? !!m : (!m || !/^(Luftlinie|Fußweg)$/.test(m.textContent))) out.ohneMethode++;
+      // „amtlicher Maßstab“ nur mit Richtwert-Zeile
+      if (/amtlicher Maßstab/.test(z.textContent) && !z.querySelector(".vs-richt")) out.massstabOhneWert = (out.massstabOhneWert || 0) + 1;
       if (z.classList.contains("vs-zeile--orientierung")) { out.orientierung++; if (/Orientierung, kein Richtwert/.test(z.textContent)) out.orientierungMarkiert++; }
     });
     const ew = document.querySelector(".vs-ew"); out.ewVermerk = !!ew && /Zensus 2022/.test(ew.textContent) && /dl-de\/by-2-0/.test(ew.textContent) && /Daten verändert/.test(ew.textContent);
@@ -119,8 +124,8 @@ async function planerEcht(basis, art) {
   pruef(ebene.wert === "pr" && ebene.n === 19 && ebene.src === 19, `Raumebene Planungsräume voreingestellt: ${ebene.wert}, ${ebene.n} in der Liste, ${ebene.src} Flächen in der Karte`);
   await page.click('#raeume .treffer[data-nr="403"]'); await warteBereit(page);
   const z = await zahlenPruefen(page);
-  pruef(z.zeilen > 5 && z.ohneQuelle === 0 && z.ohneMethode === 0 && z.ewVermerk && z.quellenListe > 0 && z.orientierung === z.orientierungMarkiert,
-    `Versorgungstabelle mit echten Daten: ${z.zeilen} Zeilen, ohne Quelle ${z.ohneQuelle}, ohne Methode ${z.ohneMethode}, Orientierung ${z.orientierungMarkiert}/${z.orientierung}`);
+  pruef(z.zeilen > 5 && z.ohneQuelle === 0 && z.ohneMethode === 0 && !z.massstabOhneWert && z.ewVermerk && z.quellenListe > 0 && z.orientierung === z.orientierungMarkiert,
+    `Versorgungstabelle mit echten Daten: ${z.zeilen} Zeilen, ohne Quelle ${z.ohneQuelle}, Messart falsch ${z.ohneMethode}, „amtlicher Maßstab“ ohne Richtwert ${z.massstabOhneWert || 0}, Orientierung ${z.orientierungMarkiert}/${z.orientierung}`);
   // Wechsel auf Stadtteile: Hinweis statt Tabelle, keine falsche Zuordnung; zurück auf Planungsräume: Tabelle wieder da
   await page.selectOption("#raumebene", "st"); await warteBereit(page);
   await page.click('#raeume .treffer[data-nr="13"]'); await warteBereit(page);

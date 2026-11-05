@@ -87,9 +87,14 @@ Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht un
 - **ÖPNV:** Die Gebietsklasse des Nahverkehrsplans gilt für Ortsteile; jede Zelle bekommt die Klasse ihres
   Stadtteils. Zellen mit gemischter oder offener Klasse zählen nicht mit; wohnt dort mehr als die Hälfte der
   Einwohner einer Raumeinheit, steht statt eines Werts ein Hinweis in `unsicherheit`.
-- **Status:** `amtlich` = Maßstab aus einem Potsdamer Dokument mit gelesener Fundstelle, bei Werten ohne Maßstab
-  nur amtliche Daten. `orientierung` = Maßstab ohne Primärbeleg, Fundstelle nicht gelesen oder Berliner Methode;
-  kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
+- **Status:** `amtlich` mit `richtwert` = amtlicher Maßstab aus einem geltenden Potsdamer Dokument mit gelesener
+  Fundstelle; `amtlich` ohne `richtwert` = amtliche Daten, kein Maßstab. `orientierung` = Maßstab ohne
+  Primärbeleg, Fundstelle nicht gelesen, abgelaufene Geltung (Nahverkehrsplan 2019, Geltung bis 2023) oder
+  Berliner Methode; kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
+- **Methode:** `luftlinie` = Entfernung bzw. Radius in Luftlinie; `raumeinheit` = Quote je Raumeinheit ohne
+  Entfernungsbezug (Plätze je Kind, Plätze je Bedarfsplatz, Schüler je Kind, Einwohner je Standort).
+- **Vermerk:** `vermerk` nennt die Quelle der Einrichtungen bzw. Daten und immer den Zensus, weil jede Kennzahl
+  gegen Zensus-Einwohner oder -Zielgruppen gerechnet ist.
 - **Kita:** Kapazität laut Betriebserlaubnis, nicht Belegung; Kinder 2022, Plätze 2026. Tagespflege fehlt.
 - **Grün:** vereinfachte Berliner Methode (Grünanlagen und Parks aus ALKIS im 500-m-Kreis je Einwohner), ohne
   Mindestgröße; SPSG-Parks lassen sich nicht abgrenzen und zählen mit.

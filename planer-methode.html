@@ -34,7 +34,7 @@
 
   <h2>Luftlinie und Fußweg</h2>
   <p>Die Potsdamer Fachpläne messen Einzugsbereiche in Luftlinie: der Nahverkehrsplan 2019 für Haltestellen, das Einzelhandelskonzept 2014 für die Nahversorgung. Der Planer rechnet darum zuerst in Luftlinie, vom Mittelpunkt der Zelle zur nächsten Einrichtung.</p>
-  <p>Der Fußweg kommt als Zusatz dazu. Er folgt dem Wegenetz aus OpenStreetMap und ist deshalb eine eigene Datei unter der Open Database License. An jeder Zahl steht, ob sie in Luftlinie oder als Fußweg gemessen ist.</p>
+  <p>Der Fußweg folgt als Zusatz mit dem OpenStreetMap-Auszug; bis dahin ist der Schalter gesperrt. Er wird dem Wegenetz aus OpenStreetMap folgen und deshalb eine eigene Datei unter der Open Database License sein. An jeder Entfernung steht, ob sie in Luftlinie oder als Fußweg gemessen ist. Quoten je Raumeinheit wie Plätze je Kind haben keinen Radius und tragen darum keine Messart.</p>
   <p>Einrichtungen jenseits der Stadtgrenze in Brandenburg zählen für die Entfernungen mit, weil sie vom Stadtrand aus oft die nächsten sind. Einrichtungen in Berlin zählen bisher nicht.</p>
 
   <h2>Raumebene</h2>
@@ -48,16 +48,16 @@
   <p>Grundschulen werden über Schulbezirke geplant (§ 106 Brandenburgisches Schulgesetz). Ohne die Schulbezirke ist jeder Grundschulwert vorläufig und so gekennzeichnet.</p>
 
   <h2>Öffentlicher Nahverkehr</h2>
-  <p>Der Einzugsradius einer Haltestelle folgt der Gebietsklasse des Nahverkehrsplans 2019. Diese Klasse gilt für Ortsteile; jede Zelle bekommt deshalb die Klasse ihres Stadtteils. Zellen in Stadtteilen mit gemischter oder offener Klasse zählen nicht mit. Wohnen dort mehr als die Hälfte der Einwohner eines Planungsraums, steht statt eines Werts eine Spanne im Hinweis. Der Nahverkehrsplan bewertet Teilflächen mit mehr als 200 Einwohnern, der Planer ganze Planungsräume.</p>
+  <p>Der Einzugsradius einer Haltestelle folgt der Gebietsklasse des Nahverkehrsplans 2019. Diese Klasse gilt für Ortsteile; jede Zelle bekommt deshalb die Klasse ihres Stadtteils. Zellen in Stadtteilen mit gemischter oder offener Klasse zählen nicht mit. Wohnen dort mehr als die Hälfte der Einwohner eines Planungsraums, steht statt eines Werts eine Spanne im Hinweis. Der Nahverkehrsplan bewertet Teilflächen mit mehr als 200 Einwohnern, der Planer ganze Planungsräume. Hat ein Planungsraum laut Zensus 2022 höchstens 200 Einwohner, steht kein Wert: Daraus folgt nicht, dass der Nahverkehrsplan dort keine Erschließung verlangt, denn Neubau nach dem Stichtag fehlt in den Einwohnern. Der Nahverkehrsplan 2019 galt bis 2023; ob ein Nachfolger gilt, ist nicht geprüft. Seine Werte stehen deshalb als Orientierung.</p>
 
   <h2>Grün</h2>
   <p>Grün je Einwohner folgt vereinfacht der Berliner Methode (6 m² je Einwohner in 500 m). Es zählen Grünanlagen und Parks aus dem Liegenschaftskataster, ohne Mindestgröße; die Schlossparks zählen mit, Kleingärten und Wald nicht. Der Wert ist als Berliner Methode gekennzeichnet, nicht als Potsdamer Maßstab.</p>
 
   <h2>Gemeinbedarf, Ärzte und Pflege</h2>
-  <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze kommen aus OpenStreetMap. Für sie nennt der Planer Lage und Entfernung, aber keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten.</p>
+  <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze folgen mit dem OpenStreetMap-Auszug und fehlen bis dahin. Für sie wird der Planer Lage und Entfernung nennen, aber keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten.</p>
 
   <h2>Richtwerte und ihr Status</h2>
-  <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein Potsdamer oder Brandenburger Dokument ihn nennt. Werte ohne solchen Beleg stehen als <b>Orientierung, kein Richtwert</b> daneben und sind in der Versorgungstabelle gestrichelt umrandet. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>
+  <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein geltendes Potsdamer oder Brandenburger Dokument ihn nennt und die Fundstelle gelesen ist. Werte ohne solchen Beleg oder aus einem Dokument mit abgelaufener Geltung stehen als <b>Orientierung, kein Richtwert</b> daneben und sind in der Versorgungstabelle gestrichelt umrandet. Kennzahlen ohne Maßstab, etwa Einwohner je Feuerwehrstandort, tragen <b>amtliche Daten, kein Maßstab</b>: Die Zahlen stammen aus amtlichen Quellen, eine Norm für sie gibt es nicht. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>
   <div class="tabellenrahmen" id="richtwerte"></div>
   <p class="fuss" id="planer-hinweis"></p>
 

@@ -41,6 +41,7 @@
 .vs-status{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
 .abzeichen{font:500 .75rem/1.2 var(--f-text);padding:3px 6px;border:1px solid var(--ink)}
 .abzeichen--orientierung{border-style:dashed;color:var(--muted)}
+.abzeichen--daten{border-color:var(--line);color:var(--muted)}
 .abzeichen--vorlaeufig{border-style:dotted;color:var(--muted)}
 .vs-zeile--orientierung .vs-zahl{color:var(--muted)}
 .vs-richt,.vs-q{font-size:.8125rem;line-height:1.4;color:var(--muted);margin:5px 0 0}
@@ -66,7 +67,7 @@
   .planerseite .legende{max-width:calc(100% - 92px);top:auto;bottom:74px}
   .planerseite .legende__weg{display:none}
   .planerseite .legende__vermerk{font-size:.6875rem}
-  .planerseite .legende__arten{display:none}
+  .planerseite .legende__arten{font-size:.6875rem;gap:2px 8px;margin-top:5px;padding-top:4px}
   .beispiel{top:58px;bottom:auto;right:8px;left:auto;max-width:calc(100% - 16px);padding:6px 8px;font-size:.75rem}
 }
 
