@@ -104,7 +104,7 @@ def erzeugen() -> str:
     ab = abschnitte(roh.decode("utf-8"))
 
     # Zählung aus den veröffentlichten Dateien
-    je_stufe, je_g, stand, dateien = Counter(), Counter(), set(), 0
+    je_stufe, je_g, stand, dateien, jahr = Counter(), Counter(), set(), 0, 0
     for p in sorted(JAHRE.glob("*.js")):
         d = lade_js(p)
         if d.get("fixture"):
@@ -114,6 +114,8 @@ def erzeugen() -> str:
         for f in d["features"]:
             je_stufe[f["properties"]["s"]] += 1
             je_g[f["properties"]["g"]] += 1
+            if f["properties"]["j"] is not None:   # Einzeljahr j (Korrektur 6: nur Denkmale oder ohne Wohnraum)
+                jahr += 1
     if not dateien:
         fehler("keine Dateien in daten/jahre/")
 
@@ -171,7 +173,7 @@ def erzeugen() -> str:
                      "skript": "skripte/24_jahre_kaskade.py", "dateien": dateien},
         "gebaeude": sum(je_stufe.values()),
         "je_g": {k: je_g.get(k, 0) for k in ("belegt", "geschaetzt", "nicht_datiert")},
-        "jahr": 0,
+        "jahr": jahr,
         "stufen": stufen,
         "ruecktest": ruecktest,
         "gegenprobe": gegenprobe,
@@ -179,8 +181,6 @@ def erzeugen() -> str:
         "schieflage": schieflage,
         "summen": summen,
     }
-    # Gebäude mit Einzeljahr j (Korrektur 6: nur Denkmale oder ohne Wohnraum)
-    inhalt["jahr"] = sum(1 for p in sorted(JAHRE.glob("*.js")) for f in lade_js(p)["features"] if f["properties"]["j"] is not None)
     return "window.KIEZ_JAHRE_METHODE=" + json.dumps(inhalt, ensure_ascii=False, separators=(",", ":")) + ";\n"
 
 
