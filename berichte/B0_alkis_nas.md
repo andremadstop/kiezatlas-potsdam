@@ -14,7 +14,7 @@ Vermerk: © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0),
 
 ## Eingelesen
 
-- Kacheln: 40; Objekte außerhalb von `wfs:Insert`: 0; doppelte gml:id über Kacheln: 0
+- Teildateien im Zip: 40 (Kopfteil 00 und 39 NAS-Kacheln); Objekte außerhalb von `wfs:Insert`: 0; doppelte gml:id über Kacheln: 0
 - Bauwerke mit Fläche je Objektart (gelesen / ohne Fläche verworfen):
   - `AX_Gebaeude`: 50.795 (gelesen 50.795, ohne Fläche 0)
   - `AX_Bauteil`: 1.052 (gelesen 1.052, ohne Fläche 0)
@@ -59,6 +59,8 @@ Regel: größte Schnittfläche in EPSG:25833 innerhalb derselben Objektart; gül
 | `wohnungen` | 0 | 0,0 % |
 
 `wohnungen`: Der NAS-Auszug führt kein Attribut zur Zahl der Wohnungen. Die Regel „unter 3 Wohneinheiten nur Klasse, kein Jahr“ (Prüfbericht, Korrektur 6) lässt sich daher nicht aus B0 ableiten; B4 braucht eine andere Grundlage (z. B. Gebäudefunktion und Bauweise oder Zensus-Gebäudetyp).
+
+Kodierung: `funktion` = `<Objektart ohne AX_>:<Kennung>`, z. B. `Gebaeude:1010` (Wohnhaus) oder `Bauteil:<bauart>`; die Kennungen bleiben unübersetzt (Beschriftung steht im Snapshot). `dachform` und `bauweise` sind nach den Wertearten der GeoInfoDok 7.1 beschriftet. Gegenprobe Bauweise gegen den Funktionstext des Snapshots: Garagenbauweisen 1.914 von 1.916 auf „Garage“, Doppelhaushälfte/Reihenhaus/Haus in Reihe 1.730 von 1.730 auf „Wohn…“. Die Dachform-Beschriftung ist nicht gegen eine Primärquelle geprüft (keine Gegenprobe im Bestand möglich).
 
 Dachform: Satteldach 20.971, Flachdach 16.356, Pultdach 6.070, Walmdach 3.916, Krüppelwalmdach 1.358, Zeltdach 816, Mansardendach 442, Bogendach 84, Mischform 80, Sheddach 63, Versetztes Pultdach 43, Turmdach 38, Kuppeldach 27, Kegeldach 5.
 

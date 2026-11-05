@@ -389,6 +389,16 @@ def main() -> int:
             cur.execute("""SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY ueberlappung)
                            FROM auswertung.alkis_nas_gebaeude""")
             iou_median = cur.fetchone()[0]
+            # Gegenprobe der Bauweise-Beschriftung gegen die Funktionstexte des Snapshots
+            cur.execute("""
+                SELECT count(*) FILTER (WHERE a.bauweise LIKE '%garage'),
+                       count(*) FILTER (WHERE a.bauweise LIKE '%garage' AND g.funktion = 'Garage'),
+                       count(*) FILTER (WHERE a.bauweise IN ('Doppelhaushälfte', 'Reihenhaus', 'Haus in Reihe')),
+                       count(*) FILTER (WHERE a.bauweise IN ('Doppelhaushälfte', 'Reihenhaus', 'Haus in Reihe')
+                                        AND g.funktion LIKE 'Wohn%')
+                FROM auswertung.alkis_nas_gebaeude a
+                JOIN auswertung.gebaeude_stand_20261105 g ON g.oid = a.oid_bezug""")
+            gar, gar_ok, reihe, reihe_ok = cur.fetchone()
             cur.execute("""SELECT count(*), count(DISTINCT oid_bezug) FROM auswertung.gebaeude_adresse""")
             adr_n, adr_geb = cur.fetchone()
 
@@ -416,7 +426,8 @@ def main() -> int:
              "(Stichprobe der Erkundung: 0 von 600) |")
     z.append("| Kein Eigentümerfeld importiert | siehe `pruefen/B0_nas.py` (Schemaprüfung, Objektarten) |\n")
     z.append("## Eingelesen\n")
-    z.append(f"- Kacheln: {zaehl['kacheln']}; Objekte außerhalb von `wfs:Insert`: {zaehl['nicht_insert']}; "
+    z.append(f"- Teildateien im Zip: {zaehl['kacheln']} (Kopfteil 00 und 39 NAS-Kacheln); "
+             f"Objekte außerhalb von `wfs:Insert`: {zaehl['nicht_insert']}; "
              f"doppelte gml:id über Kacheln: {zaehl['doppelt']}")
     z.append("- Bauwerke mit Fläche je Objektart (gelesen / ohne Fläche verworfen):")
     for art in KLASSEN:
@@ -448,6 +459,13 @@ def main() -> int:
              "Wohneinheiten nur Klasse, kein Jahr“ (Prüfbericht, Korrektur 6) lässt sich daher nicht aus B0 "
              "ableiten; B4 braucht eine andere Grundlage (z. B. Gebäudefunktion und Bauweise oder Zensus-"
              "Gebäudetyp).\n")
+    z.append("Kodierung: `funktion` = `<Objektart ohne AX_>:<Kennung>`, z. B. `Gebaeude:1010` (Wohnhaus) oder "
+             "`Bauteil:<bauart>`; die Kennungen bleiben unübersetzt (Beschriftung steht im Snapshot). "
+             "`dachform` und `bauweise` sind nach den Wertearten der GeoInfoDok 7.1 beschriftet. "
+             f"Gegenprobe Bauweise gegen den Funktionstext des Snapshots: Garagenbauweisen {zahl(gar_ok)} von "
+             f"{zahl(gar)} auf „Garage“, Doppelhaushälfte/Reihenhaus/Haus in Reihe {zahl(reihe_ok)} von "
+             f"{zahl(reihe)} auf „Wohn…“. Die Dachform-Beschriftung ist nicht gegen eine Primärquelle "
+             "geprüft (keine Gegenprobe im Bestand möglich).\n")
     z.append("Dachform: " + ", ".join(f"{k} {zahl(v)}" for k, v in dach.most_common()) + ".\n")
     z.append("Bauweise: " + ", ".join(f"{k} {zahl(v)}" for k, v in bauw.most_common()) + ".\n")
     z.append("## Adressen (nur intern)\n")
