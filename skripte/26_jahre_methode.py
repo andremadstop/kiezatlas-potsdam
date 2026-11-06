@@ -6,6 +6,11 @@ Schreibt daten/jahre_methode.js (window.KIEZ_JAHRE_METHODE). Liest nur Dateien, 
 - berichte/B4_holdout.md (B4): Abdeckung, Rücktest, Gegenprobe, Summenvergleich, Baualter-Statistik der LHP (H4),
   gelesen aus den Tabellen
 
+Dazu für jede Rücktest-Quote das 95-%-Intervall nach Wilson (Feld ki), gerechnet aus Treffern und bewerteten
+Prüfgebäuden. Das ist nur Darstellung: Die Regeln der Schätzung und die Quoten im Bericht bleiben unverändert. Unter
+MINDEST_N bewerteten Prüfgebäuden zeigen die Seiten nur die Zählung (Schwelle steht als darstellung.mindest_n in der
+Ausgabe). Ebenfalls aus den Gebäudedateien gezählt: Herkunft der Höhe je Gebäude (hq) für die Methodenseite.
+
 Die Abdeckung im Bericht muss mit der Zählung aus den Dateien übereinstimmen, sonst bricht das Skript ab
 (Bericht und Dateien aus verschiedenen Läufen). Der SHA256 des Berichts steht in der Ausgabe.
 24_jahre_kaskade.py wird nicht gestartet (B4 gehört der Lauf).
@@ -15,6 +20,7 @@ Aufruf:  python3 -I skripte/26_jahre_methode.py [--pruefen]
 """
 import hashlib
 import json
+import math
 import re
 import sys
 from collections import Counter
@@ -26,6 +32,9 @@ JAHRE = WURZEL / "daten" / "jahre"
 ZIEL = WURZEL / "daten" / "jahre_methode.js"
 STUFEN = {1: "genaues Jahr", 2: "Luftbildklammer", 3: "Blocktyp Großsiedlung", 4: "Zensus-Verteilung",
           5: "Nachbarn", 6: "nicht datiert"}
+HQ = ("kataster", "geschosse", "ersatz")   # Herkunft der Höhe je Gebäude (skripte/24_jahre_kaskade.py)
+Z95 = 1.959964   # Normalquantil für 95 %
+MINDEST_N = 10   # darunter auf den Seiten nur Zählung, keine Prozentangabe
 
 
 def fehler(text: str) -> None:
@@ -86,12 +95,22 @@ def suche(ab: dict, praefix: str) -> tuple:
     return treffer_[0], ab[treffer_[0]]
 
 
+def wilson(t, n):
+    """95-%-Intervall nach Wilson für t Treffer von n, in Prozent auf 0,1 gerundet; None ohne Bewertung."""
+    if t is None or not n:
+        return None
+    p, z2 = t / n, Z95 * Z95
+    mitte = (p + z2 / (2 * n)) / (1 + z2 / n)
+    halb = Z95 * math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n)
+    return {"unten": round(100 * max(0.0, mitte - halb), 1), "oben": round(100 * min(1.0, mitte + halb), 1)}
+
+
 def ruecktest_tabelle(tab: dict, erste: str) -> list:
     aus = []
     for z in tab["zeilen"]:
         t, n_bew, q = treffer(z[3])
         aus.append({erste: z[0], "n": zahl(z[1]), "ohne_klasse": zahl(z[2]), "treffer": t, "bewertet": n_bew,
-                    "quote": q,
+                    "quote": q, "ki": wilson(t, n_bew),
                     "median_abstand": zahl(z[4]), "median_abstand_fehl": zahl(z[5])})
     return aus
 
@@ -106,20 +125,28 @@ def erzeugen() -> str:
     ab = abschnitte(roh.decode("utf-8"))
 
     # Zählung aus den veröffentlichten Dateien
-    je_stufe, je_g, stand, dateien, jahr = Counter(), Counter(), set(), 0, 0
+    je_stufe, je_g, je_hq, stand, umrisse, dateien, jahr = Counter(), Counter(), Counter(), set(), set(), 0, 0
     for p in sorted(JAHRE.glob("*.js")):
         d = lade_js(p)
         if d.get("fixture"):
             fehler(f"{p.name} ist eine Fixture")
         dateien += 1
         stand.add(d["stand"])
+        umrisse.add(d["quellen"]["umrisse"]["stand"])
         for f in d["features"]:
             je_stufe[f["properties"]["s"]] += 1
             je_g[f["properties"]["g"]] += 1
+            je_hq[f["properties"]["hq"]] += 1
             if f["properties"]["j"] is not None:   # Einzeljahr j (Korrektur 6: nur Denkmale oder ohne Wohnraum)
                 jahr += 1
     if not dateien:
         fehler("keine Dateien in daten/jahre/")
+    if set(je_hq) - set(HQ):
+        fehler(f"unbekannte Herkunft der Höhe: {sorted(set(je_hq) - set(HQ))}")
+    if sum(je_hq.values()) != sum(je_stufe.values()):
+        fehler("Herkunft der Höhe nicht bei allen Gebäuden")
+    if len(umrisse) != 1:
+        fehler(f"daten/jahre/ hat mehrere Stände der Umrisse {sorted(umrisse)}")
 
     # Abdeckung: Bericht gegen Dateien
     _, tabs = suche(ab, "Abdeckung der Kaskade")
@@ -194,6 +221,10 @@ def erzeugen() -> str:
         "gebaeude": sum(je_stufe.values()),
         "je_g": {k: je_g.get(k, 0) for k in ("belegt", "geschaetzt", "nicht_datiert")},
         "jahr": jahr,
+        "hoehe": {k: je_hq.get(k, 0) for k in HQ},
+        "umrisse_stand": umrisse.pop(),
+        "darstellung": {"ki": "Wilson-Intervall 95 %, aus Treffern und bewerteten Prüfgebäuden; nur Darstellung, "
+                              "Regeln der Schätzung unverändert", "z": Z95, "mindest_n": MINDEST_N},
         "stufen": stufen,
         "ruecktest": ruecktest,
         "gegenprobe": gegenprobe,

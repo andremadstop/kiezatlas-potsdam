@@ -140,6 +140,13 @@ function gebaeudeZahlen() {
   setze("g-gegen", M.gegenprobe.quote == null ? "k. A." : T.fmt1.format(M.gegenprobe.quote) + NB + "%");
   setze("g-gegen-n", fmt.format(M.gegenprobe.bewertet));
   setze("g-berlin", T.fmt1.format(M.berlin.gesamt) + NB + "%");
+  if (M.hoehe) {
+    setze("g-h-kataster", fmt.format(M.hoehe.kataster)); setze("g-h-geschosse", fmt.format(M.hoehe.geschosse)); setze("g-h-ersatz", fmt.format(M.hoehe.ersatz));
+    setze("g-h-kataster-p", T.fmt1.format(100 * M.hoehe.kataster / M.gebaeude) + NB + "%");
+    setze("g-h-ohne-p", pz(100 * (M.hoehe.geschosse + M.hoehe.ersatz) / M.gebaeude));
+  }
+  if (M.umrisse_stand) setze("g-umrisse-stand", new Date(M.umrisse_stand).toLocaleDateString("de-DE"));
+  if (M.darstellung) setze("g-mindest-n", fmt.format(M.darstellung.mindest_n));
 }
 
 // Schichtband: Anteile der Klassen als ein Streifen (Startseite der Bauzeiten, Steckbrief, Liste)
@@ -225,8 +232,10 @@ function karte() {
         { id: "teile-linie", type: "line", source: "teile", paint: { "line-color": "#13212a", "line-width": 0.8, "line-opacity": 0.4 } },
         { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
       ] }),
-    maxZoom: 18, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: false,
-    locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+    maxZoom: 18, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: !FEIN,
+    locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden",
+      "CooperativeGesturesHandler.MobileHelpText": "Mit zwei Fingern die Karte bewegen",
+      "CooperativeGesturesHandler.WindowsHelpText": "Strg + Mausrad zum Zoomen", "CooperativeGesturesHandler.MacHelpText": "⌘ + Mausrad zum Zoomen" }
   }, start));
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
@@ -452,6 +461,19 @@ function karte() {
     });
     gebSetzen();
   }
+  // Rücktest der Stufe s aus daten/jahre_methode.js, je Prüfsatz getrennt (die Prüfsätze überschneiden sich).
+  // n = bewertete Prüfgebäude; unter M.darstellung.mindest_n nur die Zählung, darüber zusätzlich „etwa x von 10“.
+  function rueckText(s) {
+    if (!M || !M.ruecktest || !M.darstellung) return "";
+    var teile = [];
+    M.ruecktest.forEach(function (r) {
+      var x = r.je_stufe.filter(function (y) { return parseInt(y.stufe, 10) === +s; })[0];
+      if (!x || !x.bewertet) return;
+      teile.push(esc(r.name) + ": " + fmt.format(x.treffer) + " von " + fmt.format(x.bewertet) + " Prüfgebäuden" +
+        (x.bewertet >= M.darstellung.mindest_n ? " (etwa " + Math.round(x.quote / 10) + " von 10)" : ""));
+    });
+    return teile.length ? "<p class=\"pop-q\">Im Rücktest traf dieser Schätzweg die bekannte Bauzeit so oft: " + teile.join("; ") + ".</p>" : "";
+  }
   function gebText(p) {
     var k = p.k == null || p.k === "null" ? null : +p.k, g = p.g, q = QUELLEN[p.q], h;
     if (g === "nicht_datiert") {
@@ -459,7 +481,7 @@ function karte() {
     } else {
       h = "<b><i class=\"j-punkt\" style=\"background:" + PALETTE[k] + "\"></i>Bauzeit " + esc(KL[k]) + "</b><br><span class=\"pop-status pop-status--" + g + "\">" + STATUS[g] + "</span>" +
         (p.j != null && p.j !== "null" && g === "belegt" ? ", Baujahr " + esc(p.j) : "") +
-        (WEG[p.s] ? "<p class=\"pop-q\">Weg: " + WEG[p.s] + " (Stufe " + esc(p.s) + " von 6).</p>" : "");
+        (WEG[p.s] ? "<p class=\"pop-q\">" + (g === "belegt" ? "Weg: " : "Schätzweg: ") + WEG[p.s] + ".</p>" + rueckText(p.s) : "");
       if (q) h += "<p class=\"pop-q\">Quelle: " + esc(q.quelle) + ". " + esc(q.vermerk) + ".</p>";
     }
     var u = QUELLEN.umrisse, hm = +p.h;
@@ -646,7 +668,10 @@ function methode() {
     kopf.forEach(function (k) { var c = el("th", null, k); c.scope = "col"; tr.appendChild(c); });
     th.appendChild(tr); tab.appendChild(cap); tab.appendChild(th); tab.appendChild(tb); box.appendChild(tab); return tb;
   }
-  function treffer(x) { return x.bewertet == null ? "–" : fmt.format(x.treffer) + " von " + fmt.format(x.bewertet) + " (" + T.fmt1.format(x.quote) + NB + "%)"; }
+  // Unter M.darstellung.mindest_n bewerteten Prüfgebäuden nur die Zählung, kein Prozent und kein Bereich (reine Darstellung)
+  function genug(x) { return x.bewertet != null && x.bewertet >= M.darstellung.mindest_n; }
+  function treffer(x) { return x.bewertet == null ? "–" : fmt.format(x.treffer) + " von " + fmt.format(x.bewertet) + (genug(x) ? " (" + fmt.format(Math.round(x.quote)) + NB + "%)" : ""); }
+  function bereich(x) { return genug(x) && x.ki ? fmt.format(Math.round(x.ki.unten)) + " bis " + fmt.format(Math.round(x.ki.oben)) + NB + "%" : "–"; }
   function jahreText(v) { return v == null ? "–" : T.fmt1.format(v).replace(/,0$/, "") + NB + "J."; }
   // Stufen
   var st = document.querySelector("#j-m-stufen tbody");
@@ -657,11 +682,11 @@ function methode() {
   M.ruecktest.forEach(function (r) {
     box.appendChild(el("h3", "j-unter", r.name));
     box.appendChild(el("p", "fuss", r.art + ", " + fmt.format(r.n) + " Prüfgebäude. „Ohne Klasse“: nicht datiert, zählt nicht mit. Abstand: Jahre zwischen geschätzter Klasse und bekannter Bauzeit, Median der Fehlgriffe."));
-    var kopf = ["", "Prüfgebäude", "ohne Klasse", "Treffer", "Abstand"];
+    var kopf = ["", "Prüfgebäude", "ohne Klasse", "Treffer", "95-%-Bereich", "Abstand"];
     var a = tabelle(box, ["bekannte Bauzeit"].concat(kopf.slice(1)), r.name + ": Treffer je bekannter Bauzeit");
-    r.je_bauzeit.forEach(function (x) { zeile(a, [x.bauzeit, fmt.format(x.n), fmt.format(x.ohne_klasse), treffer(x), jahreText(x.median_abstand_fehl)]); });
+    r.je_bauzeit.forEach(function (x) { zeile(a, [x.bauzeit, fmt.format(x.n), fmt.format(x.ohne_klasse), treffer(x), bereich(x), jahreText(x.median_abstand_fehl)]); });
     var b = tabelle(box, ["Stufe"].concat(kopf.slice(1)), r.name + ": Treffer je Stufe der Schätzung");
-    r.je_stufe.forEach(function (x) { zeile(b, [x.stufe, fmt.format(x.n), fmt.format(x.ohne_klasse), treffer(x), jahreText(x.median_abstand_fehl)]); });
+    r.je_stufe.forEach(function (x) { zeile(b, [x.stufe, fmt.format(x.n), fmt.format(x.ohne_klasse), treffer(x), bereich(x), jahreText(x.median_abstand_fehl)]); });
   });
   // Gebäudekarte gegen Zensus, ganze Stadt
   var sl = document.querySelector("#j-m-schieflage tbody");
