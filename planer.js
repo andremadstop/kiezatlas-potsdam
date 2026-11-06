@@ -448,6 +448,7 @@ function versorgung() {
   var lz = el("a", "link", "Lizenztext"); lz.href = DLDE; ew.appendChild(lz); ew.appendChild(document.createTextNode(", Daten verändert (eigene Berechnung))"));
   box.appendChild(ew);
   if (P.hinweis) box.appendChild(el("p", "fuss vs-hinweis", P.hinweis));
+  steckbriefLink(box, p, P);
   var ul = el("ul", "vs-liste"); ul.setAttribute("aria-label", "Versorgung " + p.name);
   R.werte.forEach(function (w) {
     var li = el("li", "vs-zeile" + (w.status === "orientierung" ? " vs-zeile--orientierung" : ""));
@@ -474,6 +475,19 @@ function versorgung() {
   var ol = el("ol", "vs-quellen"); ol.setAttribute("aria-label", "Quellen der Tabelle");
   QN.forEach(function (k) { var li = el("li"), Q = P.quellen[k] || { vermerk: k }; li.appendChild(vermerkKnoten(Q.vermerk)); ol.appendChild(li); });
   box.appendChild(ol);
+}
+
+// Druckseite A4 je Planungsraum (daten/export/steckbriefe/<nr>.html, aus skripte/16_export.py); nur für die
+// echten Planungsräume, nicht für Beispieldaten oder die Stadtteil-Ebene. Der Steckbrief rechnet in Luftlinie.
+function steckbriefLink(box, p, P) {
+  if (FIXTURE || S.raum !== "pr" || P.raumebene !== "planungsraum") return;
+  var z = el("div", "seite__aktion vs-steckbrief"), a = el("a", "knopf knopf--rand");
+  a.href = WURZEL + "export/steckbriefe/" + encodeURIComponent(p.nr) + ".html";
+  var f = el("span", "knopf__flut"); f.setAttribute("aria-hidden", "true"); a.appendChild(f);
+  a.appendChild(el("span", "knopf__text", "Steckbrief (A4)")); a.title = "Steckbrief " + p.nr + " " + p.name + " als Druckseite";
+  z.appendChild(a); box.appendChild(z);
+  box.appendChild(el("p", "fuss", "Druckseite dieses Planungsraums mit der Versorgungstabelle. Der Steckbrief rechnet in Luftlinie" +
+    (S.weg === "fuss" ? ", die Tabelle hier zeigt den Fußweg." : ".")));
 }
 
 // ---------- Fragen als Einstieg: jede setzt den Zustand und erklärt nebenbei eine Funktion
@@ -633,6 +647,8 @@ function methode() {
       tr.appendChild(td); tb.appendChild(tr);
     });
     tab.appendChild(tb); box.appendChild(tab);
+    // Zahl der Planungsräume aus der Datei statt fest im Text (K28); Beispieldaten rechnen auf Stadtteilen
+    if (P.raumebene === "planungsraum" && !P.fixture) document.querySelectorAll('[data-feld="anzahl-raeume"]').forEach(function (n) { n.textContent = String(Object.keys(P.raeume).length); });
     var h = $("planer-hinweis"); if (h) h.textContent = (P.hinweis || "") + " Einwohnerzahlen sind auf " + fmt.format(P.rundung.ew) + " gerundet. Raumebene der Datei: " + (P.raumebene === "stadtteil" ? "Stadtteile" : "Planungsräume") + ", Stand der Auswertung " + P.stand.split("-").reverse().join(".") + ".";
     window.KIEZ_BEREIT = true;
   });

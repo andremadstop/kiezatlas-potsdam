@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
+<html lang="de" class="kopf-zwei" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,12 +16,21 @@
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten des Planers">
     <ul>
-      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
-      <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
-      <li><a class="nav" href="planer-methode.html" aria-current="true"><span>Methode</span></a></li>
+      <li><a class="nav" href="planer.html"><span>Versorgung</span></a></li>
+      <li><a class="nav" href="planer-methode.html" aria-current="page"><span>Methode</span></a></li>
       <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
     </ul>
   </nav>
@@ -29,16 +38,16 @@
 
 <main id="inhalt">
   <h1>Wie der Planer rechnet</h1>
-  <p class="lede">Der Planer beantwortet zwei Fragen: Wie weit ist es von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung, und wie ist eine Raumeinheit insgesamt versorgt. Jede Zahl trägt Methode, Status und Quelle.</p>
+  <p class="lede">Der Planer beantwortet zwei Fragen: Wie weit ist es von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung, und wie ist eine Raumeinheit insgesamt versorgt. Im Planer trägt jede Zahl Methode, Status und Quelle. Auf dieser Seite liest die Tabelle der Maßstäbe ihre Werte aus der Versorgungsdatei. Die Zahlen im Text sind dagegen feste Prüfwerte vom 5. November 2026; hinter jeder steht die Datei im Quellcode, die sie belegt.</p>
   <p class="fuss" id="beispiel" hidden>Beispieldaten: Die Tabelle unten zeigt unechte Werte und dient nur dem Aufbau.</p>
 
   <h2>Luftlinie und Fußweg</h2>
   <p>Die Potsdamer Fachpläne messen Einzugsbereiche in Luftlinie: der Nahverkehrsplan 2019 für Haltestellen, das Einzelhandelskonzept 2014 für die Nahversorgung. Der Planer rechnet darum zuerst in Luftlinie, vom Mittelpunkt der Zelle zur nächsten Einrichtung.</p>
-  <p>Der Fußweg ist als Zusatz berechnet, auf dem Wegenetz aus OpenStreetMap (Auszug mit Stand 31. Oktober 2026, ODbL). Er läuft vom Mittelpunkt der Zelle über den nächsten Netzknoten bis zum Netzknoten an der Einrichtung, beide Anbindungsstrecken eingerechnet, und ist darum nie kürzer als die Luftlinie; im Median ist er rund 1,4-mal so lang. Die Fußwegwerte stehen in eigenen Dateien unter der Open Database License. An jeder Entfernung steht, ob sie in Luftlinie oder als Fußweg gemessen ist. Quoten je Raumeinheit wie Plätze je Kind haben keinen Radius und tragen darum keine Messart.</p>
-  <p>Einrichtungen jenseits der Stadtgrenze in Brandenburg zählen für die Entfernungen mit, weil sie vom Stadtrand aus oft die nächsten sind. Einrichtungen in Berlin zählen bisher nicht. Für die Einrichtungen aus OpenStreetMap gibt es dafür keine Landesgrenze in den Daten; sie bekommen beim Fußweg das Land der nächsten Haltestelle aus dem Fahrplan des VBB (Kennung der Haltestelle, VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0, <a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>, Daten verändert). Das ist eine Näherung: Prüft man sie an den 1.800 Haltestellen um Potsdam selbst, landen 15 im falschen Land, alle höchstens rund einen Kilometer von einer Haltestelle des anderen Landes entfernt.</p>
+  <p>Der Fußweg ist als Zusatz berechnet, auf dem Wegenetz aus OpenStreetMap (Auszug mit Stand 31. Oktober 2026, ODbL). Er läuft vom Mittelpunkt der Zelle über den nächsten Netzknoten bis zum Netzknoten an der Einrichtung, beide Anbindungsstrecken eingerechnet, und ist darum nie kürzer als die Luftlinie; im Median ist er rund 1,4-mal so lang (1,367 über alle Zellen und Arten, Prüfung vom 5. November 2026, <code>belege/N1_osm_fussweg_20261105.md</code>). Die Fußwegwerte stehen in eigenen Dateien unter der Open Database License. An jeder Entfernung steht, ob sie in Luftlinie oder als Fußweg gemessen ist. Quoten je Raumeinheit wie Plätze je Kind haben keinen Radius und tragen darum keine Messart.</p>
+  <p>Einrichtungen jenseits der Stadtgrenze in Brandenburg zählen für die Entfernungen mit, weil sie vom Stadtrand aus oft die nächsten sind. Einrichtungen in Berlin zählen bisher nicht. Für die Einrichtungen aus OpenStreetMap gibt es dafür keine Landesgrenze in den Daten; sie bekommen beim Fußweg das Land der nächsten Haltestelle aus dem Fahrplan des VBB (Kennung der Haltestelle, VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0, <a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>, Daten verändert). Das ist eine Näherung: Prüft man sie an den 1.800 Haltestellen um Potsdam selbst, landen 15 im falschen Land, alle höchstens rund einen Kilometer von einer Haltestelle des anderen Landes entfernt (Kreuzprobe vom 5. November 2026, <code>belege/A5b_landfilter_kreuzprobe.txt</code>).</p>
 
   <h2>Raumebene</h2>
-  <p>Die Stadt plant Kita und Schule auf Planungsräumen. Der Planer rechnet deshalb auf den 19 Planungsräumen der Landeshauptstadt (Grenzen Stand 31.12.2025). Eine Zelle gehört über ihren Mittelpunkt zu einem Planungsraum. Die 32 Stadtteile lassen sich zur Orientierung einblenden; Versorgungswerte gibt es nur je Planungsraum.</p>
+  <p>Die Stadt plant Kita und Schule auf Planungsräumen. Der Planer rechnet deshalb auf den <span data-feld="anzahl-raeume">19</span> Planungsräumen der Landeshauptstadt (Grenzen Stand 31.12.2025). Eine Zelle gehört über ihren Mittelpunkt zu einem Planungsraum. Die 32 Stadtteile lassen sich zur Orientierung einblenden; Versorgungswerte gibt es nur je Planungsraum.</p>
 
   <h2>Kita und Hort</h2>
   <p>In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind bezieht der Planer deshalb auf die Raumeinheit und nicht auf einen Radius. Plätze sind die Kapazität laut Betriebserlaubnis, nicht die belegten Plätze. Die Kinderzahlen stammen aus dem Zensus vom 15. Mai 2022, die Plätze vom Tag des Abrufs; beide Stände stehen an jeder Zeile. Kindertagespflege fehlt in den Daten, das unterschätzt die Versorgung der Jüngsten.</p>
@@ -51,12 +60,13 @@
 
   <h2>Öffentlicher Nahverkehr</h2>
   <p>Der Einzugsradius einer Haltestelle folgt der Gebietsklasse des Nahverkehrsplans 2019. Diese Klasse gilt für Ortsteile; jede Zelle bekommt deshalb die Klasse ihres Stadtteils. Zellen in Stadtteilen mit gemischter oder offener Klasse zählen nicht mit. Wohnen dort mehr als die Hälfte der Einwohner eines Planungsraums, steht statt eines Werts eine Spanne im Hinweis. Der Nahverkehrsplan bewertet Teilflächen mit mehr als 200 Einwohnern, der Planer ganze Planungsräume. Hat ein Planungsraum laut Zensus 2022 höchstens 200 Einwohner, steht kein Wert: Daraus folgt nicht, dass der Nahverkehrsplan dort keine Erschließung verlangt, denn Neubau nach dem Stichtag fehlt in den Einwohnern. Der Nahverkehrsplan 2019 galt bis 2023; ob ein Nachfolger gilt, ist nicht geprüft. Seine Werte stehen deshalb als Orientierung.</p>
+  <p>Den Takt einer Haltestelle zählt der Planer im Fahrplan des VBB (GTFS, gültig ab 3. November 2026) für Dienstag, den 10. November 2026, einen Schultag, in der morgendlichen Hauptverkehrszeit von 6 bis 9 Uhr. Der Tag liegt nach dem Stand der Auswertung vom 5. November 2026: Gezählt sind die Fahrten, die der Fahrplan für diesen Tag vorsieht, nicht beobachtete Fahrten. Tag und Zeitfenster sind in <code>config/richtwerte.yaml</code> (Abschnitt <code>oepnv.messung</code>) festgelegt.</p>
 
   <h2>Grün</h2>
   <p>Grün je Einwohner folgt vereinfacht der Berliner Methode (6 m² je Einwohner in 500 m). Es zählen Grünanlagen und Parks aus dem Liegenschaftskataster, ohne Mindestgröße; die Schlossparks zählen mit, Kleingärten und Wald nicht. Der Wert ist als Berliner Methode gekennzeichnet, nicht als Potsdamer Maßstab. Grün je Einwohner gibt es bisher nur in Luftlinie; beim Fußweg steht nur der Anteil der Einwohner mit Grünanlage in 500&nbsp;m.</p>
 
   <h2>Gemeinbedarf, Ärzte und Pflege</h2>
-  <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze stammen aus OpenStreetMap (Auszug mit Stand 31. Oktober 2026, ODbL). Für sie nennt der Planer nur Lage und Entfernung im Fußweg, keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten. OpenStreetMap wird freiwillig erfasst; wie vollständig diese Arten darin sind, ist nicht geprüft. Zum Vergleich: Von den amtlichen Kita-Standorten stehen 78&nbsp;% auch in OpenStreetMap. Fehlt ein Standort, ist die Entfernung zu groß.</p>
+  <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze stammen aus OpenStreetMap (Auszug mit Stand 31. Oktober 2026, ODbL). Für sie nennt der Planer nur Lage und Entfernung im Fußweg, keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten. OpenStreetMap wird freiwillig erfasst; wie vollständig diese Arten darin sind, ist nicht geprüft. Zum Vergleich: Von den amtlichen Kita-Standorten stehen 78&nbsp;% auch in OpenStreetMap (genau 78,1&nbsp;%, Abgleich vom 5. November 2026, <code>belege/N1_osm_fussweg_20261105.md</code>). Fehlt ein Standort, ist die Entfernung zu groß.</p>
 
   <h2>Richtwerte und ihr Status</h2>
   <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein geltendes Potsdamer oder Brandenburger Dokument ihn nennt und die Fundstelle gelesen ist. Werte ohne solchen Beleg oder aus einem Dokument mit abgelaufener Geltung stehen als <b>Orientierung, kein Richtwert</b> daneben und sind in der Versorgungstabelle gestrichelt umrandet. Kennzahlen ohne Maßstab, etwa Einwohner je Feuerwehrstandort, tragen <b>amtliche Daten, kein Maßstab</b>: Die Zahlen stammen aus amtlichen Quellen, eine Norm für sie gibt es nicht. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>

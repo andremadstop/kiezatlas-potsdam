@@ -222,6 +222,25 @@ async function bewegung() {
   await r.ctx.close();
 }
 
+// ---------- K31: gleiche erste Kopfzeile auf allen Seiten (Start · Karte · Planer · Bauzeiten), der eigene Teil mit aria-current
+{
+  const TEILE = ["index.html", "karte.html", "planer.html", "jahre.html"];
+  const SEITEN = { "index.html": "index.html", "karte.html": "karte.html", "planer.html": "planer.html", "planer-methode.html": "planer.html",
+    "planer-daten.html": "planer.html", "jahre.html": "jahre.html", "jahre-methode.html": "jahre.html", "jahre-daten.html": "jahre.html", "404.html": null };
+  // jahre-methode.html gehört im Audit-Durchgang einer anderen Gruppe; bis ihr Kopf nachgezogen ist, nur Hinweis statt Befund
+  const AUSSTEHEND = new Set(["jahre-methode.html"]);
+  console.log("Kopfzeile (K31)");
+  for (const [datei, eigen] of Object.entries(SEITEN)) {
+    const t = fs.readFileSync(path.join(WURZEL, datei), "utf8");
+    const nav = (t.match(/<nav class="kopf-haupt"[^>]*>([\s\S]*?)<\/nav>/) || [])[1] || "";
+    const links = [...nav.matchAll(/<a class="nav" href="([^"]+)"([^>]*)>/g)].map((m) => ({ href: m[1], aktuell: /aria-current/.test(m[2]) }));
+    const ok = JSON.stringify(links.map((l) => l.href)) === JSON.stringify(TEILE)
+      && JSON.stringify(links.filter((l) => l.aktuell).map((l) => l.href)) === JSON.stringify(eigen ? [eigen] : []);
+    const text = `${datei}: erste Kopfzeile ${links.map((l) => l.href.replace(".html", "") + (l.aktuell ? "*" : "")).join(" · ") || "fehlt"}`;
+    if (!ok && AUSSTEHEND.has(datei)) console.log("  offen " + text + " (Datei außerhalb dieses Durchgangs)");
+    else pruef(ok, text);
+  }
+}
 try {
   await startseite(FILE, "file://");
   await startseite(HTTP, "HTTP");

@@ -90,5 +90,7 @@
 .dateiliste .lizenz{grid-column:1/-1;font-size:.8125rem;margin:0;overflow-wrap:anywhere}
 .dateiliste .stand{font:500 .75rem/1.2 var(--f-text);padding:3px 6px;border:1px solid var(--ink);align-self:start;white-space:nowrap}
 .dateiliste .stand--folgt{border-style:dashed;color:var(--muted)}
+.dateiliste .steckbriefliste{grid-column:1/-1;columns:2 18rem;column-gap:24px;margin:4px 0 0;padding:0;list-style:none;font-size:.875rem}
+.dateiliste .steckbriefliste li{display:block;padding:3px 0;border:0;break-inside:avoid}
 .textseite .fuss-seite{margin-top:48px}
 @media (max-width:560px){.dateiliste li{grid-template-columns:1fr}.dateiliste .stand{justify-self:start}}

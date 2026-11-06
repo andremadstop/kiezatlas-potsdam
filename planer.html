@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
+<html lang="de" class="kopf-zwei" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,11 +24,20 @@
 <a class="sprung" href="#werkzeug-start">Zum Werkzeug springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten des Planers">
     <ul>
-      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
-      <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer.html" aria-current="page"><span>Versorgung</span></a></li>
       <li><a class="nav" href="planer-methode.html"><span>Methode</span></a></li>
       <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
     </ul>

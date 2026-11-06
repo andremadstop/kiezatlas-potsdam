@@ -330,6 +330,36 @@ async function textseiten(basis, art) {
   return liste;
 }
 
+async function steckbriefUndKita(basis, art) {
+  // K26: Die Kita-Frage der Startseite öffnet den Planer im Fußweg, und planer.js versteht den Hash so.
+  const start = fs.readFileSync(path.join(WURZEL, "index.html"), "utf8");
+  const kitaLink = (start.match(/href="(planer\.html#[^"]*zu=kita[^"]*)"/) || [])[1] || "";
+  pruef(/(?:#|&amp;)weg=fuss(?:&|$)/.test(kitaLink), `index.html: Kita-Frage verlinkt den Planer im Fußweg (${kitaLink || "kein Link"})`);
+  const k = await oeffnen(basis, "planer.html", { hash: "#" + kitaLink.split("#")[1].replace(/&amp;/g, "&") + "&r=403" });
+  const kz = await k.page.evaluate(() => ({ weg: (document.querySelector("#weg input:checked") || {}).value, zu: (document.querySelector("#zu input:checked") || {}).value,
+    odbl: !document.getElementById("fuss-odbl").hidden,
+    sb: [...document.querySelectorAll("#vs-inhalt .vs-steckbrief a.knopf")].map((a) => ({ href: a.getAttribute("href"), text: a.textContent })),
+    hinweis: (document.querySelector("#vs-inhalt .vs-steckbrief + .fuss") || {}).textContent || "" }));
+  pruef(kz.weg === "fuss" && kz.zu === "kita" && kz.odbl, `Kita-Link über ${art}: Planer zeigt Fußweg zur Kita, ODbL-Vermerk sichtbar (${kz.weg}, ${kz.zu}, ${kz.odbl})`);
+  // K25: Knopf „Steckbrief (A4)“ in der Versorgung führt zur Datei des gewählten Planungsraums, mit Luftlinien-Hinweis
+  const sb = kz.sb[0] || {};
+  pruef(kz.sb.length === 1 && /\/export\/steckbriefe\/403\.html$/.test(sb.href) && fs.existsSync(path.join(WURZEL, sb.href)) && /Steckbrief \(A4\)/.test(sb.text) && /Luftlinie/.test(kz.hinweis),
+    `Versorgung 403 über ${art}: Knopf „Steckbrief (A4)“ auf ${sb.href || "–"}, Datei vorhanden, Hinweis Luftlinie`);
+  await k.ctx.close();
+  // Beispieldaten (Stadtteile) haben keinen Steckbrief: kein Knopf
+  const f = await oeffnen(basis, "planer.html" + FIX, { hash: "#r=13" });
+  const fz = await f.page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, sb: document.querySelectorAll(".vs-steckbrief").length }));
+  pruef(fz.zeilen > 0 && fz.sb === 0, `Beispieldaten über ${art}: Versorgung ohne Steckbrief-Knopf (${fz.zeilen} Zeilen, ${fz.sb} Knöpfe)`);
+  await f.ctx.close();
+  // planer-daten.html listet alle Steckbriefe, je einer je Datei in daten/export/steckbriefe/
+  const d = await oeffnen(basis, "planer-daten.html", { warten: false });
+  const liste = await d.page.$$eval('.steckbriefliste a[href*="export/steckbriefe/"]', (l) => l.map((a) => a.getAttribute("href").split("/").pop()));
+  await d.ctx.close();
+  const dateien = fs.readdirSync(path.join(WURZEL, "daten", "export", "steckbriefe")).filter((x) => x.endsWith(".html")).sort();
+  pruef(dateien.length > 0 && JSON.stringify([...liste].sort()) === JSON.stringify(dateien),
+    `planer-daten.html über ${art}: ${liste.length} Steckbriefe verlinkt, ${dateien.length} Dateien in daten/export/steckbriefe/`);
+}
+
 function downloadsPruefen(liste) {
   const schemaDir = path.join(WURZEL, "daten", "schema");
   const schemas = fs.readdirSync(schemaDir).filter((f) => f.endsWith(".json")).map((f) => ({ f, s: JSON.parse(fs.readFileSync(path.join(schemaDir, f), "utf8")) }));
@@ -357,6 +387,7 @@ try {
     await rundreise(basis, art);
     await handy(basis, art);
     const liste = await textseiten(basis, art);
+    await steckbriefUndKita(basis, art);
     if (art === "HTTP") downloadsPruefen(liste);
   }
   await raumebeneFremd(true);
