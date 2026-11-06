@@ -1,0 +1,13 @@
+# Python-Pakete für skripte/ und pruefen/ (Kiezatlas Potsdam), festgeschrieben am 06.11.2026.
+# Versionen = was am 06.11.2026 offline aus dem lokalen uv-Zwischenspeicher aufgelöst wurde und mit der
+# bisherigen Umgebung ../kiezatlas-potsdam-west/.venv übereinstimmt (numpy, pyproj, shapely) bzw. mit
+# ../geodaten-import-pipeline/requirements.txt (psycopg, pyyaml). Herleitung: docs/rundgang.md, „Umgebung“.
+# Neu erzeugen (ohne Netz, nur aus dem Zwischenspeicher):
+#   uv pip compile --offline --generate-hashes --python-version 3.13 requirements.in -o requirements.txt
+psycopg[binary]==3.3.6
+pyyaml==6.0.3
+numpy==2.5.4
+scipy==1.18.1
+pyproj==3.8.0
+shapely==2.2.0
+pillow==13.0.0

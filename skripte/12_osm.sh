@@ -9,13 +9,14 @@
 # KIEZ_ENV: Datei mit RECHNEN_PASSWORD (chmod 600), Standard ./.env, in Worktrees ../kiezatlas-potsdam/.env.
 set -eu
 cd "$(dirname "$0")/.."
-PIPELINE="${PIPELINE_DIR:-../geodaten-import-pipeline}"
 KIEZ_DATEN="${KIEZ_DATEN:-$(cd .. && pwd)/kiezatlas-daten}"
 if [ -z "${KIEZ_ENV:-}" ]; then
   if [ -f ./.env ]; then KIEZ_ENV=./.env; else KIEZ_ENV=../kiezatlas-potsdam/.env; fi
 fi
 case "$KIEZ_ENV" in */*) ;; *) KIEZ_ENV="./$KIEZ_ENV" ;; esac
-UV="uv run -q --offline --no-project --with-requirements $PIPELINE/requirements.txt --with numpy --with scipy"
+# Pakete mit exakten Versionen und Prüfsummen aus requirements.txt (seit 06.11.2026; vorher „--with numpy
+# --with scipy“ ohne Version, also die jeweils neueste im Zwischenspeicher). pytest aus requirements-pruefen.txt.
+UV="uv run -q --offline --python 3.13 --no-project --with-requirements requirements.txt"
 
 lade_umgebung() {
   set -a; . "$KIEZ_ENV"; set +a
@@ -32,6 +33,6 @@ case "$schritt" in
   test)
     # Datenbanktest (Trockenlauf mit ROLLBACK) nur mit A3_DB_TEST=1
     if [ "${A3_DB_TEST:-0}" = 1 ]; then lade_umgebung; fi
-    $UV --with pytest python -I -m pytest -q -p no:cacheprovider pruefen/a3_test_osm.py "$@" ;;
+    $UV --with-requirements requirements-pruefen.txt python -I -m pytest -q -p no:cacheprovider pruefen/a3_test_osm.py "$@" ;;
   *) echo "Aufruf: skripte/12_osm.sh laden --pbf DATEI [--trockenlauf] | pruefen | test" >&2; exit 2 ;;
 esac

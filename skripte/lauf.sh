@@ -15,11 +15,16 @@
 #   KIEZ_DATEN   Rohdaten außerhalb der Repos (Standard ../kiezatlas-daten, HERKUNFT.md je Ordner)
 #   KIEZ_ENV     Datei mit POSTGRES_PASSWORD, IMPORT_PASSWORD, LESE_PASSWORD, RECHNEN_PASSWORD
 #                (chmod 600). Standard ./.env, in Worktrees ../kiezatlas-potsdam/.env.
-# Braucht: Docker, uv, daneben die Repositories geodaten-import-pipeline und kiezatlas-potsdam-west (.venv).
+#   PIPELINE_DIR Repository der Geodaten-Import-Pipeline (Standard ../geodaten-import-pipeline)
+# Braucht: Docker, uv, daneben das Repository geodaten-import-pipeline. Python-Pakete für vorbereiten aus
+# requirements.txt (exakte Versionen mit Prüfsummen, uv --offline: nur aus dem lokalen Zwischenspeicher);
+# laden, auswerten und einrichten nutzen wie bisher die requirements.txt der Pipeline.
+# Seit 06.11.2026 ohne die .venv von kiezatlas-potsdam-west. Die Rohdaten für vorbereiten liest
+# skripte/01_vorbereiten.py aber weiter aus rohdaten/ (Verweis ins Nachbar-Repo, belege/rohdaten.md).
 set -eu
 cd "$(dirname "$0")/.."
 PIPELINE="${PIPELINE_DIR:-../geodaten-import-pipeline}"
-PY="../kiezatlas-potsdam-west/.venv/bin/python"
+PY="uv run -q --offline --python 3.13 --no-project --with-requirements requirements.txt python"
 KIEZ_DATEN="${KIEZ_DATEN:-$(cd .. && pwd)/kiezatlas-daten}"
 if [ -z "${KIEZ_ENV:-}" ]; then
   if [ -f ./.env ]; then KIEZ_ENV=./.env; else KIEZ_ENV=../kiezatlas-potsdam/.env; fi
@@ -40,6 +45,8 @@ case "$schritt" in
       *" --nur "*) ;;
       *) echo "laden nur mit --nur QUELLE (Ladebetrieb, pruefen/INVENTAR.md)" >&2; exit 2 ;;
     esac
+    # Stand der Pipeline mitschreiben, damit er zum Laufbericht notiert werden kann (docs/rundgang.md, „Umgebung“)
+    echo "Pipeline: $(git -C "$PIPELINE" describe --always --dirty 2>/dev/null || echo unbekannt)" >&2
     PGUSER=pipeline_import PGPASSWORD="$IMPORT_PASSWORD" $UV python -m pipeline.laden --config config/potsdam.yaml "$@" ;;
   auswerten)
     PGUSER=mosidi_lesen PGPASSWORD="$LESE_PASSWORD" $UV python skripte/02_auswerten.py ;;
