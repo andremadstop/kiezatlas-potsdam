@@ -162,9 +162,9 @@ var LEER = { type: "FeatureCollection", features: [] };
 var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 } };
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
-  style: { version: 8, sources: {
+  style: T.grundkarte({ version: 8, sources: {
       basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="' + DLDE + '">dl-de/by-2-0</a>' },
+        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
       zellen: { type: "geojson", data: LEER },
       raum: { type: "geojson", data: RAUMEBENE[S.raum].fc, promoteId: "nr", attribution: RAUMEBENE[S.raum].att },
       ein: { type: "geojson", data: LEER },
@@ -178,7 +178,7 @@ var map = new maplibregl.Map(Object.assign({
       { id: "raum-wahl", type: "line", source: "raum", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } },
       { id: "ein_odbl", type: "circle", source: "ein_odbl", layout: { visibility: "none" }, paint: {} },
       { id: "ein", type: "circle", source: "ein", paint: {} }
-    ] },
+    ] }, { vor: "ein_odbl" }),
   maxZoom: 19, maxPitch: 60, attributionControl: false, fadeDuration: RUHIG ? 0 : 300,
   locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
 }, start));

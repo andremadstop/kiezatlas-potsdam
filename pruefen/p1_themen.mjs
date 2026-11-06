@@ -14,6 +14,8 @@ const HIER = path.dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const befunde = [];
 function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if (!ok) befunde.push(text); }
 
@@ -37,7 +39,7 @@ async function probe(basis, art) {
   const ctx = await browser.newContext({ reducedMotion: "reduce" });
   const page = await ctx.newPage();
   const konsole = [], seitenfehler = [];
-  await page.route("**/*", (r) => eigen(r.request().url()) ? r.continue() : r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD }));
+  await page.route("**/*", (r) => eigen(r.request().url()) ? r.continue() : r.fulfill(fremdAntwort(r.request().url())));
   page.on("console", (m) => { if (m.type() === "error") konsole.push(m.text()); });
   page.on("pageerror", (e) => seitenfehler.push(e.message));
   await page.goto(basis + "karte.html", { waitUntil: "load" });
@@ -119,8 +121,8 @@ async function probe(basis, art) {
     return o;
   });
 
-  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "HASH", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
-    "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
+  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
+    "grundLuft", "grundkarte", "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
   pruef(JSON.stringify(r.schluessel) === JSON.stringify(soll), `Objekt KIEZ_THEMEN hat genau die ${soll.length} Namen des Vertrags`);
   pruef(r.paare.slice(0, 7).join(",") === "stadtteile/stadtteile,ew/ew,d_alter/alter,q_u18/u18,q_65p/65p,q_v1949/vor1949,q_fern/fern" && r.hashOk,
     `Themen-Schlüssel id/h wie im Vertrag (${r.paare.slice(0, 7).join(", ")})`);

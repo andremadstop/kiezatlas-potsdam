@@ -111,5 +111,5 @@ QUELLEN (Liste, zwei Spalten)    FUSS (Impressumszeile, Stand)
 ## Nachträge (Besitzerwünsche während des Baus)
 
 - **Schaugrafik:** Export im Browser als SVG (Schriften eingebettet), PNG mit 300 dpi und PDF über die Druckansicht (`@page` in Formatgröße). Formate A4 hoch, A4 quer, halbe Seite quer, Spalte 85 mm, Quadrat. Karte nur aus eigenen Daten (Gitter, Stadtteile), keine Kacheln. Passt der Inhalt nicht, wird höchstens auf 85 % verkleinert und danach werden Rubriken von hinten weggelassen und benannt.
-- **Datenschutz und Veröffentlichung:** alle Bibliotheken und Schriften lokal (`vendor/`, `fonts/`), fremd sind nur Kartenkacheln (basemap.de) und Luftbild (LGB); Hinweis im Fuß, Links auf Impressum und Datenschutz.
+- **Datenschutz und Veröffentlichung:** alle Bibliotheken und Schriften lokal (`vendor/`, `fonts/`), fremd sind nur Kartenkacheln und Kartenschrift (basemap.de) und Luftbild (LGB); Hinweis im Fuß, Links auf Impressum und Datenschutz.
 - **Desktop-Mausrad:** scrollt immer die Seite (kein Strg-Hinweis über der Karte); gezoomt wird per Doppelklick oder Knopf. Auf Touch bleibt die Zwei-Finger-Bedienung.

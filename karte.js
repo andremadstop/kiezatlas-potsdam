@@ -37,9 +37,9 @@ var LEER = { type: "FeatureCollection", features: [] }, bereit = false;
 var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 } };
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
-  style: { version: 8, sources: {
+  style: T.grundkarte({ version: 8, sources: {
       basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
+        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
       dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
         attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
       zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, eigene Auswertung' },
@@ -56,7 +56,7 @@ var map = new maplibregl.Map(Object.assign({
       { id: "gebaeude3d", type: "fill-extrusion", source: "gebaeude", layout: { visibility: "none" }, paint: { "fill-extrusion-color": "#aebfbf", "fill-extrusion-height": ["get", "h"], "fill-extrusion-opacity": 0.95, "fill-extrusion-vertical-gradient": true } },
       { id: "teile-linie", type: "line", source: "teile", paint: { "line-color": "#ffffff", "line-width": 1.2, "line-opacity": 0.9 } },
       { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
-    ] },
+    ] }),
   maxZoom: 19, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: false,
   locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
 }, start));
@@ -79,7 +79,7 @@ function anwenden() {
     map.setPaintProperty("zellen-2d", "fill-color", farbe(t)); map.setPaintProperty("zellen-2d", "fill-opacity", S.geb ? 0.55 : 0.85);
   }
   map.setLayoutProperty("dop", "visibility", S.luft ? "visible" : "none");
-  map.setLayoutProperty("basemap", "visibility", S.luft ? "none" : "visible");
+  T.grundLuft(map, S.luft);
   map.setLayoutProperty("gebaeude3d", "visibility", S.geb && S.d3 ? "visible" : "none");
   map.setLayoutProperty("gebaeude2d", "visibility", S.geb && !S.d3 ? "visible" : "none");
   if (S.geb) gebaeudeLaden();

@@ -34,6 +34,8 @@ if (process.argv.includes("--vergleich")) {
 const WURZEL = path.resolve(arg("--wurzel", "."));
 const AUS = arg("--json");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const server = http.createServer((q, a) => {
   const p = path.normalize(path.join(WURZEL, decodeURIComponent(new URL(q.url, "http://x").pathname)));
@@ -49,7 +51,7 @@ const fehler = [];
 async function oeffnen(datei, hash = "") {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce", acceptDownloads: true, locale: "de-DE", timezoneId: "Europe/Berlin" });
   const page = await ctx.newPage();
-  await page.route("**/*", (r) => r.request().url().startsWith(HTTP) ? r.continue() : r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD }));
+  await page.route("**/*", (r) => r.request().url().startsWith(HTTP) ? r.continue() : r.fulfill(fremdAntwort(r.request().url())));
   page.on("pageerror", (e) => fehler.push(datei + ": " + e.message));
   await page.goto(HTTP + datei + hash, { waitUntil: "load" });
   await page.waitForFunction(() => window.KIEZ_BEREIT === true, null, { timeout: 90000 });

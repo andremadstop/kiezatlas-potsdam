@@ -1,0 +1,42 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Grundkarte: Auszug aus dem Vektorstil von basemap.de",
+ "x-datei": "grundkarte.js",
+ "x-global": "^KIEZ_GRUNDKARTE$",
+ "x-odbl": false,
+ "x-eigentuemer": "skripte/27_grundkarte.py",
+ "description": "Gekürzter, veränderter Auszug aus dem Kartenstil bm_web_gry (basemap.de Web Vektor, © GeoBasis-DE / BKG, CC BY 4.0). Keine Geodaten: nur Stilebenen und die Kachel-URL; die Kacheln lädt der Browser bei sgx.geodatenzentrum.de. unten = Flächen und Linien unter den eigenen Ebenen, oben = Beschriftungen. Ohne Gebäude und ohne Sprite-Bilder.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["stand", "quelle", "glyphs", "unten", "oben", "vermerk"],
+ "properties": {
+  "stand": {"type": "string"},
+  "quelle": {
+   "type": "object",
+   "required": ["type", "tiles", "minzoom", "maxzoom", "attribution"],
+   "properties": {
+    "type": {"const": "vector"},
+    "tiles": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^https://sgx\\.geodatenzentrum\\.de/gdz_basemapde_vektor/"}},
+    "minzoom": {"type": "integer"},
+    "maxzoom": {"type": "integer"},
+    "bounds": {"type": "array"},
+    "attribution": {"type": "string", "pattern": "CC BY 4\\.0"}
+   }
+  },
+  "glyphs": {"type": "string", "pattern": "^https://sgx\\.geodatenzentrum\\.de/gdz_basemapde_vektor/"},
+  "unten": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/ebene"}},
+  "oben": {"type": "array", "minItems": 1, "items": {"allOf": [{"$ref": "#/$defs/ebene"}, {"properties": {"type": {"const": "symbol"}}}]}},
+  "vermerk": {"type": "string", "pattern": "GeoBasis-DE / BKG.*CC BY 4\\.0"}
+ },
+ "$defs": {
+  "ebene": {
+   "type": "object",
+   "required": ["id", "type", "source"],
+   "properties": {
+    "id": {"type": "string", "pattern": "^bm-"},
+    "source": {"const": "bm"},
+    "type": {"enum": ["fill", "line", "circle", "symbol"]}
+   }
+  }
+ }
+}

@@ -25,6 +25,8 @@ const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? proces
 const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));
 const AXE = fs.readFileSync(path.join(HIER, "..", "node_modules", "axe-core", "axe.min.js"), "utf8");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
   ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json" };
 
@@ -60,7 +62,7 @@ async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 
   await page.route("**/*", (r) => {
     const u = r.request().url();
     if (eigen(u)) return r.continue();
-    abgewiesen.push(u); return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    abgewiesen.push(u); return r.fulfill(fremdAntwort(r.request().url()));
   });
   page.on("console", (m) => {
     if (m.type() !== "error") return;

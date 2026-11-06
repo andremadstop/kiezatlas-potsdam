@@ -200,9 +200,9 @@ function karte() {
   var start = { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? 12 : 40 } };
   var map = new maplibregl.Map(Object.assign({
     container: "karte",
-    style: { version: 8, transition: { duration: RUHIG ? 0 : 450, delay: 0 }, sources: {
+    style: T.grundkarte({ version: 8, transition: { duration: RUHIG ? 0 : 450, delay: 0 }, sources: {
         basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-          attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
+          attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
         dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
           attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
         zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung)' },
@@ -220,9 +220,11 @@ function karte() {
         { id: "geb-nd", type: "fill", source: "gebaeude", minzoom: GEB_ZOOM, filter: ["==", ["get", "g"], "nicht_datiert"], paint: { "fill-color": GEB_ND, "fill-outline-color": GEB_LINIE, "fill-opacity": 0.95 } },
         { id: "geb-farbe", type: "fill", source: "gebaeude", minzoom: GEB_ZOOM, filter: [">=", ["coalesce", ["get", "k"], -1], 0], paint: { "fill-color": PALETTE[0], "fill-opacity": ["match", ["get", "g"], "belegt", 0.97, 0.58] } },
         { id: "geb-belegt", type: "line", source: "gebaeude", minzoom: GEB_ZOOM, filter: ["==", ["get", "g"], "belegt"], paint: { "line-color": "#13212a", "line-width": 1.4 } },
+        // 3D: dieselben Gebäude als Körper in ALKIS-Höhe (h), Farbe wie in 2D; geschätzt heller statt durchscheinend
+        { id: "geb-3d", type: "fill-extrusion", source: "gebaeude", minzoom: GEB_ZOOM, layout: { visibility: "none" }, paint: { "fill-extrusion-color": GEB_REST, "fill-extrusion-height": ["coalesce", ["get", "h"], 3], "fill-extrusion-opacity": 0.93, "fill-extrusion-vertical-gradient": true } },
         { id: "teile-linie", type: "line", source: "teile", paint: { "line-color": "#13212a", "line-width": 0.8, "line-opacity": 0.4 } },
         { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
-      ] },
+      ] }),
     maxZoom: 18, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: false,
     locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
   }, start));
@@ -245,6 +247,14 @@ function karte() {
   function farbeSpanne() { var e = ["step", summe(), STUFEN[0]]; GRENZEN.forEach(function (g, i) { e.push(g, STUFEN[i + 1]); }); return e; }
   // Gebäude: Farbe der Klasse k, Zeitfilter über k (kein neues Laden); k null = nicht datiert
   function gebFarbe() { var e = ["match", ["coalesce", ["get", "k"], -1]]; PALETTE.forEach(function (c, k) { e.push(k, c); }); e.push(GEB_ND); return e; }
+  // 3D kennt keine Deckkraft je Gebäude: geschätzte Bauzeit als hellere Mischung mit Papierweiß (wie 2D mit 58 % Deckkraft)
+  function hell(c) { var n = parseInt(c.slice(1), 16), w = [250, 251, 248], a = 0.58; return "rgb(" + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (x, i) { return Math.round(a * x + (1 - a) * w[i]); }).join(",") + ")"; }
+  var PALETTE_HELL = PALETTE.map(hell);
+  function geb3dFarbe() {
+    var k = ["coalesce", ["get", "k"], -1], kraeftig = ["match", k], blass = ["match", k];
+    PALETTE.forEach(function (c, i) { kraeftig.push(i, c); blass.push(i, PALETTE_HELL[i]); }); kraeftig.push(GEB_ND); blass.push(GEB_ND);
+    return ["case", ["==", ["get", "g"], "nicht_datiert"], GEB_ND, gebFilter(), ["case", ["==", ["get", "g"], "belegt"], kraeftig, blass], GEB_REST];
+  }
   function gebFilter() { var k = ["coalesce", ["get", "k"], -1]; return S.ansicht === "spanne" ? ["all", [">=", k, S.von], ["<=", k, S.bis]] : [">=", k, 0]; }
   // Zellen treten ab Zoom 14 zurück, damit Gebäude und Zellen nicht doppelt färben, aber nur in Stadtteilen, deren
   // Gebäude geladen sind (sonst sähe ein nicht geladener Stadtteil aus wie unbebaut)
@@ -268,12 +278,17 @@ function karte() {
     map.setPaintProperty("zellen-muster", "fill-pattern", ["match", ["get", "j_s"], 2, "j-punkte", "j-schraffur"]);
     map.setFilter("geb-farbe", gebFilter()); map.setFilter("geb-belegt", ["all", gebFilter(), ["==", ["get", "g"], "belegt"]]);
     map.setPaintProperty("geb-farbe", "fill-color", gebFarbe());
+    map.setPaintProperty("geb-3d", "fill-extrusion-color", geb3dFarbe());
+    // 3D ab Zoom 14: Gebäude stehen als Körper, die flachen Gebäudeebenen treten ab
+    var koerper = S.d3 && map.getZoom() >= GEB_ZOOM;
+    map.setLayoutProperty("geb-3d", "visibility", koerper ? "visible" : "none");
+    ["geb-rest", "geb-nd", "geb-farbe", "geb-belegt"].forEach(function (id) { map.setLayoutProperty(id, "visibility", koerper ? "none" : "visible"); });
     // ab Zoom 14 keine Säulen: dort stehen die Gebäude, die Zellen liegen flach darunter (abgeblendet, wo Gebäude geladen)
     var saeulen = S.d3 && map.getZoom() < GEB_ZOOM;
     map.setLayoutProperty("zellen-3d", "visibility", saeulen ? "visible" : "none");
     map.setLayoutProperty("zellen-2d", "visibility", saeulen ? "none" : "visible");
     map.setLayoutProperty("dop", "visibility", S.luft ? "visible" : "none");
-    map.setLayoutProperty("basemap", "visibility", S.luft ? "none" : "visible");
+    T.grundLuft(map, S.luft);
     leisteZeigen(); listeZeigen(); hashSchreiben();
   }
   function hashSchreiben() {
@@ -343,7 +358,7 @@ function karte() {
     setze("spanne-name", name);
     var st = document.getElementById("j-status");
     var nah = map.getZoom() >= GEB_ZOOM;
-    if (nah) st.textContent = (sp ? "Gebäude mit geschätzter Bauzeit " + name + " in Farbe" : "Gebäude nach geschätzter Bauzeit") + (gebMehr ? "; weitere Stadtteile beim Heranzoomen" : "");
+    if (nah) st.textContent = (sp ? "Gebäude mit geschätzter Bauzeit " + name + " in Farbe" : "Gebäude nach geschätzter Bauzeit") + (S.d3 ? ", Höhe: Gebäudehöhe nach ALKIS" : "") + (gebMehr ? "; weitere Stadtteile beim Heranzoomen" : "");
     else st.textContent = sp ? "Anteil " + name + " je Zelle" + (S.d3 ? ", Höhe: Zahl dieser Gebäude" : "") : "Bauzeit mit den meisten Gebäuden je Zelle" + (S.d3 ? ", Höhe: Zahl der Gebäude" : "");
     document.getElementById("kartenstatus").textContent = "Karte zeigt: " + st.textContent + (S.nr ? ", ausgewählt " + S.nr + " " + T.name(S.nr) : "") + (nah ? ", " + gebSichtText() : "") + ".";
     var L = document.getElementById("j-legende"); L.innerHTML = "";
@@ -357,10 +372,10 @@ function karte() {
     [["j-legende__muster j-legende__muster--schraffur", "Klassen geheim gehalten"], sp ? null : ["j-legende__muster j-legende__muster--punkte", "zwei Klassen gleichauf"], ["j-legende__muster j-legende__muster--blass", "unter " + WENIG + " Gebäuden, sehr unsicher"]]
       .forEach(function (x) { if (!x || nah) return; var s = el("span", "j-legende__eintrag"), i = el("i", x[0]); i.setAttribute("aria-hidden", "true"); s.appendChild(i); s.appendChild(document.createTextNode(x[1])); L.appendChild(s); });
     if (nah) {
-      [["j-legende__muster j-legende__muster--geschaetzt", "Bauzeit geschätzt (Farbe der Bauzeit, heller)"], gebBelegt ? ["j-legende__muster j-legende__muster--belegt", "Bauzeit belegt (Farbe kräftig, mit Rand)"] : null,
+      [["j-legende__muster j-legende__muster--geschaetzt", "Bauzeit geschätzt (Farbe der Bauzeit, heller)"], gebBelegt ? ["j-legende__muster j-legende__muster--belegt", S.d3 ? "Bauzeit belegt (Farbe kräftig)" : "Bauzeit belegt (Farbe kräftig, mit Rand)"] : null,
         ["j-legende__muster j-legende__muster--nd", "nicht datiert"], sp ? ["j-legende__muster j-legende__muster--rest", "andere Bauzeit"] : null]
         .forEach(function (x) { if (!x) return; var s = el("span", "j-legende__eintrag"), i = el("i", x[0]); i.setAttribute("aria-hidden", "true"); s.appendChild(i); s.appendChild(document.createTextNode(x[1])); L.appendChild(s); });
-      L.appendChild(el("span", "j-legende__quelle", "Gebäude: Schätzung je Haus, keine Aussage über einzelne Grundstücke. Bauzeit geschätzt aus dem Zensus 2022, den Bauzeiten der Großsiedlungen und den Nachbargebäuden, belegt bei einigen Baudenkmalen aus Wikidata (CC0); Umrisse © GeoBasis-DE/LGB, Daten verändert (eigene Berechnung)."));
+      L.appendChild(el("span", "j-legende__quelle", "Gebäude: Schätzung je Haus, keine Aussage über einzelne Grundstücke. Bauzeit geschätzt aus dem Zensus 2022, den Bauzeiten der Großsiedlungen und den Nachbargebäuden, belegt bei einigen Baudenkmalen aus Wikidata (CC0); Umrisse" + (S.d3 ? " und Höhen" : "") + " © GeoBasis-DE/LGB, Daten verändert (eigene Berechnung)."));
     } else {
       L.appendChild(el("span", "j-legende__eintrag j-legende__hinweis", "Näher heran (ab Zoom " + GEB_ZOOM + "): einzelne Gebäude"));
       L.appendChild(el("span", "j-legende__quelle", D.beschriftung + ". " + QUELLE_KURZ + "."));
@@ -380,7 +395,7 @@ function karte() {
   });
 
   // ---------- Gebäude ab Zoom 14: je Stadtteil im Bild eine Datei, per <script> (T.laden), nie beim Seitenstart
-  var GEB = ["geb-farbe", "geb-nd", "geb-rest"], ZELL = ["zellen-2d", "zellen-3d", "zellen-muster"];
+  var GEB = ["geb-farbe", "geb-nd", "geb-rest", "geb-3d"], ZELL = ["zellen-2d", "zellen-3d", "zellen-muster"];
   var gebDaten = {}, gebFehl = {}, gebNrs = [], gebImBild = [], gebSchluessel = "", gebBelegt = 0, QUELLEN = {}, BOX = {};
   // Stadtteil an einem Punkt (Strahlverfahren, Löcher beachtet)
   function inRing(r, x, y) { var c = false; for (var i = 0, j = r.length - 1; i < r.length; j = i++) { var a = r[i], b = r[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
@@ -447,7 +462,8 @@ function karte() {
         (WEG[p.s] ? "<p class=\"pop-q\">Weg: " + WEG[p.s] + " (Stufe " + esc(p.s) + " von 6).</p>" : "");
       if (q) h += "<p class=\"pop-q\">Quelle: " + esc(q.quelle) + ". " + esc(q.vermerk) + ".</p>";
     }
-    var u = QUELLEN.umrisse;
+    var u = QUELLEN.umrisse, hm = +p.h;
+    if (hm > 0) h += "<p class=\"pop-q\">Höhe rund " + fmt.format(hm) + NB + "m (ALKIS-Objekthöhe, sonst aus der Geschosszahl geschätzt).</p>";
     if (u) h += "<p class=\"pop-q\">Umriss: " + esc(u.vermerk) + ".</p>";
     return h + "<p class=\"pop-q\">" + (g === "belegt" ? "Belegt aus einer Quelle; " : "Schätzung, ") + "keine Aussage über einzelne Grundstücke. <a class=\"link\" href=\"jahre-methode.html#m-gebaeude\">Wie genau?</a></p>";
   }

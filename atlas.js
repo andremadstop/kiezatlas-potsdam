@@ -127,12 +127,12 @@ var GRENZ_DATEN = GZ ? { type: "FeatureCollection", features: [
 var Q_ZENSUS = 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, eigene Auswertung';
 var map = new maplibregl.Map({
   container: "karte",
-  style: {
+  style: T.grundkarte({
     version: 8,
     sources: {
       basemap: { type: "raster", tileSize: 256, maxzoom: 18,
         tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
+        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
       dop: { type: "raster", tileSize: 256, maxzoom: 20,
         tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
         attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
@@ -158,7 +158,7 @@ var map = new maplibregl.Map({
       { id: "grenz-zelle", type: "line", source: "grenze", filter: ["==", ["get", "art"], "zelle"], layout: { visibility: "none" }, paint: { "line-color": "#13212a", "line-width": 3, "line-dasharray": [2, 1] } },
       { id: "grenz-mitte", type: "circle", source: "grenze", filter: ["==", ["get", "art"], "mitte"], layout: { visibility: "none" }, paint: { "circle-radius": 7, "circle-color": "#13212a", "circle-stroke-color": "#fff", "circle-stroke-width": 2 } }
     ]
-  },
+  }),
   bounds: GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 },
   maxZoom: 19, maxPitch: 70, attributionControl: false, cooperativeGestures: !FEIN, scrollZoom: !FEIN, fadeDuration: RUHIG ? 0 : 300,
   locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern",
@@ -245,7 +245,7 @@ function gebaeudeLaden(nr) {
 function setzeLuftbild(an) {
   S.luftbild = an; document.getElementById("luftbild").checked = an;
   map.setLayoutProperty("dop", "visibility", an ? "visible" : "none");
-  map.setLayoutProperty("basemap", "visibility", an ? "none" : "visible");
+  T.grundLuft(map, an);
 }
 function setzeGebaeude3d(an) {
   S.geb3d = an; document.getElementById("dreid").checked = an;

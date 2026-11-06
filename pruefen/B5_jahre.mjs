@@ -28,6 +28,8 @@ const WURZEL = path.resolve(HIER, "..");
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 const AXE = fs.readFileSync(path.join(WURZEL, "node_modules", "axe-core", "axe.min.js"), "utf8");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const SEITEN = ["jahre.html", "jahre-methode.html", "jahre-daten.html"];
 const EIGENE = ["jahre.html", "jahre.js", "jahre.css", "jahre-methode.html", "jahre-daten.html"];
@@ -88,7 +90,7 @@ const JAHRE = path.join(WURZEL, "daten", "jahre");
 const JDATEIEN = fs.readdirSync(JAHRE).filter((f) => /^\d{2}\.js$/.test(f)).sort();
 let gebAlle = 0;
 {
-  const fehl = [], NAMEN = ["j", "k", "g", "q", "s"];
+  const fehl = [], NAMEN = ["j", "k", "g", "q", "s", "h"];   // h = Höhe in m für 3D (ALKIS), 06.11.
   for (const f of JDATEIEN) {
     const d = ladeJs(path.join(JAHRE, f));
     if (d.fixture) fehl.push(f + ": Fixture");
@@ -104,13 +106,14 @@ let gebAlle = 0;
       const p = x.properties, extra = Object.keys(p).filter((k) => !NAMEN.includes(k));
       if (extra.length) fehl.push(`${f}: Feld ${extra.join(",")}`);
       if (!["belegt", "geschaetzt", "nicht_datiert"].includes(p.g)) fehl.push(`${f}: g=${p.g}`);
+      if (!(Number.isInteger(p.h) && p.h >= 1 && p.h <= 200)) fehl.push(`${f}: h=${p.h}`);
       if ((p.k == null) !== (p.g === "nicht_datiert")) fehl.push(`${f}: k=${p.k} bei g=${p.g}`);
       if (p.g !== "nicht_datiert" && !(p.q && d.quellen[p.q])) fehl.push(`${f}: Quelle ${p.q} fehlt`);
       if (p.j != null && p.g !== "belegt") fehl.push(`${f}: Jahr bei ${p.g}`);
       if (fehl.length > 5) break;
     }
   }
-  pruef(JDATEIEN.length === 32 && fehl.length === 0, `${JDATEIEN.length} Dateien, ${gebAlle} Gebäude: nur j/k/g/q/s, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ ${fehl.slice(0, 5).join(" | ")}`);
+  pruef(JDATEIEN.length === 32 && fehl.length === 0, `${JDATEIEN.length} Dateien, ${gebAlle} Gebäude: nur j/k/g/q/s/h, Höhe 1–200 m, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ ${fehl.slice(0, 5).join(" | ")}`);
   let ok = true, aus = "";
   try { aus = execFileSync("python3", ["-I", path.join(WURZEL, "skripte", "26_jahre_methode.py"), "--pruefen"], { encoding: "utf8" }).trim(); } catch (e) { ok = false; aus = String(e.stdout || e.message).trim(); }
   let vertrag = "";
@@ -141,7 +144,7 @@ const browser = await chromium.launch();
 async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 1440, hoehe = 900 } = {}) {
   const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, reducedMotion: bewegung, acceptDownloads: true });
   const page = await ctx.newPage(), fehler = [], abgewiesen = [], geladen = [];
-  await page.route("**/*", (r) => { const u = r.request().url(); if (eigen(u)) return r.continue(); abgewiesen.push(u); return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD }); });
+  await page.route("**/*", (r) => { const u = r.request().url(); if (eigen(u)) return r.continue(); abgewiesen.push(u); return r.fulfill(fremdAntwort(r.request().url())); });
   page.on("console", (m) => { if (m.type() !== "error") return; const ort = (m.location() || {}).url || ""; if (!(/ERR_ABORTED/.test(m.text()) && (!ort || !eigen(ort)))) fehler.push(m.text().split("\n")[0]); });
   page.on("pageerror", (e) => fehler.push("pageerror: " + e.message));
   page.on("request", (q) => geladen.push(q.url()));
@@ -462,7 +465,7 @@ console.log("\nHash und Bewegung");
       const u = r.request().url();
       if (/\/daten\/jahre\/52\.js$/.test(u)) return r.fulfill({ status: 200, contentType: "text/javascript", body: fs.readFileSync(path.join(WURZEL, "daten", "fixtures", "jahre", "52.js")) });
       if (eigen(u)) return r.continue();
-      return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+      return r.fulfill(fremdAntwort(r.request().url()));
     });
     page.on("pageerror", (e) => fehler.push(e.message));
     await page.goto(HTTP + "jahre.html#ansicht=ueberblick&blick=13.09846,52.40150,17.20", { waitUntil: "load" });

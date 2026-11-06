@@ -25,3 +25,8 @@ Je Lauf genau eine Quelle (`skripte/lauf.sh laden --nur …`), Ziele in `sql/002
 
 Das Quellenverzeichnis oben schreibt die Pipeline nur im eigenen Berichtsordner neu; es ist hier noch der Stand
 vom 04.11. Die neuen Quellen stehen in `QUELLEN.md`.
+
+## 3D-Gebäude und Vektor-Grundkarte (06.11.2026)
+
+`3D_grundkarte_20261106.md`: Entscheidungen G1 bis G8, Herkunft der Gebäudehöhen (50.356 von 52.309 aus der
+ALKIS-Objekthöhe), Nachweis, dass die Bauzeit-Schätzung unverändert blieb, Prüfungen, Netzabrufe und Grenzen.

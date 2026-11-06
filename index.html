@@ -94,7 +94,7 @@
       <p class="frage__nr">Frage 4</p>
       <h2 class="frage__titel">Wie alt sind die Häuser in meinem Stadtteil?</h2>
       <p>Gefärbt ist jetzt der Anteil der Wohnungen in Gebäuden von vor 1949. Im Stadtteil <b data-q="altbau-teil"></b> sind es <span data-q="altbau-wert"></span>, in ganz Potsdam <span data-q="altbau-stadt"></span>.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der Zahl der Geschosse genähert.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m).</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="4" data-gebaeude="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Gebäude in 3D zeigen</span></button>
     </li>
     <li class="frage" id="frage-5" data-schritt="5">
@@ -277,9 +277,9 @@
   <ul class="quellen">
     <li>Zensus 2022, Gitterzellen 100 m (Bevölkerungszahl; Alter in 5 Altersklassen; Durchschnittsalter; Energieträger der Heizung; überwiegende Heizungsart; Wohnungen nach modifizierten Mikrozensus-Baujahresklassen). <span class="vermerk">© Statistische Ämter des Bundes und der Länder, 2024 bzw. 2025</span>; Destatis: freie Nutzung mit Namensnennung, in Open-Data-Katalogen als <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> geführt. Daten verändert (eigene Berechnung: Zuordnung zu Stadtteilen, Summen, Anteile). Datensätze: <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html">Destatis, Gitterdaten Zensus 2022</a>.</li>
     <li>Stadtteile in Potsdam. Landeshauptstadt Potsdam, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/zero-2-0">dl-zero-de/2.0</a>. Datensatz: <a href="https://opendata.potsdam.de/explore/dataset/stadtteile/">opendata.potsdam.de/explore/dataset/stadtteile</a> (von Hand heruntergeladen).</li>
-    <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse, Höhe genähert). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
+    <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse; Höhe = ALKIS-Objekthöhe aus dem NAS-Auszug der LGB, wo vorhanden, sonst Geschosse × 3 m bzw. 3 m). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
     <li>Luftbild: Digitale Orthophotos DOP20. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. Dienst: <code>https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms</code>.</li>
-    <li>Hintergrundkarte: basemap.de Web Raster grau. <span class="vermerk">© basemap.de / BKG</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
+    <li>Grundkarte: basemap.de Web Vektor, Auszug aus dem Kartenstil „bm_web_gry“, verändert (ohne Gebäude, eigene Ebenen dazwischen). <span class="vermerk">© GeoBasis-DE / BKG (2026)</span>, <a href="https://www.bkg.bund.de">BKG</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
     <li>Planer und Bauzeiten: Kita- und Schulstandorte <span class="vermerk">© Ministerium für Bildung, Jugend und Sport</span>; Flächennutzung und Gebäudemerkmale aus ALKIS <span class="vermerk">© GeoBasis-DE/LGB</span>; jeweils <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung). Planungsräume <span class="vermerk">© Landeshauptstadt Potsdam</span>, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert. Haltestellen und Takte <span class="vermerk">VBB Verkehrsverbund Berlin-Brandenburg GmbH</span>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Daten verändert (eigene Berechnung). Richtwerte aus dem Nahverkehrsplan 2019 und dem Potsdamer Baulandmodell 2019, Bauzeiten der Großsiedlungen aus „Potsdamer Platte“ (2008), jeweils nur Zahlen mit Fundstelle. Alle Dateien mit Vermerk: <a href="planer-daten.html">Daten</a>.</li>
     <li>Gegenproben: Regionaldatenbank Deutschland, Tabelle 12411-01-01-5-B (Bevölkerungsstand Potsdam); Landeshauptstadt Potsdam, „Stadtteile im Blick 2022“, S. 26 (Potsdam West). Je eine Zahl übernommen.</li>
     <li>Werkzeuge: Geodaten-Import-Pipeline (Apache-2.0, <a href="https://github.com/andremadstop/geodaten-import-pipeline">github.com/andremadstop/geodaten-import-pipeline</a>), PostgreSQL mit PostGIS, MapLibre GL JS 4.7.1 (BSD-3-Clause), GSAP 3.15.1 (GreenSock Standard License). Schrift: Barlow und Barlow Semi Condensed (SIL Open Font License 1.1).</li>
@@ -290,7 +290,7 @@
 <footer class="fuss-seite">
   <p class="fuss-seite__marke" aria-hidden="true">Kiezatlas Potsdam</p>
   <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
-  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
+  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln und die Schrift der Kartenbeschriftung von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
   <p class="fuss-seite__links"><a class="link" href="planer.html">Planer</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
 </footer>
 
@@ -303,6 +303,7 @@
 <script defer src="vendor/gsap.min.js"></script>
 <script defer src="vendor/ScrollTrigger.min.js"></script>
 <script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/grundkarte.js"></script>
 <script defer src="themen.js"></script>
 <script defer src="atlas.js"></script>
 <script defer src="schaugrafik.js"></script>

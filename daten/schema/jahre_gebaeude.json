@@ -110,6 +110,12 @@
         "type": "integer",
         "minimum": 1,
         "maximum": 6
+       },
+       "h": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 200,
+        "description": "Höhe für die 3D-Ansicht in ganzen Metern: ALKIS-Objekthöhe über Gelände, sonst Geschosse × 3 m, sonst 3 m"
        }
       }
      }
