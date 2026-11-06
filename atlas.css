@@ -119,7 +119,7 @@ html.kopf-weg .werkzeug{top:12px}
 .marken{display:flex;justify-content:space-between;margin-top:3px;color:var(--muted);font-size:.75rem}
 .legende__q{margin:6px 0 0;color:var(--muted);font-size:.75rem}
 .legende__grau{display:flex;gap:6px;align-items:center;margin-top:6px;color:var(--muted);font-size:.75rem}
-.legende__grau i{width:10px;height:10px;background:#d5d8d3;border:1px solid #b9bdb7;flex:0 0 auto}
+.legende__grau i{width:10px;height:10px;background:#cdc8be;border:1px solid #a9a397;flex:0 0 auto}
 .bezirke{display:grid;grid-template-columns:repeat(4,1fr);gap:3px 8px;margin-top:6px}
 .bezirke span{display:flex;gap:5px;align-items:center;font-size:.75rem;color:var(--muted)}
 .bezirke i{width:10px;height:10px;flex:0 0 auto}
@@ -306,7 +306,7 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .werkzeug{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
   .themen{flex-wrap:nowrap}
   .legende{left:8px;bottom:34px;width:auto;max-width:calc(100% - 92px);padding:8px 10px 6px}
-  .legende__q,.legende__grau,.bezirke,.legende__auswahl{display:none}
+  .legende__q,.bezirke,.legende__auswahl{display:none}
   .legende{max-width:190px}
   .legende__titel{font-size:.8125rem}
   .marken{font-size:.6875rem}

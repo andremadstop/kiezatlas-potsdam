@@ -99,12 +99,15 @@ def kennzahlen(s: dict, gebaeude: dict) -> dict:
     }
 
 
-def hoehe_m(objekthoehe, geschosse) -> float:
-    """Höhe in Metern für die 3D-Gebäude: ALKIS-Objekthöhe (über Gelände), sonst Geschosse × 3 m, sonst 3 m.
-    Werte bis 0,5 m (Tiefbauten, negative Angaben) gelten als fehlend. Wie skripte/24_jahre_kaskade.py."""
+def hoehe_m(objekthoehe, geschosse) -> tuple[float, str]:
+    """Höhe in Metern für die 3D-Gebäude und ihre Herkunft: ALKIS-Objekthöhe (über Gelände, "kataster"), sonst
+    Geschosse × 3 m ("geschosse"), sonst 3 m ("ersatz"). Werte bis 0,5 m (Tiefbauten, negative Angaben) gelten als
+    fehlend. Wie skripte/24_jahre_kaskade.py."""
     if objekthoehe is not None and float(objekthoehe) > 0.5:
-        return float(max(1, round(float(objekthoehe))))
-    return round((geschosse or 1) * 3.0, 1)
+        return float(max(1, round(float(objekthoehe)))), "kataster"
+    if geschosse:
+        return round(geschosse * 3.0, 1), "geschosse"
+    return 3.0, "ersatz"
 
 def main() -> None:
     DATEN.mkdir(exist_ok=True)
@@ -156,17 +159,17 @@ def main() -> None:
         for t in teile:
             # Höhe für 3D: ALKIS-Objekthöhe aus der NAS (relativ zum Gelände), sonst Geschosse × 3 m
             cur.execute("""SELECT ST_AsGeoJSON(ST_SimplifyPreserveTopology(g.geom, 0.000005), 6),
-                                  g.funktion, g.anzahlgs, n.objekthoehe
+                                  g.funktion, g.anzahlgs, n.objekthoehe, coalesce(n.geschosse, g.anzahlgs)
                            FROM gebaeude g JOIN stadtteil s ON s.nr = %s
                                 AND ST_Contains(s.geom, ST_PointOnSurface(g.geom))
-                           LEFT JOIN (SELECT DISTINCT ON (oid_bezug) oid_bezug, objekthoehe
+                           LEFT JOIN (SELECT DISTINCT ON (oid_bezug) oid_bezug, objekthoehe, geschosse
                                       FROM auswertung.alkis_nas_gebaeude WHERE oid_bezug IS NOT NULL
                                       ORDER BY oid_bezug, ueberlappung DESC NULLS LAST, gml_id) n ON n.oid_bezug = g.oid
                            ORDER BY g.oid""", (t["nr"],))
             js_datei(DATEN / "gebaeude" / f"{t['nr']}.js", "KIEZ_GEB_" + t["nr"], {"type": "FeatureCollection",
                      "features": [{"type": "Feature", "geometry": json.loads(gj),
-                                   "properties": {"f": f or "", "gs": gs, "h": hoehe_m(oh, gs)}}
-                                  for gj, f, gs, oh in cur.fetchall()]})
+                                   "properties": {"f": f or "", "gs": gs, **dict(zip(("h", "hq"), hoehe_m(oh, gsh)))}}
+                                  for gj, f, gs, oh, gsh in cur.fetchall()]})
 
         # Grenzfall: Zuordnung nach Mittelpunkt (Methode der Seite) gegen flächenanteilig.
         # Gerechnet in EPSG:3035, dem Bezugssystem des Gitters, damit die Zellen echte 100-m-Quadrate sind.

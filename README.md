@@ -37,7 +37,7 @@ und `python -I pruefen/daten.py`.
 
 https://souverain-systems.de/kiezatlas/ (oder `index.html` per Doppelklick, ohne Server)
 
-- **Sieben Fragen** führen durch die Karte, von „Wie viele Menschen wohnen in meiner Nachbarschaft?“ bis
+- **Neun Fragen** führen durch die Karte, von „Wie viele Menschen wohnen in meiner Nachbarschaft?“ bis
   „Wie kommt das ins Heft?“; jede stellt Stadtteil, Thema und Kamera ein und erklärt nebenbei eine Funktion.
   Alle Antworten rechnet der Browser aus den Daten in `daten/`, im Text steht keine Zahl von Hand.
 - **3D-Gitter:** Jede Zensus-Zelle ist eine Säule, Höhe und Farbe zeigen denselben Wert. Gebäude in 3D und

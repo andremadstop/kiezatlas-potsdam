@@ -25,9 +25,13 @@ Stadtteil über einen Punkt im Umriss):
 | Herkunft | Gebäude | Anteil |
 |---|---:|---:|
 | ALKIS-Objekthöhe > 0,5 m | 50.356 | 96,3 % |
-| keine bzw. ≤ 0,5 m Objekthöhe, Geschosszahl vorhanden → Geschosse × 3 m | 38 | 0,1 % |
-| weder Objekthöhe noch Geschosse → 3 m | 1.915 | 3,7 % |
-| davon ohne jeden Eintrag im NAS-Auszug | 1.914 | |
+| keine bzw. ≤ 0,5 m Objekthöhe, Geschosszahl vorhanden (NAS, sonst ALKIS vereinfacht) → Geschosse × 3 m | 73 | 0,1 % |
+| weder Objekthöhe noch Geschosse → 3 m | 1.880 | 3,6 % |
+
+Nachtrag nach dem Audit (K1): Jedes Gebäude trägt jetzt die Herkunft seiner Höhe (`hq`: kataster, geschosse,
+ersatz), das Fenster zum Gebäude nennt sie. Dabei vereinheitlicht: Die Geschosszahl kommt auf beiden Seiten erst aus
+dem NAS-Auszug, sonst aus ALKIS vereinfacht (vorher Bauzeiten nur NAS: 38 / 1.915; Stadtteilkarte nur WFS). Abgleich:
+0 von 52.305 Umrissen haben auf Bauzeiten-Seite und Stadtteilkarte verschiedene Höhen.
 
 Plausibilität der Objekthöhe (alle 50.409 NAS-Gebäude mit Wert): Minimum −9,1 m, 5 % 2,2 m, Median 5,5 m,
 95 % 16,2 m, Maximum 89 m. Median je Geschosszahl: 1 → 3,1 m, 2 → 8,6 m, 3 → 11 m, 4 → 14,2 m, 5 → 17,3 m,
@@ -81,7 +85,7 @@ gesperrt sind nur `/gdz_geoviewserver/` und `/gdz_geoviewserv/`).
 
 - Dächer: jedes Gebäude ist ein Block mit flachem Dach in Objekthöhe. LoD2 mit Dachformen gibt es für Potsdam
   nur kachelweise lokal (5 km²); stadtweit nicht geprüft.
-- 1.915 Gebäude (3,7 %) haben den Ersatzwert 3 m, meist Nebengebäude ohne Eintrag im NAS-Auszug.
+- 1.880 Gebäude (3,6 %) haben den Ersatzwert 3 m, meist Nebengebäude ohne Eintrag im NAS-Auszug.
 - Die Stadtteilkarte verknüpft `public.gebaeude` über die oid mit dem NAS-Auszug, der sich auf den Snapshot vom
   05.11. bezieht. Heute sind beide gleich; nach einem neuen ALKIS-Import fielen geänderte Gebäude still auf
   Geschosse × 3 m zurück (Hinweis der Gegenprobe, nicht behoben).

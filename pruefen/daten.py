@@ -29,6 +29,8 @@ FIXTURES = DATEN / "fixtures"
 
 ADRESSFELDER = {"strasse", "straße", "hausnr", "hausnummer", "adresse", "street", "telefon", "telefonnummer",
                 "fax", "faxnummer", "email", "e_mail", "dienst_email", "homepage"}
+# Datenschutzgrenze Bauzeiten: keine Kennung, über die sich ein Gebäude mit Adresse oder Eigentum verknüpfen ließe
+KENNUNGEN = {"oid", "gml_id", "gebaeude_id", "oid_bezug", "id"}
 FEINE_KLASSEN = {f"i_{s}" for s in ("u3", "3_5", "6_9", "10_15", "16_18", "19_24", "25_39", "40_59", "60_66",
                                     "67_74", "75p")} | {
     "hh_1", "hh_2", "hh_3", "hh_4", "hh_5", "hh_6p", "ht_single", "ht_paar_ohne", "ht_paar_mit", "ht_alleinerz",
@@ -194,6 +196,8 @@ def datei_pruefen(pfad: Path, rel: str, liste, kontext: dict, fixture: bool) -> 
     if s.get("x-odbl") and "_odbl" not in pfad.name:
         fehler.append("ODbL-Vertrag, aber Dateiname ohne _odbl")
     k = schluessel(inhalt, set())
+    if rel.startswith("jahre/") and k & KENNUNGEN:
+        fehler.append(f"Gebäudekennung in daten/jahre/ (Datenschutzgrenze): {sorted(k & KENNUNGEN)}")
     if k & ADRESSFELDER:
         fehler.append(f"Adress- oder Kontaktfeld: {sorted(k & ADRESSFELDER)}")
     if k & FEINE_KLASSEN:

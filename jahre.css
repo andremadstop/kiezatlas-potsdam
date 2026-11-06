@@ -165,7 +165,7 @@
   .j-leiste__status{font-size:.8125rem}
   .j-klasse{font-size:.6875rem;min-height:40px}
   .j-klasse__balken{height:18px}
-  .j-legende__quelle{display:none}
+  .j-legende__quelle{font-size:.6875rem;line-height:1.3}
   .jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 48px)}
   .j-register__koerper{grid-template-columns:minmax(0,1fr)}
   .j-steckbrief{position:static}

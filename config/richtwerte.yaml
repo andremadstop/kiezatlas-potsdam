@@ -221,7 +221,7 @@ kita:
   hinweis: "In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind auf die Raumeinheit beziehen, nicht auf einen Radius."
   radius_orientierung_m: {wert: 500, status: orientierung}
   platz_kind_relation:
-    plaetze: "Kapazität laut MBJS (Betriebserlaubnis), nicht belegte Plätze; je id_kita einmal (weitere Häuser ohne Plätze)"
+    plaetze: "Genehmigte Plätze laut Betriebserlaubnis (MBJS); wie viele frei sind, steht nicht in den Daten; je id_kita einmal (weitere Häuser ohne Plätze)"
     kinder_krippe_kita: "Zensus i_u3 + i_3_5"
     kinder_hort: "Zensus i_6_9"
     kombinierte_einrichtungen: "Kapazität nicht nach Altersbereich aufteilbar. A6 weist drei Kennzahlen aus: Kita ohne Hortanteil gegen Kinder unter 6, reine Horte gegen 6 bis 9, alle Plätze gegen den Bedarf nach Baulandmodell (Prüfbericht 9)"

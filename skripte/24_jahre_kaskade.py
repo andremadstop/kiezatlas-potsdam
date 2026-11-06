@@ -587,14 +587,15 @@ def kaskade(cur, ohne_stufe1: bool = False) -> dict:
             "wohn_ohne_zelle": sum(len(o) for z, o in wohn_je_zelle.items() if z not in anteile)}
 
 
-def hoehe_m(objekthoehe, geschosse) -> int:
-    """Höhe für die 3D-Ansicht in ganzen Metern: ALKIS-Objekthöhe (relativ zum Gelände), sonst Geschosse × 3 m,
-    sonst 3 m. Werte bis 0,5 m (Tiefbauten, negative Angaben) gelten als fehlend."""
+def hoehe_m(objekthoehe, geschosse) -> tuple[int, str]:
+    """Höhe für die 3D-Ansicht in ganzen Metern und ihre Herkunft: ALKIS-Objekthöhe (relativ zum Gelände,
+    "kataster"), sonst Geschosse × 3 m ("geschosse"), sonst 3 m ("ersatz"). Werte bis 0,5 m (Tiefbauten, negative
+    Angaben) gelten als fehlend."""
     if objekthoehe is not None and float(objekthoehe) > 0.5:
-        return max(1, round(float(objekthoehe)))
+        return max(1, round(float(objekthoehe))), "kataster"
     if geschosse:
-        return int(geschosse) * 3
-    return 3
+        return int(geschosse) * 3, "geschosse"
+    return 3, "ersatz"
 
 
 def rechnen() -> None:
@@ -612,7 +613,7 @@ def rechnen() -> None:
         groessen = {}
         for nr in teile:
             cur.execute(f"""SELECT s.oid, ST_AsGeoJSON(ST_SimplifyPreserveTopology(s.geom, 0.000005), 6),
-                                   n.objekthoehe, n.geschosse
+                                   n.objekthoehe, coalesce(n.geschosse, s.anzahlgs)
                             FROM {SNAPSHOT} s JOIN public.stadtteil t ON t.nr = %s
                                  AND ST_Contains(t.geom, ST_PointOnSurface(s.geom))
                             LEFT JOIN {NAS_BESTE} n ON n.oid_bezug = s.oid ORDER BY s.oid""", (nr,))
@@ -622,7 +623,7 @@ def rechnen() -> None:
                 g = "belegt" if s in (1, 2) else ("nicht_datiert" if s == 6 else "geschaetzt")
                 q = {1: "beleg", 2: "klammer", 3: "blocktyp", 4: "zensus", 5: "nachbarn"}.get(s)
                 feats.append({"type": "Feature", "geometry": json.loads(gj),
-                              "properties": {"j": j, "k": k, "g": g, "q": q, "s": s, "h": hoehe_m(oh, gs)}})
+                              "properties": {"j": j, "k": k, "g": g, "q": q, "s": s, **dict(zip(("h", "hq"), hoehe_m(oh, gs)))}})
             genutzt = {f["properties"]["q"] for f in feats} - {None}
             quellen = {k: v for k, v in QUELLEN_JS.items() if k in genutzt or k == "umrisse"}
             inhalt = {"type": "FeatureCollection", "stand": date.today().isoformat(), "klassen": KLASSEN,

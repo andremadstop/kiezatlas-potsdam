@@ -51,7 +51,7 @@ var farbe = T.farbe;
 (function () {
   var feats = Z.features.slice().sort(function (a, b) { return b.properties.ew - a.properties.ew; });
   var top = feats[0].properties, ew = werte("ew");
-  q("ew-max-teil", name(top.st)); q("ew-max", fmt.format(top.ew)); q("ew-median", fmt.format(ew[Math.floor(ew.length / 2)]));
+  q("ew-max-teil", name(top.st)); q("ew-max", T.rundEw(top.ew)); q("ew-median", fmt.format(ew[Math.floor(ew.length / 2)]));
   q("schwelle", fmt.format(SCHWELLE));
   var gross = Object.keys(K.stadtteile).filter(function (nr) { return kachel(K.stadtteile[nr], "einwohner").wert >= SCHWELLE; });
   function extrem(id, max) {
@@ -66,7 +66,7 @@ var farbe = T.farbe;
   var alle = Object.keys(K.stadtteile);
   var kz = alle.slice().sort(function (a, b) { return (kachel(K.stadtteile[b], "u18").zaehler || 0) - (kachel(K.stadtteile[a], "u18").zaehler || 0); })[0];
   var kk = kachel(K.stadtteile[kz], "u18");
-  q("kind-teil", name(kz)); q("kind-zahl", fmt.format(kk.zaehler)); q("kind-nenner", fmt.format(kk.nenner)); q("kind-anteil", proz(kk.wert));
+  q("kind-teil", name(kz)); q("kind-zahl", T.rundEw(kk.zaehler)); q("kind-nenner", T.rundEw(kk.nenner)); q("kind-anteil", proz(kk.wert));
   var ka = extrem("u18", true);
   q("kind-anteilig", ka === kz ? "Es hat auch anteilig die meisten, unter den Stadtteilen mit mindestens " + fmt.format(SCHWELLE) + " Einwohnern."
     : "Anteilig liegt der Stadtteil " + name(ka) + " vorn, mit " + proz(kachel(K.stadtteile[ka], "u18").wert) + ", unter den Stadtteilen mit mindestens " + fmt.format(SCHWELLE) + " Einwohnern.");
@@ -305,7 +305,7 @@ function legende(t) {
   var m = el("div", "marken"), r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
   m.appendChild(el("span", null, r(s.min))); s.grenzen.forEach(function (g) { m.appendChild(el("span", null, r(g))); }); m.appendChild(el("span", null, r(s.max)));
   L.appendChild(m);
-  if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode("Weniger als 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen"))); L.appendChild(g); }
+  if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode("Weniger als 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen") + ", Wert zu unscharf")); L.appendChild(g); }
   L.appendChild(el("p", "legende__q", "Farbe und Höhe zeigen denselben Wert. " + (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
 }
 
@@ -340,8 +340,8 @@ map.on("click", function (e) {
     new maplibregl.Popup({ maxWidth: "270px" }).setLngLat(e.lngLat).setHTML(
       "<b>" + esc(gp.f || "Gebäude") + "</b><table class='pop-tab'>" +
       zeile("Geschosse", gp.gs == null || gp.gs === "null" ? "k. A." : esc(gp.gs)) +
-      zeile("Höhe (genähert)", fmt1.format(gp.h) + " m") + "</table>" +
-      "<div class='pop-q'>ALKIS vereinfacht, Höhe = Geschosse × 3 m. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
+      zeile("Höhe", fmt1.format(gp.h) + " m") + "</table>" +
+      "<div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
     return;
   }
   var zl = ["zellen-3d", "zellen-flach"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });

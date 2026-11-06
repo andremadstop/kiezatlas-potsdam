@@ -34,6 +34,21 @@ const befunde = [];
 const bericht = { stand: new Date().toISOString(), wurzel: WURZEL, seiten: [] };
 function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if (!ok) befunde.push(text); return ok; }
 
+// ---------- Textstellen, die nicht wiederkommen dürfen (Audit 06.11.2026, berichte/audit_20261106.md)
+{
+  const VERBOTEN = [
+    [/Höhe = Geschosse × 3 m|Höhe \(genähert\)|Geschosszahl mal 3 m\. Gemessene/, "K1: Gebäudehöhe als Geschosse × 3 m beschrieben (seit 06.11. Katasterhöhe mit Herkunft je Gebäude)"],
+    [/zugeordnet über die Nummer der Denkmalliste oder/, "K2: Denkmallisten-Nummer als Zuordnungsweg genannt (nur Prüfung)"],
+  ];
+  const DATEIEN = ["index.html", "karte.html", "planer.html", "planer-methode.html", "planer-daten.html", "jahre.html", "jahre-methode.html",
+    "jahre-daten.html", "atlas.js", "karte.js", "planer.js", "jahre.js", "themen.js", "schaugrafik.js"];
+  console.log("Textstellen (Audit)");
+  for (const [re, was] of VERBOTEN) {
+    const treffer = DATEIEN.filter((f) => re.test(fs.readFileSync(path.join(WURZEL, f), "utf8")));
+    pruef(treffer.length === 0, `${was}${treffer.length ? ": " + treffer.join(", ") : ""}`);
+  }
+}
+
 // ---------- eigener Prüfserver, nur 127.0.0.1, nur Dateien unter WURZEL
 const server = http.createServer((q, a) => {
   const p = path.normalize(path.join(WURZEL, decodeURIComponent(new URL(q.url, "http://x").pathname)));

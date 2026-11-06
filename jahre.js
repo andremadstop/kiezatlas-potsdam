@@ -463,7 +463,7 @@ function karte() {
       if (q) h += "<p class=\"pop-q\">Quelle: " + esc(q.quelle) + ". " + esc(q.vermerk) + ".</p>";
     }
     var u = QUELLEN.umrisse, hm = +p.h;
-    if (hm > 0) h += "<p class=\"pop-q\">Höhe rund " + fmt.format(hm) + NB + "m (ALKIS-Objekthöhe, sonst aus der Geschosszahl geschätzt).</p>";
+    if (hm > 0) h += "<p class=\"pop-q\">Höhe rund " + fmt.format(hm) + NB + "m (" + (T.HQ[p.hq] || "Herkunft unbekannt") + ").</p>";
     if (u) h += "<p class=\"pop-q\">Umriss: " + esc(u.vermerk) + ".</p>";
     return h + "<p class=\"pop-q\">" + (g === "belegt" ? "Belegt aus einer Quelle; " : "Schätzung, ") + "keine Aussage über einzelne Grundstücke. <a class=\"link\" href=\"jahre-methode.html#m-gebaeude\">Wie genau?</a></p>";
   }

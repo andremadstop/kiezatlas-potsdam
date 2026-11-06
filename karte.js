@@ -223,7 +223,7 @@ map.on("click", function (e) {
   if (g.length) {
     var gp = g[0].properties;
     new maplibregl.Popup({ maxWidth: "270px" }).setLngLat(e.lngLat).setHTML("<b>" + esc(gp.f || "Gebäude") + "</b><table class='pop-tab'>" + zeile("Geschosse", gp.gs == null || gp.gs === "null" ? "k. A." : esc(gp.gs)) +
-      zeile("Höhe (genähert)", fmt1.format(gp.h) + " m") + "</table><div class='pop-q'>ALKIS vereinfacht, Höhe = Geschosse × 3 m. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
+      zeile("Höhe", fmt1.format(gp.h) + " m") + "</table><div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
     return;
   }
   var zl = ["zellen-3d", "zellen-2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });

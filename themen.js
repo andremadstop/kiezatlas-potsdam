@@ -26,7 +26,7 @@ THEMEN.forEach(aufnehmen);
 
 // ---------- Farben und Klassen
 var STUFEN = ["--k1", "--k2", "--k3", "--k4", "--k5"].map(function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); });
-var GRAU = "#d5d8d3";
+var GRAU = "#cdc8be";   // unscharf: warmes Grau, vom hellsten Blaugrün (--k1) im Farbton abgesetzt (Audit K6)
 // Prozent: feste Grenzen; sonst Quintile über die Werte, doppelte Grenzen entfallen
 function klassen(t, features) {
   if (t.einheit === "%") return { grenzen: [20, 40, 60, 80], min: 0, max: 100, fest: true };
@@ -150,8 +150,11 @@ function grundLuft(map, an) {
   GK.unten.forEach(function (l) { if (l.layout && l.layout.visibility === "none") return; if (map.getLayer(l.id)) map.setLayoutProperty(l.id, "visibility", v); });
 }
 
+// Herkunft der Gebäudehöhe (Feld hq in daten/gebaeude/*.js und daten/jahre/*.js)
+var HQ = { kataster: "Objekthöhe aus dem Kataster (ALKIS)", geschosse: "geschätzt: Geschosse × 3 m", ersatz: "Ersatzwert 3 m, keine Höhe im Kataster" };
+
 window.KIEZ_THEMEN = {
-  grundkarte: grundkarte, grundLuft: grundLuft, GRUNDKARTE: !!GK,
+  grundkarte: grundkarte, grundLuft: grundLuft, GRUNDKARTE: !!GK, HQ: HQ,
   THEMEN: THEMEN, THEMA: THEMA, HASH: HASH,
   STUFEN: STUFEN, GRAU: GRAU,
   KLASSEN: KLASSEN, klassen: klassen, klasse: klasse,

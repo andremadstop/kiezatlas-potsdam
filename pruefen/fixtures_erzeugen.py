@@ -149,7 +149,7 @@ def main() -> None:
         "features": [{"type": "Feature", "geometry": f["geometry"], "properties": {
             "j": jahr(i) if arten_g[i % 3] == "belegt" else None,
             "k": None if arten_g[i % 3] == "nicht_datiert" else klasse_von(jahr(i)), "g": arten_g[i % 3], "d": i % 3 == 0,
-            "q": None if arten_g[i % 3] == "nicht_datiert" else "bsp", "s": [1, 4, 6][i % 3], "h": 3 + (i * 7) % 30}}
+            "q": None if arten_g[i % 3] == "nicht_datiert" else "bsp", "s": [1, 4, 6][i % 3], "h": 3 + (i * 7) % 30, "hq": ["kataster", "geschosse", "ersatz"][i % 3]}}
             for i, f in enumerate(g52)]})
 
 

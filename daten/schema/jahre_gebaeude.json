@@ -5,7 +5,7 @@
  "x-global": "^KIEZ_JAHR_\\d{2}$",
  "x-odbl": false,
  "x-eigentuemer": "B4 (skripte/24_jahre_kaskade.py)",
- "description": "Gebäude des Snapshots auswertung.gebaeude_stand_20261105, EPSG:4326. j = Jahr nur bei belegten Jahren von Denkmalen oder Gebäuden mit mindestens 3 Wohneinheiten bzw. ohne Wohnraum; Wohngebäude mit weniger als 3 Wohneinheiten nur Klasse k (Korrektur 6). Keine Adresse. Kein OSM- oder Wikipedia-Wert.",
+ "description": "Gebäude des Snapshots auswertung.gebaeude_stand_20261105, EPSG:4326. j = Jahr nur bei belegten Jahren von Gebäuden ohne Wohnraum; Gebäude mit Wohnraum tragen nur die Klasse k, auch Denkmale, weil ALKIS keine Zahl der Wohneinheiten führt (Korrektur 6, Nachlauf N3). Keine Adresse, keine Gebäudekennung (oid, gml_id). Kein OSM- oder Wikipedia-Wert.",
  "type": "object",
  "additionalProperties": false,
  "required": [
@@ -73,9 +73,6 @@
        "s"
       ],
       "properties": {
-       "oid": {
-        "type": "string"
-       },
        "j": {
         "type": [
          "integer",
@@ -116,6 +113,10 @@
         "minimum": 1,
         "maximum": 200,
         "description": "Höhe für die 3D-Ansicht in ganzen Metern: ALKIS-Objekthöhe über Gelände, sonst Geschosse × 3 m, sonst 3 m"
+       },
+       "hq": {
+        "enum": ["kataster", "geschosse", "ersatz"],
+        "description": "Herkunft der Höhe h"
        }
       }
      }

@@ -544,7 +544,7 @@ function popupEinrichtung(e, f) {
   if (p.plaetze != null) tab += zeile("Plätze", fmt.format(p.plaetze));
   if (p.schueler != null) tab += zeile("Schüler", fmt.format(p.schueler) + (p.schueler_stand ? " (Stand " + esc(p.schueler_stand) + ")" : ""));
   if (tab) h += "<table class='pop-tab'>" + tab + "</table>";
-  if (p.plaetze != null) h += "<div class='pop-q'>Kapazität laut Betriebserlaubnis, nicht belegte Plätze.</div>";
+  if (p.plaetze != null) h += "<div class='pop-q'>Genehmigte Plätze laut Betriebserlaubnis. Wie viele frei sind, steht nicht in den Daten.</div>";
   if (p.status === "lage_ohne_kapazitaet" || osm) h += "<div class='pop-q'>Nur Lage, ohne Kapazität" + (NUR_LAGE[p.art] ? "; keine Aussage zur Versorgung" : "") + ".</div>";
   if (p.hinweis) h += "<div class='pop-q'>" + esc(p.hinweis) + "</div>";
   else if (p.in_potsdam === false) h += "<div class='pop-q'>Außerhalb der Stadtgrenze; zählt für die Entfernungen mit.</div>";

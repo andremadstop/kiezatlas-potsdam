@@ -90,7 +90,7 @@ const JAHRE = path.join(WURZEL, "daten", "jahre");
 const JDATEIEN = fs.readdirSync(JAHRE).filter((f) => /^\d{2}\.js$/.test(f)).sort();
 let gebAlle = 0;
 {
-  const fehl = [], NAMEN = ["j", "k", "g", "q", "s", "h"];   // h = Höhe in m für 3D (ALKIS), 06.11.
+  const fehl = [], NAMEN = ["j", "k", "g", "q", "s", "h", "hq"];   // h = Höhe in m für 3D, hq = ihre Herkunft (06.11.)
   for (const f of JDATEIEN) {
     const d = ladeJs(path.join(JAHRE, f));
     if (d.fixture) fehl.push(f + ": Fixture");
@@ -107,13 +107,14 @@ let gebAlle = 0;
       if (extra.length) fehl.push(`${f}: Feld ${extra.join(",")}`);
       if (!["belegt", "geschaetzt", "nicht_datiert"].includes(p.g)) fehl.push(`${f}: g=${p.g}`);
       if (!(Number.isInteger(p.h) && p.h >= 1 && p.h <= 200)) fehl.push(`${f}: h=${p.h}`);
+      if (!["kataster", "geschosse", "ersatz"].includes(p.hq)) fehl.push(`${f}: hq=${p.hq}`);
       if ((p.k == null) !== (p.g === "nicht_datiert")) fehl.push(`${f}: k=${p.k} bei g=${p.g}`);
       if (p.g !== "nicht_datiert" && !(p.q && d.quellen[p.q])) fehl.push(`${f}: Quelle ${p.q} fehlt`);
       if (p.j != null && p.g !== "belegt") fehl.push(`${f}: Jahr bei ${p.g}`);
       if (fehl.length > 5) break;
     }
   }
-  pruef(JDATEIEN.length === 32 && fehl.length === 0, `${JDATEIEN.length} Dateien, ${gebAlle} Gebäude: nur j/k/g/q/s/h, Höhe 1–200 m, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ ${fehl.slice(0, 5).join(" | ")}`);
+  pruef(JDATEIEN.length === 32 && fehl.length === 0, `${JDATEIEN.length} Dateien, ${gebAlle} Gebäude: nur j/k/g/q/s/h/hq, Höhe 1–200 m mit Herkunft, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ ${fehl.slice(0, 5).join(" | ")}`);
   let ok = true, aus = "";
   try { aus = execFileSync("python3", ["-I", path.join(WURZEL, "skripte", "26_jahre_methode.py"), "--pruefen"], { encoding: "utf8" }).trim(); } catch (e) { ok = false; aus = String(e.stdout || e.message).trim(); }
   let vertrag = "";
