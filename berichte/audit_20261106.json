@@ -1,0 +1,1164 @@
+{
+ "ende": {
+  "funde": [
+   {
+    "nr": "K1",
+    "titel": "Höhenangabe widerspricht sich: Methode und Gebäude-Popups sagen „Geschosse × 3 m“, Frage 4 und Quellen sagen Katasterhöhe",
+    "gruppen": [
+     "buerger",
+     "presse",
+     "transparenz"
+    ],
+    "art": "korrektheit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "index.html:269 „die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West“; dagegen index.html:97 (Objekthöhe bei 96 %) und index.html:280 (Quellen: Höhe = ALKIS-Objekthöhe aus dem NAS-Auszug); atlas.js:344 und karte.js:226 Popup „ALKIS vereinfacht, Höhe = Geschosse × 3 m“, karte.js:226 Zeile „Höhe (genähert)“; richtig in jahre-methode.html:121 (50.356 von 52.309).",
+    "problem": "Auf derselben Startseite stehen zwei Aussagen zur Herkunft der 3D-Höhen, und jedes Gebäude-Popup bezeichnet eine gemessene Katasterhöhe als Schätzung. Wer den Methodenblock zitiert, gibt den Stand vor dem 06.11. wieder. Der Datenvertrag gebaeude.json hat kein Herkunftsfeld, deshalb kann die Seite Messwert und Ersatzwert nicht unterscheiden.",
+    "vorschlag": "index.html:269 auf den Wortlaut von jahre-methode.html:121 bringen, LoD2-Satz streichen; Popups in atlas.js:344/karte.js:226 auf „Höhe = ALKIS-Objekthöhe, sonst Geschosse × 3 m bzw. 3 m“. Als zweiter Schritt ein Feld hq (kataster|geschosse|ersatz) in daten/gebaeude/*.js und Schema, damit das Popup die Herkunft je Haus nennt. Textprüfung in pruefen/seiten.mjs auf „Geschosse × 3 m“ ohne „sonst“.",
+    "aufwand": "klein",
+    "begruendung": "Alle vier Stellen per sed/grep am Stand 9864962 gelesen; Widerspruch wörtlich vorhanden. Drei Prüfer haben denselben Fund, zusammengeführt.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K2",
+    "titel": "Methodenseite Bauzeiten nennt die Denkmallisten-Nummer als Zuordnungsweg für Wikidata, der Code nutzt ihn nur zur Prüfung",
+    "gruppen": [
+     "transparenz",
+     "forschung"
+    ],
+    "art": "korrektheit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "jahre-methode.html:111 „Wikidata (frei, CC0), zugeordnet über die Nummer der Denkmalliste oder den Ort des Objekts“; skripte/22_jahre_genau.py:73-76 (Zuordnung über Denkmal-ID nutzt BLDAM-Adressen, Lizenz ungeklärt, „nur Prüfspalte“); berichte/B2_genaue_jahre.md:13 (106 genau, „Zuordnung über die Koordinate“) und :40.",
+    "problem": "Die öffentliche Seite behauptet einen Weg über eine Liste mit ungeklärter Lizenz (§ 87a UrhG). Leser müssen annehmen, dass BLDAM-Inhalte in die belegten Jahre eingeflossen sind. Das stimmt nicht, die Seite sagt es aber.",
+    "vorschlag": "jahre-methode.html:111: „zugeordnet über die Koordinate des Wikidata-Objekts; die Zuordnung über die Nummer der Denkmalliste läuft über die Adressen der BLDAM-Liste und dient nur der Prüfung.“ Kleiner Textcheck in pruefen/B5_jahre.mjs.",
+    "aufwand": "klein",
+    "begruendung": "Code und Bericht B2 eindeutig: veröffentlichter Weg = Koordinate, ID-Weg = Prüfspalte mit Quelle „nur Prüfung“.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K3",
+    "titel": "Datenvertrag jahre_gebaeude.json ist lockerer als die feste Datenschutzgrenze (Jahr bei ≥ 3 Wohneinheiten, oid erlaubt), Offline-Prüfung prüft oid nicht",
+    "gruppen": [
+     "verwaltung_gis",
+     "forschung"
+    ],
+    "art": "lizenz-datenschutz",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "daten/schema/jahre_gebaeude.json:8 „j = Jahr nur bei belegten Jahren von Denkmalen oder Gebäuden mit mindestens 3 Wohneinheiten bzw. ohne Wohnraum“; :76 Feld oid in properties; QUELLEN.md:78 „Wohngebäude mit weniger als 3 Wohneinheiten nur mit Klasse“; pruefen/daten.py:30 ADRESSFELDER ohne oid; nur pruefen/B4_kaskade.py:39 (braucht DB) sperrt oid. Offline gezählt: 53 Einzeljahre, 0 oid in daten/jahre/*.js.",
+    "problem": "Die Daten halten die Grenze ein, der maßgebliche Vertrag und das Register erlauben aber Einzeljahre bei Mehrfamilienhäusern und Gebäude-IDs. Eine Datei mit oid in daten/jahre/ ginge durch die Offline-Prüfung. Wer übernimmt, kann sich auf den Vertrag berufen.",
+    "vorschlag": "description auf „Einzeljahr nur bei Gebäuden ohne Wohnraum“; oid aus properties streichen (additionalProperties:false greift dann); QUELLEN.md:78 gleich formulieren; in pruefen/daten.py für daten/jahre/ oid, gml_id, gebaeude_id sperren.",
+    "aufwand": "klein",
+    "begruendung": "Schema, Register und daten.py gelesen; Zählung der Daten offline nachgerechnet. Der Vorschlag verschärft die Grenze, verträgt sich also mit ihr. Schwere gegenüber Prüfer auf hoch gesetzt, weil es die feste Grenze betrifft und der Fix eine Viertelstunde ist.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K4",
+    "titel": "Grundschüler je Kind: Grundschulteile kombinierter Schulen fehlen, Waldstadt II zeigt 0,00 neben „amtlicher Maßstab 1“",
+    "gruppen": [
+     "stadtplanung"
+    ],
+    "art": "korrektheit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "skripte/11_einrichtungen.py:98-104 (G/S und G/O/OG → sek1); skripte/15_planer.py:853 (nur art == \"grundschule\"); daten/export/csv/raumeinheit.csv Zeile 604: schueler_je_kind_grundschule 0.0; einrichtung.csv:55 „Oberschule Theodor Fontane mit Primarstufe“ G/S, 436 Schüler, raum 604; :52 Montessori (304), :81 Schulzentrum am Stern G/O/OG (501); steckbriefe/604.html: „amtlicher Maßstab · vorläufig … 0,00 | 1 Schüler je Kind“, Unsicherheit mit Kita-Baustein „Plätze = Kapazität laut Betriebserlaubnis … Kindertagespflege fehlt“ und „wie oben“.",
+    "problem": "Eine Vorlage liest 0,00 als vollständiges Grundschuldefizit, obwohl in 604 eine Schule mit Primarstufe liegt; 304 und 501 sind unterzählt, ebenso Entfernungen und Einwohner je Standort. Der Hinweis „Grundschulteile … fehlen“ steht im Text, entschärft die Zahl mit Abzeichen aber nicht. Der Unsicherheitstext trägt fremde Kita-Bausteine und verweist auf ein „oben“, das es in CSV und Einzelansicht nicht gibt.",
+    "vorschlag": "Entweder G/…-Schulen als Grundschulstandort für Entfernung und Einwohner je Standort mitzählen, oder in Räumen mit solcher Schule wert = null mit Grund „Schule mit Primarstufe, Schülerzahl nicht nach Stufe teilbar“. Status prüfen (Anlage C ist Bedarfsquote, keine Norm für Schüler am Schulort). Unsicherheitstext von Kita-Bausteinen befreien, „wie oben“ ausschreiben.",
+    "aufwand": "mittel",
+    "begruendung": "Zuordnung, Filter, CSV-Zeile und Steckbrief gelesen; die drei Schulen mit Raumnummer stehen in einrichtung.csv.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K5",
+    "titel": "Export-CSV mit Semikolon und Dezimalpunkt: in deutschem Office werden Flächen ×1000 und Quoten zu Text",
+    "gruppen": [
+     "stadtplanung",
+     "verwaltung_gis"
+    ],
+    "art": "zugang",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "daten/export/README.md:22 „Trennzeichen Semikolon, UTF-8 mit BOM, Dezimalpunkt“; raumeinheit.csv Zeile 604: flaeche_km2 „1.036“, plaetze_je_kind_kita „1.42“.",
+    "problem": "Semikolon und BOM zielen auf deutsches Excel/LibreOffice, gerade dort ist der Punkt Tausendertrenner: „1.036“ km² wird 1036, „1.42“ wird Text oder Datum. Verfälschung fällt nur bei genauem Hinsehen auf.",
+    "vorschlag": "Zusätzlich je Ebene eine .xlsx/.ods ohne Geometrie aus der GPKG (Zahlen als Zahlen) oder eine Komma-Fassung; README-Satz „In Excel/LibreOffice Datei X öffnen“. Prüfung in pruefen/A8_export.py.",
+    "aufwand": "klein",
+    "begruendung": "Format und Werte in den Dateien gelesen; den LibreOffice-Import selbst nicht wiederholt, das Verhalten (de-DE: Punkt = Tausender) ist aber eindeutig. GIS-Werkzeuge lesen die Punkt-Fassung korrekt, deshalb behalten.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K6",
+    "titel": "Am Handy blendet die Legende den Grau-Eintrag aus; Grau ist von der untersten Stufe kaum zu unterscheiden",
+    "gruppen": [
+     "buerger"
+    ],
+    "art": "transparenz",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "atlas.css:309 (Handy) „.legende__q,.legende__grau,.bezirke,.legende__auswahl{display:none}“; jahre.css:168 „.j-legende__quelle{display:none}“; themen.js:29 GRAU #d5d8d3 gegen atlas.css:11 --k1 #dce6e2; atlas.js:308 „Weniger als 10 Personen“, karte.js:129 zusätzlich „Wert zu unscharf“.",
+    "problem": "Der Fließtext verweist für Grau auf die Legende, am Handy fehlt der Eintrag. In der flachen Ansicht liest man einen unscharfen Wert als „niedriger Anteil“. Index und Karte erklären Grau verschieden.",
+    "vorschlag": ".legende__grau aus der Handy-Regel nehmen; Grau als Schraffur oder deutlich abgesetzt zeichnen; atlas.js:308 an karte.js:129 angleichen; in jahre.css:168 nur den Lizenzteil kürzen, „keine Aussage über einzelne Häuser“ stehen lassen.",
+    "aufwand": "klein",
+    "begruendung": "CSS-Regel, Farbwerte und beide Legendentexte gelesen. Am Gerät nicht geprüft.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K7",
+    "titel": "Plätze je Bedarfsplatz trägt „amtlicher Maßstab“, rechnet aber ohne die amtliche Nachbarraum-Regel, und sagt das nirgends",
+    "gruppen": [
+     "stadtplanung"
+    ],
+    "art": "korrektheit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "config/richtwerte.yaml:243 „angrenzende Planungsräume zählen mit (Nr. 3.4.4, S. 14–15)“; skripte/15_planer.py:835-848 nur Plätze in der Raumeinheit; „angrenzend“ kommt in daten/planer.js, versorgung.csv und steckbriefe/403.html 0-mal vor, in planer-methode.html ebenfalls nicht.",
+    "problem": "Unterdeckung wie 0,61 in 403 erscheint als Befund nach amtlicher Methode, obwohl die amtliche Rechnung anders ausfallen kann. Die Abweichung steht nur in einem Config-Kommentar.",
+    "vorschlag": "Sofort: Satz „Abweichend von Nr. 3.4.4 ohne angrenzende Planungsräume gerechnet“ in Unsicherheit, Steckbrief und planer-methode.html; Status auf Orientierung oder „amtliche Daten, Raum allein“. Später: zweite Kennzahl mit Nachbarräumen aus gemeinsamen Grenzen, nur sie mit amtlichem Maßstab.",
+    "aufwand": "klein",
+    "begruendung": "grep belegt, dass die Regel nur in der Config steht. Aufwand für den Texthinweis klein, für die zweite Kennzahl mittel.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K8",
+    "titel": "Kita-Popup „Kapazität laut Betriebserlaubnis, nicht belegte Plätze“ lässt sich als freie Plätze lesen",
+    "gruppen": [
+     "buerger"
+    ],
+    "art": "korrektheit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "planer.js:547; dieselbe Wendung in config/richtwerte.yaml:224 und damit in jeder Kita-Unsicherheit des Steckbriefs.",
+    "problem": "Eltern lesen „nicht belegte Plätze“ als „unbelegt“. Die Zeile „Plätze 104“ wirkt wie 104 freie Plätze.",
+    "vorschlag": "„Genehmigte Plätze laut Betriebserlaubnis. Wie viele frei sind, steht nicht in den Daten.“ An beiden Stellen.",
+    "aufwand": "klein",
+    "begruendung": "Wortlaut an beiden Stellen gelesen. Schwere auf mittel, weil es eine Formulierung ist, kein falscher Wert.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K9",
+    "titel": "Vorab-Festlegung von Nachtrag N3 öffentlich nicht belegbar: zitierte Commits nur lokal",
+    "gruppen": [
+     "forschung",
+     "transparenz"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "git branch -a --contains: 1298b23 nur nachlauf/historie-20261105 und nachlauf/n3, f9e87ce und e009fad nur nachlauf/historie-20261105 (kein remotes/…); 9e962b4 (Grundprotokoll) und c16ee93 liegen auf origin/main. pruefen/B4_protokoll.md:58/88/95 nennt diese Kennungen.",
+    "problem": "jahre-methode.html sagt „Die Regeln standen vor dem Lauf fest“. Für N3, das den veröffentlichten Rücktest prägt, sieht ein Externer nur c16ee93 mit Regel und Ergebnis zusammen; zwei zitierte Commits lassen sich nicht auflösen.",
+    "vorschlag": "nachlauf/historie-20261105 unverändert pushen oder Tag auf 1298b23 setzen; in B4_protokoll.md Kennung und Uhrzeit von 1298b23 nennen. Künftig Nachträge als eigenen Commit vor dem Lauf pushen.",
+    "aufwand": "klein",
+    "begruendung": "Remote-Zugehörigkeit lokal geprüft (Stand der lokalen Remote-Refs, kein Netzabruf).",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K10",
+    "titel": "Kein Entscheidungsprotokoll im Repo: „Korrektur N“, „Prüfbericht N“, „Bauplan“, E7/E8, H1–H11 ohne Fundstelle; E-Nummern kollidieren mit der Pipeline; keine Liste „nicht geprüft sind …“",
+    "gruppen": [
+     "verwaltung_gis",
+     "forschung",
+     "transparenz",
+     "stadtplanung"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "git grep -cE 'Korrektur [0-9]+|Prüfbericht [0-9]+|Bauplan' trifft 54 Dateien; git ls-files | grep -iE 'entscheid|bauplan|pruefbericht' leer; docs/ enthält nur codekarte/; Beispiel skripte/22_jahre_genau.py:73 „(Lizenz ungeklärt, E8)“, Pipeline-E8 ist etwas anderes; eigene Festlegungen verstreut (config/richtwerte.yaml:249-251 Altersschätzung 6–11 u. a.).",
+    "problem": "Die Regeln, die man beim Übernehmen, Lehren oder Angreifen kennen muss (Datenschutzregel, Wikipedia nur Prüfspalte, ODbL-Trennung, Pestalozza-Ausschluss, Luftlinie vor Fußweg), sind nur im internen Vault begründet. Wer Atlas und Pipeline zusammen liest, ordnet E7/E8 falsch zu.",
+    "vorschlag": "docs/entscheidungen.md neu und bereinigt schreiben (eigenes Präfix, z. B. K1…), je Eintrag Anlass, Optionen, Entscheidung, Begründung, Neu prüfen wenn; Zuordnungstabelle alte Kennung → neue; Glossar der Paketkürzel und H1–H11. Dazu ein Kasten „Nicht geprüft sind …“ auf planer-methode.html (NVP-Nachfolger, OSM-Vollständigkeit, Fundstelle Schülerfahrtkostensatzung, Schulbezirke).",
+    "aufwand": "mittel",
+    "begruendung": "Zählung und fehlende Definition nachvollzogen. Vier Prüfer melden dasselbe, zusammengeführt. André muss entscheiden, was aus dem internen Bauplan öffentlich werden darf (Ansprechpartner, Vault-Regeln).",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K11",
+    "titel": "README beschreibt den Stand vor dem Ausbau: kein Kasten „Zur Prüfung“, kein Gesamtweg der Skripte 01–27, „Sieben Fragen“ statt neun",
+    "gruppen": [
+     "transparenz",
+     "verwaltung_gis",
+     "forschung",
+     "presse"
+    ],
+    "art": "transparenz",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "README.md „Wie es gebaut ist“ nur 01 → Pipeline → 02; skripte/lauf.sh kennt nur vorbereiten|laden|auswerten|einrichten; README.md:40 „Sieben Fragen“, index.html hat frage-1 bis frage-10; belege/README.md listet nur die Läufe vom 04.11.",
+    "problem": "Wer prüft oder übernimmt, findet Planer, Bauzeiten und Export nicht in der README, keine Reihenfolge der rund 20 weiteren Skripte mit Ein- und Ausgabe, keine Zuordnung Kernzahl → Beleg. Ohne André lässt sich daten/ nicht vollständig neu erzeugen.",
+    "vorschlag": "README neu gliedern mit Kasten „Zur Prüfung, Stand <Tag>“ (Angabe → Beleg → Skript); docs/rundgang.md mit Tabelle Schritt → Skript → liest → schreibt → Prüfung; lauf.sh um planer, jahre, export erweitern; README:40 korrigieren; belege/README.md zur Übersicht aller Belege ausbauen.",
+    "aufwand": "mittel",
+    "begruendung": "README, lauf.sh und index.html gelesen.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K12",
+    "titel": "Python-Umgebung nicht festgeschrieben: hängt an kiezatlas-potsdam-west, numpy/scipy ohne Version, Pipeline-Stand ungepinnt",
+    "gruppen": [
+     "verwaltung_gis",
+     "forschung",
+     "transparenz"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "skripte/lauf.sh:18 „daneben … kiezatlas-potsdam-west (.venv)“, :21 PIPELINE ohne Tag/Commit, :22 PY=../kiezatlas-potsdam-west/.venv/bin/python; skripte/12_osm.sh:18 und 14b_fussweg.sh:21 „--with numpy --with scipy“; git ls-files ohne requirements/pyproject/uv.lock.",
+    "problem": "Ein Dritter kann 01_vorbereiten nicht starten; Fußweg-Ergebnisse hängen von der gerade gecachten numpy/scipy-Version ab; welcher Pipeline-Stand die Belege erzeugt hat, steht nirgends.",
+    "vorschlag": "pyproject.toml + uv.lock (oder requirements.txt mit Hashes) für skripte/ und pruefen/; lauf.sh und .sh-Skripte auf `uv run --locked`; West-Repo-Verweis entfernen; PIPELINE_REF pinnen und Commit in Belege schreiben.",
+    "aufwand": "klein",
+    "begruendung": "Stellen gelesen. Schwere mittel, weil Ausgaben versioniert vorliegen; betrifft Nachrechnen, nicht Richtigkeit.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K13",
+    "titel": "Nicht zitierfähig: keine CITATION.cff, keine Tags, kein Versionsstand an Daten, Steckbrief und Teilen-Link, kein Änderungsprotokoll, kein Meldeweg für Datenfehler",
+    "gruppen": [
+     "stadtplanung",
+     "presse",
+     "forschung",
+     "transparenz",
+     "verwaltung_gis"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "Repo-Wurzel ohne CITATION.cff, SECURITY.md, CHANGELOG; `git tag` leer; git grep 'zitier|CITATION' ohne Treffer; Steckbrief nennt nur „Stand der Auswertung 05.11.2026“ (steckbriefe/403.html:56); origin/main = 191a2c1, live = 9864962 (nur auf origin/ausbau/3d-grundkarte).",
+    "problem": "Eine Drucksache, Abschlussarbeit oder ein Artikel kann keinen festen Stand nennen; derselbe Link zeigt nach einem Neulauf andere Zahlen, unbemerkt. Fehlerhinweise haben keinen benannten Weg außer dem Impressum.",
+    "vorschlag": "CITATION.cff nach Muster der Pipeline; jeden Live-Stand taggen; Commit-Kurzhash in kennzahlen.js/planer.js und im Seitenfuß und Steckbrief; Zitiervorschlag auf index.html und planer-daten.html; CHANGELOG.md (erster Eintrag: Katasterhöhe 06.11.); Zeile „Fehler gefunden? <Adresse>“ auf der Seite.",
+    "aufwand": "klein",
+    "begruendung": "Fehlen per ls/git geprüft. Fünf Prüfer melden Teilaspekte, zusammengeführt. Zitierform, Kontaktadresse und öffentliche Tags sind Außenwirkung.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K14",
+    "titel": "Zähler und Nenner fehlen in Planer-Daten und Export: kein Nachrechnen, kein Fehlbedarf in Plätzen",
+    "gruppen": [
+     "stadtplanung",
+     "forschung"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "hoch",
+    "urteil": "bestaetigt",
+    "beleg": "grep -c 'zaehler|nenner' daten/planer.js = 0; raumeinheit.csv-Kopfzeile nur Quoten und Einwohner je Standort, keine Kinderzahlen je Altersgruppe, keine Platz- oder Bedarfssummen; 15_planer.py rechnet beide intern (Z. 613-649).",
+    "problem": "Für Vorlagen braucht die Planung absolute Größen (Plätze, Bedarfsplätze, Differenz). Dritte können die Quote nicht prüfen.",
+    "vorschlag": "Je Versorgungszeile zaehler, nenner (mit gleicher Rundung und Mindestgrößen) und bei Richtwert differenz; in raumeinheit die Zielgruppen u3, 3–5, 6–<12 als Spalten; auf der Seite „826 von 1.354“; Prüfung zaehler/nenner = wert in pruefen/A6_planer.py.",
+    "aufwand": "mittel",
+    "begruendung": "Datei ohne diese Schlüssel; Aggregate je Planungsraum mit Mindestgröße berühren die Datenschutzgrenze nicht.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K15",
+    "titel": "Register und Downloadseiten widersprechen den eigenen Belegen (Gemeindeabgleich „noch nicht ausgewertet“, Gebäudedatei „gibt es nicht“)",
+    "gruppen": [
+     "presse",
+     "forschung",
+     "transparenz"
+    ],
+    "art": "korrektheit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "QUELLEN.md:74 (Nr. 34) „noch nicht ausgewertet“ gegen belege/A1_gemeindeabgleich_20261105.md:1-3 (N2, 0 Befunde); QUELLEN.md:52 (Nr. 12) „public.planungsraum noch leer“; jahre-daten.html:97 „als Datei gibt es sie hier nicht“ gegen planer-daten.html:110-111 Link auf daten/jahre/11.js.",
+    "problem": "Das als maßgeblich bezeichnete Register unterschätzt die Validierung; Leser bekommen zur Gebäudedatei zwei verschiedene Auskünfte (die Datenschutzgrenze selbst bleibt gewahrt). Zudem zeigt die Seite als Gegenprobe nur die Fortschreibung 2025 (anderer Stichtag), nicht den belegten Abgleich mit −0,07 % am selben Stichtag.",
+    "vorschlag": "QUELLEN.md Nr. 34 und Nr. 12 nachziehen; jahre-daten.html:97 präzisieren („nur als Kartendatei, nur Klasse, ohne Adresse/Kennung; als Tabelle bewusst nicht“); Gemeindeabgleich aus der CSV per 02_auswerten.py als erste Gegenprobe in kennzahlen.json und im Steckbrief „Potsdam“.",
+    "aufwand": "klein",
+    "begruendung": "Alle Stellen gelesen. Drei Prüfer, zusammengeführt. Der Ausbau um Melderegisterzahlen aller 32 Stadtteile (Presse-Vorschlag) ist eine eigene, größere Sache und hängt an der Lizenzeinordnung von „Stadtteile im Blick“.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K16",
+    "titel": "Größte Prüfreferenz des Rücktests (Bornstedt, 193 Gebäude) hat ein KI-Agent erhoben, die Methodenseite sagt es nicht",
+    "gruppen": [
+     "forschung",
+     "presse"
+    ],
+    "art": "transparenz",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "pruefen/B3_protokoll.md:42 „Wer: der Agent (Claude) am 05.11.2026, nicht Andre“; berichte/B4_holdout.md:30 „aus einer Sichtprüfung von Luftbildern“, :32 193 Gebäude; jahre-methode.html:133 nur „Die Luftbildprüfung deckt nur Bornstedt ab“; grep Agent/Claude in jahre-methode.html ohne Treffer.",
+    "problem": "Leser halten die rund 74 % für einen Abgleich mit menschlich geprüften Baujahren. Der Fußvermerk „Code mit KI-Unterstützung“ deckt das Setzen der Referenz nicht ab.",
+    "vorschlag": "jahre-methode.html:133 und B4_holdout.md:30: „Sichtprüfung durch einen KI-Agenten (Claude), ohne zweite Bewertung; Referenz und Schätzung lesen dieselben Luftbilder.“ Optional: André prüft eine vorab gezogene Stichprobe blind nach, Übereinstimmung als Zählung in berichte/.",
+    "aufwand": "klein",
+    "begruendung": "Protokoll und Seite gelesen. Offenlegen ist klein; die Stichprobe kostet Andrés Zeit und ist seine Entscheidung.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K17",
+    "titel": "Startseite: Antwortsätze ohne Jahr, kein Hinweis auf Neubau nach Mai 2022 und auf Abweichung zum Melderegister",
+    "gruppen": [
+     "buerger",
+     "presse"
+    ],
+    "art": "transparenz",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "index.html Fragen 1–5 im Präsens ohne Stichtag; Stichtag nur klein in .stadtzahlen__quelle (index.html:53) und im Steckbrief-Fuß; Neubau-Hinweis nur in planer-methode.html und jahre-methode.html, vorbildlich in jahre.html Frage 4.",
+    "problem": "Die Antwortsätze werden 1:1 zitiert; „Bornstedt: 3.176 Kinder“ liest sich als heutiger Stand, gerade in den Wachstumsgebieten.",
+    "vorschlag": "In Frage 1 und den Antwortsätzen „im Mai 2022“ ohne zusätzliche Zahlen; Kasten „Was die Zahlen nicht sagen“ im Methodenabschnitt nach Muster von jahre-methode.html; Zuzug-Hinweis bei betroffenen Stadtteilen nur datengesteuert.",
+    "aufwand": "klein",
+    "begruendung": "Seitentext geprüft; Buerger- und Presse-Fund sind dieselbe Sache, zusammengeführt.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K18",
+    "titel": "Startseite gibt exakte Personenzahlen aus, obwohl sie „darum gerundet“ verspricht",
+    "gruppen": [
+     "presse"
+    ],
+    "art": "korrektheit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "index.html:265 „Die Einwohnerzahl ist darum gerundet“; atlas.js:54 q(\"ew-max\", fmt.format(top.ew)); atlas.js:68 fmt.format(kk.zaehler) und fmt.format(kk.nenner); Steckbrief rundet (rundEw).",
+    "problem": "Für denselben Stadtteil stehen zwei Einwohnerzahlen auf der Seite (exakt im Fragetext, gerundet im Steckbrief), dazu eine Einzelzelle exakt, wo die Methode Einzelwerte unscharf nennt.",
+    "vorschlag": "In atlas.js:54 und :68 rundEw verwenden; Anteil als Hauptaussage behalten. Prüfung in pruefen/seiten.mjs.",
+    "aufwand": "klein",
+    "begruendung": "Code gelesen.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K19",
+    "titel": "Schaugrafik: keine Nachnutzungsbedingung und keine Atlas-Adresse auf der Grafik, Vermerk kürzer als das eigene Muster, Lizenzkürzel falsch",
+    "gruppen": [
+     "presse"
+    ],
+    "art": "lizenz-datenschutz",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "schaugrafik.js:225 „dl-zero-de/2.0“, ebenso index.html:279, README.md:66, QUELLEN.md:41/84; der verlinkte govdata-Pfad heißt dl-de/zero-2-0; fuss() ohne URL des Atlas und ohne „Daten verändert“ beim Stadtteil-Vermerk.",
+    "problem": "Frage 7 bewirbt die Grafik „fürs Heft“, eine Redaktion erfährt aber nicht, ob und mit welcher Bildzeile sie drucken darf; Leser der gedruckten Grafik finden den Atlas nicht.",
+    "vorschlag": "André legt die Bedingung fest (z. B. CC BY 4.0 mit Nennung); dann Zeile mit Adresse und Bedingung in fuss(), Satz „Abdruck erlaubt mit der Bildzeile …“ im Abschnitt #schaugrafik; Kürzel überall auf dl-de/zero-2-0.",
+    "aufwand": "klein",
+    "begruendung": "Kürzel per grep an vier Stellen gefunden; Link im selben Element widerspricht ihm.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K20",
+    "titel": "Berliner Vergleichsquote (visinage) und Gegenproben ohne Fundstelle und Ablesedatum, Register sagt „keine Datenübernahme“",
+    "gruppen": [
+     "transparenz",
+     "presse"
+    ],
+    "art": "transparenz",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "berichte/B4_holdout.md:109 „61,4 % … Zensus 46,7 % …“ ohne URL/Datum, geht nach jahre-methode.html:136 (data-j g-berlin); QUELLEN.md:73 Nr. 33 „keine Datenübernahme“, Stand „–“; skripte/02_auswerten.py:30-37 GEGENPROBE 185.137 und 8.221 von Hand, ohne Ablesedatum.",
+    "problem": "Eine fremde Kennzahl erscheint als Vergleich, ohne dass Ort und Stand prüfbar sind, und widerspricht dem Register. Die einzigen handgesetzten Zahlen der Startseite haben keinen Ablesebeleg, obwohl die Regionaldatenbank nur von Hand abrufbar ist.",
+    "vorschlag": "Fundstelle und Lesedatum für visinage nachtragen und Nr. 33 auf „eine Vergleichszahl übernommen (Fakt mit Fundstelle)“ ändern, sonst Vergleich streichen; belege/gegenproben.md mit Ablesedatum und Seite, Feld abgelesen in GEGENPROBE.",
+    "aufwand": "klein",
+    "begruendung": "Bericht, Register und Skript gelesen.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K21",
+    "titel": "Rohdaten-Prüfsummen nicht im Repo, für die Kerndaten (Zensus-Zips, Stadtteile) gar keine; Gebäude-Snapshot nur im Docker-Volume",
+    "gruppen": [
+     "forschung",
+     "verwaltung_gis"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "QUELLEN.md:5 verweist auf $KIEZ_DATEN/…/HERKUNFT.md außerhalb des Repos; rohdaten/ ist Symlink ins Nachbar-Repo; config/potsdam.yaml:59-61 ALKIS-Quelle ruhend; sql/002_ausbau.sql Snapshot auswertung.gebaeude_stand_20261105; grep pg_dump in skripte, sql, README ohne Treffer.",
+    "problem": "Wer nachrechnet, kann nicht prüfen, ob die eigene Destatis-Datei dieselbe ist. Der veröffentlichte Gebäudestand lässt sich nach Verlust des Volumes nicht wiederherstellen; ein Neuabruf des WFS liefert anderes. Wie man auf einen neuen ALKIS-Stand umsteigt, steht nirgends.",
+    "vorschlag": "belege/rohdaten.sha256 (Metadaten aus den HERKUNFT.md, Bestandsdateien nachträglich gehasht und so gekennzeichnet); Snapshot als pg_dump oder GPKG mit SHA256 unter $KIEZ_DATEN sichern; Abschnitt „Neuer Datenstand“ im Rundgang (K11).",
+    "aufwand": "klein",
+    "begruendung": "Verweise und fehlende Sicherung geprüft; Inhalt von $KIEZ_DATEN nicht eingesehen, Aussage der Prüfer dazu übernommen.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K22",
+    "titel": "Bauzeit-Popup nennt „Stufe X von 6“, aber nicht, wie oft diese Schätzung stimmt",
+    "gruppen": [
+     "buerger",
+     "forschung"
+    ],
+    "art": "transparenz",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "jahre.js:462 „Weg: … (Stufe X von 6)“; jahre.js:27 WEG kennt nur Stufen 1–5; Quoten liegen geladen in daten/jahre_methode.js (M.ruecktest, jahre.js:657).",
+    "problem": "„Stufe 4 von 6“ wirkt wie eine Note; dass rund jede vierte Schätzung in der falschen Klasse landet, steht erst auf der Methodenseite.",
+    "vorschlag": "Im Popup die Quote der Stufe aus M.ruecktest als „etwa 7 von 10 in Stichproben (n …)“ zeigen, nicht im Code fest; „Stufe X von 6“ durch „Schätzweg“ ersetzen.",
+    "aufwand": "klein",
+    "begruendung": "Popup-Code und vorhandene Daten gelesen.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K23",
+    "titel": "Rücktest-Quoten mit Nachkommastelle bei n = 6, ohne Unsicherheitsintervall",
+    "gruppen": [
+     "forschung"
+    ],
+    "art": "korrektheit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "berichte/B4_holdout.md:48 „5 von 6 (83,3 %)“, :68 „1 von 6 (16,7 %)“; jahre_methode.js führt quote und n, kein Intervall.",
+    "problem": "Prozentwerte bei sehr kleinem n suggerieren Genauigkeit; gerade die soziologisch relevanten Klassen haben die kleinsten Prüfsätze.",
+    "vorschlag": "Wilson-95-%-Intervall in 24_jahre_kaskade.py, Feld ki in jahre_methode.js und Schema; bei n < 10 nur Zählung. Als reine Darstellung kennzeichnen, Regeln unverändert.",
+    "aufwand": "klein",
+    "begruendung": "Zeilen im Bericht gelesen; Intervall nicht selbst nachgerechnet, Prüferwerte plausibel.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K24",
+    "titel": "Kein Wert für Gesamtpotsdam und kein Vergleich der 19 Planungsräume",
+    "gruppen": [
+     "stadtplanung",
+     "presse"
+    ],
+    "art": "nutzen",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "daten/planer.js ohne Schlüssel gesamt/stadt (grep leer); planer.js versorgung() zeigt einen Raum; Steckbrief ohne Stadtwert.",
+    "problem": "0,61 Plätze je Bedarfsplatz ohne Stadtwert und Rang lässt sich in einer Abstimmung nicht einordnen.",
+    "vorschlag": "Eintrag gesamt mit denselben Kennzahlen (Summe der Zähler und Nenner, setzt K14 voraus); Vergleichstabelle „Alle Planungsräume“ auf planer.html; Spalte Potsdam im Steckbrief.",
+    "aufwand": "mittel",
+    "begruendung": "Fehlender Schlüssel per grep.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K25",
+    "titel": "Steckbrief aus dem Planer nicht erreichbar, nur Beispiel 403 verlinkt",
+    "gruppen": [
+     "stadtplanung"
+    ],
+    "art": "zugang",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "grep steckbrief in planer.js ohne Treffer; planer-daten.html:137 verlinkt nur steckbriefe/403.html; 19 Dateien in daten/export/steckbriefe/.",
+    "problem": "Das Sitzungsdokument ist für 18 Räume praktisch unauffindbar.",
+    "vorschlag": "Knopf „Steckbrief drucken (A4)“ in der Versorgungstabelle auf steckbriefe/<nr>.html (Hinweis: Steckbrief rechnet Luftlinie); Liste aller 19 auf planer-daten.html.",
+    "aufwand": "klein",
+    "begruendung": "Geprüft per grep und ls.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K26",
+    "titel": "Kita-Frage für Eltern öffnet den Planer in Luftlinie, Fußweg läge vor",
+    "gruppen": [
+     "buerger"
+    ],
+    "art": "nutzen",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "planer.js:122 Standard weg: \"luft\"; index.html:127 Link planer.html#ein=kita&zu=kita ohne weg=fuss.",
+    "problem": "Für Eltern zählt der Fußweg; 500 m Luftlinie sind im Median rund 700 m zu Fuß, das steht nur auf der Methodenseite.",
+    "vorschlag": "Link auf index.html:127 um &weg=fuss ergänzen (ODbL-Vermerk wird dann schon eingeblendet); im Zell-Popup beide Werte; Halbsatz in der Legende.",
+    "aufwand": "klein",
+    "begruendung": "Standard und Link gelesen. Fachansicht bleibt Luftlinie, nur der Bürger-Einstieg ändert sich.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K27",
+    "titel": "Kita mit Häusern in zwei Planungsräumen: alle Plätze am Hauptstandort, Spanne nicht genannt",
+    "gruppen": [
+     "stadtplanung"
+    ],
+    "art": "korrektheit",
+    "schwere": "niedrig",
+    "urteil": "bestaetigt",
+    "beleg": "config/richtwerte.yaml:224 „je id_kita einmal (weitere Häuser ohne Plätze)“; einrichtung.csv:661 KTS 04806 mit 104 Plätzen in 502, :662 KTS 04806#haus2 in 503 ohne Plätze.",
+    "problem": "503 und 502 können je nach Verteilung deutlich anders stehen; an der Zahl steht nichts.",
+    "vorschlag": "In 15_planer.py raumübergreifende Kitas erkennen und in der Unsicherheit der betroffenen Räume nennen; im Prüfskript zählen.",
+    "aufwand": "klein",
+    "begruendung": "Datenzeilen gefunden; die Spanne der Prüfer nicht nachgerechnet, „eines von 20 Nebenhäusern“ nicht nachgezählt. Schwere auf niedrig, weil ein Einzelfall.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K28",
+    "titel": "Methodenseiten mit festen Zahlen im HTML, obwohl der Kopf sagt, der Browser rechne alles aus den Dateien",
+    "gruppen": [
+     "transparenz"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "jahre-methode.html:32 „Alle Zahlen auf dieser Seite rechnet der Browser aus denselben Dateien“; :121 fest 50.356, 52.309, 96,3 %, 1.915; planer-methode.html:37-38 „1,4-mal“, „1.800 Haltestellen … 15“; skripte/15_planer.py:74 OSM_KITA_VOLLSTAENDIG = \"78 %\".",
+    "problem": "Die Zahlen veralten bei neuem Import still, genau wie index.html:269 (K1); der Seitenkopf verspricht etwas anderes.",
+    "vorschlag": "Zählungen in jahre_methode.js bzw. planer.js (Schlüssel hoehe, pruefwerte mit Beleg) und per data-feld füllen; bis dahin Beleg und Stand hinter jede feste Zahl und den Kopfsatz einschränken.",
+    "aufwand": "mittel",
+    "begruendung": "Feste Zahlen im HTML per grep gefunden.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K29",
+    "titel": "Kein Prüfstand am veröffentlichten Stand: keine gemeinsame Prüfkette, Ergebnis des 06.11. nur als „grün“",
+    "gruppen": [
+     "transparenz",
+     "verwaltung_gis"
+    ],
+    "art": "nachvollziehbarkeit",
+    "schwere": "mittel",
+    "urteil": "teilweise",
+    "beleg": "Kein pruefen.sh und kein Prüfstand-Ordner (grep in belege und README leer); belege/3D_grundkarte_20261106.md:52-61 laut Prüfer nur „grün“; daten.py prüft die GPKG nicht, das tut A8_export.py, das laut Verwaltungs-Prüfer offline mit --odbl-erwartet lief.",
+    "problem": "Welche Prüfungen mit welchem Ergebnis am Live-Stand 9864962 liefen, ist nicht belegt.",
+    "vorschlag": "pruefen.sh für alle offline lauffähigen Prüfungen mit Zählungen und Rückgabewert; je Live-Stand belege/pruefstand-<datum>-<commit>/ mit Log.",
+    "aufwand": "klein",
+    "begruendung": "Teilweise: Die Aussage, Exporte würden nur mit Datenbank geprüft, widerspricht dem Verwaltungs-Prüfer, der A8_export.py offline laufen ließ. Fehlender Runner und Prüfstand bestätigt.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K30",
+    "titel": "Keine Ortsfindung („Wo bin ich?“), nur Stadtteil-Namen oder -Nummern",
+    "gruppen": [
+     "buerger"
+    ],
+    "art": "nutzen",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "grep Geolocate/geolocat in *.js ohne Treffer; Stadtteilsuche nur in karte.html; Fragen sprechen von „meine Nachbarschaft“.",
+    "problem": "Wer seine Straße, aber nicht den amtlichen Stadtteil kennt, muss am Handy suchen.",
+    "vorschlag": "maplibregl.GeolocateControl (trackUserLocation:false) auf den Kartenseiten, Position bleibt im Browser; Datenschutzsatz ergänzen; Stadtteilsuche auch auf index, planer, jahre. Keine eigene Straßensuche (ODbL/Adressgrenze).",
+    "aufwand": "mittel",
+    "begruendung": "Fehlen per grep bestätigt. Vorschlag hält die Grenze „keine Adressen“, ändert aber den Datenschutzhinweis.",
+    "andre_entscheidet": true
+   },
+   {
+    "nr": "K31",
+    "titel": "Kopfzeile je Seite verschieden, Planer und Bauzeiten von der Startseite oben nicht erreichbar",
+    "gruppen": [
+     "buerger"
+    ],
+    "art": "zugang",
+    "schwere": "mittel",
+    "urteil": "bestaetigt",
+    "beleg": "index.html:28-37 Navigation: Karte, Fragen, Stadtteile, Schaugrafik, Grenzfall, Methode (kein Planer, keine Bauzeiten); „Methode“ führt je Seite woandershin.",
+    "problem": "Eltern finden den Planer erst über Frage 8; zwischen den vier Teilen verliert man die Orientierung.",
+    "vorschlag": "Gleiche erste Zeile auf allen Seiten (Start · Karte · Planer · Bauzeiten, aria-current), Seitenspezifisches in zweiter Zeile; Direktwege unter dem Auftakt.",
+    "aufwand": "mittel",
+    "begruendung": "index.html gelesen; übrige Köpfe nach Prüferangabe, nicht einzeln nachgesehen.",
+    "andre_entscheidet": false
+   },
+   {
+    "nr": "K32",
+    "titel": "Kleinere Bürger- und Fachhinweise: Zwei-Finger-Schutz auf jahre.html, ÖPNV-Stichtag nach Auswertungsdatum, Fachbegriffe, Grundschule ≠ zuständige Schule, Metadaten je Feld, Zensusanteile fehlen im GIS-Export, GSAP-Lizenz",
+    "gruppen": [
+     "buerger",
+     "stadtplanung",
+     "verwaltung_gis"
+    ],
+    "art": "sammel",
+    "schwere": "niedrig",
+    "urteil": "teilweise",
+    "beleg": "jahre.js:228 cooperativeGestures:false gegen atlas.js:163 !FEIN; config/richtwerte.yaml:75 stichtag 2026-11-10 (Schultag), Steckbrief „Stichtag 10.11.2026“ neben „Stand der Auswertung 05.11.2026“; daten/schema/zellen.json 0 description; zelle.csv ohne q_u18/q_65p usw., export/README.md:45 „Keine Altersklassen je Zelle“ gegen LIZENZ.md:31; vendor/gsap.min.js-Kopf „All rights reserved. Subject to the terms at gsap.com/standard-license“, kein Lizenztext in vendor/.",
+    "problem": "Je für sich klein: anderes Gestenverhalten zwischen Seiten; Stichtag in der Zukunft wirkt wie Tippfehler; Laienbegriffe (Raumeinheit, ALKIS) unerklärt; Eltern erfahren nicht, wer die zuständige Grundschule festlegt; Feldbedeutungen nicht maschinenlesbar; Zellanteile der Startseite nur als JS in WGS84; GSAP ist keine Open-Source-Lizenz und als optional nicht gekennzeichnet.",
+    "vorschlag": "cooperativeGestures: !FEIN auf jahre.html (danach am Gerät prüfen); „Sollfahrplan für Dienstag, 10.11.2026 (Schultag), HVZ 6–9 Uhr“; Klammererklärungen bzw. „Gebiet“ statt „Raumeinheit“; Satz mit Verweis auf die Stadt zur Schulanmeldung (nur Link, URL vorher prüfen); description je Schemafeld; zelle-Ebene um die veröffentlichten Anteile erweitern und README:45 präzisieren; NOTICE-Satz zu GSAP und Rückfall ohne GSAP.",
+    "aufwand": "mittel",
+    "begruendung": "Stellen einzeln gelesen. Teilweise: karte.html hat ebenfalls cooperativeGestures:false, dort als Vollbildkarte begründbar; GSAP trägt seinen Lizenzverweis im Dateikopf, es fehlt nur der beigelegte Text; README:45 ist für die Exportebene nicht falsch, nur missverständlich.",
+    "andre_entscheidet": false
+   }
+  ],
+  "beduerfnisse": [
+   {
+    "gruppe": "stadtplanung",
+    "braucht": "Belastbare Kennzahlen je Planungsraum nach amtlicher Rechenweise, mit Zähler, Nenner, Stadtwert und Vergleich, office-tauglichem Export und zitierfähigem Stand.",
+    "heute": "Kennzeichnung von Status, Richtwert und Unsicherheit vorbildlich; Belastbarkeit leidet an Grundschul-Zuordnung (K4) und Nachbarraum-Regel (K7), Gebrauch an fehlenden Absolutzahlen, Vergleich und Office-CSV (K5, K14, K24, K25)."
+   },
+   {
+    "gruppe": "buerger",
+    "braucht": "Schneller Einstieg über den eigenen Ort, Alltagsantworten (Kita zu Fuß, Hausalter) und verständliche Hinweise, was unscharf oder alt ist, am Handy.",
+    "heute": "Fragen, Datenschutz und Barrierearmut gut; am Handy fehlt die Grau-Erklärung (K6), es gibt keine Ortsfindung (K30), die Navigation wechselt (K31) und einige Texte führen in die Irre (K1, K8, K26)."
+   },
+   {
+    "gruppe": "verwaltung_gis",
+    "braucht": "Offene GIS-Formate mit Lizenz je Ebene, maschinenlesbare Feldbeschreibung, einen dokumentierten Neuberechnungsweg mit fester Umgebung und einen Pfad für neue Datenstände.",
+    "heute": "Ausgabeseite (GPKG, QGIS-Projekt, Lizenztabelle, ODbL-Trennung, Prüfungen) sehr gut; Herstellungsseite schwach: kein Rundgang, ungepinnte Umgebung, Snapshot ungesichert, Vertrag lockerer als die Datenschutzgrenze (K3, K11, K12, K21)."
+   },
+   {
+    "gruppe": "presse",
+    "braucht": "Zitierbare Kernsätze mit Stand, druckfähige Grafik mit klarer Nutzungsbedingung, Einordnung gegenüber amtlichen Zahlen und einen Korrekturweg.",
+    "heute": "Quellenvermerke je Zahl und Schaugrafik stark; Startseite widerspricht sich bei Höhe und Rundung (K1, K18), sagt nicht, was die Zahlen nicht sagen (K17), und es fehlen Abdruckbedingung, Versionsstand und Kontakt (K13, K19)."
+   },
+   {
+    "gruppe": "forschung",
+    "braucht": "Nachrechenbare Methode, Validierung mit Fehlermaßen und Intervallen, festen zitierbaren Datenstand mit Rohdaten-Hashes und öffentliches Entscheidungsprotokoll.",
+    "heute": "Rücktest-Design auf Forschungsniveau; Zitierbarkeit, Reproduzierbarkeit und öffentliche Belegbarkeit von N3 fehlen, die KI-erhobene Referenz ist nicht offengelegt (K9, K10, K12, K13, K16, K21, K23)."
+   },
+   {
+    "gruppe": "transparenz",
+    "braucht": "Einen Einstieg, der jede Kernzahl mit Beleg und Skript verbindet, ein ohne interne Unterlagen lesbares Entscheidungsprotokoll und einen nachrechenbaren Stand.",
+    "heute": "Datenschicht nah am Pipeline-Standard (Verträge, Lizenzregister, Abrufprotokoll, Bericht-SHA); Dokumentation hinkt: README alt, Entscheidungen intern, Seiten widersprechen Code an zwei Stellen (K1, K2, K10, K11, K28)."
+   }
+  ],
+  "gesamturteil": "Kein Prüferfund ist widerlegt. Zwei sind nur teilweise bestätigt (K29, K32). Die 6 Prüferberichte lassen sich auf 32 Funde zusammenführen. Belegt am Stand 9864962 sind fünf Sachen mit hoher Schwere und kleinem Aufwand: (1) Die Startseite widerspricht sich bei der Gebäudehöhe, auch in den Popups (K1). (2) Die Bauzeiten-Methode nennt einen Wikidata-Zuordnungsweg, der nur zur Prüfung dient (K2). (3) Der Datenvertrag jahre_gebaeude.json ist lockerer als die feste Datenschutzgrenze. Die Daten selbst halten sie ein: 53 Einzeljahre, keine oid (K3). (4) Die Export-CSV bricht die Zahlen in deutschem Office (K5). (5) Am Handy fehlt in der Legende die Erklärung für Grau (K6). Dazu kommen zwei inhaltliche Mängel der Planer-Ebene, die André entscheiden muss: Schulen mit Primarstufe fehlen bei den Grundschulwerten, deshalb steht bei 604 der Wert 0,00 (K4). Und die Kita-Relation trägt das Abzeichen „amtlicher Maßstab“, rechnet aber ohne die Nachbarraum-Regel (K7). Gemessen am Maßstab der Pipeline fehlt vor allem die Dokumentationsschicht: Entscheidungsprotokoll, Rundgang mit „Zur Prüfung“, festgeschriebene Umgebung, CITATION/Tags/Changelog, gesicherte Rohdaten-Hashes und Snapshot (K10–K13, K21). Die Commits zu N3 liegen nur lokal (K9). Daten, Lizenztrennung und Prüfungen sind dagegen schon auf hohem Niveau. Mit den kleinen Textkorrekturen (K1, K2, K3, K6, K7-Hinweis, K8, K15, K16, K18) lässt sich in einer Session viel Glaubwürdigkeit gewinnen. André entscheidet bei K4, K7, K9, K10, K13, K16, K19, K20 und K30."
+ },
+ "roh": [
+  {
+   "linse": "stadtplanung",
+   "zusammenfassung": "Was eine Stadtplanerin oder ein Sozial- und Infrastrukturplaner der LHP (etwa Jens Lüscher) für Bedarfsplanung, Vorlagen und Abstimmungen braucht: Werte auf Ebene der 19 Planungsräume mit klarem Stichtag. Richtwerte mit Fundstelle und Geltung. Zähler und Nenner, um nachzurechnen und den Fehlbedarf in absoluten Plätzen anzugeben. Den Vergleich mit der Gesamtstadt und zwischen den Räumen. Eine Rechenweise, die der amtlichen Methode folgt (Baulandmodell Nr. 3.4.4: angrenzende Planungsräume zählen mit). Exporte, die ohne Nacharbeit in QGIS und in deutschem Excel bzw. LibreOffice laufen. Einen zitierfähigen, versionierten Stand für Drucksachen.\nBei Transparenz ist die Seite schon weit. Jede Zahl trägt Status, Maßstab mit Fundstelle, Stand, Unsicherheit und Quelle. Strittige Werte bleiben leer und werden nicht geraten. GPKG und QGIS-Projekt sind sauber.\nDie größten Lücken liegen bei Belastbarkeit und Gebrauchstauglichkeit. Beim Grundschulwert verfälscht eine Zuordnungsregel einen ganzen Planungsraum zu „0,00 gegen amtlichen Maßstab 1“. Die Kita-Relation weicht ohne Hinweis von der amtlichen Nachbarraum-Regel ab. Zähler und Nenner fehlen. Es gibt keinen Vergleich zwischen den Räumen und keinen Stadtwert. Die CSV verliert in deutschem Office die Dezimalzahlen. Zitierhinweis und Versionsstand fehlen.\nZensus-Stichtag 2022 und fehlende Prognose (H11) sind überall offengelegt. Für die Planung bleiben sie der größte inhaltliche Vorbehalt, sind hier aber nicht als neuer Fund geführt.",
+   "staerken": [
+    "Drei Status sauber getrennt: amtlicher Maßstab (geltendes Dokument, Fundstelle gelesen, Lesedatum in config/richtwerte.yaml:235-241), Orientierung (ohne Primärbeleg, abgelaufene Geltung NVP 2019, Berliner Methode), amtliche Daten ohne Maßstab. Gestrichelte Umrandung für Orientierungswerte; Erklärung in planer-methode.html:62.",
+    "Jede Zeile der Versorgungstabelle trägt Wert, Methode, Status, Richtwert mit Seitenzahl, Stand und Unsicherheit. Das gilt für die Seite (planer.js:452-475), die Langform versorgung.csv (323 Zeilen, 22 Felder) und den Steckbrief gleichermaßen.",
+    "Strittiges bleibt leer statt geraten. Pestalozza-Standort: Grundschulwerte in 101/103 leer, mit Grund (planer-methode.html:50). ÖPNV: kein Wert bei höchstens 200 EW oder mehr als 50 % Einwohnern ohne eindeutige Gebietsklasse (planer-methode.html:53).",
+    "Das Badge „vorläufig, ohne Schulbezirk“ steht an jedem Grundschulwert (§ 106 BbgSchulG benannt). Die LHP-Einzugsgebiete bleiben wegen der Nutzungsbedingungen konsequent intern.",
+    "Die Lizenzgrenze ist technisch durchgezogen: ODbL nur in *_odbl-Dateien und eigener GPKG. Jede Ebene hat einen fertigen Vermerk in der Tabelle lizenz (csv/lizenz.csv).",
+    "Das GIS-Paket ist planertauglich: GeoPackage in EPSG:25833, QGIS-Stile in layer_styles eingebettet, QGIS-Projekt mit relativen Pfaden, Planungsräume als Rechenebene, Stadtteile zur Orientierung (daten/export/README.md).",
+    "Der A4-Steckbrief je Planungsraum ist druckbar. Er enthält Kennzahlen, Einrichtungsliste, Lesehilfe und Quellenblock (daten/export/steckbriefe/*.html).",
+    "„Link zu dieser Ansicht“ hält Arten, Messart, Raumebene, gewählten Raum und Kamera im Hash fest (planer.js:137-145). So lassen sich Ansichten in Abstimmungen weitergeben."
+   ],
+   "funde": [
+    {
+     "titel": "Grundschüler je Kind: Schulen mit Primarstufe fallen heraus, Waldstadt II zeigt 0,00 gegen „amtlichen Maßstab 1“",
+     "art": "korrektheit",
+     "schwere": "hoch",
+     "beleg": "skripte/11_einrichtungen.py:100-104 (G/S und G/O/OG → art sek1); skripte/15_planer.py:853 (nur art == \"grundschule\"); daten/export/csv/raumeinheit.csv Zeile 604: schueler_je_kind_grundschule 0.0, ew_je_grundschule leer, anteil_grundschule_1000m 78; einrichtung.csv: 604 sek1 G/S „Oberschule Theodor Fontane mit Primarstufe“ 436 Schüler, 501 G/O/OG „Schulzentrum am Stern“ 775, 304 G/S „Montessori-Oberschule mit Primarstufe“ 496; daten/export/steckbriefe/604.html: „Grundschüler je Kind … amtlicher Maßstab · vorläufig … 0,00 | 1 Schüler je Kind“, „Schüler: MBJS, Stand k. A.“",
+     "problem": "Grundschulteile kombinierter Schulen werden als Sekundarstufe I geführt. Für Schülerquote, Einwohner je Grundschule und Grundschul-Entfernung zählen sie nicht. In 604 steht deshalb 0,00 Schüler je Kind neben dem Richtwert 1 aus dem Baulandmodell, mit dem Abzeichen „amtlicher Maßstab“. In einer Vorlage liest sich das als vollständiges Grundschuldefizit, obwohl dort eine Schule mit Primarstufe und 436 Schülern liegt. 304 und 501 sind ebenso unterzählt. Auch die Zellentfernung (78 % in 1000 m) ignoriert diese Schule. Der Hinweis „Grundschulteile kombinierter Schulformen fehlen“ steht im Fließtext, entschärft die Zahl aber nicht. Dazu kommt: Der Unsicherheitstext dieser Zeile enthält Kita-Textbausteine („Plätze = Kapazität laut Betriebserlaubnis … Kindertagespflege fehlt“) und verweist auf „wie oben“. In CSV und Einzelansicht gibt es kein „oben“.",
+     "vorschlag": "Je nach Datenlage eine von zwei Lösungen. Entweder die Schulen mit unterart „G/…“ als Grundschulstandort mitzählen, für Entfernung und Einwohner je Standort, die Schülerzahl dann nur mit Vermerk, weil sie die Sekundarstufe enthält. Oder in jedem Planungsraum mit einer solchen Schule wert = null setzen, mit dem ersten Satz „keine Aussage: Schule mit Primarstufe (G/S) in der Raumeinheit, Schülerzahl nicht nach Stufe teilbar“. Den Status dieser Kennzahl zusätzlich prüfen: Anlage C nennt eine Bedarfsquote, keine Norm für Schüler am Schulort. Ehrlicher ist „amtliche Daten, Quote als Orientierung“. Den Unsicherheitstext von Kita-Bausteinen befreien und „wie oben“ ausschreiben.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "CSV mit Semikolon und Dezimalpunkt bricht in deutschem Office die Zahlen",
+     "art": "zugang",
+     "schwere": "hoch",
+     "beleg": "daten/export/README.md:22 „CSV: Trennzeichen Semikolon, UTF-8 mit BOM, Dezimalpunkt“; skripte/16_export.py:12. Offline geprüft mit LibreOffice (headless, CSV-Filter Sprache de-DE 1031) auf daten/export/csv/raumeinheit.csv: flaeche_km2 „20.808“ → Zahl 20808 (101), „51.076“ → 51076 (102); plaetze_je_kind_kita „1.23“, plaetze_je_bedarf_kita „1.09“ → Text statt Zahl (Zelltyp t=\"s\")",
+     "problem": "Semikolon und BOM zielen auf deutsches Excel bzw. LibreOffice. Gerade dort wird der Punkt als Tausendertrenner gelesen. Flächen werden um den Faktor 1000 falsch, die Quoten zu Text, mit dem keine Formel rechnet. Wer die Versorgungstabelle für eine Vorlage in Office weiterverarbeitet (Sortieren, Summen, Diagramm), arbeitet mit verfälschten oder toten Zellen. Ein Fehler ist nur bei genauem Hinsehen erkennbar.",
+     "vorschlag": "Für Office eine eigene Fassung erzeugen: entweder csv/ mit Dezimalkomma (passend zum Semikolon) und die maschinenlesbare Punkt-Fassung als csv_punkt/ behalten, oder zusätzlich je Ebene eine .xlsx/.ods ohne Geometrie aus der GPKG schreiben (Zahlen als Zahlen, Spaltenköpfe mit Einheit). In daten/export/README.md einen Satz „In Excel/LibreOffice: Datei X öffnen, nicht die Punkt-CSV“. In pruefen/A8_export.py eine Prüfung ergänzen, die die Datei wie oben mit soffice de-DE importiert und Zahlentypen kontrolliert.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Plätze je Bedarfsplatz weicht von der amtlichen Nachbarraum-Regel ab, ohne das an der Zahl zu sagen",
+     "art": "korrektheit",
+     "schwere": "hoch",
+     "beleg": "config/richtwerte.yaml:243 „Plätze und Prognose werden je Planungsraum abgeglichen, angrenzende Planungsräume zählen mit (Nr. 3.4.4, S. 14–15)“; skripte/15_planer.py um 838-850 (nur Plätze in der Raumeinheit); steckbriefe/403.html: „Plätze je Bedarfsplatz … amtlicher Maßstab … 0,61 | 1 Platz je Bedarfsplatz“; planer-methode.html:45 nennt die Regel nicht",
+     "problem": "Das Baulandmodell, aus dem der Richtwert stammt, gleicht Plätze und Bedarf je Planungsraum unter Einbezug der angrenzenden Planungsräume ab. Der Kiezatlas rechnet streng innerhalb der Grenze und setzt daneben das Abzeichen „amtlicher Maßstab“. 403 Babelsberg Süd (0,61) oder 303 Brandenburger Vorstadt (0,62) erscheinen so als deutliche Unterdeckung nach amtlicher Methode. Nach der amtlichen Rechnung kann der Wert anders ausfallen. Die Abweichung ist in der Config dokumentiert, erreicht aber weder Methodenseite noch Tabelle noch Steckbrief. Der allgemeine Satz „Wunsch- und Wahlrecht: Kinder besuchen auch Einrichtungen in anderen Raumeinheiten“ ersetzt den Hinweis auf die abweichende Rechenweise nicht.",
+     "vorschlag": "Eine zweite Zeile „Plätze je Bedarfsplatz mit angrenzenden Planungsräumen (Baulandmodell Nr. 3.4.4)“ berechnen. Die Nachbarschaft lässt sich aus planungsraeume.js über gemeinsame Grenzen bestimmen und in der Config festlegen. Nur diese Zeile trägt den amtlichen Maßstab. Die heutige Zeile wird „amtliche Daten, Raum allein“. Liegt dafür keine Zeit, mindestens Status auf Orientierung setzen und in Unsicherheit, Steckbrief und planer-methode.html:45 den Satz ergänzen: „Abweichend von Nr. 3.4.4 ohne angrenzende Planungsräume gerechnet.“",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Zähler und Nenner fehlen: kein Nachrechnen, kein Fehlbedarf in Plätzen",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "daten/planer.js: Werte je Raum tragen nur kennzahl, art, zielgruppe, einheit, methode, status, richtwert, q, stand, wert, unsicherheit, vorlaeufig (Node-Auswertung aller Schlüssel); daten/export/README.md:29-30 raumeinheit/versorgung ohne Kinderzahlen je Altersgruppe, ohne Platzsumme, ohne Bedarfsplätze",
+     "problem": "Eine Planerin braucht für Vorlagen absolute Größen: wie viele Kinder unter 3, 3 bis 5 und 6 bis unter 12, wie viele Plätze, wie viele Bedarfsplätze, also wie viele Plätze fehlen oder übrig sind. Die Exporte liefern nur die Quote. Die Plätze lassen sich aus einrichtung.csv mühsam summieren, die Kinderzahlen je Planungsraum gibt es gar nicht. Damit ist auch die Prüfung durch Dritte unmöglich, ein Kernpunkt des Pipeline-Maßstabs (Laufberichte mit Zählungen). Die Datenschutzgrenze steht dem nicht entgegen: Es geht um Aggregate je Planungsraum ab 100 EW bzw. ab 20 Personen der Zielgruppe, die das Skript ohnehin rechnet.",
+     "vorschlag": "In jede Versorgungszeile die Felder zaehler, nenner, zaehler_text und nenner_text aufnehmen (z. B. 826 Plätze / 1.354 Bedarfsplätze), dieselbe Rundung und Mindestgrößen wie heute. Bei Quoten mit Richtwert zusätzlich differenz (z. B. „−528 Plätze“). In raumeinheit die Zielgruppen u3, 3_5, 6_9, 6_11_geschaetzt als Spalten. Auf der Seite die Zahl unter dem Wert als „826 von 1.354“ zeigen. In pruefen/A6_planer.py prüfen, dass zaehler/nenner = wert.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Kein Vergleich zwischen Planungsräumen und kein Wert für die Gesamtstadt",
+     "art": "nutzen",
+     "schwere": "mittel",
+     "beleg": "daten/planer.js: Schlüssel stand, raumebene, rundung, hinweis, quellen, raeume (kein gesamt/stadt); planer.js:412-475 versorgung() zeigt genau einen Raum; steckbriefe/403.html ohne Stadtwert oder Rang",
+     "problem": "Für Abstimmungen und Prioritäten fragt die Planung zuerst: Wo steht dieser Raum gegenüber der Stadt und den anderen 18? Die Seite zeigt immer nur einen Raum. Der Steckbrief nennt 0,61 Plätze je Bedarfsplatz ohne den Potsdamer Gesamtwert. Vergleiche gehen nur über den CSV-Export, und der ist in Office wegen der Dezimalpunkte zudem fehleranfällig. Damit fehlt eine Grundfunktion, die die Aufgabenstellung ausdrücklich nennt.",
+     "vorschlag": "In 15_planer.py einen Eintrag raeume[\"0\"] bzw. gesamt mit denselben Kennzahlen für ganz Potsdam erzeugen (gleiche Methode, Summe der Zähler und Nenner). Auf planer.html unter der Raumtabelle eine Vergleichsansicht „Alle Planungsräume“ anbieten: eine Kennzahl wählen, sortierbare Tabelle mit 19 Zeilen plus Stadtzeile, Status und vorläufig je Zelle, dazu optional die Choroplethe der Kennzahl auf der Karte. Im Steckbrief je Zeile eine Spalte „Potsdam“.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Nicht zitierfähig: kein Zitiervorschlag, kein Versionsstand an Steckbrief und Link",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "Kein CITATION.cff und kein Zitierhinweis im Repo (grep „zitier|citation“ ohne Treffer), das Vorbild geodaten-import-pipeline hat CITATION.cff; skripte/16_export.py:984 und 1018 (Steckbrief nennt nur „Stand der Auswertung 05.11.2026“ und „Erzeugt mit skripte/16_export.py“, ohne Commit); planer.js:137-145 (Link ohne Datenstand); live = Arbeitszweig ausbau/3d-grundkarte",
+     "problem": "Eine Vorlage oder ein Gutachten, das sich auf den Kiezatlas stützt, kann weder einen Zitiervorschlag übernehmen noch einen festen Stand benennen. Der geteilte Link öffnet immer den aktuellen Datenstand. Wird neu gerechnet (etwa nach der Grundschul-Korrektur oben), zeigt derselbe Link in einer Drucksache andere Zahlen, ohne dass das erkennbar ist. Der Steckbrief trägt ein Datum, aber keinen Commit und keine Version, über die sich der Stand im Repo wiederfinden ließe.",
+     "vorschlag": "CITATION.cff wie in der Pipeline anlegen. Auf planer-daten.html und im Steckbrief-Fuß einen Block „So zitieren“ einfügen, etwa „Kiezatlas Potsdam, Planer, Datenstand 2026-11-05 (Commit 9864962), Stiebitz Souverain Systems UG, URL, abgerufen am …“. In daten/planer.js ein Feld version (Commit-Kurzhash) mitschreiben und im Steckbrief und in der Tabelle anzeigen. Den Teilen-Link um v=<stand> ergänzen. Weicht der geladene Stand ab, nennt die Seite das: „Dieser Link wurde mit Datenstand X erstellt, gezeigt wird Y.“",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Kita-Plätze am Hauptstandort: Nebenhaus jenseits der Planungsraumgrenze verschiebt die Relation",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "config/richtwerte.yaml:224 „je id_kita einmal (weitere Häuser ohne Plätze)“; einrichtung.csv: KTS 04806 „Schillers Sternchen, Krippe, Kita und Hort“ Hauptstandort raum_nr 502 mit 104 Plätzen, KTS 04806#haus2 in 503 ohne Plätze; Nachrechnung aus einrichtung.csv: 502 990 Plätze / 1,41 ≈ 702 Bedarfsplätze, 503 589 / 1,08 ≈ 545; lägen alle 104 Plätze in 503: 502 1,26, 503 1,27",
+     "problem": "Die Plätze einer Kita mit mehreren Häusern zählen komplett am Hauptstandort. Von 20 Nebenhäusern liegt eines in einem anderen Planungsraum als sein Hauptstandort. Je nach tatsächlicher Verteilung liegt 503 Alt Drewitz/Kirchsteigfeld zwischen 1,08 und 1,27 und 502 Drewitz zwischen 1,41 und 1,26. Die Spanne entscheidet mit darüber, ob 503 als knapp oder als gut versorgt gilt. An der Zahl steht davon nichts.",
+     "vorschlag": "In 15_planer.py Kitas erkennen, deren Häuser in mehreren Planungsräumen liegen. In den betroffenen Räumen in der Unsicherheit eine Spanne nennen („104 Plätze der Kita KTS 04806 liegen ganz oder teilweise in 503; Spanne 1,08 bis 1,27“). Im Prüfskript diese Fälle zählen und im Laufbericht ausweisen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Steckbrief aus dem Planer nicht erreichbar",
+     "art": "zugang",
+     "schwere": "mittel",
+     "beleg": "planer.js:412-475 und 518 (Knöpfe nur „Auf Raumeinheit zoomen“ und „Link zu dieser Ansicht“, kein Verweis auf steckbriefe/<nr>.html); planer-daten.html:137 verlinkt nur das Beispiel 403",
+     "problem": "Der druckbare A4-Steckbrief ist das, was eine Planerin in eine Sitzung mitnimmt. Aus der Versorgungstabelle des gewählten Raums führt aber kein Weg dorthin. Man muss auf der Datenseite das Beispiel 403 öffnen und die Nummer in der Adresse von Hand ändern. Für die anderen 18 Räume ist das praktisch unauffindbar.",
+     "vorschlag": "In der Versorgungstabelle neben „Link zu dieser Ansicht“ einen Knopf „Steckbrief drucken (A4)“ einfügen, der daten/export/steckbriefe/<S.r>.html öffnet; bei Fußweg einen Hinweis, dass der Steckbrief in Luftlinie rechnet. Auf planer-daten.html alle 19 Steckbriefe als Liste mit Nummer und Name verlinken.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Eigene Festlegungen und offene Prüfungen verstreut statt als Liste „nicht geprüft sind …“",
+     "art": "transparenz",
+     "schwere": "niedrig",
+     "beleg": "config/richtwerte.yaml:249-251 (6 bis unter 12 = 6–9 + 1/3 von 10–15, „Eigene Festlegung von A6“), :332-339 (Bus+Tram mit beiden Radien, 50-%-Schwelle), :341 (min_zielgruppe 20), :75 (ÖPNV-Stichtag); Schülerfahrtkostensatzung „Fundstelle nicht gelesen“ nur im Datenfeld richtwert_quelle; docs/ enthält nur codekarte/, kein Entscheidungsprotokoll",
+     "problem": "Der Pipeline-Maßstab führt eigene Festlegungen als E1…E48 und offene Grenzen gebündelt. Im Planer stehen sie verteilt in Config-Kommentaren und Unsicherheitstexten. Wer die Methode in einer Fachrunde vertreten oder angreifen will, findet nirgends die vollständige Liste der Setzungen. Dazu gehören die Altersschätzung 10–11, die 50-%-Schwelle, die Mindestgröße 20, das Zusammenfassen von ALKIS-Gebäuden bis 50 m und die Doppelradien Bus/Tram. Ebenso fehlt die Liste der nicht geprüften Dinge: NVP-Nachfolger, OSM-Vollständigkeit, Fundstelle der Schülerfahrtkostensatzung, Grundschuleinzugsgebiete.",
+     "vorschlag": "docs/entscheidungen.md für den Planer anlegen, je Festlegung eine Nummer, Begründung, Alternative und Wirkung. Die Nummer im Unsicherheitstext zitieren („Eigene Festlegung P3“). Auf planer-methode.html einen Kasten „Nicht geprüft sind …“ mit den offenen Punkten. Die Schülerfahrtkostensatzung 2016 lesen und die Fundstelle nachtragen: kleiner Aufwand, und danach kann der 2000-m-Wert vom Status Orientierung wegkommen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "ÖPNV-Stichtag liegt nach dem Auswertungsdatum, ohne Erklärung auf Seite und Steckbrief",
+     "art": "transparenz",
+     "schwere": "niedrig",
+     "beleg": "steckbriefe/403.html: „VBB-Fahrplandaten (GTFS), Fahrplan ab 03.11.2026, Stichtag 10.11.2026“ neben „Stand der Auswertung 05.11.2026“; Begründung nur in config/richtwerte.yaml:75 „Dienstag, Schultag (Herbstferien Brandenburg 19.–30.10.2026)“",
+     "problem": "Ein Stichtag, der fünf Tage nach der Auswertung liegt, sieht in einer Vorlage wie ein Tippfehler aus. Gemeint ist ein Referenz-Schultag im Sollfahrplan. Das ist sinnvoll, steht aber nur in der Config.",
+     "vorschlag": "Überall „Stichtag 10.11.2026“ ersetzen durch „Sollfahrplan für Dienstag, 10.11.2026 (Schultag nach den Herbstferien), HVZ 6–9 Uhr“, in planer-methode.html Abschnitt ÖPNV ein Satz dazu.",
+     "aufwand": "klein"
+    }
+   ]
+  },
+  {
+   "linse": "buerger",
+   "zusammenfassung": "Bürgerinnen und Bürger, Eltern und Ältere, die ohne Fachwissen und meist am Handy kommen, wollen vor allem drei Dinge. Erstens: ihren eigenen Ort schnell finden, also Straße oder Standort und nicht die Nummer eines Stadtteils. Zweitens: Antworten auf Alltagsfragen wie „Wie weit ist die Kita zu Fuß?“, „Welche Grundschule ist für uns zuständig?“ und „Wie alt ist das Haus hier?“. Drittens: dabei verstehen, was eine Zahl aus dem Jahr 2022, eine Schätzung oder ein unscharfer Wert bedeutet. Die Seite liefert dafür viel: Die Fragen sind in Alltagssprache gestellt, unter jeder steht „So geht’s“, Datenschutz und Stichtage sind ehrlich benannt, und die Bedienung ist barrierearm gebaut. Die Lücken liegen beim Einstieg und am Handy. Es gibt keine Suche nach Straße oder Standort. Die Kopfzeile ist auf jeder Seite anders, deshalb verliert man leicht die Orientierung. Auf dem Handy blendet die Legende genau die Hinweise auf Unsicherheit aus. Für Eltern rechnet der Planer standardmäßig in Luftlinie, und ein Kita-Hinweis lässt sich als „freie Plätze“ missverstehen. Eine Bauzeit-Schätzung nennt keine Trefferquote, und die Höhenangabe widerspricht sich zwischen Seiten. Alles ist statisch am Code geprüft (Stand 9864962): Ich habe keinen Browser geöffnet, weil die Karte Kacheln von fremden Servern lädt. Kontraste habe ich aus den Farbwerten berechnet. Das Verhalten der Gesten ist nicht am Gerät geprüft.",
+   "staerken": [
+    "Die Fragen sind in Alltagssprache gestellt, etwa „Wie viele Menschen wohnen in meiner Nachbarschaft?“ oder „Wie weit ist es zur nächsten Kita?“, und jede hat einen Absatz „So geht’s“ mit Hinweis auf die Bedienung, auch für zwei Finger am Handy (index.html Frage 1 bis 9, jahre.html Frage 1 bis 7).",
+    "jahre.html Frage 6 „Wie genau ist das?“ erklärt die Geheimhaltung des Zensus ohne Fachwort („damit niemand erkennbar wird“). Schraffur und blasse Zellen sind als Unsicherheit gekennzeichnet. Der Satz „Keine Aussage über einzelne Grundstücke“ steht wiederholt im Text, im Popup und in der Fußzeile.",
+    "Der Stichtag ist ehrlich benannt: jahre.html Frage 4 sagt, dass in Neubaugebieten heute mehr Häuser stehen als auf der Karte. Grundschulwerte tragen sichtbar das Abzeichen „vorläufig, ohne Schulbezirk“ (planer.js:461), und strittige Standorte zählen nicht mit.",
+    "Die Textkontraste erfüllen AA deutlich: --muted auf --ground 6,06:1, auf --surface 6,56:1, --tief-muted auf --tief 7,82:1, Akzent 8,14:1 (berechnet aus atlas.css:9-10).",
+    "Für die Barrierefreiheit ist vieles schon gebaut: Sprunglinks auf jeder Seite, aria-live für Kartenstatus und Steckbrief, prefers-reduced-motion, Knöpfe mit min-height 44px (atlas.css:49), Escape schließt die Schublade und setzt den Fokus zurück (karte.js:216, planer.js:528). Die Bauzeit-Knöpfe sagen der Sprachausgabe Name und Anteil an (jahre.js:333), die Bauzeit-Regler haben aria-valuetext. Ein gesperrter Fußweg-Schalter steht sichtbar als „Fußweg folgt“ da und nicht nur im title-Attribut (planer.js:292).",
+    "Am Handy gibt es eine Schublade für Steckbrief und Planer-Tabelle. Die Versorgungstabelle ist bewusst als Liste gebaut, damit sie auf 375 px nicht seitlich läuft (planer.css Kommentar). Der Datenschutzhinweis ist kurz und verständlich: keine Cookies, keine Zählung, nur basemap.de und LGB sehen die IP-Adresse."
+   ],
+   "funde": [
+    {
+     "titel": "Am Handy fehlen in der Legende die Hinweise auf Unsicherheit, und Grau ist kaum von der untersten Stufe zu unterscheiden",
+     "art": "transparenz",
+     "schwere": "hoch",
+     "beleg": "atlas.css:309 (max-width:860px): „.legende__q,.legende__grau,.bezirke,.legende__auswahl{display:none}“; jahre.css:168 „.j-legende__quelle{display:none}“ (dort steht „Schätzung je Haus, keine Aussage über einzelne Grundstücke“, jahre.js:378); index.html Frage 2: „Die Legende erklärt Farben und Höhen; grau und flach sind Zellen, deren Wert zu unscharf ist.“; themen.js GRAU #d5d8d3 gegen --k1 #dce6e2 = 1,13:1 (berechnet); atlas.js:308 Legendentext nur „Weniger als 10 Personen“, karte.js:129 dagegen „…, Wert zu unscharf“",
+     "problem": "Gerade die Gruppe, die meist am Handy kommt, sieht nicht, was Grau bedeutet. Der Fließtext verweist dafür auf die Legende, aber dort fehlt der Eintrag. In der flachen Ansicht (karte.html ohne 3D) ist Grau mit 1,13:1 praktisch gleich der Stufe 0–20 %. Wer das nicht weiß, liest einen unscharfen Wert als „niedriger Anteil“. Auf jahre.html fehlt am Handy außerdem der Satz „keine Aussage über einzelne Grundstücke“ in der Legende. Auf index.html lautet der Grau-Eintrag nur „Weniger als 10 Personen“ ohne die Bedeutung; karte.html sagt „Wert zu unscharf“.",
+     "vorschlag": "In atlas.css:309 nur .legende__q und .bezirke ausblenden, .legende__grau am Handy sichtbar lassen (eine Zeile). Grau als Muster zeichnen und nicht nur als Farbe, z. B. dieselbe Schraffur wie auf jahre.html (fill-pattern aus muster() in jahre.js), oder deutlich dunkler als --k1. Den Legendentext in atlas.js:308 an karte.js:129 angleichen: „Weniger als 10 Personen, Wert zu unscharf“. In jahre.css:168 statt der ganzen Quellenzeile nur den Lizenzteil kürzen und „Schätzung, keine Aussage über einzelne Häuser“ stehen lassen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Keine Suche nach eigener Straße oder eigenem Standort",
+     "art": "nutzen",
+     "schwere": "hoch",
+     "beleg": "karte.html:58-60 „Stadtteil suchen“, placeholder „Name oder Nummer“; index.html Steckbrief nur <select id=\"gebiet\">; planer.html nur Raumeinheit-Liste; jahre.html nur Stadtteil-Liste; grep nach geolocat/GeolocateControl in *.js ohne Treffer. Die Fragen sind aber als „meine Nachbarschaft“, „mein Stadtteil“, „mein Viertel“ formuliert (index.html Frage 1, 2, 4, 9).",
+     "problem": "Viele Menschen kennen ihre Straße, aber nicht den amtlichen Stadtteil (etwa „Brandenburger Vorstadt“ statt „Potsdam West“). Ohne Ortsfindung müssen sie auf der Karte suchen. Die Straßennamen der Grundkarte erscheinen erst beim Heranzoomen, und am Handy auf 52 bis 68 svh ist das mühsam. Die Fragen versprechen „meine Nachbarschaft“, der Einstieg führt aber nur über Stadtteil-Namen oder -Nummern.",
+     "vorschlag": "Auf allen vier Kartenseiten einen Knopf „Wo bin ich?“ mit maplibregl.GeolocateControl (trackUserLocation:false) einbauen. Die Position bleibt im Browser, es werden keine Adressdaten gespeichert, und die feste Grenze „keine Adressen“ bleibt gewahrt. Den Datenschutzabsatz um einen Satz ergänzen: Der Browser fragt nach Erlaubnis und nutzt je nach Gerät einen eigenen Ortungsdienst; die Seite überträgt nichts. Außerdem die Stadtteilsuche aus karte.html (karte.js:176) auch auf index, planer und jahre anbieten. Eine Straßensuche mit eigenem Straßenverzeichnis bewusst nicht vorschlagen: Bei OSM-Daten ginge das nur unter ODbL, und es berührt die Adressgrenze.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Kita-Popup lässt sich als „freie Plätze“ lesen",
+     "art": "korrektheit",
+     "schwere": "hoch",
+     "beleg": "planer.js:547: „Kapazität laut Betriebserlaubnis, nicht belegte Plätze.“ (unter der Zeile „Plätze“, planer.js:541)",
+     "problem": "Gemeint ist: genehmigte Kapazität, nicht die Zahl der belegten Plätze. Eltern lesen „nicht belegte Plätze“ aber leicht als „unbelegt“, also freie Plätze. Das ist die Frage, die sie am meisten interessiert, und die Daten können sie nicht beantworten. Die Zeile „Plätze 120“ kann so als „120 Plätze frei“ missverstanden werden.",
+     "vorschlag": "Den Text ersetzen durch: „Genehmigte Plätze laut Betriebserlaubnis. Wie viele davon gerade frei sind, steht nicht in den Daten.“ Optional einen Satz anfügen, wo Eltern freie Plätze erfragen können (Kita-Platzvergabe der Stadt), als bloßen Verweis ohne Daten.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Höhe der Gebäude: Methode und Popups widersprechen der Frage 4 auf derselben Seite",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "index.html:97 „Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m)“ und index.html:280 (Quellen) gegen index.html:269 „die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West.“; Gebäude-Popups atlas.js:344 und karte.js:226 „ALKIS vereinfacht, Höhe = Geschosse × 3 m“; richtig in jahre.js:466 und jahre-methode.html:121 (50.356 von 52.309 Gebäuden mit Objekthöhe); README.md:73",
+     "problem": "Wer auf index.html ein Haus anklickt, liest „Höhe = Geschosse × 3 m“. Im Abschnitt Methode steht dasselbe, nur zwei Bildschirme vorher heißt es „amtliche Objekthöhe bei 96 %“. Für Laien ist das ein Widerspruch, und er untergräbt das Versprechen „Jede Zahl nennt ihre Quelle“. Der Satz zu LoD2 und Potsdam-West ist nach README.md:73-75 überholt.",
+     "vorschlag": "index.html:269 und die Popups in atlas.js:344 und karte.js:226 auf die Formulierung aus jahre.js:466 bringen: „Höhe rund X m (ALKIS-Objekthöhe, sonst aus der Geschosszahl geschätzt).“ Den LoD2-Satz streichen oder durch den Stand aus README.md:73-75 ersetzen. Die Popup-Zeile „Höhe (genähert)“ zu „Höhe“ ändern, wenn die Objekthöhe vorliegt. Einen Prüfschritt in pruefen/ ergänzen, der nach „Geschosse × 3 m“ ohne „sonst“ sucht.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Kopfzeile wechselt je Seite, man verirrt sich zwischen Erzählung, Karte, Planer und Bauzeiten",
+     "art": "zugang",
+     "schwere": "mittel",
+     "beleg": "index.html:30-37 Kopf: Karte, Fragen, Stadtteile, Schaugrafik, Grenzfall, Methode (kein Planer, keine Bauzeiten); karte.html:28-34: Zur Geschichte, Planer, Bauzeiten, Schaugrafik, Methode (ohne aria-current); planer.html:30-35: Karte, Planer, Methode, Daten (kein Start, keine Bauzeiten); jahre.html:22-27: Bauzeiten, Stadtteile, Methode, Daten (keine Karte, kein Planer); „Methode“ führt je nach Seite auf index.html#methode, planer-methode.html oder jahre-methode.html; atlas.css:296 am Handy „.marke{font-size:0}“, der Name verschwindet, nur das Zeichen bleibt.",
+     "problem": "Eltern, die die Kita-Frage suchen, finden den Planer auf der Startseite nur über Frage 8, also nach acht Bildschirmhöhen Scrollen, oder in der Fußzeile. Von jahre.html führt die Kopfzeile nicht zur Karte oder zum Planer. Vom Planer kommt man nur über das Logo zurück, und das ist am Handy ein namenloses Zeichen. Gleiche Wörter („Methode“, „Stadtteile“) führen auf verschiedene Ziele. Wer nicht technisch denkt, verliert so den Überblick über die Teile des Atlas.",
+     "vorschlag": "Eine gleiche erste Zeile auf allen Seiten: Start · Karte · Planer · Bauzeiten, mit aria-current auf der aktiven Seite. Seitenspezifisches wie Methode, Daten, Stadtteile kommt in eine zweite Zeile oder heißt eindeutig („Methode Planer“). Auf index.html im Auftakt unter dem Knopf „Mit der ersten Frage beginnen“ drei Direktwege anbieten: „Kita, Schule, Grün in der Nähe“ → planer.html, „Wie alt sind die Häuser?“ → jahre.html, „Karte frei erkunden“ → karte.html.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Bauzeit je Haus: Popup nennt „Stufe 4 von 6“, aber nicht, wie oft die Schätzung stimmt",
+     "art": "transparenz",
+     "schwere": "mittel",
+     "beleg": "jahre.js:462 „Weg: … (Stufe X von 6)“; jahre.js:27 WEG-Texte wie „Zensuszahlen der Zelle nach Gebäudeform verteilt“, „Luftbildklammer“; die Trefferquoten liegen schon geladen in daten/jahre_methode.js → ruecktest: Sichtprüfung Bornstedt Stufe 4 = 74 % (n=169), Stufe 5 = 77,8 % (n=18); Denkmalliste Stufe 4 = 71,2 % (n=198), Stufe 5 = 78 % (n=109); Wikidata Stufe 4 = 58,3 % (n=36). Laut index.html Frage 9 steht das nur auf der Methodenseite.",
+     "problem": "Die Frage „Wie alt ist mein Haus?“ endet im Popup mit einer Klasse und dem Wort „geschätzt“. Dass ungefähr jede vierte Schätzung in der falschen Klasse landet (bei Wikidata-Gebäuden öfter), erfährt man erst über den Link „Wie genau?“. „Stufe 4 von 6“ klingt für Laien wie eine Qualitätsnote und erklärt nichts. Die Methodenseite misst das sauber, aber es kommt nicht dort an, wo die Leute schauen.",
+     "vorschlag": "Im Popup die Quote der Stufe aus M.ruecktest in Klartext zeigen, mit Stichprobe und Spanne, z. B.: „Geschätzt. In Stichproben (Bornstedt, Denkmalliste, zusammen rund 370 Häuser) lag diese Art der Schätzung bei etwa 7 von 10 Häusern in der richtigen Bauzeit.“ „(Stufe X von 6)“ entfernen oder durch „Schätzweg“ ersetzen. Die Quote nicht in den Code schreiben, sondern aus jahre_methode.js lesen, wie es die Regel „keine von Hand eingesetzte Zahl“ verlangt.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Kita-Frage für Eltern rechnet in Luftlinie, obwohl Fußweg vorliegt",
+     "art": "nutzen",
+     "schwere": "mittel",
+     "beleg": "planer.js:122 Standard „weg: \"luft\"“; index.html:127 Link „planer.html#ein=kita&zu=kita“ ohne weg=fuss (der Hash-Parser kann es, planer.js:130); planer-methode.html:37: Fußweg „im Median … rund 1,4-mal so lang“; Zell-Popup planer.js:566 zeigt nur einen Wert in der gewählten Messart",
+     "problem": "Die Methodenseite begründet die Luftlinie fachlich gut mit den Potsdamer Fachplänen. Für Eltern ist aber der Weg zu Fuß mit Kind die Antwort. Wer von der Startseite kommt, sieht Luftlinie: ein Wert von 500 m ist zu Fuß im Mittel etwa 700 m. Das Wort „Luftlinie“ steht zwar dabei, aber was es ausmacht, steht nur auf der Methodenseite.",
+     "vorschlag": "Im Popup einer Zelle beide Werte zeigen, wenn die Fußwegdaten geladen sind: „Luftlinie 480 m, zu Fuß etwa 690 m“, mit dem ODbL-Vermerk wie bisher. Den Link auf index.html:127 auf #ein=kita&zu=kita&weg=fuss setzen. Das ist möglich, weil der OSM-Vermerk bei Fußweg schon eingeblendet wird (planer.js:261). Für Fachleute bleibt Luftlinie wählbar. In der Legende ein Halbsatz: „Luftlinie, zu Fuß meist rund 1,4-mal so weit“.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Grundschule: Die nächste ist nicht unbedingt die zuständige, und Eltern erfahren nicht, wo sie das klären",
+     "art": "nutzen",
+     "schwere": "mittel",
+     "beleg": "planer.js:482 „Liegt eine Grundschule in der Nähe? … Vorläufig, denn Grundschulen werden über Schulbezirke geplant, die hier noch fehlen.“; planer-methode.html:48-49 (Schulbezirke nach § 106 BbgSchulG, Einzugsgebiete nur intern wegen Nutzungsbedingungen der LHP)",
+     "problem": "Für Eltern heißt die eigentliche Frage „Auf welche Schule kommt mein Kind?“. Die Karte zeigt die nächste Grundschule in Luftlinie. Dass die zuständige Schule eine andere sein kann, steht nur abstrakt als „vorläufig“ da. Wo man die verbindliche Auskunft bekommt, sagt die Seite nicht. Die Daten dürfen nicht gezeigt werden, und das bleibt richtig. Ein Verweis auf die zuständige Stelle verletzt diese Grenze aber nicht.",
+     "vorschlag": "Den Fragetext und das Grundschul-Popup ergänzen: „Welche Grundschule für eine Adresse zuständig ist, legt der Schulbezirk fest. Die nächste Schule ist nicht immer die zuständige. Verbindlich Auskunft gibt die Landeshauptstadt Potsdam.“ Dazu ein Link auf die Seite der Stadt zur Schulanmeldung bzw. auf die Datensatzseite der Einzugsgebiete im Open-Data-Portal, nur als Link, ohne Daten zu übernehmen. Die URL vor dem Einbau prüfen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "jahre.html am Handy: große Karte ohne Zwei-Finger-Schutz, anders als auf der Startseite",
+     "art": "zugang",
+     "schwere": "niedrig",
+     "beleg": "jahre.js:228 „cooperativeGestures: false“ gegen atlas.js:163 „cooperativeGestures: !FEIN“ auf index.html; jahre.css:161 am Handy „.j-buehne{height:68svh}“ (sticky, atlas.css .buehne), darin auch die Bauzeit-Leiste; index.html Frage 1 erklärt „am Handy mit zwei Fingern“, jahre.html sagt dazu nichts. Statisch geprüft, nicht am Gerät.",
+     "problem": "Auf der Startseite verschiebt ein Finger die Seite und zwei Finger die Karte. Auf der Bauzeiten-Seite verschiebt ein Finger die Karte, die gut zwei Drittel des Bildschirms einnimmt. Zum Weiterscrollen bleibt nur der schmale Streifen mit dem Fragetext. Wer zwischen beiden Seiten wechselt, erlebt ein anderes Verhalten. Ältere Nutzer bleiben dann leicht „in der Karte hängen“.",
+     "vorschlag": "Auf jahre.html dieselbe Regel wie auf index.html übernehmen: cooperativeGestures: !FEIN. In Frage 1 den Satz „Am Handy die Karte mit zwei Fingern bewegen“ ergänzen. Danach auf einem echten Handy (375 px) prüfen, ob Regler und Bauzeit-Felder weiter mit einem Finger gehen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Fachbegriffe ohne Erklärung in Popups und Planer (ALKIS, Raumeinheit, Planungsraum, Fünftel aller Zellen)",
+     "art": "nachvollziehbarkeit",
+     "schwere": "niedrig",
+     "beleg": "Popups atlas.js:344 und karte.js:226 „ALKIS vereinfacht“; planer.html:69 „Raumeinheit“, planer.js:414 „Keine Raumeinheit gewählt … Raumeinheit in der Liste oder in der Karte wählen“; atlas.js:309 und karte.js:130 Legende „Stufen: Fünftel aller Zellen“; index.html:263 „Cell-Key-Methode stochastisch“; in keiner HTML-Datei ein Glossar, <abbr> oder <dfn> (grep, 0 Treffer)",
+     "problem": "Fachleute verstehen die Begriffe, Bürgerinnen und Bürger nicht. „Raumeinheit“ ist im Planer das zentrale Bedienwort und wird nirgends erklärt. „Fünftel aller Zellen“ sagt Laien nicht, dass dunkel „mehr als bei 80 % der Zellen“ bedeutet. ALKIS steht in Popups ohne Auflösung.",
+     "vorschlag": "Bei der ersten Nennung je Seite eine kurze Erklärung in Klammern oder als <abbr title>: „ALKIS (amtliches Liegenschaftskataster)“, „Planungsraum (Gebiet, nach dem die Stadt Kitas und Schulen plant)“. In der Bedienung „Raumeinheit“ durch „Gebiet“ ersetzen. Die Legende umformulieren: „Dunkelste Stufe: mehr als in 80 % aller Zellen“. Ein kurzes Begriffsverzeichnis auf index.html#methode, auf das die Popups verlinken.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Startseite: Die Zahlen sind vom Mai 2022, aber das steht nicht bei den Fragen",
+     "art": "transparenz",
+     "schwere": "niedrig",
+     "beleg": "index.html Frage 1 bis 5 ohne Stichtag im Text; der Stichtag steht nur klein in .stadtzahlen__quelle (index.html:54), im Steckbrief-Fuß (index.html:183) und im Popup; vgl. jahre.html Frage 4: „Was danach fertig wurde, fehlt hier ganz; in Neubaugebieten ist der Bestand heute größer“",
+     "problem": "„Wie viele Menschen wohnen in meiner Nachbarschaft?“ wird mit Werten von vor viereinhalb Jahren beantwortet. In wachsenden Stadtteilen wie Bornstedter Feld oder Krampnitz weichen sie heute deutlich ab. jahre.html sagt das vorbildlich, index.html nicht.",
+     "vorschlag": "In Frage 1 einen Satz nach dem Muster von jahre.html Frage 4 ergänzen: „Gezählt ist der Stand vom 15. Mai 2022. Wo seitdem gebaut wurde, wohnen heute mehr Menschen als hier gezeigt.“ Den Text nicht mit Zahlen füllen, damit die Regel „keine von Hand eingesetzte Zahl“ gewahrt bleibt.",
+     "aufwand": "klein"
+    }
+   ]
+  },
+  {
+   "linse": "verwaltung_gis",
+   "zusammenfassung": "Eine GIS-Fachstelle oder ein Team, das den Atlas übernehmen will, braucht vier Dinge: Daten in offenen GIS-Formaten mit klarem Koordinatensystem, Lizenz und Stand je Ebene; Feldbeschreibungen und Verträge; einen Weg, alles aus den Rohdaten neu zu rechnen, mit festen Versionen; und eine Anleitung, wie man auf einen neuen Datenstand umsteigt und die Seite betreibt. Die Ausgabeseite erfüllt das schon sehr gut. GeoPackage und CSV in EPSG:25833 haben eine Lizenztabelle je Ebene, QGIS-Projekt und Stile liegen bei, die OSM-Daten (ODbL) stehen in eigenen Dateien, und die Exportprüfung meldet offline 0 Befunde. Schwach ist die Seite der Herstellung. README und lauf.sh beschreiben nur den ursprünglichen Stand mit vier Schritten, die rund 20 Skripte des Ausbaus haben keine festgelegte Reihenfolge, und die Python-Umgebung kommt aus einem Nachbarprojekt (kiezatlas-potsdam-west) ohne festgeschriebene Versionen. Die Begründungen hinter „Korrektur N“, „Prüfbericht N“ und „Bauplan“ stehen nicht im Repo. Der Gebäudebestand ist nur ein Datenbank-Snapshot ohne beschriebenen Weg zur Aktualisierung. Das Vorbild, die Pipeline, löst genau diese Punkte mit Entscheidungsprotokoll, Rundgang, Lockfile und CITATION.cff, und die Lücke ist in einer Session zu schließen.",
+   "staerken": [
+    "GIS-Export nach Fachstellen-Maßstab: daten/export/README.md nennt je Ebene Geometrie, Zeilenzahl, Felder und Lizenz, dazu das CSV-Format (Semikolon, UTF-8 mit BOM, Dezimalpunkt, EPSG:25833 auf 1 cm). Die GPKG-Dateien tragen SRS 25833 in gpkg_contents, eine Tabelle lizenz und layer_styles; ein QGIS-Projekt mit relativen Pfaden liegt bei (offline mit sqlite3 geprüft).",
+    "Lizenzgrenzen sind als Dateigrenzen gebaut und werden geprüft: ODbL nur in *_odbl-Dateien, daten/LIZENZ.md gibt die Lizenz je Datei an, und Code (Apache-2.0, NOTICE) ist ausdrücklich von den Daten getrennt (daten/LIZENZ.md:3, export/README.md:83).",
+    "Maschinell geprüfte Datenverträge: `python -I pruefen/daten.py` lief offline mit 0 Abweichungen (Schemas, Fixtures, ODbL-Spur, Adressfelder). `python -I pruefen/A8_export.py --odbl-erwartet` lief offline mit 0 Befunden (GPKG-Integrität, CSV = GPKG, Werte = planer.js, keine Adressen, Steckbriefe).",
+    "Reproduzierbare Datenbank: docker-compose.yml legt PostGIS per Digest fest, ist nur über 127.0.0.1 erreichbar und setzt no-new-privileges. Das Rollenmodell mit geringsten Rechten ist samt Rechtetest dokumentiert (pruefen/INVENTAR.md:38-59).",
+    "Herkunft ist nachvollziehbar: QUELLEN.md führt 34 Quellen mit Vermerk, Weg (A/H/L) und Abrufdatum sowie Abrufregeln je Rechner. skripte/abruf.py erzwingt Abstand und Protokoll, belege/ enthält die Laufberichte der Pipeline mit Zählungen.",
+    "Prüfsummenkette für die Bauzeit-Methode: daten/jahre_methode.js nennt berichte/B4_holdout.md mit SHA256 18f3f14e…, die Datei ist versioniert und die Summe stimmt (sha256sum lokal nachgerechnet).",
+    "Die Deploy-Kopie ist ohne Netz reproduzierbar und schreibt MD5SUMS zum Abgleich nach dem Upload (skripte/deploy_kopie.py:1-12).",
+    "Die Datenschutzgrenze hält in den veröffentlichten Daten: In daten/jahre/*.js gibt es 53 Einzeljahre und kein Feld oid; die Felder sind nur j, k, g, q, s, h (offline ausgezählt)."
+   ],
+   "funde": [
+    {
+     "titel": "Kein dokumentierter Gesamtweg zur Neuberechnung (Reihenfolge der Skripte 01 bis 27)",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "README.md:10-33 („Wie es gebaut ist“ nur 01_vorbereiten → Pipeline → 02_auswerten → index.html); skripte/lauf.sh:6-12 und 53-55 kennen nur vorbereiten | laden | auswerten | einrichten. Daneben stehen 03, 11, 12(.sh), 13, 14, 14b(.sh), 15, 16, 17, 20–27, je mit eigenem Aufruf nur im Docstring (z. B. skripte/24_jahre_kaskade.py:20-32, skripte/16_export.py:23-27).",
+     "problem": "Wer den Atlas weiterbetreibt, findet nirgends, in welcher Reihenfolge welche Skripte mit welcher Rolle laufen, welche Tabellen oder Dateien jedes Skript liest und schreibt und welche Prüfung danach folgt. Die Abhängigkeiten stehen verstreut in den Docstrings und in pruefen/INVENTAR.md §4–5, das ein Arbeitsdokument des Ausbaus ist. Ohne Andre lässt sich daten/ nicht vollständig neu erzeugen.",
+     "vorschlag": "docs/rundgang.md nach dem Muster der Pipeline anlegen: eine Tabelle Schritt → Skript → Rolle → liest → schreibt → Prüfskript → Laufzeit, von `docker compose up` bis `deploy_kopie.py`. Dazu skripte/lauf.sh um die Schritte planer, jahre und export erweitern (oder ein Makefile mit diesen Zielen), die jeweils die Docstring-Aufrufe ausführen. Im README den Abschnitt „Wie es gebaut ist“ auf den Ausbau bringen und auf den Rundgang verweisen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Python-Umgebung nicht festgeschrieben, sie hängt am Nachbarprojekt kiezatlas-potsdam-west",
+     "art": "zugang",
+     "schwere": "hoch",
+     "beleg": "skripte/lauf.sh:18 und 22 `PY=\"../kiezatlas-potsdam-west/.venv/bin/python\"`; Aufruf in skripte/01_vorbereiten.py:2, 03_planungsraeume.py:10 und 25_jahre_gpkg.py (Docstring). skripte/12_osm.sh:18 und 14b_fussweg.sh:21 `--with numpy --with scipy` ohne Version. shapely, pyproj, PIL und weasyprint (16_export.py:1809, 23_luftbild_pilot.py:174) stehen in keiner Datei des Repos. `git ls-files` findet kein requirements*, pyproject oder uv.lock.",
+     "problem": "Wer nur dieses Repo und das der Pipeline hat, kann 01_vorbereiten und 25_jahre_gpkg nicht starten. numpy und scipy werden in der Version gezogen, die gerade im uv-Zwischenspeicher liegt, und davon hängen Fußweg-Ergebnisse (Dijkstra, cKDTree) ab. Ein Neulauf ist deshalb nicht auf dieselben Versionen festgelegt. Das Vorbild arbeitet mit requirements.in und requirements.txt mit Hashes (geodaten-import-pipeline/requirements.in).",
+     "vorschlag": "Eine eigene requirements.in im Repo anlegen (numpy, scipy, shapely, pyproj, pillow, weasyprint plus psycopg und PyYAML wie in der Pipeline) und daraus mit `uv pip compile --generate-hashes` eine requirements.txt erzeugen. lauf.sh, 12_osm.sh, 14b_fussweg.sh und alle Docstrings auf `uv run --with-requirements requirements.txt` umstellen und den Verweis auf kiezatlas-potsdam-west entfernen. Im README die Python-Version nennen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Entscheidungen stehen nicht im Repo: 161 Verweise auf „Korrektur N“, „Prüfbericht N“ und „Bauplan“ ohne Fundstelle",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "`git grep -c -E 'Korrektur [0-9]+|Prüfbericht [0-9]+|Bauplan'` ergibt 161 Treffer in 54 Dateien, z. B. config/potsdam.yaml:59 („Korrektur 16“), skripte/16_export.py:20 („Prüfbericht 3, 4, 6, 15, 26“), daten/schema/jahre_gebaeude.json:8 („Korrektur 6“), pruefen/INVENTAR.md:43 („Bauplan 0.2“), daten/LIZENZ.md:34 („Prüfbericht 24“). Keine Datei im Repo definiert diese Nummern. Auch die Handdownloads H1–H11 und die Paketkürzel A1…B5 werden nur benutzt und nirgends erklärt.",
+     "problem": "Gerade die Regeln, die eine Datenverwaltung beim Übernehmen kennen muss, verweisen auf Dokumente außerhalb des Repos: warum die Gebäudequelle ruht, warum Wohngebäude kein Jahr tragen, warum es je Zelle keine feinen Altersklassen gibt. Ein Nachfolger kann diese Regeln nicht prüfen und nicht sicher ändern. Die Pipeline hat dafür docs/entscheidungen.md (E1…E48).",
+     "vorschlag": "docs/entscheidungen.md anlegen: je Korrektur und Prüfbericht ein Eintrag mit Nummer, Datum, Frage, Entscheidung und Begründung, betroffenen Dateien und Prüfung. Dazu ein Glossar der Paketkürzel (P0, A1–A8, B0–B5, N1–N4, I1/I2) und der Handdownloads H1–H11 mit Quelle (Nr. in QUELLEN.md). Die Verweise im Code bleiben stehen und finden damit ihre Fundstelle.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Gebäudebestand nur als ungesicherter Datenbank-Snapshot, kein Weg zur Aktualisierung beschrieben",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "config/potsdam.yaml:59-61 („Seit 05.11.2026 ruhend (Korrektur 16) … erst nach Teil B wieder auf aktiv setzen“, `aktiv: false`). sql/002_ausbau.sql:126-134 (Snapshot `auswertung.gebaeude_stand_20261105` als Kopie von public.gebaeude, die direkt aus dem WFS kam). belege/README.md:10 (85.046 Gebäude per WFS, keine Rohdatei). `git grep -i pg_dump` findet nichts. Gegenbeispiel: alkis_p.zip hat eine SHA256 in QUELLEN.md Nr. 9.",
+     "problem": "daten/gebaeude/, daten/jahre/ und die Gebäudehöhen beruhen auf einem WFS-Stand, den es nur im Docker-Volume pgdata gibt. Der Dienst liefert immer den aktuellen Stand. Fällt das Volume aus, lässt sich der veröffentlichte Stand nicht wiederherstellen, und ein Neuabruf ergibt andere Gebäude und oid. Zugleich steht nirgends, wie man auf einen neuen ALKIS-Stand umsteigt (gebaeude_alkis aktivieren, neuen Snapshot anlegen, B0/B4/B5 in welcher Reihenfolge neu rechnen). Für eine Kommune ist gerade das die regelmäßige Aufgabe.",
+     "vorschlag": "Den Snapshot als Datei sichern: `pg_dump -t auswertung.gebaeude_stand_20261105` oder als GPKG nach $KIEZ_DATEN/alkis_vereinf/2026-11-05/ mit HERKUNFT.md und SHA256, die Prüfsumme in QUELLEN.md Nr. 5 eintragen. Im Rundgang einen Abschnitt „Neuer Datenstand“ ergänzen, je Quelle: was neu laden, welcher Snapshot-Name, welche Skripte neu rechnen, welche Prüfungen und Ausgangswerte (INVENTAR D1/D2) sich ändern dürfen. Den datierten Tabellennamen an einer Stelle als Konstante oder Konfiguration führen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Datenvertrag und Register widersprechen der Datenschutzregel für Gebäude: Jahr bei 3 und mehr Wohneinheiten, oid erlaubt",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "daten/schema/jahre_gebaeude.json:8 „j = Jahr nur bei belegten Jahren von Denkmalen oder Gebäuden mit mindestens 3 Wohneinheiten bzw. ohne Wohnraum; Wohngebäude mit weniger als 3 Wohneinheiten nur Klasse k“; ebd. :76 Feld `oid` erlaubt. QUELLEN.md:78 „Wohngebäude mit weniger als 3 Wohneinheiten nur mit Klasse, ohne Jahr, außer Denkmale.“ Dagegen daten/LIZENZ.md:15 („53 mit Einzeljahr, alle ohne Wohnraum“) und der hinweis in daten/jahre/*.js („Wohngebäude tragen kein Einzeljahr“). pruefen/daten.py prüft kein oid; das tut nur pruefen/B4_kaskade.py:39, und das braucht die Datenbank.",
+     "problem": "Die Daten selbst halten die strengere Regel ein (offline gezählt: 53 Einzeljahre, kein oid). Der Vertrag, den ein Übernehmender als maßgeblich liest, erlaubt aber Jahre bei Mehrfamilienhäusern und Gebäude-IDs. Die Offline-Prüfung würde eine Datei mit oid in daten/jahre/ durchlassen. Wer den Atlas weiterführt, könnte sich auf den Vertrag berufen und die feste Grenze unterlaufen, ohne dass eine Prüfung anschlägt.",
+     "vorschlag": "In jahre_gebaeude.json die description auf „Einzeljahr nur bei Gebäuden ohne Wohnraum“ ändern und `oid` aus den properties streichen (additionalProperties: false lehnt es dann ab). QUELLEN.md:78 gleich formulieren. In pruefen/daten.py den Satz ADRESSFELDER für daten/jahre/ um oid, gml_id und gebaeude_id ergänzen, damit die Grenze auch ohne Datenbank geprüft wird.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Kerndaten des Hauptatlas fehlen im GIS-Export (Zellthemen, Kennzahlen der 32 Stadtteile)",
+     "art": "nutzen",
+     "schwere": "mittel",
+     "beleg": "daten/export/csv/zelle.csv, Kopfzeile: nur gitter_id, stadtteil, raum_nr, ew, m_*, stand, lizenz, wkt. daten/export/csv/stadtteil.csv: nur nr, name, flaeche_km2, vermerk_grenze, wkt („ohne Werte“, export/README.md:48). daten/zellen.js veröffentlicht je Zelle d_alter, q_u18, q_65p, q_v1949, q_fern, w_ges, a_ges, allerdings in EPSG:4326 hinter `window.KIEZ_ZELLEN=`; die Kennzahlen je Stadtteil gibt es nur in kennzahlen.js/.json. daten/LIZENZ.md:31 erlaubt die fünf Zensus-Altersklassen, Baujahr und Heizung je Zelle ausdrücklich. export/README.md:45 und :115 („keine Alters-… klassen“) nennen dagegen keinen Grund.",
+     "problem": "Die sieben Fragen, das Register und der Steckbrief der Startseite beruhen auf Daten, die eine Fachstelle nicht als GPKG oder CSV bekommt. Sie muss JavaScript-Hüllen parsen und von WGS84 umprojizieren. Wer die Exportseite liest, versteht „keine Altersklassen je Zelle“ als Datenschutzgrenze, obwohl die Seite dieselben Werte je Zelle offen ausliefert.",
+     "vorschlag": "In skripte/16_export.py die Ebene zelle um die in zellen.js veröffentlichten Zensus-Anteile erweitern (d_alter, q_u18, q_65p, q_v1949, q_fern mit Nennern w_ges und a_ges). Die feinen Klassen bleiben weiter draußen, die Positivliste in A8_export.py §4 wird entsprechend angepasst. Eine Ebene stadtteil_kennzahl (Langform wie versorgung: nr, kennzahl, wert, einheit, quelle, stand) aus kennzahlen.json anlegen. In export/README.md:45 und 115 die Grenze genau formulieren: „keine feineren Klassen als der Zensus je Gitterzelle veröffentlicht“.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Metadaten je Feld nicht maschinenlesbar, Kerndateien ohne Stand, Quelle und Koordinatensystem, keine Version und keine Zitierangabe",
+     "art": "transparenz",
+     "schwere": "mittel",
+     "beleg": "Feldbeschreibungen (description) in daten/schema/*.json offline gezählt: zellen.json 0 von 16, stadtteile.json 0 von 3, kennzahlen.json 0 von 3, planungsraeume.json 0 von 14, grundkarte.json 0 von 16, insgesamt etwa 19 %. Ohne Pflichtfeld stand/quellen: zellen.json, stadtteile.json, gebaeude.json, kennzahlen.json; daten/zellen.js und stadtteile.js tragen weder stand noch Vermerk. Das KBS EPSG:4326 der daten/*.js steht nur in jahre_gebaeude.json:8. Das Format von stand schwankt (ISO-Datum oder Freitext, z. B. daten/grundkarte.js, planer_fuss_odbl.js). Die GPKG-Dateien haben keine gpkg_data_columns und kein gpkg_metadata. `git tag` ist leer, eine CITATION.cff fehlt, package.json:3 sagt 1.0.0 ohne Bezug.",
+     "problem": "Wer die Daten übernimmt, braucht je Feld Bedeutung, Einheit, Nenner und Quelle; diese stehen bisher nur verteilt in READMEs und Methodenseiten. Für einen Geoportal-, GDI- oder Open-Data-Eintrag (DCAT-AP.de) fehlen Version, Stand und Zitierform. Ein veröffentlichter Datenstand lässt sich nicht eindeutig benennen oder mit einem späteren vergleichen.",
+     "vorschlag": "In den Schemas jedes Feld mit description (Bedeutung, Einheit, Nenner) und x-quelle (Nr. in QUELLEN.md) versehen, x-crs: EPSG:4326 je Datei setzen und stand als ISO-Datum für alle Dateien verpflichtend machen; daten.py erzwingt das. In 16_export.py gpkg_data_columns aus denselben Schemas füllen. Eine CITATION.cff wie bei der Pipeline anlegen, je veröffentlichtem Datenstand einen Git-Tag setzen (z. B. daten-2026-11-06) und in export/README.md eine Zeile „Version/Commit“ ausgeben.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Mitgelieferte GSAP-Bibliothek ohne Lizenztext und nicht als ersetzbar gekennzeichnet",
+     "art": "lizenz-datenschutz",
+     "schwere": "niedrig",
+     "beleg": "vendor/README.txt:3 „gsap 3.15.1 mit ScrollTrigger (GreenSock Standard License, kostenfrei: https://gsap.com/standard-license)“; in vendor/ liegt nur MAPLIBRE-LICENSE.txt, kein GSAP-Lizenztext. NOTICE nennt die Drittbibliotheken nicht. pruefen/INVENTAR.md:12 zeigt, dass es einen Rückfall ohne GSAP gibt (IntersectionObserver).",
+     "problem": "Eine Kommune, die den Code unter Apache-2.0 übernehmen und weiterverteilen will, muss die Lizenzen der mitgelieferten Teile prüfen. Bei GSAP gibt es dafür nur einen Link und keinen beigelegten Text, und es steht nicht da, dass die Bibliothek keine Open-Source-Lizenz hat und verzichtbar ist.",
+     "vorschlag": "Den Lizenztext der GSAP-Fassung 3.15.1 als vendor/GSAP-LICENSE.txt beilegen. In NOTICE und README einen Satz ergänzen: GSAP steht nicht unter einer Open-Source-Lizenz und ist optional; ohne vendor/gsap*.js läuft die Seite mit dem IntersectionObserver-Rückfall (INVENTAR S2). Diesen Fall in pruefen/seiten.mjs einmal ohne GSAP prüfen.",
+     "aufwand": "klein"
+    }
+   ]
+  },
+  {
+   "linse": "presse",
+   "zusammenfassung": "Eine Lokaljournalistin braucht vier Dinge. Erstens Kernsätze, die sie mit Stand und Quelle zitieren kann. Zweitens Grafiken, für die klar ist, dass sie gedruckt werden dürfen und mit welcher Quellenzeile. Drittens eine Einordnung, was die Zahlen nicht sagen und wie sie zu den Zahlen der Stadt passen. Viertens einen Weg für Rückfragen und Korrekturen. Bei der Quellenangabe je Zahl liefert der Atlas heute schon viel: Jede Kachel trägt Quelle und Stichtag, die Schaugrafik kommt druckfertig mit Quellenvermerk, die Bauzeiten-Methode benennt ihre Grenzen vorbildlich. Die Lücken liegen auf der Startseite, also genau dort, wo zitiert wird. Ein Methodenabsatz zu den Gebäudehöhen ist veraltet. Die Antwortsätze nennen kein Jahr und schweigen über Neubau nach Mai 2022. Gerundete und exakte Einwohnerzahlen stehen nebeneinander. Die beste Gegenprobe gegen das amtliche Gemeindeergebnis (−0,07 %) liegt nur im Repo. Für die Schaugrafik fehlen Nutzungsbedingungen und eine Adresse. Es gibt weder Änderungsprotokoll noch Zitierhinweis oder Korrekturkontakt. Nicht geprüft ist der Inhalt der externen Seiten Impressum und Datenschutz auf souverain-systems.de, weil kein Netzabruf erlaubt war; geprüft ist nur, dass jede Seite auf sie verlinkt.",
+   "staerken": [
+    "Jede Kennzahl trägt einen eigenen Quellenstring mit Stichtag, Copyright-Jahr, Lizenz und Tabellenname (daten/kennzahlen.json, Feld quelle). Steckbrief und Verteilungen zeigen ihn an (atlas.js:509).",
+    "Der Steckbrief nennt eine Gegenprobe mit Link, Stichtag und Zählart und sagt offen: „Anderer Stichtag und andere Zählweise als der Zensus“ (atlas.js:488-493).",
+    "Grenzfall-Abschnitt mit Tabelle Mittelpunkt gegen Flächenanteil je Stadtteil und einer ehrlichen Einordnung, welche Methode zu welcher Frage passt (index.html, Abschnitt #grenzfall). Für Journalisten gut erklärbar.",
+    "Die Schaugrafik gibt es als SVG mit eingebetteten Schriften, als PNG mit 300 dpi und als PDF, in fünf Formaten bis hin zur Zeitungsspalte. Titel, Stichtag, Quellenvermerk und Auswertungsdatum stehen automatisch drauf, ohne fremde Kartenkacheln (schaugrafik.js:55-63, 217-232).",
+    "Klarer Datenschutzhinweis im Fuß: keine Cookies, keine Zählung; basemap.de und LGB sehen die IP-Adresse (index.html, #datenschutz).",
+    "Die KI-Mitarbeit ist im Fuß jeder Seite offengelegt („Code mit KI-Unterstützung geschrieben“).",
+    "jahre-methode.html hat einen eigenen Abschnitt „Grenzen der Aussage“. Er bietet einen Rücktest mit vorab festgelegten Regeln, nennt die Abhängigkeit der Prüfsätze und vergleicht mit der Baualter-Statistik der Stadt. Das ist ein Muster für die Startseite.",
+    "Die Planer-Methode trennt amtlichen Maßstab und Orientierung, benennt den strittigen Standort der Grundschule Hanna von Pestalozza offen und nennt die Lücken, etwa fehlende Kindertagespflege und den abgelaufenen Nahverkehrsplan."
+   ],
+   "funde": [
+    {
+     "titel": "Methodenabsatz zu Gebäudehöhen veraltet und widersprüchlich",
+     "art": "korrektheit",
+     "schwere": "hoch",
+     "beleg": "index.html:269 (Abschnitt #methode, „Säulen, Farben, Gebäude“): „die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West.“ Dagegen stehen index.html Frage 4 (Z. ~95: „Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude …)“), der Quellenblock (Gebäudeumrisse: „Höhe = ALKIS-Objekthöhe aus dem NAS-Auszug“), README.md:73-76 und jahre-methode.html („50.356 der 52.309 Gebäude (96,3 %)“).",
+     "problem": "Auf derselben Seite stehen zwei verschiedene Aussagen zur Herkunft der 3D-Höhen. Wer den Methodenblock zitiert, gibt den Stand vor dem 06.11. wieder. Das untergräbt die Glaubwürdigkeit der übrigen Methodentexte.",
+     "vorschlag": "Den Satz in index.html:269 ersetzen durch: „Die Höhe ist die Objekthöhe aus dem amtlichen Kataster (ALKIS, NAS-Auszug der LGB) bei rund 96 % der Gebäude, sonst Geschosse × 3 m bzw. 3 m; Dächer flach.“ Den Zusatz zu LoD2/Potsdam-West streichen. Zusätzlich in pruefen/seiten.mjs eine Prüfung ergänzen, die nach „Geschosszahl mal 3 m“ ohne Objekthöhe sucht.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Startseite sagt nicht, was die Zahlen nicht sagen (Stichtag 2022, Neubau, Melderegister)",
+     "art": "transparenz",
+     "schwere": "hoch",
+     "beleg": "index.html:89 (Frage 3): „Die meisten Kinder und Jugendlichen unter 18 leben im Stadtteil …“ im Präsens, ohne Jahr; ebenso die Fragen 1, 2, 4 und 5. Eine Suche nach „neubau|nach dem stichtag|Krampnitz“ in index.html, karte.html, atlas.js und themen.js ergibt keinen Treffer. Der Hinweis „Neubaugebiete, die danach bezogen wurden, fehlen … zum Beispiel in Krampnitz, im Bornstedter Feld und in Golm“ steht nur in planer-methode.html (Abschnitt Geheimhaltung, Rundung, Stichtag) und jahre-methode.html (Grenzen der Aussage).",
+     "problem": "Die Antwortsätze sind die zitierfähigsten Stellen und werden 1:1 in Artikel übernommen. Ohne Jahr im Satz liest sich etwa „Bornstedt: 3.176 Kinder“ als heutiger Stand. Gerade Bornstedt, Golm und Krampnitz sind seit 2022 gewachsen. Die Startseite erklärt auch nicht, warum Zensuszahlen von den Melderegisterzahlen der Stadt abweichen. Die Abweichung gibt es: 182.673 gegen 185.137 in der Gegenprobe. Ohne diese Erklärung schreibt man einen Fehler herbei.",
+     "vorschlag": "(1) In jeden Antwortsatz der Fragen 1-5 und 8 „(Zensus, Mai 2022)“ bzw. „im Mai 2022“ fest einsetzen. (2) Im Abschnitt #methode einen fünften Kasten „Was die Zahlen nicht sagen“ anlegen, nach dem Muster von „Grenzen der Aussage“ in jahre-methode.html. Vier Punkte: Stand 15.05.2022, Neubau danach fehlt (mit den drei Beispielgebieten aus planer-methode.html); Zensus zählt anders als das Melderegister der Stadt, Abweichungen von einigen Prozent sind normal; Cell-Key-Verfahren; Zuordnung nach Mittelpunkt, mit Link auf #grenzfall. (3) Im Steckbrief bei den Stadtteilen 13, 17 und 84 einen Hinweis „Starker Zuzug nach 2022, Zensuszahl unterschätzt den heutigen Stand“ einblenden, gesteuert über ein Datenfeld in kennzahlen.json und nicht von Hand im Text.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Gerundete und exakte Einwohnerzahlen widersprechen sich auf derselben Seite",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "index.html:265: „Die Einwohnerzahl ist darum gerundet.“ Steckbrief, Register und Kartenschild runden tatsächlich (atlas.js:36, 368, 480, 536: rundEw). Frage 3 setzt dagegen exakte Werte ein: atlas.js:68 q(\"kind-zahl\", fmt.format(kk.zaehler)); q(\"kind-nenner\", fmt.format(kk.nenner)). Bei den aktuellen Daten ergibt das „3.176 von 15.063 Einwohnern“ für Bornstedt, während der Steckbrief „rund 15.100“ zeigt. Frage 1, atlas.js:54: q(\"ew-max\", fmt.format(top.ew)) für eine einzelne Zelle, also gerade dort, wo die Methode Einzelwerte „unscharf“ nennt.",
+     "problem": "Eine Journalistin findet für Bornstedt zwei Einwohnerzahlen (15.063 und 15.100) und eine Kinderzahl mit falscher Genauigkeit. Das widerspricht dem eigenen Methodentext und führt zu Rückfragen oder Korrekturmeldungen.",
+     "vorschlag": "In atlas.js:54 und 68 rundEw statt fmt.format verwenden und den Anteil (21,1 %) als Hauptaussage behalten. Etwa: „rund 3.200 von rund 15.100 Einwohnern, also 21,1 %“. Für die Zelle in Frage 1 „rund …“ schreiben. In pruefen/seiten.mjs prüfen, dass kein data-q-Feld mit Personenzahl ungerundet ausgegeben wird.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Schaugrafik: keine Nutzungsbedingungen, keine Adresse, Vermerk kürzer als das eigene Muster",
+     "art": "lizenz-datenschutz",
+     "schwere": "mittel",
+     "beleg": "schaugrafik.js:217-232 (function fuss). Bei Potsdam mit Standardrubriken entstehen diese Zeilen: „Zensus 2022, Stichtag 15.05.2022, 100-m-Gitter; © Statistische Ämter des Bundes und der Länder, 2024, dl-de/by-2-0; eigene Auswertung (…)“ / „Stadtteile: © Landeshauptstadt Potsdam, Stand 31.12.2025, dl-zero-de/2.0.“ / „Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt). Auswertung vom 06.11.2026.“ Es gibt keine URL des Atlas, keinen Link zum Lizenztext und keinen Hinweis „Daten verändert“. Dagegen verlangt QUELLEN.md, Abschnitt Vermerke: „dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)“. Eine Suche nach „abdruck|weiterverwend|nachnutz|Bildrecht|Nennung“ in index.html und schaugrafik.js ergibt keinen Treffer. Die Lizenzkennung lautet amtlich „dl-de/zero-2-0“ (so der verlinkte govdata-Pfad in index.html, Quellen), geschrieben wird „dl-zero-de/2.0“.",
+     "problem": "Frage 7 bewirbt die Grafik ausdrücklich „fürs Heft“. Eine Redaktion erfährt aber nicht, ob sie die Grafik abdrucken darf, ob sie dafür fragen muss und welche Bildzeile sie setzen soll. Leser der gedruckten Grafik finden den Atlas nicht. Der Vermerk unterschreitet zudem das eigene Lizenzmuster.",
+     "vorschlag": "Entscheidung für André: unter welchen Bedingungen die Gestaltung der Grafik nachgenutzt werden darf, z. B. CC BY 4.0 mit Nennung, oder frei mit Nennung. Danach (1) in fuss() eine Zeile ergänzen: „Grafik: Kiezatlas Potsdam, souverain-systems.de/kiezatlas, <Bedingung>“. (2) Die Vermerke nach dem Muster in QUELLEN.md vervollständigen: „Daten verändert“ und eine Kurz-URL zum Lizenztext, bei Platzmangel einmal gesammelt. (3) „dl-zero-de/2.0“ in schaugrafik.js:225, index.html (Quellen), README.md und QUELLEN.md zu „dl-de/zero-2-0“ korrigieren. (4) Im Abschnitt #schaugrafik einen Satz „Abdruck erlaubt mit der Bildzeile …“ mit Kopierfeld für die Bildzeile.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Beste Gegenprobe zum amtlichen Gemeindeergebnis liegt nur im Repo, Register widerspricht dem Beleg",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "Seite: kennzahlen.json gegenprobe.stadt = Fortschreibung 31.12.2025, 185.137 (12411-01-01-5-B), angezeigt in atlas.js:490-492. Für die Stadtteile gibt es nur Nr. 32 (Melderegister 31.12.2022, 8.221). Repo: belege/A1_gemeindeabgleich_20261105.md vergleicht das Gitter mit 182.673 gegen das Zensus-Gemeindeergebnis Potsdam mit 182.806 am selben Stichtag 15.05.2022, Abweichung −0,07 %, bei Haushalten −0,66 %. QUELLEN.md:74 (Nr. 34) sagt dagegen: „von pruefen/A1_zensus.py noch nicht ausgewertet“. Die Gegenproben 12411-01-01-5-B und „Stadtteile im Blick 2022“ stehen im README (Z. 69) und auf der Seite, aber nicht im Register QUELLEN.md.",
+     "problem": "Für die Frage „Stimmen Ihre Zahlen mit den amtlichen?“ zeigt die Seite nur den Vergleich mit anderem Stichtag und anderer Zählart. Der Unterschied von 1,3 % bleibt unerklärt, obwohl der passende Vergleich mit −0,07 % belegt vorliegt. Für 31 von 32 Stadtteilen fehlt jeder Bezug zu den Stadtteilzahlen der Stadt, und die werden Journalisten zuerst daneben legen. Das Register widerspricht dem eigenen Beleg.",
+     "vorschlag": "(1) Den Gemeindeabgleich als erste Gegenprobe in kennzahlen.json übernehmen: Wert, Tabelle 1000A-1004, Stichtag 15.05.2022, Abweichung. Erzeugen lassen von skripte/02_auswerten.py aus der vorliegenden CSV, nicht von Hand. Im Steckbrief „Potsdam“ anzeigen; die Fortschreibung 2025 als zweite Zeile behalten mit „heutiger Stand laut Fortschreibung“. (2) Aus „Stadtteile im Blick 2022“ die Melderegisterzahl aller 32 Stadtteile als Tabelle neben dem Zensus zeigen, mit Abweichung; die Lizenz vorher wie bei Nr. 17 und Nr. 20 als „nur Fakten mit Fundstelle“ einordnen. (3) QUELLEN.md:74 auf „ausgewertet 05.11.2026, belege/A1_gemeindeabgleich_20261105.md“ setzen und beide Gegenprobe-Quellen als eigene Registerzeilen eintragen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Kein Änderungsprotokoll, kein Zitierhinweis, kein Korrekturkontakt",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "index.html, Fuß: „Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert“. Angezeigt werden nur „Prototyp, Stand <Datum>“ und „Import zuletzt“, ohne Version oder Commit. Die Suche nach „changelog|korrektur|zitier|kontakt|mailto“ in index.html ergibt keinen Treffer; der einzige Treffer für „presse“ ist aria-pressed (Z. 227f.). Kontakt gibt es nur über den externen Link souverain-systems.de/impressum. Im Repo fehlen ein CHANGELOG und eine CITATION.cff, anders als im Vorbild geodaten-import-pipeline mit Entscheidungsprotokoll, Laufberichten und CITATION.cff.",
+     "problem": "Wer am 06.11. „21,1 %“ zitiert, kann später nicht nachweisen, dass die Zahl damals so stand, und sieht nicht, wenn sie sich ändert. Für Fehlerhinweise aus Redaktion oder Leserschaft gibt es keinen benannten Weg, und Korrekturen bleiben unsichtbar. Gerade bei einem Prototyp, der laufend neu erzeugt wird, ist das für Medien das größte Risiko.",
+     "vorschlag": "(1) Seite oder Abschnitt „Änderungen“, erzeugt aus einer Datei aenderungen.md im Repo: Datum, was sich geändert hat (Methode, Daten, Korrektur), welche Kennzahlen um wie viel. Die Höhenkorrektur vom 06.11. wäre der erste Eintrag. (2) Im Fuß eine Zeile „So zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG, Auswertung vom <stand_auswertung>, Datenstand <Commit-Kurz-ID>, souverain-systems.de/kiezatlas“, dazu CITATION.cff wie bei der Pipeline. (3) Eine Zeile „Fehler gefunden oder Rückfrage für einen Bericht? <mailto:…>“ direkt auf der Seite, nicht nur im Impressum. (4) Ältere Datenstände als datierte kennzahlen.json unter daten/download/ aufbewahren, damit zitierte Werte nachprüfbar bleiben.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "README zählt „Sieben Fragen“, die Seite hat neun und den freien Teil",
+     "art": "korrektheit",
+     "schwere": "niedrig",
+     "beleg": "README.md:40 sagt „Sieben Fragen … bis ‚Wie kommt das ins Heft?‘“. index.html enthält frage-1 bis frage-9 (Kita in Frage 8, Bauzeiten in Frage 9) und dazu frage-10 „Selbst erkunden“.",
+     "problem": "Wer die Projektbeschreibung als Hintergrund nutzt, beschreibt den Atlas falsch. Es ist eine kleine, aber unnötige Abweichung zwischen Doku und Seite.",
+     "vorschlag": "README.md:40 auf „Neun Fragen … bis ‚Wann wurde mein Viertel gebaut?‘, danach freies Erkunden“ ändern und Planer und Bauzeiten als eigene Spiegelpunkte nennen.",
+     "aufwand": "klein"
+    }
+   ]
+  },
+  {
+   "linse": "forschung",
+   "zusammenfassung": "Forschung und Lehre (Geografie, Stadtsoziologie, Studierende der TH Brandenburg) brauchen vier Dinge: eine Methode, die man Schritt für Schritt nachrechnen kann, eine Validierung mit Fehlermaßen und Unsicherheit, einen festen und zitierbaren Datenstand mit Prüfsummen der Rohdaten und ein Entscheidungsprotokoll, das man öffentlich nachlesen kann. Bei der Methodik ist der Kiezatlas schon auf Forschungsniveau. Das Rücktest-Protokoll B4 wurde öffentlich belegbar vor dem Lauf committet (9e962b4 um 12:30, der Lauf be05dc8 um 12:34). Lauf 1 ist aufbewahrt, die Lesart-Abschnitte sind ehrlich, Summenprüfung, Gemeindeabgleich und Grenzfall-Vergleich sind vorhanden. Bei Zitierbarkeit und Reproduzierbarkeit bleibt der Atlas aber deutlich hinter der Pipeline zurück. Es gibt keine CITATION.cff, keinen Tag, kein docs/entscheidungen.md und keine Lauf-ID oder Commit-Angabe in den Daten. Die Prüfsummen der Rohdaten liegen außerhalb jedes Repos oder sind nur gekürzt abgedruckt, für die Kerndaten (Zensus-Bestand, Stadtteile) gibt es gar keine. Die Python-Umgebung hängt an einem Nachbar-Repo ohne Remote. Dazu kommen zwei Lücken in der Validierung: Die Quoten stehen ohne Unsicherheitsintervall da, oft bei n unter 20. Und die größte Referenz (Bornstedt, 193 Gebäude) hat ein KI-Agent erstellt, was auf der Methodenseite nicht steht. Das meiste davon ist mit Kopieren von vorhandenem Material zu beheben (HERKUNFT-Hashes, Commit-Folge, das Muster aus der Pipeline), ohne dass Datenschutz- oder Lizenzgrenzen berührt werden.",
+   "staerken": [
+    "Vorab-Protokoll für den Rücktest: pruefen/B4_protokoll.md:3-5 legt Regeln, Schwellen und Prüfgebäude vor dem Lauf fest, und das ist öffentlich belegbar. Commit 9e962b4 (05.11. 12:30, 'Rücktest-Protokoll (vor dem Lauf)') liegt vor dem Ergebnis-Commit be05dc8 (12:34), beide auf origin/main.",
+    "Ehrliche Nachträge: B4_protokoll.md:83-95 schreibt ausdrücklich 'Dieser Nachtrag ist nach einem weiteren Lauf geschrieben, nicht vorher' und nennt, wie sich der Prüfsatz dadurch verkleinert hat (105 statt 129 Gebäude, Überschneidung 33 statt 39). Lauf 1 liegt mit den benannten Codekorrekturen als berichte/B4_holdout_lauf1.md bei (B4_holdout.md:5-8).",
+    "Holdout ohne Leck: Der Rücktest rechnet die Kaskade ohne Stufe 1 neu, damit die Wikidata-Jahre nicht zugleich Eingabe und Prüfwert sind (B4_holdout.md:30, Protokoll N3 Punkt 1). Die Abhängigkeit zwischen den Prüfsätzen Wikidata und Wikipedia ist beziffert (B4_holdout.md:91, 33 gemeinsame Gebäude), dazu eine eigene Gegenprobe (Z. 93-99).",
+    "Fehlermaße mehrdimensional und ohne Schönfärberei: je Prüfsatz, je Stufe und je bekannter Bauzeit n, 'ohne Klasse', Treffer, Median-Abstand und Median-Abstand der Fehlgriffe, ausdrücklich ohne Gesamtquote (B4_protokoll.md:39-41). Die Lesart sagt offen, dass die Quoten nicht mit Berlin vergleichbar sind und das Maß großzügiger ist (B4_holdout.md:111-117).",
+    "Systematische Verzerrung offengelegt statt geglättet: Die Kaskade weicht in der Gruppe 1949-1990 um -32 % von der Statistik der LHP und um -23/-35 % vom Zensus ab, mit Ursache und Folge für die Karte (B4_holdout.md:166-192).",
+    "Mehrere unabhängige Gegenproben mit Schwelle: Zensus-Gitter gegen Gemeindeergebnis je Thema, Grenze 3 %, alle unter 1,5 % (belege/A1_gemeindeabgleich_20261105.md:8-17). Grenzfall Mittelpunkt gegen Flächenanteil in EPSG:3035 (README.md:53-60). Summenprüfung der Stufen 1-3 mit 19 von 19 Paaren eingehalten (B4_holdout.md:145).",
+    "Herkunft auf Anfrageebene ist erfasst: $KIEZ_DATEN/abrufprotokoll.tsv führt 176 Anfragen mit Zeit, Rechner, URL, Status, Bytes und SHA256. Die 15 HERKUNFT.md je Quelle/Stand tragen volle SHA256, die Zensus-Zips mit Bytes und Abrufzeit (kiezatlas-daten/zensus/2022/HERKUNFT.md:13-26). Die Prüfsumme der KI-Referenz steht im Repo (pruefen/B3_protokoll.md, Abschnitt 7: SHA256 6f5a0fb5…4173).",
+    "Prüfkette Bericht → Daten → Seite: daten/jahre_methode.js nennt Bericht, Skript und SHA256 von berichte/B4_holdout.md (18f3f14e…a6b3). Nachgerechnet: Der Hash stimmt mit der Datei überein, und jahre-methode.html:158 zeigt ihn an.",
+    "Lizenz und Datenschutz je Ausgabe nachvollziehbar: Lizenzregister mit Grundlagen-Nummer je Ausgabedatei (QUELLEN.md:80-95, daten/LIZENZ.md), maschinell geprüft (pruefen/daten.py). Der Export trägt je Kennzahl Status, Richtwert mit Fundstelle und Unsicherheit (daten/export/README.md: Ebene versorgung)."
+   ],
+   "funde": [
+    {
+     "titel": "Kein öffentliches Entscheidungsprotokoll, Kennungen ins Leere und Kollision mit den E-Nummern der Pipeline",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "git grep zählt in *.md/*.html/*.py: E7 rund 43-mal, 'Korrektur 6' 19-mal, E8 22-mal, H1 33-mal, 'Prüfbericht 4/9/12/24'; keine Datei im Repo definiert sie (git ls-files | grep -i 'entscheid|bauplan|pruefbericht' leer). Kiezatlas-E7 = 'Brandenburg ja / Berlin nein' (belege/A5a_erreichbarkeit_20261105.md:29-31), Pipeline-E7 = 'Eine Transaktion je Quelle' (geodaten-import-pipeline/docs/entscheidungen.md:61). Ebenso E8: BLDAM-Anfrage (QUELLEN.md:68) gegen 'Meldungen an Anbieter nur als Entwurf' (Pipeline :68). kiezatlas-daten/README.md verweist auf 'Bauplan 0.2', der nicht im Repo liegt.",
+     "problem": "Studierende und Gutachter stoßen bei fast jeder Methodenentscheidung (Randeffekt, Datenschutzregel 'Korrektur 6', Lizenzsperre E8, ODbL-Trennung 'Prüfbericht 4') auf eine Kennung, die sie nicht nachschlagen können. Das Begründungs-Gerüst liegt im unveröffentlichten Bauplan bzw. Prüfbericht. Wer den Atlas zusammen mit der Pipeline liest, die ja ausdrücklich das Vorbild ist, ordnet E7 und E8 außerdem falsch zu. Das widerspricht dem Maßstab 'maximale Transparenz per Design'.",
+     "vorschlag": "docs/entscheidungen.md nach dem Muster der Pipeline anlegen, mit eigenem Präfix gegen die Kollision (z. B. K1…Kn). Je Eintrag: Anlass, Entscheidung, verworfene Alternativen, Folgen, Beleg-Datei. Am Anfang eine Zuordnungstabelle alt → neu (E1…E8, H1…H11, 'Korrektur 1…22', 'Prüfbericht n', G1…G8 aus belege/3D_grundkarte_20261106.md, N1…N4), damit vorhandene Verweise lesbar bleiben. Im README unter 'Wie es gebaut ist' verlinken.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Vorab-Festlegung von Nachtrag N3 öffentlich nicht belegbar, zitierte Commits fehlen auf GitHub",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "pruefen/B4_protokoll.md:58 ('Nachtrag N3 … vor Lauf 3 festgelegt und committet'), :88 (Commit f9e87ce), :95 (Commit e009fad). git branch -r --contains liefert für 1298b23 (N3, 05.11. 18:53), d3b8df2, f9e87ce und e009fad nichts; sie liegen nur lokal auf nachlauf/historie-20261105. Auf origin/main erscheinen Protokoll-Nachtrag und Ergebnis zusammen in c16ee93 (05.11. 22:24, git show --stat: berichte/B4_holdout.md und pruefen/B4_protokoll.md im selben Commit).",
+     "problem": "Der stärkste Anspruch der Validierung lautet: Die Regeln standen vor dem Lauf fest, so auch auf jahre-methode.html:128 ('Die Regeln standen vor dem Lauf fest'). Für das Grundprotokoll ist das öffentlich prüfbar, für N3 nicht. N3 hat aber den heute veröffentlichten Rücktest geprägt (Holdout ohne Stufe 1, dritter Prüfsatz). Ein Externer sieht auf GitHub nur einen Commit, der Regel und Ergebnis zugleich bringt. Zwei im Protokoll genannte Commit-Kennungen lassen sich dort nicht auflösen.",
+     "vorschlag": "Den Zweig nachlauf/historie-20261105 unverändert auf origin pushen (oder als Tag, z. B. b4-n3-vorab auf 1298b23), damit die Kennungen öffentlich aufgelöst werden. In B4_protokoll.md bei N3 die Commit-Kennung und Uhrzeit von 1298b23 nennen, dazu die Kennung des Ergebnis-Commits. Künftig Protokoll-Nachträge als eigenen Commit vor dem Lauf pushen und nicht squashen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Prüfsummen der Rohdaten nicht im Repo, für die Kerndaten gar keine",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "QUELLEN.md:5 verweist auf $KIEZ_DATEN/<quelle>/<stand>/HERKUNFT.md und abrufprotokoll.tsv (außerhalb des Repos, kiezatlas-daten ist kein Git-Repo). QUELLEN.md:49, 50, 68, 69 zeigen nur gekürzte Hashes ('4b92f837…f094ce'). Die Kerndaten des Atlas (Zensus2022_Bevoelkerungszahl.zip, Alter_in_5_Altersklassen.zip, Heizungsart, Energieträger, Wohnungen nach Baujahr, stadtteile.geojson) liegen unter rohdaten/ → ../kiezatlas-potsdam-west/rohdaten (Symlink, Repo ohne Remote). Für sie steht in keiner Datei eine SHA256 (grep über kiezatlas-daten, Repo und laden.log: 0 Treffer). Machbar: sha256sum ergibt z. B. 1a8428d3…941a für Zensus2022_Bevoelkerungszahl.zip und 866fa80e…b605 für stadtteile.geojson.",
+     "problem": "Wer die Zahlen in einer Hausarbeit oder Studie nachrechnen will, kann nicht prüfen, ob die eigene Destatis-Datei dieselbe ist. Destatis hat die Gitterdateien schon neu ausgegeben (HERKUNFT nennt 'Stand 31.10.2024', Impressum 2025). Die Pipeline löst das über Laufberichte und Archiv je Lauf (docs/forschung.md, Abschnitt 'Welcher Datenstand lag einer Auswertung zugrunde?'). Hier sind die Belege vorhanden, aber nicht veröffentlicht.",
+     "vorschlag": "belege/rohdaten.sha256 (bzw. .tsv) ins Repo: je Rohdatei Quelle, URL, Stand, Abrufzeit, Bytes, volle SHA256. Nur die Metadaten aus den 15 HERKUNFT.md und dem abrufprotokoll.tsv, ohne die Dateien selbst, also lizenzneutral. Für die Bestandsdateien vom 03.11. die Hashes jetzt nachrechnen und als 'nachträglich berechnet am …' kennzeichnen. In QUELLEN.md die gekürzten Hashes durch Verweise auf diese Datei ersetzen. pruefen/daten.py kann prüfen, dass jede Quelle aus dem Register dort eine Zeile hat.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Nicht zitierbar: keine CITATION.cff, keine Version, kein Datenstand-Kennzeichen",
+     "art": "zugang",
+     "schwere": "mittel",
+     "beleg": "Repo-Wurzel ohne CITATION.cff (ls CITATION* leer), git tag leer, package.json:3 'version: 1.0.0' ohne Bezug. git grep 'zitier|citation|zenodo|doi' in *.md/*.html: 0 Treffer. Vergleich: geodaten-import-pipeline/CITATION.cff:1-23 (Autor, Version 'angebot-va-2026-536', date-released, Lizenz) und docs/forschung.md, Abschnitt 'Zitieren' (Zenodo-DOI je Release). Die Datendateien tragen Datum (kennzahlen.js 'stand_auswertung', planer.js 'stand'), aber keinen Commit und keine Lauf-ID. Einzige Ausnahme ist daten/jahre_methode.js mit Bericht-SHA. Die Laufberichte belege/2026110*.json haben die Schlüssel lauf_id, start, …, karte, aber keine Version oder Commit der Pipeline.",
+     "problem": "Eine Abschlussarbeit kann den Atlas nur als URL mit Abrufdatum zitieren. Die Live-Seite ändert sich aber täglich (Stand 9864962 vom 06.11., davor 191a2c1 vom selben Morgen). Eine Zahl aus der Arbeit lässt sich später keinem Datenstand mehr zuordnen. Auf main liegt außerdem ein anderer Stand als live (origin/main = 191a2c1, live = 9864962).",
+     "vorschlag": "CITATION.cff nach dem Muster der Pipeline anlegen (type: dataset oder software, Autor André Stiebitz, UG als affiliation, repository-code, version, date-released, Lizenz Apache-2.0 für Code mit Hinweis auf daten/LIZENZ.md). Jeden Live-Stand taggen (z. B. 2026-11-06). Zenodo-Anbindung wie in docs/forschung.md der Pipeline beschreiben. In jede Datei in daten/ den Commit und die Lauf-IDs der Importe schreiben, wie jahre_methode.js es mit 'herkunft' schon vormacht. Auf index.html im Abschnitt Quellen einen Zitiervorschlag mit Version anzeigen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Rechenweg nicht reproduzierbar: Umgebung und Pipeline-Stand nicht festgelegt",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "skripte/lauf.sh:18 ('Braucht: … daneben die Repositories geodaten-import-pipeline und kiezatlas-potsdam-west (.venv)'), :21 PIPELINE=${PIPELINE_DIR:-../geodaten-import-pipeline} ohne Tag oder Commit, :22 PY=../kiezatlas-potsdam-west/.venv/bin/python, :31 Abhängigkeiten aus $PIPELINE/requirements.txt. Im Repo kein requirements*.txt, pyproject.toml oder uv.lock (ls). skripte/*.py importieren psycopg (9), shapely (8), numpy (4), scipy (3), pyproj (3), yaml (4). kiezatlas-potsdam-west hat kein Remote (git remote -v leer). README.md:30-34 nennt nur 'daneben das Repository der Pipeline'.",
+     "problem": "Eine Lehrveranstaltung oder ein Gutachter kann die Kette 01_vorbereiten → Pipeline → 02_auswerten … 26_jahre_methode nicht wieder aufbauen: Ein Repo ist nicht öffentlich, Bibliotheks- und Pipeline-Version sind offen. Ändert sich die Pipeline (E47 und E48 kamen am 05. und 06.11. dazu), ändern sich womöglich die Importe, ohne dass es in den Belegen sichtbar wird. Die Pipeline selbst hat uv.lock, requirements.txt und sbom.cdx.json.",
+     "vorschlag": "pyproject.toml und uv.lock für die skripte/ ins Repo. Die Abhängigkeit vom West-Repo auflösen: 01_vorbereiten mit der eigenen Umgebung laufen lassen, rohdaten/ über KIEZ_DATEN statt Symlink. In lauf.sh den Pipeline-Stand pinnen (Tag, z. B. angebot-va-2026-536, oder Commit) und beim Start prüfen. In README einen Abschnitt 'Nachrechnen' mit Reihenfolge der Skripte, erwarteten Zählungen je Schritt (die Zahlen stehen schon in belege/README.md) und Laufzeit, nach dem Vorbild docs/rundgang.md der Pipeline.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Trefferquoten ohne Unsicherheitsintervall, auch bei sehr kleinem n",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "berichte/B4_holdout.md:48 'ab 2020 | 8 | 2 | 5 von 6 (83,3 %)', :68 '1919–1948 | 7 | 1 | 1 von 6 (16,7 %)', :88 '6 von 17 (35,3 %)', :57/77 '0 von 1 (0,0 %)'. jahre-methode.html:128-135 und daten/jahre_methode.js führen nur 'quote' und 'n', kein Intervall. grep 'Wilson|Konfidenz|Intervall' in skripte/24_jahre_kaskade.py, 26_jahre_methode.py, jahre.js, jahre-methode.html: 0 Treffer. Nachgerechnet (Wilson 95 %): 5/6 → 44–97 %, 1/6 → 3–56 %, 6/17 → 17–59 %, 125/169 → 67–80 %, 46/71 → 53–75 %.",
+     "problem": "Eine Quote mit einer Nachkommastelle bei n = 6 suggeriert eine Genauigkeit, die es nicht gibt. Studierende übernehmen erfahrungsgemäß die Zahl ohne n. Gerade die Bauzeit-Klassen, die für die Stadtsoziologie zählen (1919–1948, Nachkriegszeit, nach 2010), haben die kleinsten Prüfsätze. Die Lesart nennt das in Worten (B4_holdout.md:115), beziffert es aber nicht.",
+     "vorschlag": "In 24_jahre_kaskade.py je Quote ein 95-%-Wilson-Intervall berechnen, als Spalte in B4_holdout.md und als Feld 'ki' in jahre_methode.js (Schema daten/schema/jahre_methode.json erweitern). Auf jahre-methode.html die Quote als 'x von n (Intervall)' zeigen und Quoten bei n < 10 nicht als Prozent, sondern nur als Zählung. Wenn das Protokoll geändert werden muss, als neuen Nachtrag vor dem Lauf führen (reine Darstellung, Regeln unverändert).",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Größte Prüfreferenz hat ein KI-Agent erstellt, die Methodenseite sagt es nicht",
+     "art": "transparenz",
+     "schwere": "mittel",
+     "beleg": "pruefen/B3_protokoll.md:42 'Wer: der Agent (Claude) am 05.11.2026, nicht Andre', :57 Zirkularität (Referenz und Automatik lesen dieselben Bilder). berichte/B3_pilot.md:31. In B4 ist diese Referenz der größte Prüfsatz (193 Gebäude, B4_holdout.md:32) und der einzige für Bauzeiten nach 1990 (:47-48). B4_holdout.md:30 sagt nur 'aus einer Sichtprüfung von Luftbildern', jahre-methode.html:133 nur 'Die Luftbildprüfung deckt nur Bornstedt ab'. grep 'Agent|Claude|Sichtprüf' in jahre-methode.html und jahre-daten.html: 0 Treffer.",
+     "problem": "Für die Forschung ist entscheidend, wer eine Referenz erhoben hat und ob jemand zweites sie geprüft hat. Hier hat ein Sprachmodell die 'Wahrheit' für den wichtigsten Prüfsatz gesetzt, ohne zweite Bewertung und ohne Stichprobe durch einen Menschen. Ein Leser der Methodenseite hält die Werte von 74 % für einen Abgleich mit menschlich geprüften Baujahren. Der Kolophon 'Code mit KI-Unterstützung' (jahre-methode.html:186) deckt Daten-Labels nicht ab.",
+     "vorschlag": "Auf jahre-methode.html:133 und in B4_holdout.md:30/32 ergänzen: 'Sichtprüfung durch einen KI-Agenten (Claude), ohne zweite Bewertung; Referenz und Schätzung sind nicht unabhängig von den Luftbildern.' Als Validierung der Referenz: André prüft eine Zufallsstichprobe (z. B. 30 Gebäude, Zufallszahl vorab festgelegt) blind nach und dokumentiert die Übereinstimmung (Anteil gleicher k_ref, Cohen's Kappa) nur als Zählung in berichte/. Die referenz.csv bleibt intern.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Lizenz- und Quellenregister meldet erledigten Gemeindeabgleich als offen",
+     "art": "korrektheit",
+     "schwere": "niedrig",
+     "beleg": "QUELLEN.md:74 Zeile 34: 'liegt seit 05.11.2026 in eingang/, von pruefen/A1_zensus.py noch nicht ausgewertet'. Dagegen belege/A1_gemeindeabgleich_20261105.md:1-17 (Nachlauf N2, 0 Befunde, sechs Themen unter 3 %) und quellen-a1.md:80 ('~~Zensus-Gemeindeergebnis Potsdam~~ erledigt im Nachlauf N2'). Ähnlich QUELLEN.md:52 '`public.planungsraum` noch leer', während daten/planer.js und der Export auf 19 Planungsräumen rechnen.",
+     "problem": "Das Register ist laut QUELLEN.md:3-5 die zusammengeführte, maßgebliche Liste. Wer daraus den Validierungsstand abliest, unterschätzt die vorhandenen Gegenproben und findet den Beleg A1 nicht.",
+     "vorschlag": "QUELLEN.md Zeile 34 auf 'ausgewertet im Nachlauf N2 (05.11.2026), 0 Befunde, Beleg belege/A1_gemeindeabgleich_20261105.md' setzen, Zeile 12 auf den tatsächlichen Ladestand. In pruefen/daten.py eine Prüfung ergänzen, die für jede Registerzeile mit Beleg-Verweis die Existenz der Belegdatei prüft und 'noch nicht' gegen vorhandene Belege meldet.",
+     "aufwand": "klein"
+    }
+   ]
+  },
+  {
+   "linse": "transparenz",
+   "zusammenfassung": "Ein strenger Gutachter will drei Dinge: einen Einstieg, der jede Kernzahl der Seiten mit Beleg und Skript verbindet, ein Entscheidungsprotokoll, das ohne Zugang zu internen Unterlagen lesbar ist, und einen Stand, der sich mit festgelegter Umgebung nachrechnen lässt. Die Datenschicht des Kiezatlas ist schon nah am Standard der Pipeline. Es gibt Datenverträge mit 0 Abweichungen, ein Lizenzregister mit Abrufregeln, ein Abrufprotokoll, die ODbL-Trennung, eine Prüfsumme des Rücktest-Berichts in den Methodendaten und offen benannte Grenzen. Die Dokumentation hält damit nicht Schritt. Die README beschreibt noch den Stand vom 04.11. ohne Planer, Bauzeiten und Export und hat keinen Kasten „Zur Prüfung“. Die Entscheidungen stehen als „Korrektur N“, „Prüfbericht N“ und „Bauplan 0.x“ im Code, aufgelöst werden sie nur in einem internen Vault-Dokument. CITATION.cff, SECURITY.md, SBOM, Änderungsprotokoll und eine gemeinsame Prüfkette fehlen. Auf den Seiten widersprechen zwei Stellen dem Code bzw. den eigenen Belegen: der Weg der Wikidata-Zuordnung und die Gebäudehöhe nach dem Umbau vom 06.11. Dazu kommen handgeschriebene Zahlen auf Seiten, die von sich sagen, alles aus Dateien zu rechnen.",
+   "staerken": [
+    "Datenverträge greifen: `python -I pruefen/daten.py` offline am Stand 9864962 ergibt 15 Schemas, alle Dateien in daten/ und 8 Fixtures mit 0 Abweichungen. Die Lizenzgrenze (ODbL nur in *_odbl, keine Adressfelder) wird mitgeprüft (pruefen/INVENTAR.md D4–D6).",
+    "Rückführbarkeit der Methodenseite Bauzeiten: daten/jahre_methode.js nennt `herkunft.bericht = berichte/B4_holdout.md` und SHA256 18f3f14e…a6b3. Nachgerechnet stimmt das mit der versionierten Datei überein. Die Zahlen werden von skripte/26_jahre_methode.py aus dem Bericht geparst, nicht abgetippt.",
+    "Die README-Aussage zum Grenzfall („bei großen um bis zu drei Prozent, bei kleinen deutlich mehr“) stimmt, aus daten/kennzahlen.json nachgerechnet: größter Abstand bei Stadtteilen über 5.000 EW −3,0 % (Nr. 21), bei kleinen bis +19,7 % (Nr. 12, 183 EW).",
+    "QUELLEN.md ist ein echtes Lizenzregister: 34 Quellen mit Weg (automatisch/Hand/lokal), Stand, Vermerk und Abrufregeln je Rechner samt robots.txt-Befund. Dahinter liegen ein Abrufprotokoll mit 176 Anfragen (Zeit, Status, Bytes, SHA256) und 15 HERKUNFT.md in kiezatlas-daten.",
+    "Die Lizenz steht in den Exportdateien selbst: daten/export/kiezatlas_potsdam.gpkg hat eine Tabelle `lizenz` mit 7 Zeilen, Vermerk und Link je Ebene. OSM-Anteile liegen getrennt in *_odbl.gpkg und csv_odbl/.",
+    "Offene Grenzen werden selbst benannt, auch unbequeme. belege/3D_grundkarte_20261106.md:80–93 nennt z. B. den stillen Rückfall auf Geschosse × 3 m nach einem neuen ALKIS-Import und meldet ihn als „nicht behoben“. jahre-methode.html sagt ausdrücklich, dass die Rücktest-Quoten nicht mit Berlin vergleichbar sind.",
+    "Ein Feature-Inventar mit Ausgangswerten und ein dokumentierter Rechtetest der Datenbankrollen (pruefen/INVENTAR.md, Abschnitte 1–3) halten die Abnahmekriterien vor dem Ausbau prüfbar fest.",
+    "Die Datenschutzgrenze ist sauber umgesetzt: In daten/jahre/<nr>.js steht nur die Klasse, die Gebäudedateien enthalten keine Adressen oder IDs, auswertung.gebaeude_adresse ist für die Leserolle gesperrt (INVENTAR, Rechtetest)."
+   ],
+   "funde": [
+    {
+     "titel": "README beschreibt den Stand vor dem Ausbau, Einstieg „Zur Prüfung“ fehlt",
+     "art": "transparenz",
+     "schwere": "hoch",
+     "beleg": "README.md:3–5 und Diagramm „Wie es gebaut ist“ (nur Stadtteile, Zensus, ALKIS; Skripte 01/02); README.md Abschnitt „Quellen, Abrufe und Grenzen“ mit 4 Zeilen gegenüber 34 in QUELLEN.md; keines der Skripte 03, 11–17, 20–27 kommt in README.md vor (grep, je 0 Treffer); DESIGN.md:5 und package.json `description` ebenso alter Stand",
+     "problem": "Wer prüft, findet in der README weder die Planer-Ebene, die Bauzeiten noch den GIS-Export, keine Reihenfolge der 27 Skripte und keine Zuordnung Kernzahl → Beleg. Beim Vorbild (geodaten-import-pipeline/README.md, Kasten „Zur Prüfung“) führt jede Angabe zu einem Laufbericht. Hier muss man die Belege selbst zusammensuchen.",
+     "vorschlag": "README neu gliedern: (1) Kasten „Zur Prüfung, Stand <Commit/Tag>“ als Tabelle Angabe → Beleg → Skript, mindestens 182.673 EW / 3.443 Zellen (belege/20261104T132325Z.txt, 02_auswerten.py), 52.309 von 85.046 Gebäuden, 50.356 Katasterhöhen (belege/3D_grundkarte_20261106.md), 106/150 Wikidata-Gebäude (berichte/B2_genaue_jahre.md:13–14), Kita in OSM 78,1 % (belege/N1_osm_fussweg_20261105.md:20), Fußweg/Luftlinie 1,367 (ebd. :31), 15 von 1.800 Haltestellen (belege/A5b_landfilter_kreuzprobe.txt), Rücktest mit SHA256. (2) Ablauf aller Skripte in Reihenfolge mit Ein- und Ausgabe. (3) Quellen nur mit Verweis auf QUELLEN.md statt eigener Kurztabelle. DESIGN.md:5 und package.json mitziehen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Entscheidungen nur als „Korrektur N“, „Prüfbericht N“ und „Bauplan 0.x“, aufgelöst nur im internen Vault",
+     "art": "nachvollziehbarkeit",
+     "schwere": "hoch",
+     "beleg": "z. B. skripte/24_jahre_kaskade.py („Korrektur 6“, 3×), sql/002_ausbau.sql (Korrektur 5, 6, 12, 16, 17, 22), skripte/11_einrichtungen.py („Prüfbericht 12“), skripte/12_osm.py („Bauplan 0.2–0.4“), jahre.js:6, pruefen/A2_einrichtungen.py („Bauplan 171“), daten/schema/themen.md („Bauplan 0.1“), berichte/B4_holdout.md:116 („Erwartung im Bauplan“); dazu G1–G8 in belege/3D_grundkarte_20261106.md, H1–H11, N1–N4, E7/E8. Auflösung nur in ~/Vaults/UG-Souverain/Wissen/produkt/kiezatlas/2026-11-05-bauplan-kritik.md bzw. -bauplan-ausbau.md, nicht im Repo (git ls-files ohne Treffer)",
+     "problem": "Im öffentlichen Repo (origin github.com/andremadstop/kiezatlas-potsdam) lässt sich keine dieser Begründungen nachlesen. Es fehlt ein Entscheidungsprotokoll mit Anlass, Optionen, Begründung und „Neu prüfen, wenn“ wie geodaten-import-pipeline/docs/entscheidungen.md (E1–E48, abgelöste Einträge markiert). Das interne Bauplan-Dokument lässt sich nicht einfach veröffentlichen: Es nennt einen Ansprechpartner und unterliegt den Vault-Regeln.",
+     "vorschlag": "docs/entscheidungen.md neu schreiben (nicht kopieren), bereinigt, im Format der Pipeline: K1, K2 … mit Datum, Anlass, Optionen, Entscheidung, Begründung, Neu prüfen wenn. Darin eine Zuordnungstabelle alte Kennung (Korrektur 1–24, Prüfbericht N, Bauplan 0.x, G1–G8, H1–H11, N1–N4) → K-Nummer. Danach die Kommentare in Code und SQL auf K-Nummern umstellen. Die wichtigsten Einträge: Datenschutzregel ohne Einzeljahr (Korrektur 6), Wikipedia nur als Prüfspalte (Korrektur 5), Fußweg in _odbl (Korrektur 4), Rücktest nach Bauzeit (Korrektur 7), Luftlinie vor Fußweg, Planungsraum als Raumebene, Pestalozza-Ausschluss.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Methodenseite Bauzeiten nennt einen Zuordnungsweg für Wikidata, den der Code für die Veröffentlichung nicht nutzt",
+     "art": "korrektheit",
+     "schwere": "hoch",
+     "beleg": "jahre-methode.html:111: „Wikidata (frei, CC0), zugeordnet über die Nummer der Denkmalliste oder den Ort des Objekts“; dagegen skripte/22_jahre_genau.py:74 („Zuordnung über die Denkmal-ID nutzt die Adressen der BLDAM-Liste … nur Prüfspalte“), berichte/B2_genaue_jahre.md:13 (106 genau, „Zuordnung über die Koordinate“) und :40 (Weg über BLDAM-ID = Prüfspalte), QUELLEN.md Nr. 27 und Nr. 28",
+     "problem": "Die öffentliche Seite beschreibt einen Weg über die BLDAM-Nummer, die Lizenz der BLDAM-Liste ist aber ungeklärt (QUELLEN.md Nr. 28: „offen (§ 87a UrhG)“). Wer das liest, kann annehmen, dass Inhalte unklarer Lizenz in die belegten Jahre eingeflossen sind. Das trifft nicht zu, die Seite sagt aber das Gegenteil.",
+     "vorschlag": "jahre-methode.html:111 ändern in: „… Wikidata (CC0), zugeordnet über die Koordinate des Wikidata-Objekts (Gebäude, das den Punkt enthält, sonst das nächste Hauptgebäude bis 10 m). Die Zuordnung über die Nummer der Denkmalliste läuft über die Adressen der BLDAM-Liste und dient nur der Prüfung.“ Zusätzlich in pruefen/B5_jahre.mjs oder einem kleinen Textcheck sicherstellen, dass „Nummer der Denkmalliste“ nicht mehr als Veröffentlichungsweg auftaucht.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Höhenangaben nach dem Umbau vom 06.11. veraltet: Popup und Startseite sagen „Geschosse × 3 m“",
+     "art": "korrektheit",
+     "schwere": "mittel",
+     "beleg": "karte.js:226 und atlas.js:344: Popup „Höhe (genähert)“ und „ALKIS vereinfacht, Höhe = Geschosse × 3 m“; index.html:269: „die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West“. Dagegen index.html:278 (Quellenliste derselben Seite), README.md:73–76, jahre-methode.html:121, Commit 77bd0d6: h = ALKIS-Objekthöhe bei 50.356 von 52.309. Beispiel daten/gebaeude/11.js, zweites Objekt: Wohnhaus, gs = null, h = 8.0",
+     "problem": "Das Popup zeigt für ein Wohnhaus „Geschosse k. A.“, „Höhe (genähert) 8 m“ und „Höhe = Geschosse × 3 m“. Die drei Angaben widersprechen sich, und eine gemessene Katasterhöhe erscheint als Schätzung. Die Startseite widerspricht sich selbst zwischen Methode (Z. 269) und Quellen (Z. 278). Der Daten-Vertrag daten/schema/gebaeude.json hat kein Feld für die Herkunft der Höhe, deshalb kann die Seite Messwert und Ersatzwert gar nicht unterscheiden.",
+     "vorschlag": "In skripte/02_auswerten.py bzw. 20_alkis_nas.py ein Feld `hq` (\"kataster\" | \"geschosse\" | \"ersatz\") in daten/gebaeude/*.js und daten/jahre/*.js schreiben und in gebaeude.json/jahre_gebaeude.json aufnehmen. Popup: „Höhe 8 m (ALKIS-Objekthöhe, NAS-Auszug LGB)“ bzw. „(genähert: Geschosse × 3 m)“ bzw. „(Ersatzwert 3 m)“. index.html:269 auf den Text von jahre-methode.html:121 umstellen und den LoD2-Satz streichen. In pruefen/seiten.mjs nach „Geschosse × 3 m“ als alleiniger Herkunftsangabe suchen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Handgeschriebene Zahlen auf Methodenseiten, die von sich sagen, alles aus Dateien zu rechnen",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "jahre-methode.html Kopf: „Alle Zahlen auf dieser Seite rechnet der Browser aus denselben Dateien“; dagegen jahre-methode.html:121 fest im HTML: 50.356, 52.309, 96,3 %, 38, 1.915 und „rund 4 %“ unter „Grenzen“. planer-methode.html:37 (Median „rund 1,4-mal“), :38 („1.800 Haltestellen … 15 im falschen Land“), :59 („78 %“) fest im HTML ohne Verweis; skripte/15_planer.py:74 `OSM_KITA_VOLLSTAENDIG = \"78 %\"` als Zeichenkette abgeschrieben aus belege/N1_osm_fussweg_20261105.md:20 (78,1 %)",
+     "problem": "Die Zahlen lassen sich auf Belege zurückführen (N1:20, N1:31 mit 1,367, A5b_landfilter_kreuzprobe.txt). Auf der Seite fehlen aber Beleg und Stand, und bei einem neuen OSM-Auszug oder ALKIS-Import veralten sie still, so wie die Höhenangaben in index.html:269. Die 3D-Zählung lässt sich aus den veröffentlichten Dateien nicht einmal nachrechnen, weil das Herkunftsfeld fehlt (siehe Höhen-Fund).",
+     "vorschlag": "Die Zählungen in die erzeugten Dateien legen: Höhenherkunft nach daten/jahre_methode.js (Schlüssel `hoehe`: kataster/geschosse/ersatz/gesamt, Stand) und OSM-Vollständigkeit, Umwegfaktor und Landfilter-Fehltreffer nach daten/planer.js (Schlüssel `pruefwerte` mit Beleg-Pfad). Die Seiten füllen diese Werte wie die übrigen per data-feld. Bis das umgesetzt ist, hinter jede feste Zahl „(Beleg: belege/…, Stand 05.11.2026)“ setzen und den Satz im Seitenkopf einschränken. 15_planer.py:74 soll den Wert aus a3_pruefen lesen, nicht als Text führen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Laufumgebung nicht festgelegt: Pipeline-Stand unbekannt, Python aus einem Nachbar-Repo, kein Lock, keine SBOM",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "skripte/lauf.sh:18,22 `PY=\"../kiezatlas-potsdam-west/.venv/bin/python\"` (auch 01_vorbereiten.py:22, 03_planungsraeume.py:10, 15_planer.py:39, 25_jahre_gpkg.py:17); lauf.sh:21,31 `PIPELINE=../geodaten-import-pipeline` ohne Tag oder Commit; skripte/14b_fussweg.sh:21 `--with numpy --with scipy` ohne Version; die Laufberichte belege/20261104T132324Z.json ff. enthalten keinen Pipeline-Commit (Schlüssel: lauf_id, start, probelauf, sprache, quellen, laufzeit_s …); Planer liest vorbereitet/planungsraeume.csv (belege/N4_planer_lauf_20261105.txt:1), vorbereitet/ steht in .gitignore; kein pyproject/requirements/uv.lock im Repo",
+     "problem": "Die Pipeline hat sich nach dem 04.11. über E40–E48 geändert. Mit welchem Stand die Kiezatlas-Belege entstanden sind, steht nirgends. Die Auswertung braucht ein zweites, nicht dokumentiertes Repo (kiezatlas-potsdam-west) und ungepinnte numerische Bibliotheken. Ein Dritter kann den Stand 9864962 deshalb nicht nachrechnen. Das Vorbild hat requirements.txt mit Prüfsummen, uv.lock, sbom.cdx.json und pruefen.sh.",
+     "vorschlag": "(1) pyproject.toml und uv.lock im Kiezatlas mit allen Paketen von skripte/ und pruefen/ (psycopg, shapely, numpy, scipy, pyyaml …), lauf.sh auf `uv run --locked` umstellen und kiezatlas-potsdam-west streichen. (2) Pipeline per Tag oder Commit festlegen (Variable PIPELINE_REF in lauf.sh, Prüfung per `git -C $PIPELINE rev-parse`) und den Commit in jeden Beleg schreiben. (3) sbom.cdx.json für vendor/ (maplibre-gl 4.7.1, gsap 3.15.1), Schriften und Python-Pakete erzeugen, wie bei der Pipeline über pruefen.sh. (4) Die Herkunft von vorbereitet/planungsraeume.csv (Eingabedatei, SHA256, Aufruf von 03_planungsraeume.py) als Beleg ablegen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Kein Prüfstand am veröffentlichten Stand: Prüfergebnisse nur als „grün“, ohne Protokoll, ohne Commit, ohne gemeinsame Prüfkette",
+     "art": "nachvollziehbarkeit",
+     "schwere": "mittel",
+     "beleg": "belege/3D_grundkarte_20261106.md:52–61: seiten.mjs, A7_planer.mjs, p1_*.mjs nur „grün“, ohne Protokolldatei und Commit (Ausnahme B5_jahre.mjs mit „203 Punkte“); README.md nennt nur `node pruefen/seiten.mjs` und `python -I pruefen/daten.py`, pruefen/ enthält 40 Prüfdateien ohne Runner; belege/README.md listet nur die Läufe vom 04.11., P0 und 3D, nicht den Lauf 20261105T101043Z (zensus_struktur, in QUELLEN.md Nr. 3 zitiert) und keine der rund 30 Dateien A*/N*/B*/a4_*; skripte/25_jahre_gpkg.py und 26_jahre_methode.py ohne Bericht in belege/ oder berichte/; pruefen/daten.py prüft daten/export/*.gpkg, csv/ und daten/download/bauzeiten.gpkg nicht (grep ohne Treffer)",
+     "problem": "Welche Prüfungen am live geschalteten Stand 9864962 gelaufen sind, mit wie vielen Prüfpunkten und Ergebnis, lässt sich nicht belegen. Die Pakete A1–B5 haben Prüfprotokolle vom 05.11., der Umbau vom 06.11. aber nur eine Liste mit „grün“. Die Exporte, die Fachleute in QGIS weiterverwenden, prüft nur A8_export.py mit Datenbank, nicht die Datenprüfung im Repo.",
+     "vorschlag": "pruefen.sh anlegen, das alle offline lauffähigen Prüfungen nacheinander startet (daten.py, seiten.mjs, A7_planer.mjs, B5_jahre.mjs, p1_*.mjs, die Python-Tests *_test_*.py, ruff), mit Zählungen ausgibt und mit Rückgabewert endet. Je veröffentlichtem Stand einen Ordner belege/pruefstand-JJJJ-MM-TT-<commit>/ mit pruefen.log und README anlegen, wie geodaten-import-pipeline/beispielberichte/pruefstand-2026-11-05-e47/. daten.py um eine schreibgeschützte Prüfung der GeoPackages erweitern (gpkg_contents, Tabelle `lizenz` vorhanden, keine Felder adresse/strasse/oid/jahr bei Wohnraum). belege/README.md zur Übersicht aller Belege mit Paket, Skript und Stand ausbauen.",
+     "aufwand": "mittel"
+    },
+    {
+     "titel": "Fremde Vergleichszahl (visinage) und Gegenproben ohne Fundstelle und Abrufstand",
+     "art": "transparenz",
+     "schwere": "mittel",
+     "beleg": "berichte/B4_holdout.md:109: „Berlin (visinage …): 61,4 % … Zensus 46,7 %, Blocktyp 37,6 %, Nachbarn 23,8 %“ ohne URL, Seite oder Datum; diese Werte gehen per skripte/26_jahre_methode.py:161–166 in daten/jahre_methode.js `berlin` und auf jahre-methode.html („Beim Berliner Vorbild trafen …“); QUELLEN.md Nr. 33 sagt dagegen „keine Datenübernahme“, Stand „–“. skripte/02_auswerten.py:28–37: Gegenproben 185.137 (Regionaldatenbank 12411-01-01-5-B) und 8.221 (Stadtteile im Blick 2022, S. 26) von Hand, ohne Abrufdatum und ohne Beleg in belege/",
+     "problem": "Eine Trefferquote eines Dritten erscheint auf der Seite als Vergleichswert, ohne dass Ort und Stand nachprüfbar sind, und widerspricht dem Register („keine Datenübernahme“). Die beiden Gegenproben sind die einzigen von Hand gesetzten Zahlen der Startseite. Für sie fehlt der Nachweis, wann und wo sie abgelesen wurden. Die Regionaldatenbank ist zudem für automatische Abrufe gesperrt (Pipeline E48), deshalb ist ein schriftlicher Ablesebeleg die einzige Prüfmöglichkeit.",
+     "vorschlag": "In berichte/B4_holdout.md:109 und QUELLEN.md Nr. 33 die Fundstelle nachtragen (Seite oder Dokument bei visinage, Datum der Lesung, wörtliche Bezugsgröße) und Nr. 33 auf „eine Vergleichszahl übernommen (Fakt mit Fundstelle)“ ändern. Ist keine Fundstelle mehr belegbar, den Vergleich von der Seite nehmen. Für die Gegenproben belege/gegenproben.md anlegen (Tabelle, Stichtag, Ablesedatum, Seite, SHA256 des PDFs) und `abgelesen` in GEGENPROBE in 02_auswerten.py ergänzen, damit das Datum in kennzahlen.json und im Steckbrief steht.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "Widersprüche zwischen Downloadseiten und QUELLEN.md zu Gebäudedateien und zum Gemeindeabgleich",
+     "art": "korrektheit",
+     "schwere": "niedrig",
+     "beleg": "jahre-daten.html:97: „Die geschätzte Bauzeit je Gebäude zeigt nur die Karte, als Datei gibt es sie hier nicht“; planer-daten.html:110–111 bietet daten/jahre/11.js als Download an („Bauzeitklasse je Gebäude“), QUELLEN.md Ausgaben führt daten/jahre/<nr>.js als „veröffentlicht: ja“. QUELLEN.md Nr. 34: „von pruefen/A1_zensus.py noch nicht ausgewertet“; dagegen belege/A1_gemeindeabgleich_20261105.md:1–3 (Nachlauf N2, ausgewertet, 0 Befunde, sechs Themen unter 3 %). QUELLEN.md Nr. 12: „public.planungsraum noch leer (Laden: Ladekoordinator)“, ohne Hinweis, dass der Planer dauerhaft vorbereitet/planungsraeume.csv liest",
+     "problem": "Die Bauzeiten-Downloadseite verspricht, dass es keine Datei je Gebäude gibt, die Planer-Downloadseite verlinkt genau diese Datei. Die Datenschutzgrenze bleibt gewahrt (nur Klasse, keine Adresse oder ID), aber Leser bekommen zwei verschiedene Auskünfte. Das Register meldet eine erledigte Prüfung als offen und einen Übergangszustand als Dauerzustand.",
+     "vorschlag": "jahre-daten.html:97 ändern in: „Die Bauzeitklasse je Gebäude liegt nur als Kartendatei vor (daten/jahre/<Nr>.js, ohne Adresse und Kennung, nur Klasse); als Tabelle oder GeoPackage gibt es sie bewusst nicht …“. QUELLEN.md Nr. 34 auf „ausgewertet 05.11.2026 (N2), 0 Befunde, belege/A1_gemeindeabgleich_20261105.md“ setzen. Nr. 12 um die tatsächliche Herkunft der Planer-Grenzen ergänzen. Danach QUELLEN.md mit einem Stand-Datum im Kopf versehen.",
+     "aufwand": "klein"
+    },
+    {
+     "titel": "CITATION.cff, SECURITY.md (auch als Meldeweg für Datenfehler) und Änderungsprotokoll fehlen",
+     "art": "zugang",
+     "schwere": "niedrig",
+     "beleg": "Repo-Wurzel /home/andre/Workspace/Code/kiezatlas-potsdam: keine CITATION.cff, SECURITY.md, CHANGELOG (ls/git ls-files ohne Treffer); README.md:8 „Stand November 2026“ ohne Commit oder Tag, während live = 9864962; Vorbild: geodaten-import-pipeline/CITATION.cff, SECURITY.md, README-Kasten mit Tag",
+     "problem": "Wer den Atlas in einem Bericht, Antrag oder Heft nutzt, hat keine Zitierangabe mit Version. Wer einen Datenfehler findet (z. B. Standort Pestalozza, falsche Klasse), findet keinen Meldeweg. Welche Fassung live ist und was sich seit dem 04.11. geändert hat (Planer, Bauzeiten, Fußweg, Vektorkarte, Katasterhöhe), lässt sich nur aus Git-Commits erschließen.",
+     "vorschlag": "CITATION.cff nach dem Muster der Pipeline (type: dataset bzw. software, version = Tag, date-released, Lizenzen Code Apache-2.0, Daten je Datei). SECURITY.md mit Kontakt andre@souverain-systems.de (WKD), ausdrücklich auch für Daten- und Lizenzfehler. CHANGELOG.md je veröffentlichtem Stand mit Datum, Tag und den drei bis fünf sichtbaren Änderungen. Zusätzlich Tag und Commit im Seitenfuß neben „Import zuletzt“ anzeigen (data-feld aus kennzahlen.json).",
+     "aufwand": "klein"
+    }
+   ]
+  }
+ ]
+}

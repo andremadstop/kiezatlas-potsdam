@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
+<html lang="de" class="kopf-zwei" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,11 +24,20 @@
 <a class="sprung" href="#werkzeug-start">Zum Werkzeug springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten des Planers">
     <ul>
-      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
-      <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer.html" aria-current="page"><span>Versorgung</span></a></li>
       <li><a class="nav" href="planer-methode.html"><span>Methode</span></a></li>
       <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
     </ul>
@@ -89,11 +98,24 @@
         <div id="vs-inhalt"></div>
       </div>
 
+      <div class="block" id="block-vergleich">
+        <h2 class="block__titel">Alle Planungsräume</h2>
+        <p class="fuss">Eine Kennzahl für jede Raumeinheit und für ganz Potsdam nebeneinander, mit Zähler und Nenner. Ganz Potsdam ist die Summe der veröffentlichten Zähler und Nenner.</p>
+        <button class="knopf knopf--rand" type="button" id="vg-laden"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Vergleich zeigen</span></button>
+        <div id="vg-auswahl" hidden>
+          <label class="suche"><span>Kennzahl</span>
+            <select id="vg-kennzahl" disabled></select>
+          </label>
+        </div>
+        <div class="tabellenrahmen vg-rahmen" id="vg-inhalt" aria-live="polite"></div>
+      </div>
+
       <div class="block seite__fuss">
-        <p class="fuss" id="fuss-quellen">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Planungsräume © Landeshauptstadt Potsdam, dl-de/by-2-0, Daten verändert (Grenzen vereinfacht). Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Hintergrund © basemap.de / BKG, dl-de/by-2-0. Weitere Quellen je Zahl in der Tabelle und unter <a class="link" href="planer-daten.html">Daten</a>.</p>
+        <p class="fuss" id="fuss-quellen">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Planungsräume © Landeshauptstadt Potsdam, dl-de/by-2-0, Daten verändert (Grenzen vereinfacht). Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0. Grundkarte © <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert. Weitere Quellen je Zahl in der Tabelle und unter <a class="link" href="planer-daten.html">Daten</a>.</p>
         <p class="fuss" id="fuss-odbl" hidden>Fußwege und Einrichtungen aus OpenStreetMap: © OpenStreetMap-Mitwirkende, ODbL 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). Die abgeleiteten Dateien stehen unter <a class="link" href="planer-daten.html">Daten</a>.</p>
-        <p class="fuss">Datenschutz: Die Karte lädt Kacheln von basemap.de; dieser Server sieht die IP-Adresse. Keine Cookies, keine Zählung.</p>
+        <p class="fuss">Datenschutz: Die Karte lädt Kacheln und Kartenschrift von basemap.de; dieser Server sieht die IP-Adresse. Keine Cookies, keine Zählung. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen.</p>
         <p class="fuss-seite__links"><a class="link" href="planer-methode.html">Methode</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+        <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
       </div>
     </div>
   </aside>
@@ -102,6 +124,7 @@
 <script defer src="daten/stadtteile.js"></script>
 <script defer src="daten/planungsraeume.js"></script>
 <script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/grundkarte.js"></script>
 <script defer src="themen.js"></script>
 <script defer src="planer.js"></script>
 </body>

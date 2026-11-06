@@ -20,8 +20,10 @@ const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? proces
 const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));
 const AXE = fs.readFileSync(path.join(HIER, "..", "node_modules", "axe-core", "axe.min.js"), "utf8");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json" };
-const GRENZE_JS_KB = 300;
+const GRENZE_JS_KB = 320;   // 06.11.: +16 KB gz für die Vektor-Grundkarte (daten/grundkarte.js) statt Rasterkacheln
 
 const befunde = [];
 const bericht = { stand: new Date().toISOString(), wurzel: WURZEL, laeufe: [] };
@@ -46,7 +48,7 @@ async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 
   const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, reducedMotion: bewegung });
   const page = await ctx.newPage();
   const fehler = [], abgewiesen = [], geladen = [];
-  await page.route("**/*", (r) => { const u = r.request().url(); if (eigen(u)) return r.continue(); abgewiesen.push(u); return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD }); });
+  await page.route("**/*", (r) => { const u = r.request().url(); if (eigen(u)) return r.continue(); abgewiesen.push(u); return r.fulfill(fremdAntwort(r.request().url())); });
   page.on("console", (m) => {
     if (m.type() !== "error") return;
     const ort = (m.location() || {}).url || "", text = m.text();
@@ -141,6 +143,27 @@ async function planerEcht(basis, art) {
     const c = document.querySelector(".maplibregl-popup-content"); const t = c ? c.textContent : ""; document.querySelectorAll(".maplibregl-popup").forEach((x) => x.remove()); return t;
   });
   pruef(!!popup && /dl-de/.test(popup) && /Daten verändert/.test(popup), `Klick auf Einrichtung mit echten Daten: ${(popup || "").slice(0, 90)}…`);
+  // Audit K14/K24: Zähler und Nenner („a von b“) und ganz Potsdam an den Zeilen, Vergleich aller Planungsräume
+  const zn = await page.evaluate(() => {
+    const P = window.KIEZ_PLANER, R = P.raeume["403"], fmt = new Intl.NumberFormat("de-DE");
+    const mitZn = R.werte.filter((w) => w.zaehler != null && w.nenner != null).length;
+    const texte = [...document.querySelectorAll(".vs-zn")].map((e) => e.textContent);
+    const erste = R.werte.find((w) => w.zaehler != null && w.nenner != null);
+    return { mitZn, zn: texte.length, passt: !!erste && texte.some((x) => x.startsWith(fmt.format(erste.zaehler) + " von " + fmt.format(erste.nenner))),
+      stadt: document.querySelectorAll(".vs-stadt").length, gesamt: P.gesamt ? P.gesamt.werte.length : 0 };
+  });
+  pruef(zn.mitZn > 0 && zn.zn === zn.mitZn && zn.passt && zn.stadt === zn.gesamt && zn.gesamt > 0,
+    `Zähler und Nenner an ${zn.zn} von ${zn.mitZn} Zeilen („a von b“ wie planer.js ${zn.passt}), ganz Potsdam an ${zn.stadt} Zeilen (gesamt ${zn.gesamt})`);
+  await page.click("#vg-laden"); await warteBereit(page);
+  const vg = await page.evaluate(() => {
+    const P = window.KIEZ_PLANER, sel = document.getElementById("vg-kennzahl"), tab = document.querySelector(".vg-tabelle");
+    const zeilen = tab ? tab.querySelectorAll("tbody tr").length : 0, fuss = tab ? tab.querySelector("tfoot")?.textContent || "" : "";
+    const opt = sel.options.length; sel.selectedIndex = Math.min(4, opt - 1); sel.dispatchEvent(new Event("change"));
+    const zeilen2 = document.querySelectorAll(".vg-tabelle tbody tr").length;
+    return { zeilen, zeilen2, fuss, opt, raeume: Object.keys(P.raeume).length, caption: !!(tab && tab.querySelector("caption")), vsZeilen: document.querySelectorAll(".vs-zeile").length };
+  });
+  pruef(vg.zeilen === vg.raeume && vg.zeilen2 === vg.raeume && /Ganz Potsdam/.test(vg.fuss) && vg.opt > 5 && vg.caption && vg.vsZeilen === z.zeilen,
+    `Vergleich „Alle Planungsräume“: ${vg.zeilen} Zeilen (Räume ${vg.raeume}), Zeile ganz Potsdam ${/Ganz Potsdam/.test(vg.fuss)}, ${vg.opt} Kennzahlen, nach Wechsel ${vg.zeilen2} Zeilen, Tabellenzeilen der Versorgung unverändert ${vg.vsZeilen}`);
   const verstoss = await axe(page);
   pruef(verstoss.length === 0, `axe mit echten Daten: ${verstoss.length} Verstöße ${verstoss.join(", ")}`);
   pruef(fehler.length === 0, `Konsole ohne Fehler mit echten Daten (${fehler.length}${fehler.length ? ": " + fehler.slice(0, 3).join(" | ") : ""})`);
@@ -239,7 +262,7 @@ async function raumebeneFremd(ohneGrenzen) {
   page.on("pageerror", (e) => fehler.push(e.message));
   await page.route("**/*", async (r) => {
     const u = r.request().url();
-    if (!eigen(u)) return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    if (!eigen(u)) return r.fulfill(fremdAntwort(r.request().url()));
     if (ohneGrenzen && /\/daten\/planungsraeume\.js$/.test(u.split(/[?#]/)[0])) return r.fulfill({ status: 404, body: "" });
     if (/\/daten\/fixtures\/planer\.js$/.test(u.split(/[?#]/)[0])) {
       const t = fs.readFileSync(path.join(WURZEL, "daten", "fixtures", "planer.js"), "utf8").replace(/"raumebene":\s*"stadtteil"/, '"raumebene":"planungsraum"');
@@ -264,7 +287,7 @@ async function fussFehlschlag() {
   page.on("pageerror", (e) => fehler.push(e.message));
   await page.route("**/*", (r) => {
     const u = r.request().url();
-    if (!eigen(u)) return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    if (!eigen(u)) return r.fulfill(fremdAntwort(r.request().url()));
     if (/\/daten\/fixtures\/planer_fuss_odbl\.js$/.test(u.split(/[?#]/)[0]) && ++versuche === 1) return r.fulfill({ status: 404, body: "" });
     return r.continue();
   });
@@ -312,6 +335,16 @@ async function textseiten(basis, art) {
   const r = await m.page.evaluate(() => ({ zeilen: document.querySelectorAll("#richtwerte tbody tr").length,
     orient: [...document.querySelectorAll("#richtwerte tbody tr")].filter((t) => /Orientierung, kein Richtwert/.test(t.textContent)).length,
     vermerk: [...document.querySelectorAll("#richtwerte tbody tr")].every((t) => /dl-de|ODbL|CC BY|Lizenz/.test(t.textContent)) }));
+  // Audit K28: Prüfwerte im Text aus planer.js (pruefwerte), nicht fest im HTML
+  const pw = await m.page.evaluate(() => {
+    const P = window.KIEZ_PLANER || {}, PW = P.pruefwerte || {}, n = [...document.querySelectorAll("[data-pw]")];
+    const st = { ganz: { maximumFractionDigits: 0 }, eins: { minimumFractionDigits: 1, maximumFractionDigits: 1 }, genau: { maximumFractionDigits: 3 } };
+    const falsch = n.filter((e) => { const x = PW[e.dataset.pw]; return !x || e.textContent !== new Intl.NumberFormat("de-DE", st[e.dataset.format || "genau"]).format(x.wert); }).map((e) => e.dataset.pw);
+    const belege = [...document.querySelectorAll("[data-pw-beleg]")].filter((e) => !PW[e.dataset.pwBeleg] || e.textContent !== PW[e.dataset.pwBeleg].beleg).length;
+    return { n: n.length, falsch, belege, schluessel: Object.keys(PW).length, osm: Object.keys(PW).some((k) => /osm|fussweg/.test(k)) };
+  });
+  pruef(pw.n >= 2 && !pw.falsch.length && !pw.belege && pw.schluessel >= 2 && !pw.osm,
+    `planer-methode.html über ${art}: ${pw.n} Prüfwerte aus planer.js gefüllt (${pw.schluessel} mit Beleg), abweichend ${pw.falsch.join(", ") || "keiner"}, Beleg falsch ${pw.belege}`);
   const v1 = await axe(m.page);
   pruef(r.zeilen > 0 && r.orient > 0 && r.vermerk && v1.length === 0 && m.fehler.length === 0,
     `planer-methode.html über ${art}: ${r.zeilen} Maßstäbe aus der Datei, ${r.orient} als Orientierung, Vermerk je Zeile ${r.vermerk}, axe ${v1.length}, Fehler ${m.fehler.length}`);
@@ -326,6 +359,36 @@ async function textseiten(basis, art) {
   pruef(v2.length === 0 && d.fehler.length === 0, `planer-daten.html über ${art}: axe ${v2.length}, Fehler ${d.fehler.length}`);
   await d.ctx.close();
   return liste;
+}
+
+async function steckbriefUndKita(basis, art) {
+  // K26: Die Kita-Frage der Startseite öffnet den Planer im Fußweg, und planer.js versteht den Hash so.
+  const start = fs.readFileSync(path.join(WURZEL, "index.html"), "utf8");
+  const kitaLink = (start.match(/href="(planer\.html#[^"]*zu=kita[^"]*)"/) || [])[1] || "";
+  pruef(/(?:#|&amp;)weg=fuss(?:&|$)/.test(kitaLink), `index.html: Kita-Frage verlinkt den Planer im Fußweg (${kitaLink || "kein Link"})`);
+  const k = await oeffnen(basis, "planer.html", { hash: "#" + kitaLink.split("#")[1].replace(/&amp;/g, "&") + "&r=403" });
+  const kz = await k.page.evaluate(() => ({ weg: (document.querySelector("#weg input:checked") || {}).value, zu: (document.querySelector("#zu input:checked") || {}).value,
+    odbl: !document.getElementById("fuss-odbl").hidden,
+    sb: [...document.querySelectorAll("#vs-inhalt .vs-steckbrief a.knopf")].map((a) => ({ href: a.getAttribute("href"), text: a.textContent })),
+    hinweis: (document.querySelector("#vs-inhalt .vs-steckbrief + .fuss") || {}).textContent || "" }));
+  pruef(kz.weg === "fuss" && kz.zu === "kita" && kz.odbl, `Kita-Link über ${art}: Planer zeigt Fußweg zur Kita, ODbL-Vermerk sichtbar (${kz.weg}, ${kz.zu}, ${kz.odbl})`);
+  // K25: Knopf „Steckbrief (A4)“ in der Versorgung führt zur Datei des gewählten Planungsraums, mit Luftlinien-Hinweis
+  const sb = kz.sb[0] || {};
+  pruef(kz.sb.length === 1 && /\/export\/steckbriefe\/403\.html$/.test(sb.href) && fs.existsSync(path.join(WURZEL, sb.href)) && /Steckbrief \(A4\)/.test(sb.text) && /Luftlinie/.test(kz.hinweis),
+    `Versorgung 403 über ${art}: Knopf „Steckbrief (A4)“ auf ${sb.href || "–"}, Datei vorhanden, Hinweis Luftlinie`);
+  await k.ctx.close();
+  // Beispieldaten (Stadtteile) haben keinen Steckbrief: kein Knopf
+  const f = await oeffnen(basis, "planer.html" + FIX, { hash: "#r=13" });
+  const fz = await f.page.evaluate(() => ({ zeilen: document.querySelectorAll(".vs-zeile").length, sb: document.querySelectorAll(".vs-steckbrief").length }));
+  pruef(fz.zeilen > 0 && fz.sb === 0, `Beispieldaten über ${art}: Versorgung ohne Steckbrief-Knopf (${fz.zeilen} Zeilen, ${fz.sb} Knöpfe)`);
+  await f.ctx.close();
+  // planer-daten.html listet alle Steckbriefe, je einer je Datei in daten/export/steckbriefe/
+  const d = await oeffnen(basis, "planer-daten.html", { warten: false });
+  const liste = await d.page.$$eval('.steckbriefliste a[href*="export/steckbriefe/"]', (l) => l.map((a) => a.getAttribute("href").split("/").pop()));
+  await d.ctx.close();
+  const dateien = fs.readdirSync(path.join(WURZEL, "daten", "export", "steckbriefe")).filter((x) => x.endsWith(".html")).sort();
+  pruef(dateien.length > 0 && JSON.stringify([...liste].sort()) === JSON.stringify(dateien),
+    `planer-daten.html über ${art}: ${liste.length} Steckbriefe verlinkt, ${dateien.length} Dateien in daten/export/steckbriefe/`);
 }
 
 function downloadsPruefen(liste) {
@@ -355,6 +418,7 @@ try {
     await rundreise(basis, art);
     await handy(basis, art);
     const liste = await textseiten(basis, art);
+    await steckbriefUndKita(basis, art);
     if (art === "HTTP") downloadsPruefen(liste);
   }
   await raumebeneFremd(true);

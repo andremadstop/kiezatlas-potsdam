@@ -120,12 +120,27 @@ def main() -> int:
 
     print("A6-3 Status orientierung, wo der Maßstab keine gelesene Potsdamer Fundstelle hat")
     amtlich_dok = {"baulandmodell"}  # NVP 2019: Fundstelle gelesen, Geltung bis 2023 abgelaufen → orientierung
-    falsch = [
-        (nr, w["kennzahl"], w["art"])
-        for nr, _, w in werte(P)
-        if "richtwert" in w and (w["richtwert"]["q"] in amtlich_dok) != (w["status"] == "amtlich")
-    ]
-    pruef(not falsch, f"Status passt zum Dokument des Richtwerts ({len(falsch)} Abweichungen {falsch[:3]})")
+    # Audit K4/K7: Kennzahlen, deren Rechenweise vom Dokument abweicht, stehen in baulandmodell.status_je_kennzahl
+    st_kz = rw["baulandmodell"].get("status_je_kennzahl") or {}
+
+    def status_soll(w):
+        if w["richtwert"]["q"] not in amtlich_dok:
+            return "orientierung"
+        return (st_kz.get(w["kennzahl"]) or {}).get("status", "amtlich")
+
+    alle_w = [(nr, w) for nr, _, w in werte(P)] + [("gesamt", w) for w in P.get("gesamt", {}).get("werte", [])]
+    falsch = [(nr, w["kennzahl"], w["art"]) for nr, w in alle_w if "richtwert" in w and status_soll(w) != w["status"]]
+    pruef(not falsch, f"Status passt zum Dokument des Richtwerts und zu baulandmodell.status_je_kennzahl "
+                      f"({len(falsch)} Abweichungen {falsch[:3]})")
+    ohne_satz = [(nr, w["kennzahl"]) for nr, w in alle_w if w["kennzahl"] in st_kz and w["richtwert"]["q"] == "baulandmodell"
+                 and st_kz[w["kennzahl"]].get("grund") and st_kz[w["kennzahl"]]["grund"] not in w["unsicherheit"]]
+    pruef(not ohne_satz, f"K4/K7: Grund des Status steht in jeder Unsicherheit ({ohne_satz[:3] or 'alle'})")
+    nr344 = [nr for nr, w in alle_w if w["kennzahl"] == "plaetze_je_bedarf"
+             and "Abweichend von Nr. 3.4.4 (Kita-Bedarfsplanung) ohne angrenzende Planungsräume" not in w["unsicherheit"]]
+    pruef(not nr344, f"K7: Satz zu Nr. 3.4.4 an jedem Wert Plätze je Bedarfsplatz ({nr344 or 'alle'})")
+    alt_text = [nr for nr, w in alle_w if re.search(r"nicht belegte Plätze|Kapazität laut Betriebserlaubnis",
+                                                         w["unsicherheit"])]
+    pruef(not alt_text, f"K8: kein Wortlaut „Kapazität … nicht belegte Plätze“ ({alt_text[:3] or 'keiner'})")
     norm = [(nr, w["kennzahl"]) for nr, _, w in werte(P) if "fordert hier keine" in (w.get("unsicherheit") or "")]
     pruef(not norm, f"keine Normaussage „NVP fordert hier keine Erschließung“ ({norm[:3]})")
     klein = [
@@ -391,7 +406,14 @@ def main() -> int:
                 f"{sum(v is None for v in erwartet.values())} ohne Wert (über {grenze} % ohne Klasse) "
                 f"({abw[:3] or 'alle gleich'})",
             )
-    print("A6-12 Entfernungen gegen die Tabelle; strittige Lage (Pestalozza-Fall, N4)")
+    print("A6-12 Entfernungen gegen die Tabelle; strittige Lage (Pestalozza-Fall, N4); Schulen mit Primarstufe (K4)")
+    # Schulen mit Primarstufe (Schulform „G/…“) zählen als Grundschulziel mit (Audit K4): zweiter Weg in SQL über
+    # die Vereinigung beider Zielmengen, ohne strittige Standorte
+    vor = rw["grundschule"]["primarstufe_schulform_praefix"]
+    cur.execute("SELECT id FROM auswertung.einrichtung WHERE art = 'sek1' AND unterart LIKE %s ORDER BY id",
+                (vor.replace("%", "") + "%",))
+    prim = [r_[0] for r_ in cur.fetchall()]
+    print(f"        Schulen mit Primarstufe: {len(prim)} ({', '.join(prim)})")
     # Standorte mit strittiger Lage (Feld hinweis in einrichtungen.js) zählen für keine Entfernung. Zweiter Weg:
     # nächstes Ziel je Zelle ganz in SQL ohne diese IDs; wo das Ziel der Tabelle nicht strittig ist, muss es
     # dasselbe sein wie in auswertung.zelle_erreichbar (Methode von A5a nachgebaut).
@@ -405,26 +427,36 @@ def main() -> int:
         ziel[(g, a, m_)] = z
         if me is not None:
             db[(g, a, m_)] = float(me)
-    ohne = {}
+    ohne, ohne_ziel = {}, {}
+    if "grundschule" not in strittig and prim:
+        strittig["grundschule"] = []
     for a, aus in strittig.items():
+        mit = prim if a == "grundschule" else []
         cur.execute(
-            """SELECT z.gitter_id, round(ST_Distance(ST_Transform(z.geom, 25833), n.geom)::numeric, 1)
+            """SELECT z.gitter_id, round(ST_Distance(ST_Transform(z.geom, 25833), n.geom)::numeric, 1), n.id
                FROM public.zensus_zelle z JOIN public.stadtteil s ON ST_Contains(s.geom, z.geom)
-               CROSS JOIN LATERAL (SELECT e.geom FROM auswertung.einrichtung e
-                                   WHERE e.art = %s AND e.id <> ALL(%s::text[])
+               CROSS JOIN LATERAL (SELECT e.geom, e.id FROM auswertung.einrichtung e
+                                   WHERE (e.art = %s OR e.id = ANY(%s::text[])) AND e.id <> ALL(%s::text[])
                                    ORDER BY e.geom <-> ST_Transform(z.geom, 25833), e.id LIMIT 1) n
                WHERE z.ew IS NOT NULL""",
-            (a, aus),
+            (a, mit, aus),
         )
-        for g, me in cur.fetchall():
+        for g, me, zid in cur.fetchall():
             ohne[(g, a)] = float(me)
-        gleich = [k for k in ohne if k[1] == a and ziel.get((k[0], a, "luftlinie")) not in aus]
+            ohne_ziel[(g, a)] = zid
+        if mit:
+            n_prim = sum(1 for k, z in ohne_ziel.items() if k[1] == a and z in mit)
+            pruef(n_prim > 0, f"K4: {n_prim} Zellen mit einer Schule mit Primarstufe als nächstem Grundschulziel (SQL)")
+        gleich = [k for k in ohne if k[1] == a and ziel.get((k[0], a, "luftlinie")) not in aus
+                  and ohne_ziel[k] not in mit]
         abw_n = sum(1 for k in gleich if abs(ohne[k] - db[(k[0], a, "luftlinie")]) > 0.05)
         pruef(
             gleich and abw_n == 0,
-            f"Strittige Lage {a} {aus}: SQL ohne strittige Standorte = Tabelle in {len(gleich)} nicht betroffenen "
-            f"Zellen ({abw_n} Abweichungen)",
+            f"{a}: SQL ohne strittige Standorte {aus}{' mit Primarstufe' if mit else ''} = Tabelle in {len(gleich)} "
+            f"nicht betroffenen Zellen ({abw_n} Abweichungen)",
         )
+        if not aus:
+            continue
         raeume_s = strittige_raeume(aus, cur, tab, par)
         offen = [(nr, v["kennzahl"]) for nr, _, v in werte(P)
                  if nr in raeume_s and (v["kennzahl"], v["art"]) in PLANER.GS_KENNZAHLEN and v["art"] == a
@@ -444,14 +476,14 @@ def main() -> int:
                     abw += 1
                 continue
             n += 1
-            betroffen = ziel.get((ids[i], a, "luftlinie")) in strittig.get(a, [])
-            soll = ohne[(ids[i], a)] if betroffen else db[(ids[i], a, "luftlinie")]
-            neu_n += betroffen
+            soll = ohne.get((ids[i], a), db.get((ids[i], a, "luftlinie")))
+            neu_n += (ids[i], a) in ohne and abs(soll - db.get((ids[i], a, "luftlinie"), soll)) > 0.05
             if abs(v - soll) > toleranz:
                 abw += 1
     pruef(
         abw == 0 and n > 0 and len(ids) == E["anzahl"],
-        f"erreichbar.js: {n} Werte gegen die Tabelle, davon {neu_n} ohne strittige Standorte, {abw} Abweichungen",
+        f"erreichbar.js: {n} Werte gegen die Tabelle bzw. den zweiten Weg, davon {neu_n} anders als die Tabelle "
+        f"(strittige Lage, Primarstufe), {abw} Abweichungen",
     )
     EF, _ = js("erreichbar_fuss_odbl.js")
     if EF is None:
@@ -463,17 +495,21 @@ def main() -> int:
                 if v is None or not ew[i]:
                     continue
                 n += 1
-                if ziel.get((ids[i], a, "fussweg")) in strittig.get(a, []):
-                    # neu gerechnet (A5b-Verfahren in 15_planer.py): nie unter der Luftlinie ohne strittige Standorte
-                    neu_n += 1
-                    if v + toleranz < ohne[(ids[i], a)]:
+                if ziel.get((ids[i], a, "fussweg")) in strittig.get(a, []) or (a == "grundschule" and prim):
+                    # neu gerechnet (A5b-Verfahren in 15_planer.py): nie unter der Luftlinie des zweiten Wegs und
+                    # (Primarstufe) nie über der Tabelle, wenn das Tabellenziel nicht strittig ist
+                    tab_wert = db.get((ids[i], a, "fussweg"))
+                    if ziel.get((ids[i], a, "fussweg")) in strittig.get(a, []) or tab_wert is None:
+                        tab_wert = None
+                    neu_n += tab_wert is None or abs(v - tab_wert) > toleranz
+                    if v + toleranz < ohne[(ids[i], a)] or (tab_wert is not None and v > tab_wert + toleranz):
                         abw += 1
                 elif abs(v - db[(ids[i], a, "fussweg")]) > toleranz:
                     abw += 1
         pruef(
             abw == 0 and n > 0 and EF["anzahl"] == len(ids),
-            f"erreichbar_fuss_odbl.js: {n} Werte gegen die Tabelle, {neu_n} ohne strittige Standorte neu "
-            f"(≥ Luftlinie), {abw} Abweichungen",
+            f"erreichbar_fuss_odbl.js: {n} Werte gegen die Tabelle, {neu_n} neu gerechnet (strittige Lage, "
+            f"Primarstufe; ≥ Luftlinie, ≤ Tabelle), {abw} Abweichungen",
         )
         pruef(
             "vbb" in EF["quellen"] or "haltestelle" not in EF["arten"],
@@ -488,7 +524,27 @@ def main() -> int:
                 print("        Hinweis: Fußweg-Nachbau nicht geprüft, numpy/scipy fehlen "
                       "(Aufruf mit uv --with numpy --with scipy)")
             else:
+                if prim:
+                    # K4 Fußweg nachgebaut: min(Fußweg ohne strittige Standorte, Fußweg zur nächsten Schule mit
+                    # Primarstufe) je Zelle, auf rundung_meter gerundet = erreichbar_fuss_odbl.js
+                    a, aus = "grundschule", strittig.get("grundschule", [])
+                    o_ = PLANER.fussweg_ohne(cur, a, aus)
+                    p_ = PLANER.fussweg_zu(cur, "id = ANY(%s::text[])", (prim,), a)
+                    rd_m = rw["planer"]["rundung_meter"]
+                    abw_n = 0
+                    for i, g in enumerate(ids):
+                        if not ew[i]:
+                            continue
+                        alt = db.get((g, a, "fussweg")) if ziel.get((g, a, "fussweg")) not in aus else o_.get(g)
+                        kand = [x for x in (alt, p_.get(g)) if x is not None]
+                        # Zellen ohne Zeile in der Tabelle bleiben leer (wie primarstufe_einrechnen in 15_planer.py)
+                        soll = PLANER.rund(min(kand), rd_m) if kand and (g, a, "fussweg") in ziel else None
+                        abw_n += soll != EF["werte"][a][i]
+                    pruef(abw_n == 0, f"K4: Fußweg Grundschule mit Primarstufe nachgebaut = erreichbar_fuss_odbl.js "
+                                      f"({abw_n} Abweichungen)")
                 for a in strittig:
+                    if not strittig[a]:
+                        continue
                     alle = PLANER.fussweg_ohne(cur, a, [])
                     abw_n = sum(
                         1 for (g, a2, m_), v in ziel.items() if a2 == a and m_ == "fussweg"
@@ -497,6 +553,123 @@ def main() -> int:
                     )
                     pruef(abw_n == 0, f"Fußweg-Nachbau {a} mit allen Zielen = auswertung.zelle_erreichbar "
                                       f"({abw_n} Abweichungen)")
+    print("A6-13 Audit 06.11.2026: Zähler und Nenner (K14), ganz Potsdam (K24), Primarstufe (K4), Kitas über zwei Räume "
+          "(K27), Prüfwerte (K28)")
+    # Rundung je Kennzahl wie zn_merken in 15_planer.py: (Zähler gerundet auf rd, Nenner gerundet auf rd)
+    gerundet = {"anteil_in_radius": (True, True), "plaetze_je_kind": (False, True), "plaetze_je_bedarf": (False, True),
+                "schueler_je_kind": (False, True), "ew_je_einrichtung": (True, False),
+                "oepnv_erschliessung": (True, True), "oepnv_takt": (True, True)}
+    for name, D in (("planer.js", P), ("planer_fuss_odbl.js", PF)):
+        if D is None:
+            continue
+        alle = [(nr, w) for nr, _, w in werte(D)] + [("gesamt", w) for w in D.get("gesamt", {}).get("werte", [])]
+        n_zn, falsch, ohne_zn, leer_falsch = 0, [], [], []
+        for nr, w in alle:
+            if w["kennzahl"] not in gerundet:
+                continue
+            if "zaehler" not in w or "nenner" not in w:
+                ohne_zn.append((nr, w["kennzahl"]))
+                continue
+            z, n = w["zaehler"], w["nenner"]
+            if w["wert"] is None:
+                if (z is not None or n is not None) and not (w["kennzahl"] == "ew_je_einrichtung" and n == 0):
+                    leer_falsch.append((nr, w["kennzahl"], w["art"]))
+                continue
+            n_zn += 1
+            # gesamt rechnet aus den gerundeten Summen: dort ohne Rundungsspanne der Teile
+            hz, hn = ((rd / 2 if g else 0) for g in gerundet[w["kennzahl"]]) if nr != "gesamt" else (0, 0)
+            lo = max(z - hz, 0) / (n + hn) if n + hn else 0
+            hi = (z + hz) / (n - hn) if n - hn > 0 else float("inf")
+            if w["einheit"] == "%":
+                lo, hi, tol = 100 * lo, 100 * hi, 0.5
+            elif w["kennzahl"] == "ew_je_einrichtung":
+                tol = rd / 2
+            else:
+                tol = 0.005
+            if not (lo - tol - 1e-9 <= w["wert"] <= hi + tol + 1e-9):
+                falsch.append((nr, w["kennzahl"], w["art"], z, n, w["wert"]))
+            if w["kennzahl"] == "plaetze_je_bedarf" and (w.get("differenz") is None
+                                                         or abs(w["differenz"] - (z - n)) > rd + 1e-9):
+                falsch.append((nr, "differenz", w.get("differenz"), z - n))
+        pruef(not ohne_zn and not falsch and not leer_falsch and n_zn > 0,
+              f"{name}: zaehler/nenner = wert in {n_zn} Werten (Toleranz: Zähler und Nenner je ±{rd // 2} bei "
+              f"Personen und Bedarf, dazu die Rundung des Werts) ({falsch[:3] or 'alle'}); ohne Zähler/Nenner "
+              f"{ohne_zn[:3] or 'keiner'}; ohne Wert mit Zahl {leer_falsch[:3] or 'keiner'}")
+        G = D.get("gesamt")
+        if pruef(bool(G) and G["name"] == "Potsdam", f"{name}: Eintrag gesamt (ganz Potsdam) vorhanden"):
+            abw = []
+            for g in G["werte"]:
+                k = (g["kennzahl"], g["art"], (g.get("richtwert") or {}).get("wert"))
+                teile = [w for _, _, w in werte(D)
+                         if (w["kennzahl"], w["art"], (w.get("richtwert") or {}).get("wert")) == k
+                         and w.get("zaehler") is not None and w.get("nenner") is not None]
+                if g["wert"] is None:
+                    if not (g["kennzahl"] == "schueler_je_kind" and "Primarstufe" in g["unsicherheit"]):
+                        abw.append(k)
+                    continue
+                if (g["zaehler"], g["nenner"]) != (sum(w["zaehler"] for w in teile), sum(w["nenner"] for w in teile)):
+                    abw.append(k)
+                if f"aus {len(teile)} von {len(D['raeume'])} Raumeinheiten" not in g["unsicherheit"]:
+                    abw.append(("text",) + k)
+            pruef(not abw and G["werte"], f"{name}: gesamt = Summe der veröffentlichten Zähler und Nenner, "
+                                          f"{len(G['werte'])} Werte ({abw[:3] or 'alle'})")
+    kinder_ok = [nr for nr, r_ in P["raeume"].items()
+                 if (r_.get("kinder") is None) != (ew_db[nr] < rw["geheimhaltung"]["min_ew_raumeinheit"])
+                 or (r_.get("kinder") and any(v % rd for v in r_["kinder"].values()))]
+    pruef(not kinder_ok, f"K14: Kinder je Raumeinheit gerundet auf {rd}, null nur unter der Mindestgröße "
+                         f"({kinder_ok or 'alle'})")
+    # K4: Räume mit Schule mit Primarstufe: Grundschüler je Kind ohne Wert, Grund im ersten Satz
+    cur.execute(
+        f"""SELECT r.nr, count(*) FROM auswertung.einrichtung e
+            JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
+            WHERE e.id = ANY(%(prim)s) GROUP BY r.nr""",
+        {**(par or {}), "prim": prim},
+    )
+    prim_raum = {str(a): b for a, b in cur.fetchall()}
+    satz = "Schule mit Primarstufe im Raum, Schülerzahl nicht nach Stufe teilbar"
+    falsch = [nr for nr, _, w in werte(P) if w["kennzahl"] == "schueler_je_kind"
+              and (nr in prim_raum) != (w["wert"] is None and w["unsicherheit"].startswith(satz))]
+    kita_text = [nr for nr, _, w in werte(P) if w["kennzahl"] == "schueler_je_kind"
+                 and re.search(r"Betriebserlaubnis|Kindertagespflege|wie oben", w["unsicherheit"])]
+    pruef(prim_raum and not falsch and not kita_text,
+          f"K4: Grundschüler je Kind in {sorted(prim_raum)} ohne Wert mit Grund ({falsch or 'alle'}); ohne "
+          f"Kita-Bausteine und „wie oben“ ({kita_text or 'alle'})")
+    cur.execute(
+        f"""SELECT r.nr, count(*) FILTER (WHERE e.art = 'grundschule' AND e.id NOT LIKE '%%#haus%%'),
+                   count(*) FILTER (WHERE e.id = ANY(%(prim)s))
+            FROM auswertung.einrichtung e JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
+            GROUP BY r.nr""",
+        {**(par or {}), "prim": prim},
+    )
+    n_gs = {str(a): b + c for a, b, c in cur.fetchall()}
+    falsch = [(nr, w["nenner"], n_gs.get(nr, 0)) for nr, _, w in werte(P)
+              if w["kennzahl"] == "ew_je_einrichtung" and w["art"] == "grundschule" and w["nenner"] is not None
+              and w["nenner"] != n_gs.get(nr, 0)]
+    pruef(not falsch, f"K4: Einwohner je Grundschulstandort zählt Schulen mit Primarstufe mit ({falsch[:3] or 'alle'})")
+    # K27: id_kita mit Häusern in mehreren Raumeinheiten, in jeder betroffenen Raumeinheit genannt
+    cur.execute(
+        f"""SELECT split_part(e.id, '#', 1), array_agg(DISTINCT r.nr::text ORDER BY r.nr::text)
+            FROM auswertung.einrichtung e JOIN {tab} r ON ST_Contains(r.geom, ST_Transform(e.geom, 4326))
+            WHERE e.art IN ('kita', 'hort') GROUP BY 1 HAVING count(DISTINCT r.nr) > 1""",
+        par,
+    )
+    ueber = cur.fetchall()
+    fehlt = [(k, nr) for k, rr in ueber for nr in rr
+             if not any(w["kennzahl"] == "plaetze_je_bedarf" and f"(MBJS {k})" in w["unsicherheit"]
+                        for w in P["raeume"][nr]["werte"])]
+    pruef(not fehlt, f"K27: {len(ueber)} Kita(s) mit Häusern in mehreren Raumeinheiten "
+                     f"({'; '.join(f'{k}: {sorted(rr)}' for k, rr in ueber) or 'keine'}), in jeder genannt "
+                     f"({fehlt or 'alle'})")
+    # K28: Prüfwerte = Belegdateien (zweiter Weg: eigene Muster)
+    pw = P.get("pruefwerte") or {}
+    n1 = (WURZEL / "belege" / "N1_osm_fussweg_20261105.md").read_text(encoding="utf-8")
+    kp = (WURZEL / "belege" / "A5b_landfilter_kreuzprobe.txt").read_text(encoding="utf-8")
+    del n1  # OSM-Prüfwerte stehen nicht in planer.js (ODbL-Grenze A1), nur als belegter Text auf der Methodenseite
+    soll = {"landfilter_haltepunkte": int(re.search(r"Rechteck: (\d+)", kp).group(1)),
+            "landfilter_falsch": int(re.search(r"zugeordnet: (\d+)", kp).group(1))}
+    pruef({k: (v or {}).get("wert") for k, v in pw.items()} == soll
+          and all((WURZEL / v["beleg"]).exists() for v in pw.values()),
+          f"K28: Prüfwerte in planer.js = Belegdateien ({ {k: v.get('wert') for k, v in pw.items()} })")
     con.close()
     print(f"\n{len(befunde)} Befund(e)" if befunde else "\n0 Befunde")
     return 1 if befunde else 0

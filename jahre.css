@@ -165,7 +165,7 @@
   .j-leiste__status{font-size:.8125rem}
   .j-klasse{font-size:.6875rem;min-height:40px}
   .j-klasse__balken{height:18px}
-  .j-legende__quelle{display:none}
+  .j-legende__quelle{font-size:.6875rem;line-height:1.3}
   .jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 48px)}
   .j-register__koerper{grid-template-columns:minmax(0,1fr)}
   .j-steckbrief{position:static}
@@ -188,7 +188,9 @@
 #j-m-ruecktest .j-tabelle{margin:10px 0 6px}
 #j-m-ruecktest .j-tabelle th:first-child{white-space:normal}
 #j-m-ruecktest .j-tabelle :is(th,td)+:is(th,td){padding-left:12px}
-@media (max-width:860px){#j-m-ruecktest .j-tabelle{font-size:.8125rem}#j-m-ruecktest .j-tabelle thead th{font-size:.75rem}}
+@media (max-width:860px){#j-m-ruecktest .j-tabelle{font-size:.8125rem}#j-m-ruecktest .j-tabelle thead th{font-size:.75rem;hyphens:auto}}
+/* sechs Spalten seit dem 95-%-Bereich: am Handy enger */
+@media (max-width:480px){#j-m-ruecktest .j-tabelle :is(th,td)+:is(th,td){padding-left:6px}}
 /* LHP-Gegenprobe (6 Spalten): Abstand zwischen den Spalten, am Handy kleiner */
 #j-m-lhp :is(th,td)+:is(th,td){padding-left:10px}
 @media (max-width:860px){#j-m-lhp{font-size:.8125rem}#j-m-lhp thead th{font-size:.75rem;hyphens:auto}#j-m-lhp :is(th,td)+:is(th,td){padding-left:6px}}

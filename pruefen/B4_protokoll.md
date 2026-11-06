@@ -53,7 +53,7 @@ Median 25 m² Grundfläche), „Gebäude für Vorratshaltung“.
 
 ## Erwartung (keine Zielvorgabe)
 
-Unter Berlins 61,4 % (visinage, mit Gebäudealterskarte 1992/93 und Luftbilddatierung).
+Unter Berlins 61,4 % (visinage, mit Gebäudealterskarte 1992/93 und Luftbilddatierung; Fundstelle https://berlin.visinage.com/de/methods/, gelesen 05.11.2026, siehe `belege/gegenproben.md`).
 
 ## Nachtrag N3 (05.11.2026, vor Lauf 3 festgelegt und committet)
 

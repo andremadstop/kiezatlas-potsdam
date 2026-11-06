@@ -35,9 +35,17 @@ window.KIEZ_THEMEN = {
   polys,   umriss, GANZ,          // Geometrie
   TEIL, FARBE, BEZIRKFARBE, proBezirk,   // Stadtteile
   fmt, fmt1, rundEw, proz, name, kachel, esc,   // Text
-  ebenen,  laden,  v              // Ebenen-Register, Nachladen, Cache-Busting
+  ebenen,  laden,  v,             // Ebenen-Register, Nachladen, Cache-Busting
+  grundkarte, grundLuft, GRUNDKARTE,  // Vektor-Grundkarte (daten/grundkarte.js) einsetzen, Luftbild-Umschaltung, ob geladen
+  HQ                                   // Klartext zur Herkunft der Gebäudehöhe (Feld hq), seit 06.11.2026
 };
 ```
+
+`grundkarte(stil, {vor})` ersetzt im MapLibre-Stil die Rasterebene `basemap` durch die Flächen und Linien aus
+`KIEZ_GRUNDKARTE.unten` und fügt die Beschriftungen (`oben`) am Ende bzw. vor der Ebene `vor` ein. Fehlt
+`daten/grundkarte.js`, bleibt der Stil unverändert (Rasterkarte als Rückfall). `grundLuft(map, an)` blendet bei
+eingeschaltetem Luftbild die Flächen und Linien aus, die Beschriftungen bleiben; ursprünglich ausgeblendete Ebenen
+bleiben aus. Seit 06.11.2026 (Beleg `belege/3D_grundkarte_20261106.md`).
 
 ### Themen
 

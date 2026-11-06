@@ -24,16 +24,17 @@
 <a class="sprung" href="#werkzeug-start">Zum Werkzeug springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
-    <ul>
-      <li><a class="nav" href="index.html"><span>Zur Geschichte</span></a></li>
-      <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
-      <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
-      <li><a class="nav" href="index.html#schaugrafik"><span>Schaugrafik</span></a></li>
-      <li><a class="nav" href="index.html#methode"><span>Methode</span></a></li>
-    </ul>
-  </nav>
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html" aria-current="true"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 
 <main class="kartenflaeche" id="inhalt">
@@ -80,9 +81,10 @@
         <div class="verteilungen" id="verteilungen"></div>
       </div>
       <div class="block seite__fuss">
-        <p class="fuss">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung. Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Gebäude und Luftbild © GeoBasis-DE/LGB, dl-de/by-2-0. Hintergrund © basemap.de / BKG, dl-de/by-2-0. Vollständige Quellen: <a class="link" href="index.html#quellen">Quellen und Lizenzen</a>.</p>
-        <p class="fuss">Datenschutz: Die Karte lädt Kacheln von basemap.de und, wenn eingeschaltet, Luftbilder der LGB; diese Server sehen die IP-Adresse. Keine Cookies, keine Zählung.</p>
-        <p class="fuss-seite__links"><a class="link" href="index.html">Zur Geschichte</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+        <p class="fuss">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung. Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0. Gebäude und Luftbild © GeoBasis-DE/LGB, dl-de/by-2-0. Grundkarte © <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert. Vollständige Quellen: <a class="link" href="index.html#quellen">Quellen und Lizenzen</a>.</p>
+        <p class="fuss">Datenschutz: Die Karte lädt Kacheln von basemap.de und, wenn eingeschaltet, Luftbilder der LGB; diese Server sehen die IP-Adresse. Keine Cookies, keine Zählung. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen.</p>
+        <p class="fuss-seite__links"><a class="link" href="index.html">Zur Geschichte</a> <a class="link" href="index.html#schaugrafik">Schaugrafik</a> <a class="link" href="index.html#methode">Methode</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+        <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
       </div>
     </div>
   </aside>
@@ -92,6 +94,7 @@
 <script defer src="daten/stadtteile.js"></script>
 <script defer src="daten/zellen.js"></script>
 <script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/grundkarte.js"></script>
 <script defer src="themen.js"></script>
 <script defer src="karte.js"></script>
 </body>

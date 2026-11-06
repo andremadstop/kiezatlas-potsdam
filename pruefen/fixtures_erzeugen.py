@@ -102,18 +102,38 @@ def main() -> None:
                  "einheit": "%", "methode": methode, "status": "amtlich", "vorlaeufig": True,
                  "richtwert": {"wert": 2000, "einheit": "m", "q": "bsp", "seite": "Beispiel"}, "q": "bsp",
                  "stand": "Beispiel", "unsicherheit": "Beispielwert"}]
+            # Zähler und Nenner (Audit K14): glatte Beispielzahlen, die zum Wert passen
+            werte[0].update({"zaehler": 50 + j, "nenner": 100, "zaehler_text": "Beispielkinder im Radius",
+                             "nenner_text": "Beispielkinder"})
             if methode == "luftlinie":
                 werte.append({"kennzahl": "plaetze_je_kind", "art": "kita", "zielgruppe": "Kinder unter 6",
                               "wert": 0.5 + j / 100, "einheit": "Plätze je Kind", "methode": methode,
-                              "status": "amtlich", "q": "bsp", "stand": "Beispiel", "unsicherheit": "Beispielwert"})
+                              "status": "amtlich", "q": "bsp", "stand": "Beispiel", "unsicherheit": "Beispielwert",
+                              "zaehler": 50 + j, "nenner": 100, "zaehler_text": "Beispielplätze",
+                              "nenner_text": "Beispielkinder"})
             aus[nr] = {"name": f"{t['name']} (Beispiel)", "ew": 1000 * (j + 1), "werte": werte}
         return aus
 
+    def gesamt(raeume_: dict) -> dict:
+        """Ganz Potsdam (Audit K24) als Summe der Beispiel-Zähler und -Nenner."""
+        werte = []
+        for w in next(iter(raeume_.values()))["werte"]:
+            g = {k: v for k, v in w.items() if k not in ("wert", "zaehler", "nenner")}
+            if "zaehler" in w:
+                z = sum(x["zaehler"] for r in raeume_.values() for x in r["werte"] if (x["kennzahl"], x["art"]) == (w["kennzahl"], w["art"]))
+                n = sum(x["nenner"] for r in raeume_.values() for x in r["werte"] if (x["kennzahl"], x["art"]) == (w["kennzahl"], w["art"]))
+                g.update({"zaehler": z, "nenner": n, "wert": round(z / n, 2) if w["einheit"] != "%" else round(100 * z / n)})
+            else:
+                g["wert"] = None
+            werte.append(g)
+        return {"name": "Potsdam", "ew": sum(r["ew"] for r in raeume_.values()), "werte": werte}
+
     kopf = {"fixture": True, "stand": STAND, "raumebene": "stadtteil", "rundung": {"ew": 10},
             "hinweis": HINWEIS + " Zensus-Stichtag 15.05.2022; Neubaugebiete danach fehlen."}
-    schreib("planer.js", "KIEZ_PLANER", {**kopf, "quellen": {"bsp": Q_BEISPIEL}, "raeume": raeume("luftlinie")})
+    rl, rf = raeume("luftlinie"), raeume("fussweg")
+    schreib("planer.js", "KIEZ_PLANER", {**kopf, "quellen": {"bsp": Q_BEISPIEL}, "raeume": rl, "gesamt": gesamt(rl)})
     schreib("planer_fuss_odbl.js", "KIEZ_PLANER_FUSS", {**kopf, "quellen": {"bsp": Q_BEISPIEL, "osm": Q_OSM},
-                                                        "raeume": raeume("fussweg")}, ODBL_KOPF)
+                                                        "raeume": rf, "gesamt": gesamt(rf)}, ODBL_KOPF)
 
     klassen = ["vor 1919", "1919–1948", "1949–1978", "1979–1990", "1991–2000", "2001–2010", "2011–2019", "ab 2020"]
     geb = [None if not zellen[i]["properties"]["ew"] else (i % 9) + 1 for i in range(n)]
@@ -149,7 +169,7 @@ def main() -> None:
         "features": [{"type": "Feature", "geometry": f["geometry"], "properties": {
             "j": jahr(i) if arten_g[i % 3] == "belegt" else None,
             "k": None if arten_g[i % 3] == "nicht_datiert" else klasse_von(jahr(i)), "g": arten_g[i % 3], "d": i % 3 == 0,
-            "q": None if arten_g[i % 3] == "nicht_datiert" else "bsp", "s": [1, 4, 6][i % 3]}}
+            "q": None if arten_g[i % 3] == "nicht_datiert" else "bsp", "s": [1, 4, 6][i % 3], "h": 3 + (i * 7) % 30, "hq": ["kataster", "geschosse", "ersatz"][i % 3]}}
             for i, f in enumerate(g52)]})
 
 

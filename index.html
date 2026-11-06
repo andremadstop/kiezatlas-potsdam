@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="kopf-zwei">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,10 +25,19 @@
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Abschnitte">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html" aria-current="true"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Abschnitte der Startseite">
     <ul>
-      <li><a class="nav nav--karte" href="karte.html"><span>Karte frei erkunden</span></a></li>
       <li><a class="nav" href="#fragen"><span>Fragen</span></a></li>
       <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
       <li><a class="nav" href="#schaugrafik"><span>Schaugrafik</span></a></li>
@@ -72,21 +81,21 @@
     <li class="frage" id="frage-1" data-schritt="1">
       <p class="frage__nr">Frage 1</p>
       <h2 class="frage__titel">Wie viele Menschen wohnen in meiner Nachbarschaft?</h2>
-      <p>Jetzt richtet sich die Stadt auf. Jede Säule ist eine Zelle des Zensus-Gitters, 100 mal 100 Meter; je höher und dunkler, desto mehr Menschen wohnen darin. Die vollste Zelle liegt im Stadtteil <b data-q="ew-max-teil"></b> mit <b data-q="ew-max"></b> Einwohnern, in der Hälfte aller Zellen sind es höchstens <span data-q="ew-median"></span>.</p>
+      <p>Jetzt richtet sich die Stadt auf. Jede Säule ist eine Zelle des Zensus-Gitters, 100 mal 100 Meter; je höher und dunkler, desto mehr Menschen wohnen darin. Beim Zensus im Mai 2022 lag die vollste Zelle im Stadtteil <b data-q="ew-max-teil"></b> mit rund <b data-q="ew-max"></b> Einwohnern; in der Hälfte aller Zellen waren es höchstens <span data-q="ew-median"></span>.</p>
       <p class="frage__kann"><b>So geht’s:</b> Eine Säule anklicken oder antippen zeigt ihre Werte mit Quelle. Verschieben durch Ziehen, zoomen per Doppelklick oder mit den Knöpfen rechts; am Handy mit zwei Fingern.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
     </li>
     <li class="frage" id="frage-2" data-schritt="2">
       <p class="frage__nr">Frage 2</p>
       <h2 class="frage__titel">Wie alt ist meine Nachbarschaft?</h2>
-      <p>Das Gitter zeigt nun das Durchschnittsalter je Zelle. Unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern ist der Anteil der Menschen ab 65 im Stadtteil <b data-q="alt-hoch"></b> am höchsten (<span data-q="alt-hoch-wert"></span>) und im Stadtteil <b data-q="alt-tief"></b> am niedrigsten (<span data-q="alt-tief-wert"></span>); für ganz Potsdam sind es <span data-q="alt-stadt"></span>.</p>
+      <p>Das Gitter zeigt nun das Durchschnittsalter je Zelle. Unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern ist der Anteil der Menschen ab 65 im Stadtteil <b data-q="alt-hoch"></b> am höchsten (<span data-q="alt-hoch-wert"></span>) und im Stadtteil <b data-q="alt-tief"></b> am niedrigsten (<span data-q="alt-tief-wert"></span>); für ganz Potsdam sind es <span data-q="alt-stadt"></span> (Zensus, Mai 2022).</p>
       <p class="frage__kann"><b>So geht’s:</b> Das Thema wechselt in der Leiste über der Karte. Die Legende erklärt Farben und Höhen; grau und flach sind Zellen, deren Wert zu unscharf ist.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="2"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
     </li>
     <li class="frage" id="frage-3" data-schritt="3">
       <p class="frage__nr">Frage 3</p>
       <h2 class="frage__titel">Wo wohnen die meisten Kinder?</h2>
-      <p>Die meisten Kinder und Jugendlichen unter 18 leben im Stadtteil <b data-q="kind-teil"></b>: <span data-q="kind-zahl"></span> von <span data-q="kind-nenner"></span> Einwohnern, also <span data-q="kind-anteil"></span>. <span data-q="kind-anteilig"></span></p>
+      <p>Die meisten Kinder und Jugendlichen unter 18 lebten im Mai 2022 im Stadtteil <b data-q="kind-teil"></b>: rund <span data-q="kind-zahl"></span> von rund <span data-q="kind-nenner"></span> Einwohnern, also <span data-q="kind-anteil"></span>. <span data-q="kind-anteilig"></span></p>
       <p class="frage__kann"><b>So geht’s:</b> Einen Stadtteil wählen per Klick in die Karte, in der Liste der Stadtteile oder im Steckbrief. Kennzahlen und Verteilungen weiter unten folgen der Auswahl.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="3"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
     </li>
@@ -94,13 +103,13 @@
       <p class="frage__nr">Frage 4</p>
       <h2 class="frage__titel">Wie alt sind die Häuser in meinem Stadtteil?</h2>
       <p>Gefärbt ist jetzt der Anteil der Wohnungen in Gebäuden von vor 1949. Im Stadtteil <b data-q="altbau-teil"></b> sind es <span data-q="altbau-wert"></span>, in ganz Potsdam <span data-q="altbau-stadt"></span>.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der Zahl der Geschosse genähert.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m).</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="4" data-gebaeude="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Gebäude in 3D zeigen</span></button>
     </li>
     <li class="frage" id="frage-5" data-schritt="5">
       <p class="frage__nr">Frage 5</p>
       <h2 class="frage__titel">Womit wird bei uns geheizt?</h2>
-      <p>In Potsdam hängen <span data-q="fern-stadt"></span> der Wohnungen an der Fernwärme. Am höchsten ist der Anteil im Stadtteil <b data-q="fern-hoch"></b> (<span data-q="fern-hoch-wert"></span>), am niedrigsten im Stadtteil <b data-q="fern-tief"></b> (<span data-q="fern-tief-wert"></span>), jeweils unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern.</p>
+      <p>Im Mai 2022 hingen in Potsdam <span data-q="fern-stadt"></span> der Wohnungen an der Fernwärme. Am höchsten ist der Anteil im Stadtteil <b data-q="fern-hoch"></b> (<span data-q="fern-hoch-wert"></span>), am niedrigsten im Stadtteil <b data-q="fern-tief"></b> (<span data-q="fern-tief-wert"></span>), jeweils unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern.</p>
       <p class="frage__kann"><b>So geht’s:</b> Das Luftbild der Landesvermessung ersetzt auf Wunsch die graue Hintergrundkarte; so wird sichtbar, welche Bebauung hinter den Säulen steht.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="5" data-luftbild="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Luftbild einblenden</span></button>
     </li>
@@ -120,11 +129,11 @@
     <li class="frage" id="frage-8" data-schritt="8">
       <p class="frage__nr">Frage 8</p>
       <h2 class="frage__titel">Wie weit ist es zur nächsten Kita?</h2>
-      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie. Dazu kommt je Planungsraum der Stadt eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
+      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie und als Fußweg auf dem Wegenetz aus OpenStreetMap. Der Knopf öffnet den Planer mit dem Fußweg zur nächsten Kita. Dazu kommt je Planungsraum der Stadt eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
       <p class="frage__kann"><b>Mehr dazu:</b> Die Planer-Seite zeigt Einrichtungen und Entfernungen. Unter Daten liegen dieselben Werte als GeoPackage und CSV für QGIS.</p>
       <div class="frage__knoepfe">
         <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="8"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Kinder auf der Karte zeigen</span></button>
-        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
+        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita&amp;weg=fuss"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
       </div>
     </li>
     <li class="frage" id="frage-9" data-schritt="9">
@@ -182,7 +191,7 @@
 <section class="schaugrafik" id="schaugrafik" aria-labelledby="h-schau">
   <div class="schau__kopf">
     <h2 id="h-schau" class="abschnitt">Schaugrafik für den Druck</h2>
-    <p class="abschnitt__unter">Ein Gebiet oder bis zu vier zum Vergleich, die gewünschten Rubriken und ein Format wählen. Die Grafik entsteht im Browser aus denselben Daten wie die Seite, ohne Kartenkacheln, mit Quellenvermerk und Lizenz.</p>
+    <p class="abschnitt__unter">Ein Gebiet oder bis zu vier zum Vergleich, die gewünschten Rubriken und ein Format wählen. Die Grafik entsteht im Browser aus denselben Daten wie die Seite, ohne Kartenkacheln, mit Quellenvermerk und Lizenz. Abdruck in Heft, Zeitung oder Vorlage ist erlaubt (CC BY 4.0), mit der Bildzeile unten auf der Grafik: Kiezatlas Potsdam, souverain-systems.de/kiezatlas, dazu die Datenquellen.</p>
   </div>
   <form class="schau__form" id="schau-form" aria-label="Schaugrafik einstellen">
     <fieldset class="schau__gebiete">
@@ -265,8 +274,12 @@
       <p>Der Zensus verändert Fallzahlen mit der Cell-Key-Methode stochastisch leicht. Summen über viele Zellen weichen deshalb etwas von amtlichen Gebietssummen ab, kleine Einzelwerte sind unscharf; in einzelnen Zellen ergeben Anteile sogar mehr als 100 %. Die Einwohnerzahl ist darum gerundet. Anteile werden nur innerhalb derselben Zensus-Tabelle gebildet.</p>
     </div>
     <div>
+      <h3>Was die Zahlen nicht sagen</h3>
+      <p>Alle Zahlen zu Menschen und Wohnungen sind ein Bild vom 15. Mai 2022 (Zensus). Wer danach zugezogen ist oder in einem später bezogenen Neubaugebiet wohnt, etwa in Krampnitz oder im Bornstedter Feld, fehlt. Die Stadt zählt ihre Einwohner nach dem Melderegister und kommt deshalb auf andere Zahlen; der Steckbrief zeigt diesen Vergleich als Gegenprobe. Einzelne Zellen sind durch die Geheimhaltung leicht verändert und sagen nichts Sicheres über ein einzelnes Haus. Die Summe der Zellen weicht vom amtlichen Gemeindeergebnis um 0,07 % ab (182.673 gegen 182.806 Einwohner, Beleg <code>belege/A1_gemeindeabgleich_20261105.md</code>).</p>
+    </div>
+    <div>
       <h3>Säulen, Farben, Gebäude</h3>
-      <p>Farbe und Höhe einer Säule zeigen denselben Wert: Einwohner über die Wurzel, damit wenige dichte Zellen nicht alles überragen; Anteile bis 100 %. Zellen mit weniger als zehn Personen bzw. Wohnungen liegen flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist genähert, Geschosszahl mal 3 m. Gemessene Höhen (LoD2) gibt es bisher nur in der Einzelfassung für Potsdam-West.</p>
+      <p>Farbe und Höhe einer Säule zeigen denselben Wert: Einwohner über die Wurzel, damit wenige dichte Zellen nicht alles überragen; Anteile bis 100 %. Zellen mit weniger als zehn Personen bzw. Wohnungen liegen flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist die Objekthöhe aus dem Kataster (ALKIS, über dem Gelände, bei 50.356 von 52.309 Gebäuden), sonst die Geschosszahl mal 3 m (73 Gebäude) oder ein Ersatzwert von 3 m (1.880, meist Nebengebäude); das Popup nennt die Herkunft je Gebäude. Dächer sind flach dargestellt.</p>
     </div>
   </div>
 </section>
@@ -276,10 +289,10 @@
   <h2 id="h-quellen" class="abschnitt">Quellen und Lizenzen</h2>
   <ul class="quellen">
     <li>Zensus 2022, Gitterzellen 100 m (Bevölkerungszahl; Alter in 5 Altersklassen; Durchschnittsalter; Energieträger der Heizung; überwiegende Heizungsart; Wohnungen nach modifizierten Mikrozensus-Baujahresklassen). <span class="vermerk">© Statistische Ämter des Bundes und der Länder, 2024 bzw. 2025</span>; Destatis: freie Nutzung mit Namensnennung, in Open-Data-Katalogen als <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> geführt. Daten verändert (eigene Berechnung: Zuordnung zu Stadtteilen, Summen, Anteile). Datensätze: <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_inhalt.html">Destatis, Gitterdaten Zensus 2022</a>.</li>
-    <li>Stadtteile in Potsdam. Landeshauptstadt Potsdam, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/zero-2-0">dl-zero-de/2.0</a>. Datensatz: <a href="https://opendata.potsdam.de/explore/dataset/stadtteile/">opendata.potsdam.de/explore/dataset/stadtteile</a> (von Hand heruntergeladen).</li>
-    <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse, Höhe genähert). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
+    <li>Stadtteile in Potsdam. Landeshauptstadt Potsdam, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/zero-2-0">dl-de/zero-2-0</a>. Datensatz: <a href="https://opendata.potsdam.de/explore/dataset/stadtteile/">opendata.potsdam.de/explore/dataset/stadtteile</a> (von Hand heruntergeladen).</li>
+    <li>Gebäudeumrisse: ALKIS vereinfacht. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert: vereinfachte Umrisse; Höhe = ALKIS-Objekthöhe aus dem NAS-Auszug der LGB, wo vorhanden, sonst Geschosse × 3 m bzw. 3 m). Dienst: <code>https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs</code>.</li>
     <li>Luftbild: Digitale Orthophotos DOP20. <span class="vermerk">© GeoBasis-DE/LGB</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. Dienst: <code>https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms</code>.</li>
-    <li>Hintergrundkarte: basemap.de Web Raster grau. <span class="vermerk">© basemap.de / BKG</span>, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
+    <li>Grundkarte: basemap.de Web Vektor, Auszug aus dem Kartenstil „bm_web_gry“, verändert (ohne Gebäude, eigene Ebenen dazwischen). <span class="vermerk">© GeoBasis-DE / BKG (2026)</span>, <a href="https://www.bkg.bund.de">BKG</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. <a href="https://basemap.de">basemap.de</a>.</li>
     <li>Planer und Bauzeiten: Kita- und Schulstandorte <span class="vermerk">© Ministerium für Bildung, Jugend und Sport</span>; Flächennutzung und Gebäudemerkmale aus ALKIS <span class="vermerk">© GeoBasis-DE/LGB</span>; jeweils <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung). Planungsräume <span class="vermerk">© Landeshauptstadt Potsdam</span>, Stand 31.12.2025, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert. Haltestellen und Takte <span class="vermerk">VBB Verkehrsverbund Berlin-Brandenburg GmbH</span>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Daten verändert (eigene Berechnung). Richtwerte aus dem Nahverkehrsplan 2019 und dem Potsdamer Baulandmodell 2019, Bauzeiten der Großsiedlungen aus „Potsdamer Platte“ (2008), jeweils nur Zahlen mit Fundstelle. Alle Dateien mit Vermerk: <a href="planer-daten.html">Daten</a>.</li>
     <li>Gegenproben: Regionaldatenbank Deutschland, Tabelle 12411-01-01-5-B (Bevölkerungsstand Potsdam); Landeshauptstadt Potsdam, „Stadtteile im Blick 2022“, S. 26 (Potsdam West). Je eine Zahl übernommen.</li>
     <li>Werkzeuge: Geodaten-Import-Pipeline (Apache-2.0, <a href="https://github.com/andremadstop/geodaten-import-pipeline">github.com/andremadstop/geodaten-import-pipeline</a>), PostgreSQL mit PostGIS, MapLibre GL JS 4.7.1 (BSD-3-Clause), GSAP 3.15.1 (GreenSock Standard License). Schrift: Barlow und Barlow Semi Condensed (SIL Open Font License 1.1).</li>
@@ -290,8 +303,9 @@
 <footer class="fuss-seite">
   <p class="fuss-seite__marke" aria-hidden="true">Kiezatlas Potsdam</p>
   <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
-  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
+  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln und die Schrift der Kartenbeschriftung von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
   <p class="fuss-seite__links"><a class="link" href="planer.html">Planer</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
 </footer>
 
 <div id="druck" aria-hidden="true"></div>
@@ -303,6 +317,7 @@
 <script defer src="vendor/gsap.min.js"></script>
 <script defer src="vendor/ScrollTrigger.min.js"></script>
 <script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/grundkarte.js"></script>
 <script defer src="themen.js"></script>
 <script defer src="atlas.js"></script>
 <script defer src="schaugrafik.js"></script>

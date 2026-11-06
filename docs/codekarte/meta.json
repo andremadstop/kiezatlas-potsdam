@@ -1,0 +1,3 @@
+{"datei": "kiezatlas-potsdam-77bd0d6.cc.json.gz", "ref": "77bd0d6", "commit": "77bd0d656119d46074826929469d1f36a846f19c", "erzeugt": "2026-11-06T05:10:54Z",
+ "werkzeug": "codecharta/codecharta-analysis@sha256:ae97d9425ef81c00b52947a1d9d1c7cad1346204a3a288ef4fb90f07b7efd2b1", "ausgeschlossen": ["/vendor/", "/daten/", "/fonts/"], "autoren": false,
+ "begriffspruefung": false}

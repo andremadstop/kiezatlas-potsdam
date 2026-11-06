@@ -182,7 +182,11 @@ def main() -> int:
         kl = next(w for w in RL["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
         kf = next(w for w in RF["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
         ok("Obergrenze" in kl["unsicherheit"], "Randhinweis an der Luftlinie")
-        ok("Obergrenze" not in kf["unsicherheit"], "kein Luftlinien-Randhinweis am Fußweg")
+        # Seit Nachlauf N1/N4 (05.11.) hat der Fußweg einen eigenen Randhinweis (nach der Luftlinie gezählt, beim
+        # Fußweg können es mehr sein); verboten bleibt der Luftlinien-Wortlaut am Fußweg
+        ok("die Entfernung nur eine Obergrenze" not in kf["unsicherheit"]
+           and "der Fußweg nur eine Obergrenze" in kf["unsicherheit"] and "gezählt nach der Luftlinie" in kf["unsicherheit"],
+           "kein Luftlinien-Randhinweis am Fußweg, sondern der eigene Fußweg-Hinweis")
 
         PL = p.planer_datei(d, rw, "luftlinie", {}, prog, meld)
         PF = p.planer_datei(d, rw, "fussweg", {}, prog, meld)
@@ -308,6 +312,73 @@ def main() -> int:
         dh["erreichbar"]["fussweg"]["haltestelle"] = {g: 300.0 for g in ids}
         ok("vbb" in p.erreichbar_datei(dh, rw, "fussweg", ids)["quellen"] and "vbb" not in EF["quellen"],
            "Fußweg mit Haltestellen nennt die VBB-Quelle (N1)")
+
+        # Audit 06.11.2026 (K4, K14, K24, K27, K28, K32)
+        dk = beispiel()
+        dk["einrichtungen"].append({**dk["einrichtungen"][2], "id": "p1", "art": "sek1", "unterart": "G/S",
+                                    "name": "Beispiel-Oberschule mit Primarstufe (unecht)", "schueler": 400})
+        dk["einrichtungen"].append({**dk["einrichtungen"][0], "id": "k1#haus2", "plaetze": None, "raum": "B"})
+        dk["ziel"] = {"luftlinie": defaultdict(dict), "fussweg": defaultdict(dict)}
+
+        class CurP:
+            def execute(self, sql, par=None):
+                self.par = par
+
+            def fetchall(self):
+                return [(g, 100.0, "p1") for g in self.par[1]]   # Schule mit Primarstufe 100 m von jeder Zelle
+
+        alt_zu = p.fussweg_zu
+        try:
+            p.fussweg_zu = lambda cur, wo, par, art: {g: 150.0 for g in ids}
+            mp: list[str] = []
+            p.primarstufe_einrechnen(CurP(), dk, rw, mp)
+        finally:
+            p.fussweg_zu = alt_zu
+        ok([dk["erreichbar"]["luftlinie"]["grundschule"][g] for g in ids] == [100.0] * 4
+           and [dk["erreichbar"]["fussweg"]["grundschule"][g] for g in ids] == [150.0] * 4
+           and dk["erreichbar"]["luftlinie"]["kita"][ids[0]] == 200 and mp and "p1" in mp[0],
+           "K4: Schule mit Primarstufe als Grundschulziel, je Zelle das nähere Ziel, andere Arten unverändert")
+        PK = p.planer_datei(dk, rw, "luftlinie", {}, {}, [])
+        AK = {(w["kennzahl"], w["art"]): w for w in PK["raeume"]["A"]["werte"]}
+        sk = AK[("schueler_je_kind", "grundschule")]
+        ok(sk["wert"] is None and sk["zaehler"] is None
+           and sk["unsicherheit"].startswith("Schule mit Primarstufe im Raum, Schülerzahl nicht nach Stufe teilbar")
+           and "Betriebserlaubnis" not in sk["unsicherheit"] and "wie oben" not in sk["unsicherheit"]
+           and sk["status"] == "orientierung",
+           "K4: Grundschüler je Kind ohne Wert mit Grund im ersten Satz, ohne Kita-Bausteine, Status Orientierung")
+        ok(AK[("ew_je_einrichtung", "grundschule")]["nenner"] == 2
+           and "mit Primarstufe" in AK[("ew_je_einrichtung", "grundschule")]["unsicherheit"],
+           "K4: Einwohner je Grundschulstandort zählt die Schule mit Primarstufe mit")
+        pb = AK[("plaetze_je_bedarf", "kita")]
+        ok(pb["status"] == "orientierung" and "Abweichend von Nr. 3.4.4" in pb["unsicherheit"],
+           "K7: Plätze je Bedarfsplatz Orientierung mit Satz zu Nr. 3.4.4")
+        ok("wie viele frei sind, steht nicht in den Daten" in pb["unsicherheit"]
+           and "nicht belegte" not in json.dumps(PK, ensure_ascii=False), "K8: Wortlaut genehmigte Plätze")
+        pk_ = AK[("plaetze_je_kind", "kita")]
+        ok(pk_["zaehler"] == 30 and pk_["nenner"] == 30 and pk_["zaehler_text"] and pk_["nenner_text"]
+           and pb["differenz"] == p.rund(70 - bedarf, 10) and pb["zaehler"] == 70 and pb["nenner"] == p.rund(bedarf, 10),
+           "K14: Zähler, Nenner und Differenz (Plätze genau, Personen und Bedarf auf 10)")
+        fein_Bk = [w for w in PK["raeume"]["B"]["werte"]
+                   if "zaehler" in w and w["wert"] is None and w["kennzahl"] != "ew_je_einrichtung"]
+        ok(fein_Bk and all(w["zaehler"] is None and w["nenner"] is None for w in fein_Bk)
+           and PK["raeume"]["B"]["kinder"] is None and PK["raeume"]["A"]["kinder"] == {"u3": 20, "3_bis_5": 20,
+                                                                                      "6_bis_unter_12": 30},
+           "K14: ohne Wert keine Zähler und Nenner, Kinder je Raum nur ab der Mindestgröße")
+        G = PK["gesamt"]
+        gk = {(w["kennzahl"], w["art"]): w for w in G["werte"]}
+        gp = gk[("plaetze_je_kind", "kita")]
+        ok(G["name"] == "Potsdam" and gp["zaehler"] == 30 and "1 von 2 Raumeinheiten, ohne B" in gp["unsicherheit"]
+           and gk[("schueler_je_kind", "grundschule")]["wert"] is None and G["kinder"] is None,
+           "K24: gesamt aus veröffentlichten Zählern und Nennern, Raumeinheiten ohne Wert genannt")
+        ok("Häuser in den Raumeinheiten A und B" in pb["unsicherheit"]
+           and "Häuser in den Raumeinheiten A und B" in
+           next(w for w in PK["raeume"]["B"]["werte"] if w["kennzahl"] == "plaetze_je_bedarf")["unsicherheit"],
+           "K27: Kita mit Häusern in zwei Raumeinheiten in beiden genannt")
+        ok(set(PK["pruefwerte"]) == set(p.PRUEFWERTE) and PK["pruefwerte"]["landfilter_haltepunkte"]["wert"] == 1800
+           and not ({"osm_kita_vollstaendig", "fussweg_umweg_median"} & set(PK["pruefwerte"])),
+           "K28: Prüfwerte aus den Belegen gelesen")
+        ok(p.fahrplan_text(rw) == "Fahrplan für Dienstag, 10.11.2026 (Schultag), 6 bis 9 Uhr (GTFS gültig ab "
+           "3.11.2026)", "K32: Fahrplantext aus config/richtwerte.yaml")
 
         # Dateien schreiben und mit den Regeln von daten.py prüfen
         (tmp / "zellen.js").write_text(

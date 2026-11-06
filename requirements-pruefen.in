@@ -1,0 +1,3 @@
+# Zusätzlich für die pytest-Prüfungen (pruefen/a3_test_osm.py, pruefen/a5b_test_fussweg.py).
+#   uv pip compile --offline --generate-hashes --python-version 3.13 requirements-pruefen.in -o requirements-pruefen.txt
+pytest==9.2.0

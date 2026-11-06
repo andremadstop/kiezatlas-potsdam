@@ -222,9 +222,10 @@ function fuss(o, x, w, klein) {
   ["alter", "baujahr", "heizung", "energie"].forEach(function (k) { if (o.rubriken[k]) zensus(g.verteilungen[k].quelle); });
   if (o.rubriken.karte && o.kartenthema !== "stadtteile") zensus(K.stadt.kacheln[0].quelle);
   Object.keys(z).forEach(function (b) { teile.push(b + "; eigene Auswertung (" + z[b].join(", ") + ")."); });
-  teile.push("Stadtteile: © Landeshauptstadt Potsdam, Stand 31.12.2025, dl-zero-de/2.0.");
+  teile.push("Stadtteile: © Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/zero-2-0.");
   if (o.rubriken.gebaeude) teile.push("Gebäude: ALKIS vereinfacht, © GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert).");
-  teile.push("Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt). Auswertung vom " + new Date(K.stand_auswertung).toLocaleDateString("de-DE") + ".");
+  teile.push("Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), souverain-systems.de/kiezatlas. Auswertung vom " + new Date(K.stand_auswertung).toLocaleDateString("de-DE") + ".");
+  teile.push("Grafik: CC BY 4.0 (creativecommons.org/licenses/by/4.0). Abdruck und Weitergabe mit dieser Bildzeile; die Daten behalten die oben genannten Lizenzen.");
   var pt = klein ? 6 : 6.5, s = "", h = 2.5;
   teile.forEach(function (tx) { var t = zeilen(x, h, tx, w, { pt: pt, fill: MUTED, lh: 1.25 }); s += t.s; h += t.h + 0.6; });
   return { s: s, h: h };

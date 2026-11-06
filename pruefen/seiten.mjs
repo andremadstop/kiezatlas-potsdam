@@ -25,12 +25,29 @@ const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? proces
 const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));
 const AXE = fs.readFileSync(path.join(HIER, "..", "node_modules", "axe-core", "axe.min.js"), "utf8");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
   ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json" };
 
 const befunde = [];
 const bericht = { stand: new Date().toISOString(), wurzel: WURZEL, seiten: [] };
 function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if (!ok) befunde.push(text); return ok; }
+
+// ---------- Textstellen, die nicht wiederkommen dürfen (Audit 06.11.2026, berichte/audit_20261106.md)
+{
+  const VERBOTEN = [
+    [/Höhe = Geschosse × 3 m|Höhe \(genähert\)|Geschosszahl mal 3 m\. Gemessene/, "K1: Gebäudehöhe als Geschosse × 3 m beschrieben (seit 06.11. Katasterhöhe mit Herkunft je Gebäude)"],
+    [/zugeordnet über die Nummer der Denkmalliste oder/, "K2: Denkmallisten-Nummer als Zuordnungsweg genannt (nur Prüfung)"],
+  ];
+  const DATEIEN = ["index.html", "karte.html", "planer.html", "planer-methode.html", "planer-daten.html", "jahre.html", "jahre-methode.html",
+    "jahre-daten.html", "atlas.js", "karte.js", "planer.js", "jahre.js", "themen.js", "schaugrafik.js"];
+  console.log("Textstellen (Audit)");
+  for (const [re, was] of VERBOTEN) {
+    const treffer = DATEIEN.filter((f) => re.test(fs.readFileSync(path.join(WURZEL, f), "utf8")));
+    pruef(treffer.length === 0, `${was}${treffer.length ? ": " + treffer.join(", ") : ""}`);
+  }
+}
 
 // ---------- eigener Prüfserver, nur 127.0.0.1, nur Dateien unter WURZEL
 const server = http.createServer((q, a) => {
@@ -60,7 +77,7 @@ async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 
   await page.route("**/*", (r) => {
     const u = r.request().url();
     if (eigen(u)) return r.continue();
-    abgewiesen.push(u); return r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD });
+    abgewiesen.push(u); return r.fulfill(fremdAntwort(r.request().url()));
   });
   page.on("console", (m) => {
     if (m.type() !== "error") return;
@@ -205,6 +222,25 @@ async function bewegung() {
   await r.ctx.close();
 }
 
+// ---------- K31: gleiche erste Kopfzeile auf allen Seiten (Start · Karte · Planer · Bauzeiten), der eigene Teil mit aria-current
+{
+  const TEILE = ["index.html", "karte.html", "planer.html", "jahre.html"];
+  const SEITEN = { "index.html": "index.html", "karte.html": "karte.html", "planer.html": "planer.html", "planer-methode.html": "planer.html",
+    "planer-daten.html": "planer.html", "jahre.html": "jahre.html", "jahre-methode.html": "jahre.html", "jahre-daten.html": "jahre.html", "404.html": null };
+  // jahre-methode.html gehört im Audit-Durchgang einer anderen Gruppe; bis ihr Kopf nachgezogen ist, nur Hinweis statt Befund
+  const AUSSTEHEND = new Set([]);
+  console.log("Kopfzeile (K31)");
+  for (const [datei, eigen] of Object.entries(SEITEN)) {
+    const t = fs.readFileSync(path.join(WURZEL, datei), "utf8");
+    const nav = (t.match(/<nav class="kopf-haupt"[^>]*>([\s\S]*?)<\/nav>/) || [])[1] || "";
+    const links = [...nav.matchAll(/<a class="nav" href="([^"]+)"([^>]*)>/g)].map((m) => ({ href: m[1], aktuell: /aria-current/.test(m[2]) }));
+    const ok = JSON.stringify(links.map((l) => l.href)) === JSON.stringify(TEILE)
+      && JSON.stringify(links.filter((l) => l.aktuell).map((l) => l.href)) === JSON.stringify(eigen ? [eigen] : []);
+    const text = `${datei}: erste Kopfzeile ${links.map((l) => l.href.replace(".html", "") + (l.aktuell ? "*" : "")).join(" · ") || "fehlt"}`;
+    if (!ok && AUSSTEHEND.has(datei)) console.log("  offen " + text + " (Datei außerhalb dieses Durchgangs)");
+    else pruef(ok, text);
+  }
+}
 try {
   await startseite(FILE, "file://");
   await startseite(HTTP, "HTTP");

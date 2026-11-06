@@ -27,7 +27,7 @@ Stand 2026-11-05. Erzeugt von `skripte/24_jahre_kaskade.py ruecktest`. Regeln vo
 
 ## Rücktest
 
-Die Prüfgebäude gehen in keine Stufe ein: Wikipedia-Jahre sind nur Prüfspalte (Korrektur 5), die B3-Referenz stammt aus einer Sichtprüfung von Luftbildern. Seit dem Wikidata-Export rechnet der Rücktest die Kaskade ein zweites Mal **ohne Stufe 1** (Protokoll, Nachtrag N3): Kein Prüfgebäude kennt dort sein genaues Jahr, die Wikidata-Jahre werden selbst zum dritten Prüfsatz. Die Stufen in den Tabellen sind die dieses Laufs. Gemessen wird die Klasse aus der Kaskade gegen die bekannte Bauzeit. **Treffer** = geschätzte Klasse überschneidet die bekannte Spanne. **Abstand** = Jahre zwischen Klassenspanne und bekannter Spanne (0 bei Treffer; „vor 1919“ und „ab 2020“ sind nach einer Seite offen).
+Die Prüfgebäude gehen in keine Stufe ein: Wikipedia-Jahre sind nur Prüfspalte (Korrektur 5), die B3-Referenz stammt aus einer Sichtprüfung von Luftbildern durch einen KI-Agenten (Claude, 05.11.2026), ohne zweite Bewertung; Referenz und Luftbildklammer lesen dieselben Bilder (pruefen/B3_protokoll.md). Seit dem Wikidata-Export rechnet der Rücktest die Kaskade ein zweites Mal **ohne Stufe 1** (Protokoll, Nachtrag N3): Kein Prüfgebäude kennt dort sein genaues Jahr, die Wikidata-Jahre werden selbst zum dritten Prüfsatz. Die Stufen in den Tabellen sind die dieses Laufs. Gemessen wird die Klasse aus der Kaskade gegen die bekannte Bauzeit. **Treffer** = geschätzte Klasse überschneidet die bekannte Spanne. **Abstand** = Jahre zwischen Klassenspanne und bekannter Spanne (0 bei Treffer; „vor 1919“ und „ab 2020“ sind nach einer Seite offen).
 
 ### Sichtprüfung Luftbilder Bornstedt (B3-Referenz): 193 Gebäude
 

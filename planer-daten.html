@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="kopf-zwei">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,13 +16,22 @@
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten des Planers">
     <ul>
-      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
-      <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer.html"><span>Versorgung</span></a></li>
       <li><a class="nav" href="planer-methode.html"><span>Methode</span></a></li>
-      <li><a class="nav" href="planer-daten.html" aria-current="true"><span>Daten</span></a></li>
+      <li><a class="nav" href="planer-daten.html" aria-current="page"><span>Daten</span></a></li>
     </ul>
   </nav>
 </header>
@@ -76,7 +85,7 @@
     <li data-datei="stadtteile.js" data-schema="stadtteile.json" data-da="ja" data-odbl="nein">
       <a class="datei link" href="daten/stadtteile.js">stadtteile.js</a><span class="stand">vorhanden</span>
       <p class="was">Die amtlichen Stadtteile mit Nummer, Name und Fläche.</p>
-      <p class="lizenz">© Landeshauptstadt Potsdam, dl-zero-de/2.0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, dl-de/zero-2-0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
     </li>
     <li data-datei="planungsraeume.js" data-schema="planungsraeume.json" data-da="ja" data-odbl="nein">
       <a class="datei link" href="daten/planungsraeume.js">planungsraeume.js</a><span class="stand">vorhanden</span>
@@ -90,8 +99,13 @@
     </li>
     <li data-datei="gebaeude/*.js" data-schema="gebaeude.json" data-da="ja" data-odbl="nein">
       <a class="datei link" href="daten/gebaeude/11.js">gebaeude/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
-      <p class="was">Gebäudeumrisse je Stadtteil, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11).</p>
+      <p class="was">Gebäudeumrisse je Stadtteil mit Funktion, Geschosszahl und Höhe in Metern (ALKIS-Objekthöhe, sonst Geschosse × 3 m), eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11).</p>
       <p class="lizenz">© GeoBasis-DE/LGB, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="grundkarte.js" data-schema="grundkarte.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/grundkarte.js">grundkarte.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kartenstil der Grundkarte: gekürzter Auszug aus dem Stil „bm_web_gry“ von basemap.de Web Vektor (ohne Gebäude, ohne Bildsymbole). Enthält keine Geodaten; die Kacheln lädt der Browser bei sgx.geodatenzentrum.de. Erzeugt mit skripte/27_grundkarte.py.</p>
+      <p class="lizenz">© <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026), <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert.</p>
     </li>
   </ul>
 
@@ -119,23 +133,47 @@
   <ul class="dateiliste">
     <li data-export="gpkg" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.gpkg" download>kiezatlas_potsdam.gpkg</a><span class="stand">vorhanden</span>
       <p class="was">GeoPackage ohne OpenStreetMap-Anteil: Raumeinheiten mit Versorgungswerten, Versorgungstabelle, Einrichtungen, Zellen mit Entfernungen, Grünflächen, Haltestellen; QGIS-Stile sind eingebettet.</p>
-      <p class="lizenz">Je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
+      <p class="lizenz">Je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-de/zero-2-0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
     <li data-export="gpkg_odbl" data-da="ja" data-odbl="ja"><a class="datei link" href="daten/export/kiezatlas_potsdam_odbl.gpkg" download>kiezatlas_potsdam_odbl.gpkg</a><span class="stand">vorhanden</span>
-      <p class="was">GeoPackage mit OpenStreetMap-Anteil: Einrichtungen aus OpenStreetMap (ohne Namen), Zellen mit Fußweg zum nächsten Standort, Versorgungstabelle im Fußweg. Dieselben Ebenen als CSV: <a class="link" href="daten/export/csv_odbl/einrichtung_odbl.csv">einrichtung_odbl</a>, <a class="link" href="daten/export/csv_odbl/zelle_fuss_odbl.csv">zelle_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/versorgung_fuss_odbl.csv">versorgung_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/lizenz.csv">lizenz</a>.</p>
+      <p class="was">GeoPackage mit OpenStreetMap-Anteil: Einrichtungen aus OpenStreetMap (ohne Namen), Zellen mit Fußweg zum nächsten Standort, Versorgungstabelle im Fußweg. Dieselben Ebenen als CSV: <a class="link" href="daten/export/csv_odbl/einrichtung_odbl.csv">einrichtung_odbl</a>, <a class="link" href="daten/export/csv_odbl/zelle_fuss_odbl.csv">zelle_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/versorgung_fuss_odbl.csv">versorgung_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/lizenz.csv">lizenz</a>. Mit Dezimalkomma für Excel und LibreOffice: <a class="link" href="daten/export/csv_odbl_de/einrichtung_odbl.csv">einrichtung_odbl</a>, <a class="link" href="daten/export/csv_odbl_de/zelle_fuss_odbl.csv">zelle_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl_de/versorgung_fuss_odbl.csv">versorgung_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl_de/lizenz.csv">lizenz</a>.</p>
       <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz; amtliche Anteile und Haltestellen (VBB, CC BY 4.0) mit ihrem Vermerk in der Tabelle <code>lizenz</code>.</p></li>
     <li data-export="csv" data-da="ja" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand">vorhanden</span>
-      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
+      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>. Mit Dezimalpunkt, für GIS-Werkzeuge und Skripte.</p></li>
+    <li data-export="csv_de" data-da="ja" data-odbl="nein"><span class="datei">CSV für Excel und LibreOffice</span><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Ebenen mit Dezimalkomma und ohne Tausendertrenner. In Excel oder LibreOffice mit deutscher Einstellung diese Dateien öffnen, sonst werden Flächen und Quoten falsch gelesen: <a class="link" href="daten/export/csv_de/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv_de/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv_de/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv_de/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv_de/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv_de/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv_de/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv_de/lizenz.csv">lizenz</a>..</p></li>
     <li data-export="readme" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/README.md">README.md</a><span class="stand">vorhanden</span>
       <p class="was">Was in jeder Ebene steht, wie es berechnet ist, Vermerke und Lizenzen.</p></li>
     <li data-export="qgis" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.qgz" download>kiezatlas_potsdam.qgz</a><span class="stand">vorhanden</span>
       <p class="was">QGIS-Projekt mit relativen Pfaden; neben <code>kiezatlas_potsdam.gpkg</code> speichern, dann öffnet es die Ebenen mit denselben Klassen wie die Karte.</p></li>
-    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/steckbriefe/403.html">Steckbrief je Planungsraum</a><span class="stand">vorhanden</span>
-      <p class="was">Die Versorgungstabelle eines Planungsraums als Druckseite (A4, über den Druckdialog als PDF); eine Datei je Planungsraumnummer, der Link zeigt 403 Babelsberg Süd.</p></li>
+    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><span class="datei">Steckbrief je Planungsraum</span><span class="stand">vorhanden</span>
+      <p class="was">Die Versorgungstabelle eines Planungsraums als Druckseite (A4, über den Druckdialog als PDF), eine Datei je Planungsraum. Der Steckbrief rechnet Entfernungen in Luftlinie. Im Planer führt der Knopf „Steckbrief (A4)“ in der Versorgung des gewählten Planungsraums, über der Tabelle, zur passenden Datei.</p>
+      <ul class="steckbriefliste" aria-label="Steckbriefe der 19 Planungsräume">
+        <li><a class="link" href="daten/export/steckbriefe/101.html">101 Groß Glienicke, Sacrow</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/102.html">102 Neu Fahrland, Fahrland, Satzkorn, Marquardt, Uetz-Paaren</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/103.html">103 Krampnitz</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/201.html">201 Bornim, Bornstedt, Nedlitz, Am Ruinenberg, Rote Kasernen</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/202.html">202 Eiche, Grube, Golm</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/301.html">301 Nauener und Berliner Vorstadt</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/302.html">302 Innenstadt, Am Weinberg</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/303.html">303 Brandenburger Vorstadt</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/304.html">304 Potsdam West</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/401.html">401 Zentrum Ost, Nuthepark</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/402.html">402 Babelsberg Nord, Klein Glienicke</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/403.html">403 Babelsberg Süd</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/501.html">501 Stern</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/502.html">502 Drewitz</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/503.html">503 Alt Drewitz, Kirchsteigfeld</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/601.html">601 Hauptbahnhof, Brauhausberg, Templiner und Teltower Vorstadt</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/602.html">602 Schlaatz</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/603.html">603 Waldstadt I, Industriegelände</a></li>
+        <li><a class="link" href="daten/export/steckbriefe/604.html">604 Waldstadt II</a></li>
+      </ul></li>
   </ul>
 </main>
 
 <footer class="fuss-seite">
   <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-methode.html">Methode</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
 </footer>
 </body>
 </html>

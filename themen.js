@@ -26,7 +26,7 @@ THEMEN.forEach(aufnehmen);
 
 // ---------- Farben und Klassen
 var STUFEN = ["--k1", "--k2", "--k3", "--k4", "--k5"].map(function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); });
-var GRAU = "#d5d8d3";
+var GRAU = "#cdc8be";   // unscharf: warmes Grau, vom hellsten Blaugrün (--k1) im Farbton abgesetzt (Audit K6)
 // Prozent: feste Grenzen; sonst Quintile über die Werte, doppelte Grenzen entfallen
 function klassen(t, features) {
   if (t.einheit === "%") return { grenzen: [20, 40, 60, 80], min: 0, max: 100, fest: true };
@@ -123,7 +123,38 @@ var ebenen = {
   }
 };
 
+// ---------- Grundkarte: Vektorkarte von basemap.de statt der grauen Rasterkarte (daten/grundkarte.js, CC BY 4.0).
+// Ersetzt im Stil die Rasterebene "basemap" durch die Flächen und Linien (an ihrer Stelle) und hängt die
+// Beschriftungen oben an, bei o.vor vor dieser Ebene (z. B. Punkte, die über den Namen liegen sollen).
+// Fehlt daten/grundkarte.js, bleibt der Stil unverändert (Rasterkarte).
+var GK = window.KIEZ_GRUNDKARTE;
+function grundkarte(stil, o) {
+  if (!GK) return stil;
+  o = o || {};
+  var i = stil.layers.map(function (l) { return l.id; }).indexOf("basemap");
+  if (i < 0) return stil;
+  delete stil.sources.basemap;
+  stil.sources.bm = GK.quelle;
+  stil.glyphs = GK.glyphs;
+  var unten = GK.unten.map(function (l) { return Object.assign({}, l); }), oben = GK.oben.map(function (l) { return Object.assign({}, l); });
+  stil.layers.splice.apply(stil.layers, [i, 1].concat(unten));
+  var j = o.vor ? stil.layers.map(function (l) { return l.id; }).indexOf(o.vor) : -1;
+  if (j < 0) j = stil.layers.length;
+  stil.layers.splice.apply(stil.layers, [j, 0].concat(oben));
+  return stil;
+}
+// Luftbild an: Flächen und Linien der Grundkarte aus, Beschriftungen bleiben (mit Rand lesbar auf dem Foto)
+function grundLuft(map, an) {
+  var v = an ? "none" : "visible";
+  if (!GK) { if (map.getLayer("basemap")) map.setLayoutProperty("basemap", "visibility", v); return; }
+  GK.unten.forEach(function (l) { if (l.layout && l.layout.visibility === "none") return; if (map.getLayer(l.id)) map.setLayoutProperty(l.id, "visibility", v); });
+}
+
+// Herkunft der Gebäudehöhe (Feld hq in daten/gebaeude/*.js und daten/jahre/*.js)
+var HQ = { kataster: "Objekthöhe aus dem Kataster (ALKIS)", geschosse: "geschätzt: Geschosse × 3 m", ersatz: "Ersatzwert 3 m, keine Höhe im Kataster" };
+
 window.KIEZ_THEMEN = {
+  grundkarte: grundkarte, grundLuft: grundLuft, GRUNDKARTE: !!GK, HQ: HQ,
   THEMEN: THEMEN, THEMA: THEMA, HASH: HASH,
   STUFEN: STUFEN, GRAU: GRAU,
   KLASSEN: KLASSEN, klassen: klassen, klasse: klasse,

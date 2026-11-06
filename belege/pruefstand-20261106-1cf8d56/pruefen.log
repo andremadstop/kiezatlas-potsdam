@@ -1,0 +1,879 @@
+Kiezatlas Potsdam, Prüflauf 06.11.2026 07:06:28 CET
+Commit: 1cf8d56fa8ea442010fc166e0f3ba8511e037070
+Arbeitsstand: sauber (keine offenen Änderungen)
+Werkzeuge: uv 0.11.3 (x86_64-unknown-linux-gnu), node v22.23.4, Python 3.13.12
+
+== Syntax JavaScript (node --check)
+  12 Dateien, 0 mit Fehler
+-- Syntax JavaScript (node --check): grün, 1 s
+
+== Syntax Shell (sh -n)
+  4 Dateien, 0 mit Fehler
+-- Syntax Shell (sh -n): grün, 0 s
+
+== Syntax Python (ast)
+  50 Dateien, 0 mit Fehler
+-- Syntax Python (ast): grün, 1 s
+
+== Datenverträge und Summen (pruefen/daten.py)
+Summen und Kontrollen gegen kennzahlen.json
+  ok    kennzahlen.js und kennzahlen.json gleich
+  ok    zellen.js nach gitter_id sortiert (Grundlage der Zellreihenfolge)
+  ok    zellen.js ohne doppelte gitter_id (3443)
+  ok    Σ ew über zellen.js = Kachel Einwohner Stadt (182673 = 182673)
+  ok    Zahl der Zellen = stadt.zellen (3443 = 3443)
+  ok    Einwohner und Zellen je Stadtteil aus zellen.js = kennzahlen (32 Stadtteile, Abweichungen: [])
+  ok    Stadtteile in stadtteile.js = kennzahlen (32)
+  ok    Anteile der Kacheln = zaehler/nenner (Abweichungen: [])
+  ok    Σ Stadtteile einwohner = Stadt (182673)
+  ok    Gebäude je Stadtteil in gebaeude/<nr>.js = kennzahlen (Abweichungen: [])
+  ok    Σ Gebäude = kontrolle.gebaeude_in_potsdam = stadt.gebaeude.anzahl (52309)
+  ok    kontrolle: Gebäude im Rechteck (85046) ≥ in Potsdam
+  ok    grenzfall.stadt.mittelpunkt = Einwohner Stadt (182673)
+Datenverträge (15 Schemas)
+  ok    einrichtungen.js: Vertrag einrichtungen.json
+  ok    einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+  ok    erreichbar.js: Vertrag erreichbar.json
+  ok    erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+  ok    gebaeude/11.js: Vertrag gebaeude.json
+  ok    gebaeude/12.js: Vertrag gebaeude.json
+  ok    gebaeude/13.js: Vertrag gebaeude.json
+  ok    gebaeude/14.js: Vertrag gebaeude.json
+  ok    gebaeude/15.js: Vertrag gebaeude.json
+  ok    gebaeude/16.js: Vertrag gebaeude.json
+  ok    gebaeude/17.js: Vertrag gebaeude.json
+  ok    gebaeude/21.js: Vertrag gebaeude.json
+  ok    gebaeude/22.js: Vertrag gebaeude.json
+  ok    gebaeude/23.js: Vertrag gebaeude.json
+  ok    gebaeude/31.js: Vertrag gebaeude.json
+  ok    gebaeude/32.js: Vertrag gebaeude.json
+  ok    gebaeude/41.js: Vertrag gebaeude.json
+  ok    gebaeude/43.js: Vertrag gebaeude.json
+  ok    gebaeude/44.js: Vertrag gebaeude.json
+  ok    gebaeude/51.js: Vertrag gebaeude.json
+  ok    gebaeude/52.js: Vertrag gebaeude.json
+  ok    gebaeude/53.js: Vertrag gebaeude.json
+  ok    gebaeude/61.js: Vertrag gebaeude.json
+  ok    gebaeude/62.js: Vertrag gebaeude.json
+  ok    gebaeude/63.js: Vertrag gebaeude.json
+  ok    gebaeude/64.js: Vertrag gebaeude.json
+  ok    gebaeude/65.js: Vertrag gebaeude.json
+  ok    gebaeude/71.js: Vertrag gebaeude.json
+  ok    gebaeude/72.js: Vertrag gebaeude.json
+  ok    gebaeude/73.js: Vertrag gebaeude.json
+  ok    gebaeude/81.js: Vertrag gebaeude.json
+  ok    gebaeude/82.js: Vertrag gebaeude.json
+  ok    gebaeude/83.js: Vertrag gebaeude.json
+  ok    gebaeude/84.js: Vertrag gebaeude.json
+  ok    gebaeude/85.js: Vertrag gebaeude.json
+  ok    gebaeude/86.js: Vertrag gebaeude.json
+  ok    grundkarte.js: Vertrag grundkarte.json
+  ok    jahre/11.js: Vertrag jahre_gebaeude.json
+  ok    jahre/12.js: Vertrag jahre_gebaeude.json
+  ok    jahre/13.js: Vertrag jahre_gebaeude.json
+  ok    jahre/14.js: Vertrag jahre_gebaeude.json
+  ok    jahre/15.js: Vertrag jahre_gebaeude.json
+  ok    jahre/16.js: Vertrag jahre_gebaeude.json
+  ok    jahre/17.js: Vertrag jahre_gebaeude.json
+  ok    jahre/21.js: Vertrag jahre_gebaeude.json
+  ok    jahre/22.js: Vertrag jahre_gebaeude.json
+  ok    jahre/23.js: Vertrag jahre_gebaeude.json
+  ok    jahre/31.js: Vertrag jahre_gebaeude.json
+  ok    jahre/32.js: Vertrag jahre_gebaeude.json
+  ok    jahre/41.js: Vertrag jahre_gebaeude.json
+  ok    jahre/43.js: Vertrag jahre_gebaeude.json
+  ok    jahre/44.js: Vertrag jahre_gebaeude.json
+  ok    jahre/51.js: Vertrag jahre_gebaeude.json
+  ok    jahre/52.js: Vertrag jahre_gebaeude.json
+  ok    jahre/53.js: Vertrag jahre_gebaeude.json
+  ok    jahre/61.js: Vertrag jahre_gebaeude.json
+  ok    jahre/62.js: Vertrag jahre_gebaeude.json
+  ok    jahre/63.js: Vertrag jahre_gebaeude.json
+  ok    jahre/64.js: Vertrag jahre_gebaeude.json
+  ok    jahre/65.js: Vertrag jahre_gebaeude.json
+  ok    jahre/71.js: Vertrag jahre_gebaeude.json
+  ok    jahre/72.js: Vertrag jahre_gebaeude.json
+  ok    jahre/73.js: Vertrag jahre_gebaeude.json
+  ok    jahre/81.js: Vertrag jahre_gebaeude.json
+  ok    jahre/82.js: Vertrag jahre_gebaeude.json
+  ok    jahre/83.js: Vertrag jahre_gebaeude.json
+  ok    jahre/84.js: Vertrag jahre_gebaeude.json
+  ok    jahre/85.js: Vertrag jahre_gebaeude.json
+  ok    jahre/86.js: Vertrag jahre_gebaeude.json
+  ok    jahre_methode.js: Vertrag jahre_methode.json
+  ok    jahre_zellen.js: Vertrag jahre_zellen.json
+  ok    kennzahlen.js: Vertrag kennzahlen.json
+  ok    planer.js: Vertrag planer.json
+  ok    planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+  ok    planungsraeume.js: Vertrag planungsraeume.json
+  ok    stadtteile.js: Vertrag stadtteile.json
+  ok    zellen.js: Vertrag zellen.json
+Fixtures
+  ok    Fixture einrichtungen.js: Vertrag einrichtungen.json
+  ok    Fixture einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+  ok    Fixture erreichbar.js: Vertrag erreichbar.json
+  ok    Fixture erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+  ok    Fixture jahre/52.js: Vertrag jahre_gebaeude.json
+  ok    Fixture jahre_zellen.js: Vertrag jahre_zellen.json
+  ok    Fixture planer.js: Vertrag planer.json
+  ok    Fixture planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+
+0 Abweichungen
+-- Datenverträge und Summen (pruefen/daten.py): grün, 3 s
+
+== Vertrag Bauzeiten-Methode (pruefen/B5_methode.py)
+  ok    jahre_methode.js: Vertrag jahre_methode.json
+-- Vertrag Bauzeiten-Methode (pruefen/B5_methode.py): grün, 0 s
+
+== jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen)
+aktuell
+-- jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen): grün, 0 s
+
+== planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen)
+aktuell
+-- planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen): grün, 1 s
+
+== GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet)
+  ok    kiezatlas_potsdam.gpkg vorhanden
+
+[1] GeoPackage kiezatlas_potsdam.gpkg
+  ok    application_id = GPKG
+  ok    user_version 1.2 bis 1.4
+  ok    integrity_check ok
+  ok    foreign_key_check leer
+  ok    Pflichttabelle gpkg_spatial_ref_sys
+  ok    Pflichttabelle gpkg_contents
+  ok    Pflichttabelle gpkg_geometry_columns
+  ok    SRS -1, 0, 4326, 25833 eingetragen
+  ok    jede Zeile in gpkg_contents hat eine Tabelle
+  ok    einrichtung: SRS 25833 in gpkg_contents und geometry_columns
+  ok    einrichtung: 679 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+  ok    einrichtung: Hülle im Kopf = Hülle der Koordinaten
+  ok    einrichtung: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    einrichtung: Hülle in gpkg_contents umfasst alle Objekte
+  ok    gruenflaeche: SRS 25833 in gpkg_contents und geometry_columns
+  ok    gruenflaeche: 4892 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+  ok    gruenflaeche: Hülle im Kopf = Hülle der Koordinaten
+  ok    gruenflaeche: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    gruenflaeche: Hülle in gpkg_contents umfasst alle Objekte
+  ok    haltestelle: SRS 25833 in gpkg_contents und geometry_columns
+  ok    haltestelle: 315 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+  ok    haltestelle: Hülle im Kopf = Hülle der Koordinaten
+  ok    haltestelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    haltestelle: Hülle in gpkg_contents umfasst alle Objekte
+  ok    raumeinheit: SRS 25833 in gpkg_contents und geometry_columns
+  ok    raumeinheit: 19 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+  ok    raumeinheit: Hülle im Kopf = Hülle der Koordinaten
+  ok    raumeinheit: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    raumeinheit: Hülle in gpkg_contents umfasst alle Objekte
+  ok    stadtteil: SRS 25833 in gpkg_contents und geometry_columns
+  ok    stadtteil: 32 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+  ok    stadtteil: Hülle im Kopf = Hülle der Koordinaten
+  ok    stadtteil: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    stadtteil: Hülle in gpkg_contents umfasst alle Objekte
+  ok    zelle: SRS 25833 in gpkg_contents und geometry_columns
+  ok    zelle: 3443 Geometrien mit GP-Kopf, SRS 25833, WKB POLYGON
+  ok    zelle: Hülle im Kopf = Hülle der Koordinaten
+  ok    zelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    zelle: Hülle in gpkg_contents umfasst alle Objekte
+
+[2] Inhalt gegen die Quelldateien
+  ok    raumeinheit: 19 Zeilen, Quelle 19
+  ok    versorgung: 323 Zeilen, Quelle 323
+  ok    einrichtung: 679 Zeilen, Quelle 679
+  ok    zelle: 3443 Zeilen, Quelle 3443
+  ok    versorgung: alle 323 Werte mit Status, vorläufig, Maßstab, Unsicherheit wie planer.js
+  ok    versorgung: Status nur amtlich/orientierung
+  ok    versorgung: 76 Grundschulwerte alle vorläufig (ohne H2)
+  ok    versorgung: jeder Wert mit Unsicherheitshinweis
+  ok    raumeinheit: Name, Einwohner und jede Kennzahlspalte wie versorgung bzw. planer.js
+  ok    raumeinheit: Einwohner auf 10 gerundet
+  ok    einrichtung: alle Felder wie einrichtungen.js
+  ok    einrichtung: ALKIS-Lagen ohne Namen
+  ok    zelle: gitter_id, Einwohner, Stadtteil und 13 Entfernungen je Zelle wie zellen.js/erreichbar.js
+  ok    csv/einrichtung.csv vorhanden
+  ok    csv/einrichtung.csv: Spalten wie GPKG
+  ok    csv/einrichtung.csv: 679 Zeilen wie GPKG
+  ok    csv/einrichtung.csv: Werte wie GPKG
+  ok    csv/gruenflaeche.csv vorhanden
+  ok    csv/gruenflaeche.csv: Spalten wie GPKG
+  ok    csv/gruenflaeche.csv: 4892 Zeilen wie GPKG
+  ok    csv/gruenflaeche.csv: Werte wie GPKG
+  ok    csv/haltestelle.csv vorhanden
+  ok    csv/haltestelle.csv: Spalten wie GPKG
+  ok    csv/haltestelle.csv: 315 Zeilen wie GPKG
+  ok    csv/haltestelle.csv: Werte wie GPKG
+  ok    csv/lizenz.csv vorhanden
+  ok    csv/lizenz.csv: Spalten wie GPKG
+  ok    csv/lizenz.csv: 7 Zeilen wie GPKG
+  ok    csv/lizenz.csv: Werte wie GPKG
+  ok    csv/raumeinheit.csv vorhanden
+  ok    csv/raumeinheit.csv: Spalten wie GPKG
+  ok    csv/raumeinheit.csv: 19 Zeilen wie GPKG
+  ok    csv/raumeinheit.csv: Werte wie GPKG
+  ok    csv/stadtteil.csv vorhanden
+  ok    csv/stadtteil.csv: Spalten wie GPKG
+  ok    csv/stadtteil.csv: 32 Zeilen wie GPKG
+  ok    csv/stadtteil.csv: Werte wie GPKG
+  ok    csv/versorgung.csv vorhanden
+  ok    csv/versorgung.csv: Spalten wie GPKG
+  ok    csv/versorgung.csv: 323 Zeilen wie GPKG
+  ok    csv/versorgung.csv: Werte wie GPKG
+  ok    csv/zelle.csv vorhanden
+  ok    csv/zelle.csv: Spalten wie GPKG
+  ok    csv/zelle.csv: 3443 Zeilen wie GPKG
+  ok    csv/zelle.csv: Werte wie GPKG
+  --    Datenbankvergleich ausgelassen (keine PG-Umgebung oder Beispieldaten)
+
+[3] Keine Adresse, keine Kontakte, kein Personenbezug
+  ok    keine Adress- oder Kontaktspalte ([])
+  ok    Ausnahmen amtlicher Einrichtungsnamen stimmen (2 Stück)
+  ok    kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail ([]); Ausnahme nur die 2 amtlichen Namen ['Hort"Am Schulplatz 1"', 'KinderGarten Schulplatz 1']
+  ok    keine Einrichtungsnamen mit Personenbezug ([])
+
+[4] Keine feinere Altersklasse je Zelle
+  ok    zelle: Spalten exakt 21 nach Positivliste (fremd: [])
+  ok    csv/zelle.csv: nur erlaubte Spalten
+  ok    kein Feldname einer feinen Zensusklasse in GPKG oder CSV ([])
+  ok    zelle: auch keine der fünf Altersklassen je Zelle
+
+[5] Kein OSM in den Dateien ohne _odbl
+  ok    kiezatlas_potsdam.gpkg: kein OpenStreetMap, ODbL, fussweg, osm_id
+  ok    einrichtung: Quellen nur mbjs und lgb (Fixtures: nicht osm)
+  ok    versorgung: Methode luftlinie, Quoten je Raumeinheit raumeinheit
+  ok    versorgung: jeder Zeilenvermerk nennt den Zensus 2022
+  ok    csv/: kein OSM-Wert ([])
+  ok    steckbriefe/: kein OSM-Wert ([])
+  ok    csv/ ohne _odbl-Datei
+  ok    kiezatlas_potsdam_odbl.gpkg vorhanden
+
+[1] GeoPackage kiezatlas_potsdam_odbl.gpkg
+  ok    application_id = GPKG
+  ok    user_version 1.2 bis 1.4
+  ok    integrity_check ok
+  ok    foreign_key_check leer
+  ok    Pflichttabelle gpkg_spatial_ref_sys
+  ok    Pflichttabelle gpkg_contents
+  ok    Pflichttabelle gpkg_geometry_columns
+  ok    SRS -1, 0, 4326, 25833 eingetragen
+  ok    jede Zeile in gpkg_contents hat eine Tabelle
+  ok    einrichtung_odbl: SRS 25833 in gpkg_contents und geometry_columns
+  ok    einrichtung_odbl: 941 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+  ok    einrichtung_odbl: Hülle im Kopf = Hülle der Koordinaten
+  ok    einrichtung_odbl: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    einrichtung_odbl: Hülle in gpkg_contents umfasst alle Objekte
+  ok    zelle_fuss_odbl: SRS 25833 in gpkg_contents und geometry_columns
+  ok    zelle_fuss_odbl: 3443 Geometrien mit GP-Kopf, SRS 25833, WKB POLYGON
+  ok    zelle_fuss_odbl: Hülle im Kopf = Hülle der Koordinaten
+  ok    zelle_fuss_odbl: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+  ok    zelle_fuss_odbl: Hülle in gpkg_contents umfasst alle Objekte
+  ok    _odbl.gpkg: Lizenztabelle mit ODbL-Vermerk und Link
+  ok    _odbl.gpkg: jede Ebene mit ODbL-Vermerk in der Beschreibung
+  ok    _odbl.gpkg: Ebenennamen enden auf _odbl
+  ok    csv_odbl/: nur _odbl-Dateien
+  ok    einrichtung_odbl: ohne Namen
+  ok    versorgung_fuss_odbl: kein Titel einer Fußweg-Zeile nennt Luftlinie (190 Zeilen)
+  ok    versorgung_fuss_odbl: amtliche Ziele mit MBJS- bzw. LGB-Vermerk ([])
+  ok    versorgung_fuss_odbl: jede Fußweg-Zeile nennt das OSM-Wegenetz im Vermerk
+  ok    _odbl.gpkg lizenz versorgung_fuss_odbl: MBJS- und LGB-Vermerk
+
+[6] Vermerke
+  ok    lizenz raumeinheit (Grenzen): jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz raumeinheit, versorgung (Werte): jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz raumeinheit, versorgung (Werte): CC-BY-Vermerk mit Link
+  ok    lizenz einrichtung: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz zelle: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz gruenflaeche: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+  ok    lizenz haltestelle: CC-BY-Vermerk mit Link
+  ok    README nennt „Statistische Ämter des Bundes und der Länder“
+  ok    README nennt „Ministerium für Bildung, Jugend und Sport“
+  ok    README nennt „GeoBasis-DE/LGB“
+  ok    README nennt „VBB Verkehrsverbund“
+  ok    README nennt „OpenStreetMap-Mitwirkende“
+  ok    README nennt „Daten verändert (eigene Berechnung)“
+  ok    README nennt „https://www.govdata.de/dl-de/by-2-0“
+  ok    README nennt „EPSG:25833“
+  ok    README nennt „Cell-Key“
+  ok    README nennt „15.05.2022“
+  ok    README nennt „orientierung“
+  ok    README nennt „vorlaeufig“
+  ok    README nennt „Keine Adressen“
+  ok    Lizenzkürzel je Zeile nur dl-de/by-2-0 und CC BY 4.0 (['CC BY 4.0', 'dl-de/by-2-0'])
+
+[7] QGIS-Projekt und Stile
+  ok    .qgz enthält genau ein .qgs (['kiezatlas_potsdam.qgs'])
+  ok    .qgs wohlgeformt
+  ok    Projekt-KBS EPSG:25833
+  ok    relative Pfade
+  ok    11 Ebenen im Baum und in projectlayers
+  ok    Ebene einrichtung: Klassenfeld art vorhanden
+  ok    Ebene einrichtung: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene einrichtung: eigene Farbe je Kategorie
+  ok    Ebene Einrichtungen: ./kiezatlas_potsdam.gpkg|layername=einrichtung vorhanden
+  ok    Ebene haltestelle: Klassenfeld klasse vorhanden
+  ok    Ebene haltestelle: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene haltestelle: eigene Farbe je Kategorie
+  ok    Ebene Haltestellen (NVP-Klasse): ./kiezatlas_potsdam.gpkg|layername=haltestelle vorhanden
+  ok    Ebene Raumeinheiten: ./kiezatlas_potsdam.gpkg|layername=raumeinheit vorhanden
+  ok    Ebene zelle: Klassenfeld ew vorhanden
+  ok    Ebene Zensus-Zellen (Einwohner): ./kiezatlas_potsdam.gpkg|layername=zelle vorhanden
+  ok    Ebene gruenflaeche: Klassenfeld art vorhanden
+  ok    Ebene gruenflaeche: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene gruenflaeche: eigene Farbe je Kategorie
+  ok    Ebene Grünflächen: ./kiezatlas_potsdam.gpkg|layername=gruenflaeche vorhanden
+  ok    Ebene Stadtteile: ./kiezatlas_potsdam.gpkg|layername=stadtteil vorhanden
+  ok    Ebene Versorgung (Tabelle): ./kiezatlas_potsdam.gpkg|layername=versorgung vorhanden
+  ok    Ebene Lizenzen (Tabelle): ./kiezatlas_potsdam.gpkg|layername=lizenz vorhanden
+  ok    Ebene einrichtung_odbl: Klassenfeld art vorhanden
+  ok    Ebene einrichtung_odbl: jede vorkommende Kategorie hat ein Symbol ([])
+  ok    Ebene einrichtung_odbl: eigene Farbe je Kategorie
+  ok    Ebene Einrichtungen aus OpenStreetMap (ohne Namen) (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=einrichtung_odbl vorhanden
+  ok    Ebene Zellen: Fußweg zum nächsten Standort (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=zelle_fuss_odbl vorhanden
+  ok    Ebene Versorgung je Raumeinheit, Fußweg (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=versorgung_fuss_odbl vorhanden
+  ok    stile/einrichtung.qml wohlgeformt
+  ok    stile/einrichtung_odbl.qml wohlgeformt
+  ok    stile/gruenflaeche.qml wohlgeformt
+  ok    stile/haltestelle.qml wohlgeformt
+  ok    stile/raumeinheit.qml wohlgeformt
+  ok    stile/stadtteil.qml wohlgeformt
+  ok    stile/zelle.qml wohlgeformt
+  ok    GPKG: Tabelle layer_styles
+  ok    layer_styles raumeinheit: Standardstil = stile/raumeinheit.qml
+  ok    layer_styles stadtteil: Standardstil = stile/stadtteil.qml
+  ok    layer_styles zelle: Standardstil = stile/zelle.qml
+  ok    layer_styles gruenflaeche: Standardstil = stile/gruenflaeche.qml
+  ok    layer_styles einrichtung: Standardstil = stile/einrichtung.qml
+  ok    layer_styles haltestelle: Standardstil = stile/haltestelle.qml
+  ok    keine Orange- oder Gelbtöne in Stilen (Dateien, layer_styles), Projekt und Steckbriefen ([])
+
+[8] Steckbriefe
+  ok    19 Steckbriefe, einer je Raumeinheit
+  ok    keine Platzhalter, Karte und @page vorhanden ([])
+  ok    keine Gedankenstriche oder Strich-Ketten ([])
+  ok    jede Zahl aus planer.js steht im Steckbrief ([])
+
+0 Befunde
+-- GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet): grün, 1 s
+
+== Codepfade Planer (pruefen/A6_test_pfade.py)
+  ok    Prognose gelesen, Zeile anderer Raumebene nicht addiert
+  ok    Tausenderpunkt gelesen, zwei Zeilen addiert (1.200 + 34)
+  ok    unbekannte Altersgruppe gemeldet (Zeile ohne quelle)
+  ok    Zeile mit anderer Raumebene gemeldet
+  ok    Randhinweis an der Luftlinie
+  FEHLT kein Luftlinien-Randhinweis am Fußweg
+  ok    Fußweg- und OSM-Dateien entstehen, wenn Daten da sind
+  ok    Raum B (50 EW): 7 Altersklassen-Werte null
+  ok    Grund der Leerstelle im Hinweis
+  ok    Einwohner-Anteile bleiben auch in kleinen Raumeinheiten
+  ok    Kita ohne Hortanteil: 30 Plätze / 30 Kinder unter 6
+  ok    kombinierte Einrichtung benannt
+  ok    kein reiner Hort, nur kombinierte: Hortrelation null
+  ok    Bedarf nach Baulandmodell: 70 Plätze / 47.95
+  ok    Grundschule vorläufig
+  ok    ÖPNV Klasse II: beide Zellen im 400-m-Radius
+  ok    gemischte Gebietsklasse: wert null mit Spanne
+  ok    Prognose 2030/2035 an Kinder-unter-6-Werten
+  ok    Prognose 6 bis unter 12 an der Grundschul-Relation
+  ok    Fußweg: Arzt nur als Entfernung (Korrektur 13)
+  ok    Fußweg-Datei nur methode fussweg
+  ok    OSM-Quelle nur in der Fußweg-Datei
+  ok    strittige Lage: nur Zellen mit dem strittigen Ziel neu, andere Arten und Zellen unverändert
+  ok    strittige Lage: Zahl der Zellen gemeldet
+  ok    strittige Lage: Fußweg unter der Luftlinie bricht ab
+  ok    einrichtungen.js: Hinweis nur am strittigen Punkt
+  ok    erreichbar.js nennt den Punkt
+  ok    Grundschulwerte in beiden betroffenen Raumeinheiten gesperrt, mit Hinweis
+  ok    Vermerk statistische Bezirke nur, wenn eine Klasse daraus stammt
+  ok    Fußweg mit Haltestellen nennt die VBB-Quelle (N1)
+  ok    planer.js: Vertrag planer.json
+  ok    planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+  ok    erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+  ok    einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+  ok    erreichbar.js: Vertrag erreichbar.json
+  ok    einrichtungen.js: Vertrag einrichtungen.json
+  ok    alle Testdateien bestehen Vertrag und Lizenzgrenze aus daten.py
+  ok    leere OSM-Quelle: keine Fußweg- und OSM-Dateien
+  ok    Raumebene planungsraum wird übernommen
+  ok    Planungsraum: Klasse je Zelle aus dem Stadtteil, gemischte Zellen (50 %) zählen nicht
+  ok    Planungsraum nur mit gemischter Klasse: kein Wert, Spanne über die möglichen Klassen
+  ok    ohne H1, Tabelle und CSV: Stadtteile
+  ok    H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile
+  ok    leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest
+  ok    CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen
+
+1 Fehler
+-- Codepfade Planer (pruefen/A6_test_pfade.py): BEFUND (Rückgabe 1), 1 s
+
+== OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test)
+.....................s                                                   [100%]
+21 passed, 1 skipped in 0.21s
+-- OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test): grün, 0 s
+
+== Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test)
+..............sss                                                        [100%]
+14 passed, 3 skipped in 0.49s
+-- Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test): grün, 1 s
+
+== Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe)
+GTFS: /home/andre/Workspace/Code/kiezatlas-daten/vbb_gtfs/2026-11-05/GTFS.zip
+Haltepunkte im Rechteck: 1800 (Berlin 473, Brandenburg 1327)
+falsch zugeordnet: 15 (0.8 %): Berlin als Brandenburg 6, Brandenburg als Berlin 9
+Fehltreffer: Abstand zum nächsten Haltepunkt des anderen Landes 200 bis 988 m (Median 355 m)
+-- Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe): grün, 1 s
+
+== Prüfsummen Kerndaten (belege/rohdaten.sha256)
+  7 Dateien stimmen
+-- Prüfsummen Kerndaten (belege/rohdaten.sha256): grün, 0 s
+
+== Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256)
+  80 Dateien stimmen
+-- Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256): grün, 2 s
+
+== Browser: pruefen/seiten.mjs
+Textstellen (Audit)
+  ok   K1: Gebäudehöhe als Geschosse × 3 m beschrieben (seit 06.11. Katasterhöhe mit Herkunft je Gebäude)
+  ok   K2: Denkmallisten-Nummer als Zuordnungsweg genannt (nur Prüfung)
+index.html über file://
+  ok   alle Themen geschaltet (7: stadtteile, ew, d_alter, q_u18, q_65p, q_v1949, q_fern)
+  ok   Kopfzahlen: 5 Werte (rund 182.700 | 17,9% | 20,2% | 25,7% | 60,7%)
+  ok   sieben Fragen vorhanden (Schritte 0,1,2,3,4,5,6,7,8,9,10)
+  ok   Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv
+  ok   Register-Sortierung: 6 Sortierungen, je 32 Zeilen, 6 verschiedene Spitzenreiter
+  ok   Schaugrafik SVG: kiezatlas-potsdam-a4h.svg, 524 KB, Schriften eingebettet
+  ok   Schaugrafik PNG: kiezatlas-potsdam-a4h.png, 832 KB
+  ok   Schaugrafik Druck/PDF: Druckblatt gesetzt, PDF 226 KB
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 28)
+  Gewicht beim Start: 487 KB gz JS, 622 KB gz gesamt (eigene Dateien)
+index.html über HTTP
+  ok   alle Themen geschaltet (7: stadtteile, ew, d_alter, q_u18, q_65p, q_v1949, q_fern)
+  ok   Kopfzahlen: 5 Werte (rund 182.700 | 17,9% | 20,2% | 25,7% | 60,7%)
+  ok   sieben Fragen vorhanden (Schritte 0,1,2,3,4,5,6,7,8,9,10)
+  ok   Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv
+  ok   Register-Sortierung: 6 Sortierungen, je 32 Zeilen, 6 verschiedene Spitzenreiter
+  ok   Schaugrafik SVG: kiezatlas-potsdam-a4h.svg, 524 KB, Schriften eingebettet
+  ok   Schaugrafik PNG: kiezatlas-potsdam-a4h.png, 832 KB
+  ok   Schaugrafik Druck/PDF: Druckblatt gesetzt, PDF 226 KB
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 41)
+  Gewicht beim Start: 487 KB gz JS, 622 KB gz gesamt (eigene Dateien)
+karte.html über file://
+  ok   alle Themen geschaltet (7)
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 28)
+  Gewicht beim Start: 426 KB gz JS, 555 KB gz gesamt (eigene Dateien)
+  ok   Hash-Rundreise: #thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12 -> neu geladen gleich (#thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12)
+karte.html über HTTP
+  ok   alle Themen geschaltet (7)
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 28)
+  Gewicht beim Start: 426 KB gz JS, 555 KB gz gesamt (eigene Dateien)
+  ok   Hash-Rundreise: #thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12 -> neu geladen gleich (#thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12)
+index.html über HTTP ohne reduzierte Bewegung
+  ok   Bewegung an: Konsole ohne Fehler (0)
+  ok   reduzierte Bewegung wird von der Seite erkannt
+
+KB gz je Seite (eigene Dateien bis KIEZ_BEREIT):
+  index.html  file://  JS 487 KB gz, gesamt 622 KB gz
+  index.html  HTTP     JS 487 KB gz, gesamt 622 KB gz
+  karte.html  file://  JS 426 KB gz, gesamt 555 KB gz
+  karte.html  HTTP     JS 426 KB gz, gesamt 555 KB gz
+
+grün
+-- Browser: pruefen/seiten.mjs: grün, 58 s
+
+== Browser: pruefen/A7_planer.mjs
+planer.html über file://, echte Daten
+  ok   Startgewicht 316 KB gz JS mit echten Daten (Grenze 320)
+  ok   keine Datei aus daten/fixtures/ geladen
+  ok   kein Hinweis „Beispieldaten“
+  ok   data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js" passt zu daten/ (true); Fußweg gesperrt false (erwartet false), OSM-Arten gesperrt false (erwartet false)
+  ok   Einrichtungs-Chips aus den echten Daten: kita, hort, grundschule, sek1, gymnasium, foerderschule, osz, sonstige_schule, feuerwehr, bibliothek, sport, sonstiger_gemeinbedarf, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Kita (Luftlinie) mit echten Daten: 7027 Zellen gezeichnet, 679 Einrichtungen
+  ok   Raumebene Planungsräume voreingestellt: pr, 19 in der Liste, 19 Flächen in der Karte
+  ok   Versorgungstabelle mit echten Daten: 17 Zeilen, ohne Quelle 0, Messart falsch 0, „amtlicher Maßstab“ ohne Richtwert 0, Orientierung 7/7
+  ok   Ebene Stadtteile: Hinweis statt Tabelle (0 Zeilen, 32 Flächen), zurück auf Planungsräume 17 Zeilen (#ein=kita,gs&zu=kita&weg=luft&raum=pr&r=403)
+  ok   Klick auf Einrichtung mit echten Daten: Kinderhaus Wölkchen 2Kindertagesstätte, krippe kindergartenPlätze60Genehmigte Plätze laut …
+  ok   axe mit echten Daten: 0 Verstöße 
+  ok   Konsole ohne Fehler mit echten Daten (0)
+planer.html über file://, Beispieldaten
+  ok   Startgewicht 300 KB gz JS (Grenze 320); geladen: daten/stadtteile.js, daten/planungsraeume.js, vendor/maplibre-gl.js, daten/grundkarte.js, kiezatlas-wt-AUDIT-DOKU/themen.js, kiezatlas-wt-AUDIT-DOKU/planer.js, fixtures/einrichtungen.js
+  ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+  ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+  ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+  ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+  ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+  ok   Orientierungswerte gekennzeichnet: 1 von 1
+  ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+  ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+  ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+  ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+  ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+  ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 4)
+  ok   Hash-Rundreise über file://: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+  ok   planer.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   axe bei 375 px mit offener Leiste: 0 
+  ok   planer.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-daten.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html über file://: 17 Maßstäbe aus der Datei, 7 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+  ok   planer-daten.html über file://: 33 Links in daten/, ins Leere 0
+  ok   planer-daten.html über file://: axe 0, Fehler 0
+planer.html über HTTP, echte Daten
+  ok   Startgewicht 316 KB gz JS mit echten Daten (Grenze 320)
+  ok   keine Datei aus daten/fixtures/ geladen
+  ok   kein Hinweis „Beispieldaten“
+  ok   data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js" passt zu daten/ (true); Fußweg gesperrt false (erwartet false), OSM-Arten gesperrt false (erwartet false)
+  ok   Einrichtungs-Chips aus den echten Daten: kita, hort, grundschule, sek1, gymnasium, foerderschule, osz, sonstige_schule, feuerwehr, bibliothek, sport, sonstiger_gemeinbedarf, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Kita (Luftlinie) mit echten Daten: 7027 Zellen gezeichnet, 679 Einrichtungen
+  ok   Raumebene Planungsräume voreingestellt: pr, 19 in der Liste, 19 Flächen in der Karte
+  ok   Versorgungstabelle mit echten Daten: 17 Zeilen, ohne Quelle 0, Messart falsch 0, „amtlicher Maßstab“ ohne Richtwert 0, Orientierung 7/7
+  ok   Ebene Stadtteile: Hinweis statt Tabelle (0 Zeilen, 32 Flächen), zurück auf Planungsräume 17 Zeilen (#ein=kita,gs&zu=kita&weg=luft&raum=pr&r=403)
+  ok   Klick auf Einrichtung mit echten Daten: Kinderhaus Wölkchen 2Kindertagesstätte, krippe kindergartenPlätze60Genehmigte Plätze laut …
+  ok   axe mit echten Daten: 0 Verstöße 
+  ok   Konsole ohne Fehler mit echten Daten (0)
+planer.html über HTTP, Beispieldaten
+  ok   Startgewicht 300 KB gz JS (Grenze 320); geladen: daten/stadtteile.js, daten/planungsraeume.js, vendor/maplibre-gl.js, daten/grundkarte.js, 127.0.0.1:38813/themen.js, 127.0.0.1:38813/planer.js, fixtures/einrichtungen.js
+  ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+  ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+  ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+  ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+  ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+  ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+  ok   Orientierungswerte gekennzeichnet: 1 von 1
+  ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+  ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+  ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+  ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+  ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+  ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+  ok   axe: 0 Verstöße 
+  ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 4)
+  ok   Hash-Rundreise über HTTP: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+  ok   planer.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   axe bei 375 px mit offener Leiste: 0 
+  ok   planer.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-daten.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+  ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+  ok   planer-methode.html über HTTP: 17 Maßstäbe aus der Datei, 7 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+  ok   planer-daten.html über HTTP: 33 Links in daten/, ins Leere 0
+  ok   planer-daten.html über HTTP: axe 0, Fehler 0
+  ok   Download-Liste deckt alle 15 Verträge ab
+  ok   Download-Liste: Lizenzgrenze, Stand und Links stimmen mit daten/ überein
+  ok   Datei auf Planungsräumen, Stadtteil gewählt, ohne Grenzen der Planungsräume: Hinweis statt Tabelle (0 Zeilen, Ebenen st, Fehler 0)
+  ok   Datei auf Planungsräumen, Stadtteil gewählt, mit Grenzen der Planungsräume: Hinweis statt Tabelle (0 Zeilen, Ebenen pr,st, Fehler 0)
+  ok   Fußweg-Tabelle scheitert einmal: Rückfall auf Luftlinie mit Meldung (luft, 3 Zeilen), zweiter Versuch lädt (fuss, 2 Zeilen, 2 Abrufe)
+  ok   reduzierte Bewegung: Klicks bewegen die Kamera nicht (0), Zoom springt (1 Bewegung)
+  ok   ohne reduzierte Bewegung fehlerfrei (0)
+
+A7 grün.
+-- Browser: pruefen/A7_planer.mjs: grün, 58 s
+
+== Browser: pruefen/B5_jahre.mjs
+Statisch (jahre.html, jahre.js, jahre.css, jahre-methode.html, jahre-daten.html)
+  ok   jahre.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+  ok   jahre.html: „visinage“ 0-mal (erlaubt: nie)
+  ok   jahre.html: kein fetch/XHR (file://)
+  ok   jahre.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+  ok   jahre.js: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+  ok   jahre.js: „visinage“ 0-mal (erlaubt: nie)
+  ok   jahre.js: kein fetch/XHR (file://)
+  ok   jahre.js: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+  ok   jahre.css: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+  ok   jahre.css: „visinage“ 0-mal (erlaubt: nie)
+  ok   jahre.css: kein fetch/XHR (file://)
+  ok   jahre.css: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+  ok   jahre-methode.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+  ok   jahre-methode.html: „visinage“ 1-mal (erlaubt: genau einmal als Methodenvorbild)
+  ok   jahre-methode.html: kein fetch/XHR (file://)
+  ok   jahre-methode.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+  ok   jahre-daten.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+  ok   jahre-daten.html: „visinage“ 0-mal (erlaubt: nie)
+  ok   jahre-daten.html: kein fetch/XHR (file://)
+  ok   jahre-daten.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+
+Gebäudedateien daten/jahre/*.js
+  ok   32 Dateien, 52309 Gebäude: nur j/k/g/q/s/h/hq, Höhe 1–200 m mit Herkunft, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ 
+  ok   daten/jahre_methode.js gegen pruefen/B5_schema/jahre_methode.json (Prüfmaschine aus daten.py): ok jahre_methode.js: Vertrag jahre_methode.json
+  ok   daten/jahre_methode.js aktuell (aktuell), 52309 Gebäude, Rücktest je Bauzeit und Stufe mit n
+  ok   Farben in jahre.css/jahre.js: 21 geprüft, keine zwischen 20° und 70° 
+  ok   Palette: 8 Stufen, alle mit Farbton außerhalb 20°–70°: #42194d 287°, #613878 278°, #756092 265°, #8c87a9 249°, #74a1aa 190°, #428293 193°, #226174 194°, #1c4a5b 196°
+(node:2191678) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+jahre.html per file
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (90 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   reduzierte Bewegung: keine laufende Animation nach dem Laden
+  ok   reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)
+  ok   reduzierte Bewegung: „Nacheinander“ ausgeblendet
+  ok   Frage 1: Karte eingestellt (spanne 0–0), Kamera steht, keine Animation
+  ok   Frage 2: Karte eingestellt (spanne 2–3), Kamera steht, keine Animation
+  ok   Frage 3: Karte eingestellt (spanne 4–7 3D), Kamera steht, keine Animation
+  ok   Frage 4: Karte eingestellt (spanne 6–7), Kamera steht, keine Animation
+  ok   Frage 5: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Frage 6: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Frage 7: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Leiste: Klick auf die vierte Klasse zeigt nur diese (1979–1990)
+  ok   Leiste: Regler „bis“ per Pfeiltaste, Status „Anteil 1979 bis 2010 je Zelle“
+  ok   Kartenfarbe rechnet genau die gewählten Klassen (ohne neues Laden)
+  ok   Legende nennt Quelle, Stichtag und „nicht einzelne Gebäude“
+  ok   Kopfzahlen mit dl-de-Vermerk „Daten verändert (eigene Berechnung)“
+  ok   Gebäudezahlen in den Fragen als „hochgerechnet“ gekennzeichnet, Unsicherheitshinweis 
+  ok   Zell-Popup: Werte mit Quelle, Stichtag, Vermerk, „nicht einzelne Gebäude“
+  ok   Vergleich: Auswahl „52 Babelsberg Nord“, Steckbrief mit 8 Klassen, Hinweis auf Näherung und Rundung
+  ok   Vergleich: Sortierung nach Anteil absteigend
+  ok   unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen
+  ok   unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin
+  ok   Frage 7: Zoom 15.4, Gebäude aus 53, 71 (391 farbig im Bild), keine Animation
+  ok   höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (2 Anfragen, 2 Dateien)
+  ok   ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „Karte zeigt: Gebäude nach geschätzter Bauzeit, ausgewählt 52 Babelsberg Nord, Gebäude aus 53 Babelsberg Süd, 71 Stern.“
+  ok   Adresse merkt sich den Blick auf die Gebäude (blick=…)
+  ok   Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (Bauzeit 1991–2000geschätztWeg: Zensuszahlen der Zelle nach Gebäudeform…)
+  ok   Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses
+  ok   Zeitfilter 1949–1990: nur Klassen 2,3 farbig, übrige blass, 0 neue Anfragen
+  ok   Zeitfilter: Legende nennt „andere Bauzeit“, keine Prozentskala der Zellen
+  ok   Legende ab Zoom 14: Muster für „geschätzt“/„belegt“ ohne Klassenfarbe (rgb(19, 33, 42) rgb(19, 33, 42))
+  ok   3D ab Zoom 14: keine Säulen über den Gebäuden (zellen-3d none, zellen-2d visible, Zoom 15.4)
+  ok   Gebäudeansicht: axe 0 Verstöße 
+  ok   Gebäudeansicht: Farben ohne Farbton 20°–70° 
+  ok   Gebäudeansicht: reduzierte Bewegung ohne Animation
+  ok   breiter Blick Zoom 14: Gebäude aus 31, 41, 44, 61, Zellen abgeblendet nur dort (31, 41, 44, 61), Zellen voll in 22, 23, 43, 62; Hinweis „adt; weitere Stadtteile beim Heranzoomen“
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 26)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+  ok   375 px: Frage 1 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+  ok   375 px: Frage 2 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+  ok   375 px: Frage 3 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+
+jahre-methode.html per file
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (22 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   Methode: Stufentabelle, 6 Rücktest-Tabellen je Bauzeit und Stufe (19 Quoten mit n, gleich daten/jahre_methode.js), Vergleich mit dem Zensus
+  ok   Methode: „Nicht datiert“ nennt alle 25.593, davon 22.531 Nebengebäude
+  ok   Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl
+  ok   Methode: Vorbild genau einmal genannt, als Methodenvorbild
+  ok   Methode: Baualter-Statistik der Stadt (H4), 4 Zeilen, Gruppen = Gesamt, Gebäudekarte = Summe der Zensus-Tabelle, Vermerk mit Lizenz
+  ok   Methode: genaue Jahre aus Wikidata genannt, im Rücktest zurückgehalten
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+
+jahre-daten.html per file
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (10 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   CSV Zellen kiezatlas-bauzeiten-zellen-2026-11-05.csv: 2869 Zeilen (erwartet 2869), Kopf gitter_id,stadtteil,gebaeude,anteil_vor_1919,anteil_1919_194…
+  ok   GeoJSON kiezatlas-bauzeiten-zellen-2026-11-05.geojson: 2869 Zellen, Vermerk und Lizenzlink
+  ok   CSV je Stadtteil kiezatlas-bauzeiten-stadtteile-2026-11-05.csv: 32 Gebiete, Gebäudezahlen auf 10 gerundet
+  ok   Liesmich LIESMICH-kiezatlas-bauzeiten.txt: Vermerk, Lizenzlink, kein OSM
+  ok   GeoPackage daten/download/bauzeiten.gpkg: Pflichttabellen, application_id GPKG, Geometriekopf GP, EPSG:25833, Ausdehnung Potsdam
+  ok   GeoPackage zellen: 2869 Zeilen, Gebäude und Anteile gleich der Zell-CSV
+  ok   GeoPackage stadtteile: 32 Gebiete, alle Spalten gleich der Stadtteil-CSV (gerundet)
+  ok   GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten
+  ok   GeoPackage-Stand 2026-11-05 = Stand von jahre_zellen.js 2026-11-05 (sonst skripte/25_jahre_gpkg.py neu laufen lassen)
+  ok   Downloads ohne Adress- oder Eigentümerfelder
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+
+jahre.html per http
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (90 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   reduzierte Bewegung: keine laufende Animation nach dem Laden
+  ok   reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)
+  ok   reduzierte Bewegung: „Nacheinander“ ausgeblendet
+  ok   Frage 1: Karte eingestellt (spanne 0–0), Kamera steht, keine Animation
+  ok   Frage 2: Karte eingestellt (spanne 2–3), Kamera steht, keine Animation
+  ok   Frage 3: Karte eingestellt (spanne 4–7 3D), Kamera steht, keine Animation
+  ok   Frage 4: Karte eingestellt (spanne 6–7), Kamera steht, keine Animation
+  ok   Frage 5: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Frage 6: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Frage 7: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+  ok   Leiste: Klick auf die vierte Klasse zeigt nur diese (1979–1990)
+  ok   Leiste: Regler „bis“ per Pfeiltaste, Status „Anteil 1979 bis 2010 je Zelle“
+  ok   Kartenfarbe rechnet genau die gewählten Klassen (ohne neues Laden)
+  ok   Legende nennt Quelle, Stichtag und „nicht einzelne Gebäude“
+  ok   Kopfzahlen mit dl-de-Vermerk „Daten verändert (eigene Berechnung)“
+  ok   Gebäudezahlen in den Fragen als „hochgerechnet“ gekennzeichnet, Unsicherheitshinweis 
+  ok   Zell-Popup: Werte mit Quelle, Stichtag, Vermerk, „nicht einzelne Gebäude“
+  ok   Vergleich: Auswahl „52 Babelsberg Nord“, Steckbrief mit 8 Klassen, Hinweis auf Näherung und Rundung
+  ok   Vergleich: Sortierung nach Anteil absteigend
+  ok   unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen
+  ok   unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin
+  ok   Frage 7: Zoom 15.4, Gebäude aus 53, 71 (391 farbig im Bild), keine Animation
+  ok   höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (2 Anfragen, 2 Dateien)
+  ok   ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „Karte zeigt: Gebäude nach geschätzter Bauzeit, ausgewählt 52 Babelsberg Nord, Gebäude aus 53 Babelsberg Süd, 71 Stern.“
+  ok   Adresse merkt sich den Blick auf die Gebäude (blick=…)
+  ok   Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (Bauzeit 1991–2000geschätztWeg: Zensuszahlen der Zelle nach Gebäudeform…)
+  ok   Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses
+  ok   Zeitfilter 1949–1990: nur Klassen 2,3 farbig, übrige blass, 0 neue Anfragen
+  ok   Zeitfilter: Legende nennt „andere Bauzeit“, keine Prozentskala der Zellen
+  ok   Legende ab Zoom 14: Muster für „geschätzt“/„belegt“ ohne Klassenfarbe (rgb(19, 33, 42) rgb(19, 33, 42))
+  ok   3D ab Zoom 14: keine Säulen über den Gebäuden (zellen-3d none, zellen-2d visible, Zoom 15.4)
+  ok   Gebäudeansicht: axe 0 Verstöße 
+  ok   Gebäudeansicht: Farben ohne Farbton 20°–70° 
+  ok   Gebäudeansicht: reduzierte Bewegung ohne Animation
+  ok   breiter Blick Zoom 14: Gebäude aus 31, 41, 44, 61, Zellen abgeblendet nur dort (31, 41, 44, 61), Zellen voll in 22, 23, 43, 62; Hinweis „adt; weitere Stadtteile beim Heranzoomen“
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 26)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+  ok   375 px: Frage 1 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+  ok   375 px: Frage 2 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+  ok   375 px: Frage 3 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+
+jahre-methode.html per http
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (22 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   Methode: Stufentabelle, 6 Rücktest-Tabellen je Bauzeit und Stufe (19 Quoten mit n, gleich daten/jahre_methode.js), Vergleich mit dem Zensus
+  ok   Methode: „Nicht datiert“ nennt alle 25.593, davon 22.531 Nebengebäude
+  ok   Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl
+  ok   Methode: Vorbild genau einmal genannt, als Methodenvorbild
+  ok   Methode: Baualter-Statistik der Stadt (H4), 4 Zeilen, Gruppen = Gesamt, Gebäudekarte = Summe der Zensus-Tabelle, Vermerk mit Lizenz
+  ok   Methode: genaue Jahre aus Wikidata genannt, im Rücktest zurückgehalten
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+
+jahre-daten.html per http
+  ok   alle Zahlenfelder aus den Daten gefüllt 
+  ok   keine Meldung (Daten echt, passend zu den Zellen)
+  ok   axe: 0 Verstöße 
+  ok   gerenderte Farben (10 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+  ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+  ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+  ok   CSV Zellen kiezatlas-bauzeiten-zellen-2026-11-05.csv: 2869 Zeilen (erwartet 2869), Kopf gitter_id,stadtteil,gebaeude,anteil_vor_1919,anteil_1919_194…
+  ok   GeoJSON kiezatlas-bauzeiten-zellen-2026-11-05.geojson: 2869 Zellen, Vermerk und Lizenzlink
+  ok   CSV je Stadtteil kiezatlas-bauzeiten-stadtteile-2026-11-05.csv: 32 Gebiete, Gebäudezahlen auf 10 gerundet
+  ok   Liesmich LIESMICH-kiezatlas-bauzeiten.txt: Vermerk, Lizenzlink, kein OSM
+  ok   GeoPackage daten/download/bauzeiten.gpkg: Pflichttabellen, application_id GPKG, Geometriekopf GP, EPSG:25833, Ausdehnung Potsdam
+  ok   GeoPackage zellen: 2869 Zeilen, Gebäude und Anteile gleich der Zell-CSV
+  ok   GeoPackage stadtteile: 32 Gebiete, alle Spalten gleich der Stadtteil-CSV (gerundet)
+  ok   GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten
+  ok   GeoPackage-Stand 2026-11-05 = Stand von jahre_zellen.js 2026-11-05 (sonst skripte/25_jahre_gpkg.py neu laufen lassen)
+  ok   Downloads ohne Adress- oder Eigentümerfelder
+  ok   keine Konsolenfehler 
+  ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+  ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+  ok   375 px: axe 0 Verstöße 
+
+Hash und Bewegung
+  ok   Hash wird gelesen und bleibt (#ansicht=spanne&von=2&bis=3&3d=1&st=52)
+  ok   verstümmelter Hash (#st=%E0) bricht die Seite nicht ab 
+  ok   file: Adresse mit blick= öffnet die Gebäude (41), Filter ab 1991 aktiv (Klassen 4,5,6,7)
+  ok   file: Gebäudeansicht ohne Konsolenfehler 
+  ok   http: Adresse mit blick= öffnet die Gebäude (41), Filter ab 1991 aktiv (Klassen 4,5,6,7)
+  ok   http: Gebäudeansicht ohne Konsolenfehler 
+  ok   Fixture: „belegt“ kräftig mit Rand (14 Ränder), Popup mit Baujahr und Quelle, Legende, Beispieldaten-Hinweis (Bauzeit 1919–1948belegt, Baujahr 1941Weg: genaues …)
+  ok   375 px Gebäudeansicht: kein waagrechtes Scrollen (375 ≤ 375), axe 0 
+  ok   ohne reduzierte Bewegung: „Nacheinander“ sichtbar
+  ok   ohne reduzierte Bewegung: Kartenstil blendet über
+
+grün (203 Punkte)
+-- Browser: pruefen/B5_jahre.mjs: grün, 97 s
+
+== Browser: pruefen/p1_themen.mjs
+  ok   themen.js 4.37 KB gz (Vertrag: höchstens 6 KB)
+karte.html über file://
+  FEHLT Objekt KIEZ_THEMEN hat genau die 31 Namen des Vertrags
+  ok   Themen-Schlüssel id/h wie im Vertrag (stadtteile/stadtteile, ew/ew, d_alter/alter, q_u18/u18, q_65p/65p, q_v1949/vor1949, q_fern/fern)
+  ok   laden: zwei gleichzeitige Aufrufe, 1 Script-Tag, beide erhalten dasselbe Objekt
+  ok   laden: liegt das Global schon vor, kommt fertig() sofort
+  ok   ebenen.registrieren: {"liste":["erreichbar"],"themenNeu":1,"ebene":"erreichbar","hash":"m_kita","zurueck":"erreichbar","keinDoppel":true}
+  ok   ebenen.zellwerte: 3443 Werte für 3443 Zellen, erster 50
+  ok   ebenen.zellwerte bei falscher erste_id, anzahl, Art oder Ebene: null und Meldung („Die Werte der Ebene erreichbar passen nicht zu den Zellen der Karte.“)
+  ok   laden bei fehlender Datei: fertig(null), aria-live-Meldung („Daten aus daten/fixtures/gibt-es-nicht.js ließen sich nicht laden.“)
+  ok   farbe mit eigenen Klassen: ["step",["get","m_kita"],"#dce6e2",300,"#a8c7c2",500,"#6fa1a3",1000,"#3b7684",2000,"#1c4a5b"]
+  ok   klasse mit eigenen Klassen: 0,1,2,3,4
+  ok   klassen über übergebene Features: {"grenzen":[2,3,5,8],"min":1,"max":10}
+  ok   klassen für Prozent: fest 20/40/60/80
+  ok   hoehe: faktor wirkt, faktor 1 = Standard
+  ok   Texthelfer: 182.673 | 17,9 | 182.700 | 460 | k. A. | 20,2 % | Potsdam | Bornstedt | &lt;a &quot;b&quot;&gt;&amp;
+  FEHLT Geometrie und Farben: {"ganz":true,"teile":32,"umriss":2,"polys":true,"farbe":32,"bezirk":8,"stufen":5,"grau":"#cdc8be"}
+  ok   Ebenen-Thema ohne Werte: einfarbig "#dce6e2", nicht gemerkt, MapLibre nimmt es an
+  ok   nach dem Einmischen (erreichbar_fuss_odbl.js, hort): {"grenzen":[7,12,19,24],"min":1,"max":30}, MapLibre nimmt es an
+  ok   ebenen.zellwerte nimmt nur Listen (anzahl → null)
+  ok   registrieren mit vergebener id oder h: {"neu":0,"ew":true,"alter":true,"neu2":true}
+  ok   laden: gleiche Datei, verschiedene Globals getrennt ([null,"luftlinie"])
+  ok   ebenen.zellwerte auf jahre_zellen.js (gebaeude, vorherrschend, anteile): 3443, 3443, 3443
+  ok   keine Seitenfehler (0)
+  ok   Konsole: 1 Fehler, davon 1 nur von der absichtlich fehlenden Datei (Failed to load resource: net::ERR_FILE_NOT_FOUND)
+karte.html über HTTP
+  FEHLT Objekt KIEZ_THEMEN hat genau die 31 Namen des Vertrags
+  ok   Themen-Schlüssel id/h wie im Vertrag (stadtteile/stadtteile, ew/ew, d_alter/alter, q_u18/u18, q_65p/65p, q_v1949/vor1949, q_fern/fern)
+  ok   laden: zwei gleichzeitige Aufrufe, 1 Script-Tag, beide erhalten dasselbe Objekt
+  ok   laden: liegt das Global schon vor, kommt fertig() sofort
+  ok   ebenen.registrieren: {"liste":["erreichbar"],"themenNeu":1,"ebene":"erreichbar","hash":"m_kita","zurueck":"erreichbar","keinDoppel":true}
+  ok   ebenen.zellwerte: 3443 Werte für 3443 Zellen, erster 50
+  ok   ebenen.zellwerte bei falscher erste_id, anzahl, Art oder Ebene: null und Meldung („Die Werte der Ebene erreichbar passen nicht zu den Zellen der Karte.“)
+  ok   laden bei fehlender Datei: fertig(null), aria-live-Meldung („Daten aus daten/fixtures/gibt-es-nicht.js ließen sich nicht laden.“)
+  ok   farbe mit eigenen Klassen: ["step",["get","m_kita"],"#dce6e2",300,"#a8c7c2",500,"#6fa1a3",1000,"#3b7684",2000,"#1c4a5b"]
+  ok   klasse mit eigenen Klassen: 0,1,2,3,4
+  ok   klassen über übergebene Features: {"grenzen":[2,3,5,8],"min":1,"max":10}
+  ok   klassen für Prozent: fest 20/40/60/80
+  ok   hoehe: faktor wirkt, faktor 1 = Standard
+  ok   Texthelfer: 182.673 | 17,9 | 182.700 | 460 | k. A. | 20,2 % | Potsdam | Bornstedt | &lt;a &quot;b&quot;&gt;&amp;
+  FEHLT Geometrie und Farben: {"ganz":true,"teile":32,"umriss":2,"polys":true,"farbe":32,"bezirk":8,"stufen":5,"grau":"#cdc8be"}
+  ok   Ebenen-Thema ohne Werte: einfarbig "#dce6e2", nicht gemerkt, MapLibre nimmt es an
+  ok   nach dem Einmischen (erreichbar_fuss_odbl.js, hort): {"grenzen":[7,12,19,24],"min":1,"max":30}, MapLibre nimmt es an
+  ok   ebenen.zellwerte nimmt nur Listen (anzahl → null)
+  ok   registrieren mit vergebener id oder h: {"neu":0,"ew":true,"alter":true,"neu2":true}
+  ok   laden: gleiche Datei, verschiedene Globals getrennt ([null,"luftlinie"])
+  ok   ebenen.zellwerte auf jahre_zellen.js (gebaeude, vorherrschend, anteile): 3443, 3443, 3443
+  ok   keine Seitenfehler (0)
+  ok   Konsole: 1 Fehler, davon 1 nur von der absichtlich fehlenden Datei (Failed to load resource: the server responded with a status of 404 (Not Found))
+
+4 Befund(e)
+-- Browser: pruefen/p1_themen.mjs: BEFUND (Rückgabe 1), 6 s
+
+== Zählung: 18 Prüfungen, 16 grün, 2 mit Befund, 0 übersprungen
+  grün  Syntax JavaScript (node --check)
+  grün  Syntax Shell (sh -n)
+  grün  Syntax Python (ast)
+  grün  Datenverträge und Summen (pruefen/daten.py)
+  grün  Vertrag Bauzeiten-Methode (pruefen/B5_methode.py)
+  grün  jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen)
+  grün  planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen)
+  grün  GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet)
+  BEFUND (Rückgabe 1)  Codepfade Planer (pruefen/A6_test_pfade.py)
+  grün  OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test)
+  grün  Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test)
+  grün  Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe)
+  grün  Prüfsummen Kerndaten (belege/rohdaten.sha256)
+  grün  Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256)
+  grün  Browser: pruefen/seiten.mjs
+  grün  Browser: pruefen/A7_planer.mjs
+  grün  Browser: pruefen/B5_jahre.mjs
+  BEFUND (Rückgabe 1)  Browser: pruefen/p1_themen.mjs

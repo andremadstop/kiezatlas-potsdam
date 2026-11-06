@@ -1,6 +1,6 @@
 {
- "stand_auswertung": "2026-11-04",
- "stand_import": "2026-11-04T13:23+00:00",
+ "stand_auswertung": "2026-11-06",
+ "stand_import": "2026-11-05T10:10+00:00",
  "methode_zellen": "Zensus-Gitterzellen, deren Mittelpunkt im Stadtteil liegt (ST_Contains in PostGIS)",
  "stadt": {
   "name": "Potsdam",

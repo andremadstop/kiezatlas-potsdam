@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "Wenn Sie den Kiezatlas, seine Daten oder Grafiken nutzen, zitieren Sie ihn bitte mit diesen Angaben und dem Stand aus dem Seitenfuß."
+type: dataset
+title: "Kiezatlas Potsdam: Stadtteile, Planungsräume und Bauzeiten aus offenen amtlichen Daten"
+abstract: >-
+  Kennzahlen je Stadtteil und Planungsraum der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter),
+  Gemeinbedarf und Erreichbarkeit (Kita, Schule, Grün, ÖPNV) sowie geschätzte Bauzeiten der Gebäude, mit Methode,
+  Rücktest, Prüfskripten und Quellenvermerk je Zahl. Prototyp.
+authors:
+  - given-names: André
+    family-names: Stiebitz
+    affiliation: "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+contact:
+  - name: "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+    email: kontakt@souverain-systems.de
+url: "https://souverain-systems.de/kiezatlas/"
+repository-code: "https://github.com/andremadstop/kiezatlas-potsdam"
+license: Apache-2.0
+license-url: "https://github.com/andremadstop/kiezatlas-potsdam/blob/main/LICENSE"
+version: "stand-2026-11-06"
+date-released: "2026-11-06"
+keywords:
+  - Potsdam
+  - Zensus 2022
+  - Planungsräume
+  - Gemeinbedarf
+  - Baualter
+  - Open Data
+notes: >-
+  Die Lizenz Apache-2.0 gilt für Code und eigene Texte. Die Daten in daten/ behalten die Lizenzen ihrer Quellen
+  (dl-de/by-2-0, dl-de/zero-2-0, CC0, CC BY 4.0, ODbL nur in *_odbl-Dateien), siehe daten/LIZENZ.md und QUELLEN.md.
+  Grafiken aus der Schaugrafik: CC BY 4.0 mit der Bildzeile auf der Grafik (docs/entscheidungen.md, A16).
+  Code entstand mit KI-Unterstützung (Claude).

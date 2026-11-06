@@ -26,7 +26,8 @@
       "required": [
        "f",
        "gs",
-       "h"
+       "h",
+       "hq"
       ],
       "additionalProperties": false,
       "properties": {
@@ -40,7 +41,13 @@
         ]
        },
        "h": {
-        "type": "number"
+        "type": "number",
+        "minimum": 0,
+        "description": "Höhe in m für 3D: ALKIS-Objekthöhe über Gelände (ganze Meter), sonst Geschosse × 3 m, sonst 3 m (seit 06.11.2026; vorher immer Geschosse × 3 m)"
+       },
+       "hq": {
+        "enum": ["kataster", "geschosse", "ersatz"],
+        "description": "Herkunft der Höhe h"
        }
       }
      }

@@ -73,6 +73,10 @@ oepnv:
   messung:
     # Wie 13_oepnv.py den Takt misst (eigene Festlegung, im Lese-Protokoll begründet)
     stichtag: 2026-11-10        # Dienstag, Schultag (Herbstferien Brandenburg 19.–30.10.2026)
+    stichtag_art: Schultag      # Text an den ÖPNV-Werten (15_planer.py, Audit K32)
+    # Erster Gültigkeitstag des Fahrplans: calendar.txt im GTFS-Zip ($KIEZ_DATEN/vbb_gtfs/2026-11-05/GTFS.zip),
+    # start_date 20261103 bei allen 3.185 service_id (geprüft 06.11.2026); HERKUNFT.md: „Fahrplan gültig ab 03.11.2026“
+    fahrplan_gueltig_ab: 2026-11-03
     hvz_fenster: ["06:00", "09:00"]   # morgendliche HVZ Mo–Fr Klasse I und II (Abb. 4.1, S. 57); Mittel je Stunde
     hvz_fenster_nvp_anlage4: {I: ["06:00", "08:00"], II: ["07:00", "09:00"], III: ["07:00", "09:00"]}
     richtung: "Abfahrten (pickup_type ≠ 1, ohne Endhalt der Fahrt), alle Linien zusammen, je direction_id gezählt; Wert = größere der beiden Richtungen"
@@ -215,13 +219,18 @@ schulweg:
 grundschule:
   hinweis: "Grundschulen werden über Schulbezirke geplant (§ 106 BbgSchulG). Ohne Schulbezirke (H2) tragen Werte vorlaeufig: true."
   radius_orientierung_m: {wert: 1000, status: orientierung}
+  # Audit K4 (06.11.2026, Entscheidung Andre): Schulen mit Primarstufe (MBJS-Schulform beginnt mit „G/“, etwa G/S
+  # „Oberschule … mit Primarstufe“ oder G/O/OG Schulzentrum mit Grundschulteil; art sek1 in auswertung.einrichtung)
+  # zählen für Entfernung und Einwohner je Standort als Grundschulstandort mit. Ihre Schülerzahl lässt sich nicht
+  # nach Stufe teilen: In Raumeinheiten mit einer solchen Schule steht „Grundschüler je Kind“ ohne Wert.
+  primarstufe_schulform_praefix: "G/"
 
 # ---------------------------------------------------------------------------------- Kita
 kita:
   hinweis: "In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind auf die Raumeinheit beziehen, nicht auf einen Radius."
   radius_orientierung_m: {wert: 500, status: orientierung}
   platz_kind_relation:
-    plaetze: "Kapazität laut MBJS (Betriebserlaubnis), nicht belegte Plätze; je id_kita einmal (weitere Häuser ohne Plätze)"
+    plaetze: "Genehmigte Plätze laut Betriebserlaubnis (MBJS); wie viele frei sind, steht nicht in den Daten; je id_kita einmal (weitere Häuser ohne Plätze)"
     kinder_krippe_kita: "Zensus i_u3 + i_3_5"
     kinder_hort: "Zensus i_6_9"
     kombinierte_einrichtungen: "Kapazität nicht nach Altersbereich aufteilbar. A6 weist drei Kennzahlen aus: Kita ohne Hortanteil gegen Kinder unter 6, reine Horte gegen 6 bis 9, alle Plätze gegen den Bedarf nach Baulandmodell (Prüfbericht 9)"
@@ -249,6 +258,18 @@ baulandmodell:
   # Zensus 2022 hat 6–9 und 10–15 Jahre (infrastrukturelle Altersgruppen). 6 bis unter 12 = i_6_9 plus der Anteil
   # 10–11 an i_10_15, geschätzt als gleich verteilt (2 von 6 Jahrgängen). Eigene Festlegung von A6, steht an jedem Wert.
   zensus_6_bis_unter_12: {i_6_9: 1.0, i_10_15: 0.3333}
+  # Status je Kennzahl (Audit 06.11.2026, K4 und K7, Entscheidung Andre „alle wie empfohlen“). Gegengelesen am
+  # 06.11.2026 im selben PDF: Anlage C (S. 38) nennt Versorgungsquoten zur Ermittlung des Platzbedarfs neuer
+  # Vorhaben (Nr. 3.4.3, S. 13); Nr. 3.4.4 (S. 14–15) bezieht beim Kapazitätsabgleich Kitas und Grundschulen in
+  # angrenzenden Planungsräumen ein. Der Planer rechnet je Planungsraum allein und vergleicht bei der Grundschule
+  # Schüler am Schulort mit Kindern am Wohnort. Beides ist nicht die Rechenweise des Dokuments: Orientierung.
+  status_je_kennzahl:
+    plaetze_je_bedarf:
+      status: orientierung
+      grund: "Abweichend von Nr. 3.4.4 (Kita-Bedarfsplanung) ohne angrenzende Planungsräume gerechnet; deshalb Orientierung, kein amtlicher Maßstab."
+    schueler_je_kind:
+      status: orientierung
+      grund: "Anlage C nennt eine Bedarfsquote für den Platzbedarf neuer Vorhaben, keine Norm für Schüler am Schulort; Nr. 3.4.4 bezieht angrenzende Planungsräume ein. Deshalb Orientierung, kein amtlicher Maßstab."
 
 # ---------------------------------------------------------------------------------- Spielplatz
 spielplatz:

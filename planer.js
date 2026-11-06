@@ -95,10 +95,26 @@ var KENNZAHL = {
   anteil_in_radius: function (w) { return "Anteil " + (w.zielgruppe || "der Einwohner") + " mit " + art(w.art).kurz + (w.richtwert ? " in " + zahl(w.richtwert.wert) + NB + w.richtwert.einheit : " in der Nähe"); },
   ew_je_einrichtung: function (w) { return "Einwohner je " + art(w.art).kurz; },
   plaetze_je_kind: function (w) { return "Plätze je Kind, " + art(w.art).kurz + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
+  plaetze_je_bedarf: function () { return "Plätze je Bedarfsplatz (Krippe, Kindergarten, Hort)"; },
+  schueler_je_kind: function (w) { return "Grundschüler je Kind" + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
   oepnv_erschliessung: function () { return "ÖPNV-Erschließung nach Nahverkehrsplan"; },
+  oepnv_takt: function () { return "ÖPNV-Erschließung mit Soll-Takt"; },
   gruen_m2_je_ew: function () { return "Grünfläche je Einwohner"; }
 };
 function kennzahlText(w) { return KENNZAHL[w.kennzahl] ? KENNZAHL[w.kennzahl](w) : wort(w.kennzahl) + ", " + art(w.art).kurz; }
+// Gleiche Kennzahl in Raumeinheit und gesamt (ganz Potsdam): Kennzahl, Art, Maßstab
+function wertSchluessel(w) { return [w.kennzahl, w.art, w.richtwert ? w.richtwert.wert : "-"].join("|"); }
+// „826 von 1.354“ mit Bedeutung von Zähler und Nenner (Audit K14); Personen und Bedarf sind laut Datei gerundet
+function znKurz(w) { return w.zaehler == null || w.nenner == null ? "" : fmt.format(w.zaehler) + " von " + fmt.format(w.nenner); }
+function znText(w) {
+  if (!znKurz(w)) return "";
+  return znKurz(w) + " (Zähler: " + (w.zaehler_text || "") + "; Nenner: " + (w.nenner_text || "") + ")";
+}
+function differenzText(w) {
+  if (w.differenz == null) return "";
+  return w.differenz < 0 ? "Rechnerisch fehlen " + fmt.format(-w.differenz) + " Plätze zum Bedarf." :
+    "Rechnerisch " + fmt.format(w.differenz) + " Plätze mehr als der Bedarf.";
+}
 function zahl(v) { return v == null ? "k. A." : (Math.abs(v) < 10 && v % 1 ? zahl2 : fmt1).format(v).replace(/,0$/, ""); }
 var METHODE = { luftlinie: "Luftlinie", fussweg: "Fußweg" };
 // Flächenquoten je Raumeinheit haben keinen Entfernungsbezug: dort kein Etikett zur Messart
@@ -149,7 +165,7 @@ function hashSchreiben() {
 var RAUMEBENE = {
   pr: { name: "Planungsräume", einzahl: "Planungsraum", datei: "planungsraum", fc: PR,
     att: 'Planungsräume © Landeshauptstadt Potsdam, <a href="' + DLDE + '">dl-de/by-2-0</a>, Daten verändert' },
-  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" }
+  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" }
 };
 var RAUMEBENE_DATEI = { stadtteil: "Stadtteilen", planungsraum: "Planungsräumen" };
 var RAUM = {};
@@ -162,9 +178,9 @@ var LEER = { type: "FeatureCollection", features: [] };
 var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 } };
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
-  style: { version: 8, sources: {
+  style: T.grundkarte({ version: 8, sources: {
       basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://basemap.de">basemap.de / BKG</a>, <a href="' + DLDE + '">dl-de/by-2-0</a>' },
+        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
       zellen: { type: "geojson", data: LEER },
       raum: { type: "geojson", data: RAUMEBENE[S.raum].fc, promoteId: "nr", attribution: RAUMEBENE[S.raum].att },
       ein: { type: "geojson", data: LEER },
@@ -178,11 +194,12 @@ var map = new maplibregl.Map(Object.assign({
       { id: "raum-wahl", type: "line", source: "raum", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } },
       { id: "ein_odbl", type: "circle", source: "ein_odbl", layout: { visibility: "none" }, paint: {} },
       { id: "ein", type: "circle", source: "ein", paint: {} }
-    ] },
+    ] }, { vor: "ein_odbl" }),
   maxZoom: 19, maxPitch: 60, attributionControl: false, fadeDuration: RUHIG ? 0 : 300,
-  locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
 }, start));
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }), "top-right");
+map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 window.KIEZ_KARTE = map;
 
@@ -295,7 +312,7 @@ function zuBauen() {
 }
 $("zu").addEventListener("change", function (e) { if (e.target.name === "zu") { S.zu = e.target.value; zuAnwenden(); } });
 $("weg").addEventListener("change", function (e) { if (e.target.name === "weg") wegSetzen(e.target.value); });
-function wegSetzen(w) { S.weg = w; nochmal(); odblVermerk(); zuAnwenden(); versorgung(); raumHinweis(); }
+function wegSetzen(w) { S.weg = w; nochmal(); odblVermerk(); zuAnwenden(); versorgung(); raumHinweis(); vergleich(); }
 
 // themen.js liest KIEZ_ZELLEN beim eigenen Laden; zellen.js kommt hier erst bei Bedarf. Darum prüft die Seite
 // die Zellreihenfolge selbst (gleiche Regel wie KIEZ_THEMEN.ebenen.zellwerte: anzahl, erste_id, letzte_id).
@@ -423,7 +440,7 @@ function versorgung() {
         laufend--; planerLaedt[dn] = !!d;
         if (!d && dn === "planer_fuss") { meldung("Die Fußweg-Tabelle ließ sich nicht laden; sie zeigt Luftlinie."); S.weg = "luft"; odblVermerk(); zuAnwenden(); }
         if (d) { zuBauen(); raumHinweis(); }
-        versorgung(); pruefeBereit();
+        versorgung(); vergleich(); pruefeBereit();
       });
     }
     box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? "Die Versorgungsdatei ließ sich nicht laden." : "Daten werden geladen.")); return;
@@ -448,6 +465,7 @@ function versorgung() {
   var lz = el("a", "link", "Lizenztext"); lz.href = DLDE; ew.appendChild(lz); ew.appendChild(document.createTextNode(", Daten verändert (eigene Berechnung))"));
   box.appendChild(ew);
   if (P.hinweis) box.appendChild(el("p", "fuss vs-hinweis", P.hinweis));
+  steckbriefLink(box, p, P);
   var ul = el("ul", "vs-liste"); ul.setAttribute("aria-label", "Versorgung " + p.name);
   R.werte.forEach(function (w) {
     var li = el("li", "vs-zeile" + (w.status === "orientierung" ? " vs-zeile--orientierung" : ""));
@@ -456,6 +474,9 @@ function versorgung() {
     var z = el("p", "vs-wert"); z.appendChild(el("span", "vs-zahl", w.wert == null ? "k. A." : zahl(w.wert) + NB + w.einheit));
     if (wegText(w)) z.appendChild(el("span", "marke-weg", wegText(w)));
     li.appendChild(z);
+    if (znText(w)) li.appendChild(el("p", "vs-zn", znText(w) + (differenzText(w) ? ". " + differenzText(w) : "")));
+    var G = P.gesamt && P.gesamt.werte.filter(function (g) { return wertSchluessel(g) === wertSchluessel(w); })[0];
+    if (G) li.appendChild(el("p", "vs-stadt", "Ganz Potsdam: " + (G.wert == null ? "kein Wert" : zahl(G.wert) + NB + G.einheit) + (znKurz(G) ? " (" + znKurz(G) + ")" : "")));
     var st = el("p", "vs-status");
     st.appendChild(el("span", "abzeichen abzeichen--" + statusKlasse(w), statusText(w)));
     if (w.vorlaeufig) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", "vorläufig, ohne Schulbezirk"));
@@ -475,6 +496,72 @@ function versorgung() {
   QN.forEach(function (k) { var li = el("li"), Q = P.quellen[k] || { vermerk: k }; li.appendChild(vermerkKnoten(Q.vermerk)); ol.appendChild(li); });
   box.appendChild(ol);
 }
+
+// Druckseite A4 je Planungsraum (daten/export/steckbriefe/<nr>.html, aus skripte/16_export.py); nur für die
+// echten Planungsräume, nicht für Beispieldaten oder die Stadtteil-Ebene. Der Steckbrief rechnet in Luftlinie.
+function steckbriefLink(box, p, P) {
+  if (FIXTURE || S.raum !== "pr" || P.raumebene !== "planungsraum") return;
+  var z = el("div", "seite__aktion vs-steckbrief"), a = el("a", "knopf knopf--rand");
+  a.href = WURZEL + "export/steckbriefe/" + encodeURIComponent(p.nr) + ".html";
+  var f = el("span", "knopf__flut"); f.setAttribute("aria-hidden", "true"); a.appendChild(f);
+  a.appendChild(el("span", "knopf__text", "Steckbrief (A4)")); a.title = "Steckbrief " + p.nr + " " + p.name + " als Druckseite";
+  z.appendChild(a); box.appendChild(z);
+  box.appendChild(el("p", "fuss", "Druckseite dieses Planungsraums mit der Versorgungstabelle. Der Steckbrief rechnet in Luftlinie" +
+    (S.weg === "fuss" ? ", die Tabelle hier zeigt den Fußweg." : ".")));
+}
+
+// ---------- Vergleich aller Raumeinheiten (Audit K24): eine Kennzahl für jede Raumeinheit und ganz Potsdam.
+// Lädt die Versorgungsdatei erst auf Knopfdruck (Startgewicht), zeigt Wert, Zähler und Nenner aus der Datei.
+var vgOffen = false;
+function vergleich() {
+  var box = $("vg-inhalt"), sel = $("vg-kennzahl"); if (!box || !vgOffen) return;
+  var P = planerDaten();
+  if (!P) {
+    var dn = S.weg === "fuss" ? "planer_fuss" : "planer";
+    box.innerHTML = ""; box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? "Die Versorgungsdatei ließ sich nicht laden." : "Daten werden geladen."));
+    if (planerLaedt[dn] === undefined) {
+      planerLaedt[dn] = true; beginn();
+      holen(dn, function (d) { laufend--; planerLaedt[dn] = !!d; if (d) { zuBauen(); raumHinweis(); } versorgung(); vergleich(); pruefeBereit(); });
+    }
+    return;
+  }
+  // Auswahl: jede Kennzahl einmal, in der Reihenfolge der Datei
+  var liste = [], gesehen = {};
+  Object.keys(P.raeume).forEach(function (k) { P.raeume[k].werte.forEach(function (w) { var s = wertSchluessel(w); if (!gesehen[s]) { gesehen[s] = 1; liste.push(w); } }); });
+  var alt = sel.value, schl = liste.map(wertSchluessel).join(",");
+  if (sel.dataset.liste !== schl) {
+    sel.innerHTML = "";
+    liste.forEach(function (w) { var o = el("option", null, kennzahlText(w) + (wegText(w) ? ", " + wegText(w) : "")); o.value = wertSchluessel(w); sel.appendChild(o); });
+    sel.dataset.liste = schl;
+  }
+  sel.value = gesehen[alt] ? alt : (liste[0] ? wertSchluessel(liste[0]) : "");
+  sel.disabled = false;
+  var w0 = liste.filter(function (w) { return wertSchluessel(w) === sel.value; })[0];
+  box.innerHTML = ""; if (!w0) return;
+  var tab = el("table", "tabelle vg-tabelle"), cap = el("caption", "nur-sr", kennzahlText(w0) + ", alle " + (P.raumebene === "planungsraum" ? "Planungsräume" : "Stadtteile") + " und ganz Potsdam");
+  tab.appendChild(cap);
+  var kopf = el("tr"); [P.raumebene === "planungsraum" ? "Planungsraum" : "Stadtteil", "Wert", "Zähler", "Nenner"].forEach(function (x) { var th = el("th", null, x); th.scope = "col"; kopf.appendChild(th); });
+  var th = el("thead"); th.appendChild(kopf); tab.appendChild(th);
+  function reihe(teil, nr, name, w, fuss) {
+    var tr = el("tr", fuss ? "vg-stadt" : null), c = el("th", null, (nr ? nr + " " : "") + name); c.scope = "row"; tr.appendChild(c);
+    tr.appendChild(el("td", null, !w || w.wert == null ? "kein Wert" : zahl(w.wert) + NB + w.einheit));
+    tr.appendChild(el("td", null, w && w.zaehler != null ? fmt.format(w.zaehler) : ""));
+    tr.appendChild(el("td", null, w && w.nenner != null ? fmt.format(w.nenner) : ""));
+    teil.appendChild(tr);
+  }
+  var tb = el("tbody");
+  Object.keys(P.raeume).sort(function (a, b) { return a - b; }).forEach(function (nr) {
+    var R = P.raeume[nr]; reihe(tb, nr, R.name, R.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0], false);
+  });
+  tab.appendChild(tb);
+  if (P.gesamt) { var tf = el("tfoot"); reihe(tf, "", "Ganz Potsdam", P.gesamt.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0], true); tab.appendChild(tf); }
+  box.appendChild(tab);
+  var G = P.gesamt && P.gesamt.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0];
+  box.appendChild(el("p", "fuss vg-hinweis", (w0.zaehler_text ? "Zähler: " + w0.zaehler_text + ". Nenner: " + w0.nenner_text + ". " : "Ohne Zähler und Nenner (Median über die Zellen). ") +
+    statusText(w0) + (G ? ". " + G.unsicherheit : ". Für ganz Potsdam gibt es hier keinen Wert.") + " Hinweise je Raumeinheit stehen in der Versorgungstabelle oben."));
+}
+$("vg-laden").addEventListener("click", function () { vgOffen = true; this.hidden = true; $("vg-auswahl").hidden = false; vergleich(); });
+$("vg-kennzahl").addEventListener("change", vergleich);
 
 // ---------- Fragen als Einstieg: jede setzt den Zustand und erklärt nebenbei eine Funktion
 var FRAGEN = [
@@ -544,7 +631,7 @@ function popupEinrichtung(e, f) {
   if (p.plaetze != null) tab += zeile("Plätze", fmt.format(p.plaetze));
   if (p.schueler != null) tab += zeile("Schüler", fmt.format(p.schueler) + (p.schueler_stand ? " (Stand " + esc(p.schueler_stand) + ")" : ""));
   if (tab) h += "<table class='pop-tab'>" + tab + "</table>";
-  if (p.plaetze != null) h += "<div class='pop-q'>Kapazität laut Betriebserlaubnis, nicht belegte Plätze.</div>";
+  if (p.plaetze != null) h += "<div class='pop-q'>Genehmigte Plätze laut Betriebserlaubnis. Wie viele frei sind, steht nicht in den Daten.</div>";
   if (p.status === "lage_ohne_kapazitaet" || osm) h += "<div class='pop-q'>Nur Lage, ohne Kapazität" + (NUR_LAGE[p.art] ? "; keine Aussage zur Versorgung" : "") + ".</div>";
   if (p.hinweis) h += "<div class='pop-q'>" + esc(p.hinweis) + "</div>";
   else if (p.in_potsdam === false) h += "<div class='pop-q'>Außerhalb der Stadtgrenze; zählt für die Entfernungen mit.</div>";
@@ -633,6 +720,16 @@ function methode() {
       tr.appendChild(td); tb.appendChild(tr);
     });
     tab.appendChild(tb); box.appendChild(tab);
+    // Zahl der Planungsräume aus der Datei statt fest im Text (K28); Beispieldaten rechnen auf Stadtteilen
+    if (P.raumebene === "planungsraum" && !P.fixture) document.querySelectorAll('[data-feld="anzahl-raeume"]').forEach(function (n) { n.textContent = String(Object.keys(P.raeume).length); });
+    // Prüfwerte mit Beleg aus der Datei (Audit K28): Zahl, Stand und Belegdatei; ohne Datei bleibt der Text im HTML
+    var PW = P.fixture ? null : P.pruefwerte;
+    if (PW) {
+      var stellen = { ganz: { maximumFractionDigits: 0 }, eins: { minimumFractionDigits: 1, maximumFractionDigits: 1 }, genau: { maximumFractionDigits: 3 } };
+      document.querySelectorAll("[data-pw]").forEach(function (n) { var x = PW[n.getAttribute("data-pw")]; if (x) n.textContent = new Intl.NumberFormat("de-DE", stellen[n.getAttribute("data-format") || "genau"]).format(x.wert); });
+      document.querySelectorAll("[data-pw-stand]").forEach(function (n) { var x = PW[n.getAttribute("data-pw-stand")]; if (x) n.textContent = new Date(x.stand + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" }); });
+      document.querySelectorAll("[data-pw-beleg]").forEach(function (n) { var x = PW[n.getAttribute("data-pw-beleg")]; if (x) n.textContent = x.beleg; });
+    }
     var h = $("planer-hinweis"); if (h) h.textContent = (P.hinweis || "") + " Einwohnerzahlen sind auf " + fmt.format(P.rundung.ew) + " gerundet. Raumebene der Datei: " + (P.raumebene === "stadtteil" ? "Stadtteile" : "Planungsräume") + ", Stand der Auswertung " + P.stand.split("-").reverse().join(".") + ".";
     window.KIEZ_BEREIT = true;
   });

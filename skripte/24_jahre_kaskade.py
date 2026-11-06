@@ -181,7 +181,7 @@ GEBIETE = [
 # Historischen Innenstadt zwischen älteren und neueren Bauten gleicher Form; eine Grenze lässt sich aus
 # den Gebäudedaten nicht sicher ziehen. Sie bleiben bei Stufe 4 (Zensus).
 
-NAS_BESTE = ("(SELECT DISTINCT ON (oid_bezug) oid_bezug, dachform, bauweise, objekthoehe "
+NAS_BESTE = ("(SELECT DISTINCT ON (oid_bezug) oid_bezug, dachform, bauweise, objekthoehe, geschosse "
              "FROM auswertung.alkis_nas_gebaeude "
              "WHERE oid_bezug IS NOT NULL ORDER BY oid_bezug, ueberlappung DESC NULLS LAST, gml_id)")
 
@@ -587,6 +587,17 @@ def kaskade(cur, ohne_stufe1: bool = False) -> dict:
             "wohn_ohne_zelle": sum(len(o) for z, o in wohn_je_zelle.items() if z not in anteile)}
 
 
+def hoehe_m(objekthoehe, geschosse) -> tuple[int, str]:
+    """Höhe für die 3D-Ansicht in ganzen Metern und ihre Herkunft: ALKIS-Objekthöhe (relativ zum Gelände,
+    "kataster"), sonst Geschosse × 3 m ("geschosse"), sonst 3 m ("ersatz"). Werte bis 0,5 m (Tiefbauten, negative
+    Angaben) gelten als fehlend."""
+    if objekthoehe is not None and float(objekthoehe) > 0.5:
+        return max(1, round(float(objekthoehe))), "kataster"
+    if geschosse:
+        return int(geschosse) * 3, "geschosse"
+    return 3, "ersatz"
+
+
 def rechnen() -> None:
     with verbinden() as conn, conn.cursor() as cur:
         e = kaskade(cur)
@@ -601,16 +612,18 @@ def rechnen() -> None:
         teile = [r[0] for r in cur.fetchall()]
         groessen = {}
         for nr in teile:
-            cur.execute(f"""SELECT s.oid, ST_AsGeoJSON(ST_SimplifyPreserveTopology(s.geom, 0.000005), 6)
+            cur.execute(f"""SELECT s.oid, ST_AsGeoJSON(ST_SimplifyPreserveTopology(s.geom, 0.000005), 6),
+                                   n.objekthoehe, coalesce(n.geschosse, s.anzahlgs)
                             FROM {SNAPSHOT} s JOIN public.stadtteil t ON t.nr = %s
-                                 AND ST_Contains(t.geom, ST_PointOnSurface(s.geom)) ORDER BY s.oid""", (nr,))
+                                 AND ST_Contains(t.geom, ST_PointOnSurface(s.geom))
+                            LEFT JOIN {NAS_BESTE} n ON n.oid_bezug = s.oid ORDER BY s.oid""", (nr,))
             feats = []
-            for oid, gj in cur.fetchall():
+            for oid, gj, oh, gs in cur.fetchall():
                 j, k, _genau, _q, s = zeilen[oid]
                 g = "belegt" if s in (1, 2) else ("nicht_datiert" if s == 6 else "geschaetzt")
                 q = {1: "beleg", 2: "klammer", 3: "blocktyp", 4: "zensus", 5: "nachbarn"}.get(s)
                 feats.append({"type": "Feature", "geometry": json.loads(gj),
-                              "properties": {"j": j, "k": k, "g": g, "q": q, "s": s}})
+                              "properties": {"j": j, "k": k, "g": g, "q": q, "s": s, **dict(zip(("h", "hq"), hoehe_m(oh, gs)))}})
             genutzt = {f["properties"]["q"] for f in feats} - {None}
             quellen = {k: v for k, v in QUELLEN_JS.items() if k in genutzt or k == "umrisse"}
             inhalt = {"type": "FeatureCollection", "stand": date.today().isoformat(), "klassen": KLASSEN,
@@ -789,7 +802,8 @@ def ruecktest() -> None:
     # Rücktest
     L.append("## Rücktest\n")
     L.append("Die Prüfgebäude gehen in keine Stufe ein: Wikipedia-Jahre sind nur Prüfspalte (Korrektur 5), die "
-             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern. Seit dem Wikidata-Export rechnet der "
+             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern durch einen KI-Agenten (Claude, 05.11.2026), "
+             "ohne zweite Bewertung; Referenz und Luftbildklammer lesen dieselben Bilder (pruefen/B3_protokoll.md). Seit dem Wikidata-Export rechnet der "
              "Rücktest die Kaskade ein zweites Mal **ohne Stufe 1** (Protokoll, Nachtrag N3): Kein Prüfgebäude "
              "kennt dort sein genaues Jahr, die Wikidata-Jahre werden selbst zum dritten Prüfsatz. Die Stufen in den "
              "Tabellen sind die dieses Laufs. Gemessen wird die Klasse aus der Kaskade "

@@ -7,7 +7,7 @@ in anderen Formaten weiter. Für die Zusammenführung in I1 gibt es zwei Ergänz
 
 | Datei | Lizenz | Namensnennung |
 |---|---|---|
-| `export/kiezatlas_potsdam.gpkg`, `export/csv/*.csv` | je Ebene: Grenzen der Planungsräume dl-de/by-2-0 (H1, Landeshauptstadt Potsdam), Grenzen der Stadtteile dl-zero-de/2.0, Werte, Einrichtungen, Zellen und Grünflächen dl-de/by-2-0, Haltestellen und ÖPNV-Werte CC BY 4.0 | Tabelle `lizenz` in der GPKG bzw. `csv/lizenz.csv`, dazu `export/README.md`; jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link |
+| `export/kiezatlas_potsdam.gpkg`, `export/csv/*.csv` | je Ebene: Grenzen der Planungsräume dl-de/by-2-0 (H1, Landeshauptstadt Potsdam), Grenzen der Stadtteile dl-de/zero-2-0, Werte, Einrichtungen, Zellen und Grünflächen dl-de/by-2-0, Haltestellen und ÖPNV-Werte CC BY 4.0 | Tabelle `lizenz` in der GPKG bzw. `csv/lizenz.csv`, dazu `export/README.md`; jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link |
 | `export/kiezatlas_potsdam_odbl.gpkg`, `export/csv_odbl/*.csv` (entstehen erst mit A3/A5b) | Open Database License 1.0 | © OpenStreetMap-Mitwirkende, https://opendatacommons.org/licenses/odbl/1-0/ |
 | `export/steckbriefe/*.html` | wie die Werte (dl-de/by-2-0, CC BY 4.0); Vermerke stehen im Steckbrief | je Steckbrief Abschnitt „Quellen und Lizenzen“ |
 | `export/kiezatlas_potsdam.qgz`, `export/stile/*.qml` | Apache-2.0 (Projektdatei und Stile, keine Daten) | – |

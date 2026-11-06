@@ -23,7 +23,17 @@
 <body>
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 <header class="kopfleiste">
-  <a class="marke" href="./"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 <main id="inhalt" class="leer">
   <svg class="leer__gitter" viewBox="-0.5 -0.5 101 101" aria-hidden="true"><g stroke="#cdd1cc" stroke-width=".4"><line x1="0" y1="0" x2="0" y2="100"/><line x1="0" y1="0" x2="100" y2="0"/><line x1="20" y1="0" x2="20" y2="100"/><line x1="0" y1="20" x2="100" y2="20"/><line x1="40" y1="0" x2="40" y2="100"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="60" y1="0" x2="60" y2="100"/><line x1="0" y1="60" x2="100" y2="60"/><line x1="80" y1="0" x2="80" y2="100"/><line x1="0" y1="80" x2="100" y2="80"/><line x1="100" y1="0" x2="100" y2="100"/><line x1="0" y1="100" x2="100" y2="100"/></g><rect x="40" y="40" width="20" height="20" fill="#fafbf8" stroke="#6a2c82" stroke-width=".5" stroke-dasharray="1.5 1"/><circle cx="50" cy="50" r="1.4" fill="#13212a" stroke="#fff" stroke-width=".5"/></svg>
@@ -33,6 +43,7 @@
     <a class="knopf knopf--voll" href="./"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Zurück zur Karte</span></a>
   </div>
 </main>
-<footer class="fuss-seite"><p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p></footer>
+<footer class="fuss-seite"><p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
+</footer>
 </body>
 </html>

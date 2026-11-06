@@ -14,6 +14,8 @@ const HIER = path.dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+// Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
+const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const befunde = [];
 function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if (!ok) befunde.push(text); }
 
@@ -37,7 +39,7 @@ async function probe(basis, art) {
   const ctx = await browser.newContext({ reducedMotion: "reduce" });
   const page = await ctx.newPage();
   const konsole = [], seitenfehler = [];
-  await page.route("**/*", (r) => eigen(r.request().url()) ? r.continue() : r.fulfill({ status: 200, contentType: "image/png", body: LEERBILD }));
+  await page.route("**/*", (r) => eigen(r.request().url()) ? r.continue() : r.fulfill(fremdAntwort(r.request().url())));
   page.on("console", (m) => { if (m.type() === "error") konsole.push(m.text()); });
   page.on("pageerror", (e) => seitenfehler.push(e.message));
   await page.goto(basis + "karte.html", { waitUntil: "load" });
@@ -119,8 +121,8 @@ async function probe(basis, art) {
     return o;
   });
 
-  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "HASH", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
-    "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
+  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "HQ", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
+    "grundLuft", "grundkarte", "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
   pruef(JSON.stringify(r.schluessel) === JSON.stringify(soll), `Objekt KIEZ_THEMEN hat genau die ${soll.length} Namen des Vertrags`);
   pruef(r.paare.slice(0, 7).join(",") === "stadtteile/stadtteile,ew/ew,d_alter/alter,q_u18/u18,q_65p/65p,q_v1949/vor1949,q_fern/fern" && r.hashOk,
     `Themen-Schlüssel id/h wie im Vertrag (${r.paare.slice(0, 7).join(", ")})`);
@@ -141,7 +143,7 @@ async function probe(basis, art) {
   pruef(r.hoeheFaktor && r.hoeheEins, "hoehe: faktor wirkt, faktor 1 = Standard");
   pruef(r.text.join("|") === "182.673|17,9|182.700|460|k. A.|20,2 %|Potsdam|" + r.text[7] + "|&lt;a &quot;b&quot;&gt;&amp;" && r.text[7] !== "Potsdam",
     `Texthelfer: ${r.text.join(" | ")}`);
-  pruef(S.ganz && S.teile === 32 && S.umriss === 2 && S.polys && S.farbe === 32 && S.bezirk >= 7 && S.stufen === 5 && S.grau === "#d5d8d3", `Geometrie und Farben: ${JSON.stringify(S)}`);
+  pruef(S.ganz && S.teile === 32 && S.umriss === 2 && S.polys && S.farbe === 32 && S.bezirk >= 7 && S.stufen === 5 && S.grau === "#cdc8be", `Geometrie und Farben: ${JSON.stringify(S)}`);
   pruef(typeof r.leer.ausdruck === "string" && /^#/.test(r.leer.ausdruck) && !r.leer.gemerkt && !r.leer.mapFehler,
     `Ebenen-Thema ohne Werte: einfarbig ${JSON.stringify(r.leer.ausdruck)}, nicht gemerkt, MapLibre nimmt es an`);
   pruef(r.fuss === 3443 && r.gemischt.klassen && r.gemischt.klassen.grenzen.length >= 1 && r.gemischt.klassen.grenzen.every((g) => typeof g === "number") && !r.gemischt.mapFehler,
