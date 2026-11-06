@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="kopf-zwei">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,13 +15,23 @@
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Seiten">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html" aria-current="true"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten der Bauzeiten">
     <ul>
-      <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      <li><a class="nav" href="jahre.html"><span>Übersicht</span></a></li>
       <li><a class="nav" href="jahre.html#stadtteile"><span>Stadtteile</span></a></li>
       <li><a class="nav" href="jahre-methode.html"><span>Methode</span></a></li>
-      <li><a class="nav" href="jahre-daten.html" aria-current="true"><span>Daten</span></a></li>
+      <li><a class="nav" href="jahre-daten.html" aria-current="page"><span>Daten</span></a></li>
     </ul>
   </nav>
 </header>

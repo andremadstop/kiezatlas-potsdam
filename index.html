@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="kopf-zwei">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,10 +25,19 @@
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 
 <header class="kopfleiste">
-  <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
-  <nav aria-label="Abschnitte">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html" aria-current="true"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Abschnitte der Startseite">
     <ul>
-      <li><a class="nav nav--karte" href="karte.html"><span>Karte frei erkunden</span></a></li>
       <li><a class="nav" href="#fragen"><span>Fragen</span></a></li>
       <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
       <li><a class="nav" href="#schaugrafik"><span>Schaugrafik</span></a></li>
@@ -120,11 +129,11 @@
     <li class="frage" id="frage-8" data-schritt="8">
       <p class="frage__nr">Frage 8</p>
       <h2 class="frage__titel">Wie weit ist es zur nächsten Kita?</h2>
-      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie. Dazu kommt je Planungsraum der Stadt eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
+      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie und als Fußweg auf dem Wegenetz aus OpenStreetMap. Der Knopf öffnet den Planer mit dem Fußweg zur nächsten Kita. Dazu kommt je Planungsraum der Stadt eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
       <p class="frage__kann"><b>Mehr dazu:</b> Die Planer-Seite zeigt Einrichtungen und Entfernungen. Unter Daten liegen dieselben Werte als GeoPackage und CSV für QGIS.</p>
       <div class="frage__knoepfe">
         <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="8"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Kinder auf der Karte zeigen</span></button>
-        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
+        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita&amp;weg=fuss"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
       </div>
     </li>
     <li class="frage" id="frage-9" data-schritt="9">
