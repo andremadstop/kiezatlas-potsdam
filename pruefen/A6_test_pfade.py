@@ -182,7 +182,11 @@ def main() -> int:
         kl = next(w for w in RL["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
         kf = next(w for w in RF["raeume"]["A"]["werte"] if w["kennzahl"] == "anteil_in_radius" and w["art"] == "kita")
         ok("Obergrenze" in kl["unsicherheit"], "Randhinweis an der Luftlinie")
-        ok("Obergrenze" not in kf["unsicherheit"], "kein Luftlinien-Randhinweis am Fußweg")
+        # Seit Nachlauf N1/N4 (05.11.) hat der Fußweg einen eigenen Randhinweis (nach der Luftlinie gezählt, beim
+        # Fußweg können es mehr sein); verboten bleibt der Luftlinien-Wortlaut am Fußweg
+        ok("die Entfernung nur eine Obergrenze" not in kf["unsicherheit"]
+           and "der Fußweg nur eine Obergrenze" in kf["unsicherheit"] and "gezählt nach der Luftlinie" in kf["unsicherheit"],
+           "kein Luftlinien-Randhinweis am Fußweg, sondern der eigene Fußweg-Hinweis")
 
         PL = p.planer_datei(d, rw, "luftlinie", {}, prog, meld)
         PF = p.planer_datei(d, rw, "fussweg", {}, prog, meld)
