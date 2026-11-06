@@ -135,13 +135,13 @@
   <section class="j-teil" id="m-ruecktest" aria-labelledby="m-rt">
     <h2 id="m-rt">Wie oft die Schätzung trifft</h2>
     <div class="j-teil__text">
-      <p>Geprüft wird an Gebäuden mit bekannter Bauzeit, die in keine Schätzung eingehen. Die genauen Jahre aus Wikidata werden dafür zurückgehalten: Die Schätzung wird für den Rücktest ohne sie gerechnet, sonst kennte sie die Antwort schon. Treffer heißt: Die geschätzte Klasse überschneidet die bekannte Bauzeit. Die Regeln standen vor dem Lauf fest. Die Quoten gelten nur für die jeweiligen Prüfgebäude, nicht für die ganze Stadt.</p>
+      <p>Geprüft wird an Gebäuden mit bekannter Bauzeit, die in keine Schätzung eingehen. Die genauen Jahre aus Wikidata werden dafür zurückgehalten: Die Schätzung wird für den Rücktest ohne sie gerechnet, sonst kennte sie die Antwort schon. Treffer heißt: Die geschätzte Klasse überschneidet die bekannte Bauzeit. Die Regeln standen vor dem Lauf fest (Prüfprotokoll <code>pruefen/B4_protokoll.md</code>; die Reihenfolge von Festlegung und Lauf mit Uhrzeit steht in <code>docs/entscheidungen.md</code>, A9). Die Quoten gelten nur für die jeweiligen Prüfgebäude, nicht für die ganze Stadt.</p>
       <p>Neben jeder Quote steht ihr 95-%-Bereich (Intervall nach Wilson, gerechnet aus Treffern und bewerteten Prüfgebäuden). Er zeigt, wie unsicher eine Quote aus wenigen Prüfgebäuden ist. Bei weniger als <span data-j="g-mindest-n">…</span> bewerteten Prüfgebäuden steht nur die Zählung, ohne Prozent und ohne Bereich. Bereich und Rundung sind nur Darstellung; Regeln und Ergebnisse der Schätzung ändern sich dadurch nicht.</p>
       <div id="j-m-ruecktest"></div>
       <p>Gegenprobe ohne bekannte Jahre: An den Gebäuden der Großsiedlungen wurde die Zensus-Verteilung allein gerechnet. Sie ergibt bei <span data-j="g-gegen">…</span> von <span data-j="g-gegen-n">…</span> Gebäuden dieselbe Klasse wie die belegte Bauzeit des Gebiets. Das vergleicht zwei Schätzungen, nicht Schätzung und Wahrheit.</p>
       <ul>
         <li>Die Denkmale stammen fast alle aus der Zeit vor 1919 und stehen meist in Altbauzellen, in denen der Zensus selbst kaum anderes zeigt. Dort ist die Klasse leicht zu treffen.</li>
-        <li>Die Luftbildprüfung deckt nur Bornstedt ab. Viele ihrer Spannen liegen über einer Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.</li>
+        <li>Die Bauzeiten der Prüfgebäude in Bornstedt hat ein KI-Agent (Claude) aus Luftbildern verschiedener Jahre abgelesen, ohne zweite Bewertung durch einen Menschen (Protokoll <code>pruefen/B3_protokoll.md</code>). Diese Referenz ist also selbst eine Ablesung, kein amtliches Baujahr. Die Luftbildprüfung deckt nur Bornstedt ab. Viele ihrer Spannen liegen über einer Klassengrenze („mehrdeutig“) und zählen als Treffer, wenn eine der beiden Klassen stimmt.</li>
         <li>Die Denkmale aus Wikidata und aus Wikipedia sind zum Teil dieselben Gebäude; die beiden Prüfsätze sind nicht unabhängig. Viele Wikidata-Denkmale sind Kirchen, Schlösser und Parkbauten ohne Wohnraum, für die der Zensus nichts sagt; ohne das genaue Jahr bleiben sie oft ohne Klasse.</li>
         <li>Für 1919 bis 1990 gibt es kaum unabhängige Prüfgebäude.</li>
         <li>Beim Berliner Vorbild trafen die Schätzungen in dessen Rücktest <span data-j="g-berlin">…</span>. Mit Potsdam ist das nicht vergleichbar: Hier gibt es <span data-j="klassen-zahl">…</span> breite Klassen statt Jahrzehnten, eine davon 30 Jahre lang, und andere Prüfsätze.</li>
@@ -196,6 +196,7 @@
   <p id="j-vermerk"></p>
   <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Keine Cookies, keine Zählung; diese Seite lädt nichts von fremden Servern.</p>
   <p class="fuss-seite__links"><a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
 </footer>
 
 <script defer src="daten/kennzahlen.js"></script>

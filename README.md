@@ -11,7 +11,11 @@ Prototyp der Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam, Stand
 
 Jede Kernzahl mit dem Beleg, der sie trägt, und dem Skript, das sie erzeugt. Stand des Codes `6cb7efa` mit den
 Ergänzungen dieses Kastens; der Weg aller Skripte steht in [`docs/rundgang.md`](docs/rundgang.md), alle Belege in
-[`belege/README.md`](belege/README.md).
+[`belege/README.md`](belege/README.md). Warum etwas so gerechnet ist, steht im Entscheidungsprotokoll
+[`docs/entscheidungen.md`](docs/entscheidungen.md) (A1 bis A17, mit „Nicht geprüft sind …“); was sich je Stand
+geändert hat, in [`CHANGELOG.md`](CHANGELOG.md); wie man zitiert, in [`CITATION.cff`](CITATION.cff); was das Audit
+vom 06.11.2026 gefunden hat und was daraus wurde, in [`berichte/audit_20261106.md`](berichte/audit_20261106.md).
+Fehler in Daten oder Texten bitte an kontakt@souverain-systems.de.
 
 | Angabe | Beleg | Skript |
 |---|---|---|

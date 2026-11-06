@@ -16,7 +16,9 @@ import hashlib
 import os
 import re
 import shutil
+import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 WURZEL = Path(__file__).resolve().parent.parent
@@ -51,7 +53,17 @@ def stand(liste):
     return max(int((WURZEL / p).stat().st_mtime) for p in liste if p.parts[0] in ("daten", "fonts"))
 
 
-def html_umschreiben(text, stempel):
+def version() -> str:
+    """Stand für den Seitenfuß: Tag oder Commit (git describe), mit „-dirty“, wenn nicht alles committet ist, und Datum."""
+    try:
+        v = subprocess.run(["git", "-C", str(WURZEL), "describe", "--tags", "--always", "--dirty"], capture_output=True,
+                           text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        v = "unbekannt"
+    return f"{date.today().strftime('%d.%m.%Y')}, Version {v}"
+
+
+def html_umschreiben(text, stempel, ver=""):
     def ersetze(m):
         ziel = WURZEL / m.group(2)
         if not ziel.is_file():
@@ -61,6 +73,8 @@ def html_umschreiben(text, stempel):
     marke = '<meta charset="utf-8">'
     if marke not in text:
         sys.exit("Seite ohne <meta charset>: KIEZ_V lässt sich nicht setzen")
+    if ver:
+        text = text.replace("<span data-kiez-version>Entwicklungsstand</span>", f"<span data-kiez-version>{ver}</span>")
     return text.replace(marke, f'{marke}\n<script>window.KIEZ_V="{stempel}"</script>', 1)
 
 
@@ -82,12 +96,13 @@ def main():
             sys.exit(f"{ziel} ist nicht leer und keine frühere Deploy-Kopie (MD5SUMS fehlt); anderes --ziel wählen")
         shutil.rmtree(ziel)
     stempel = stand(liste)
+    ver = version()
     md5 = []
     for p in liste:
         q, z = WURZEL / p, ziel / p
         z.parent.mkdir(parents=True, exist_ok=True)
         if p.suffix == ".html" and len(p.parts) == 1:
-            z.write_text(html_umschreiben(q.read_text(encoding="utf-8"), stempel), encoding="utf-8")
+            z.write_text(html_umschreiben(q.read_text(encoding="utf-8"), stempel, ver), encoding="utf-8")
         else:
             shutil.copy2(q, z)
         md5.append(f"{hashlib.md5(z.read_bytes()).hexdigest()}  {p}")

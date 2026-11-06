@@ -802,7 +802,8 @@ def ruecktest() -> None:
     # Rücktest
     L.append("## Rücktest\n")
     L.append("Die Prüfgebäude gehen in keine Stufe ein: Wikipedia-Jahre sind nur Prüfspalte (Korrektur 5), die "
-             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern. Seit dem Wikidata-Export rechnet der "
+             "B3-Referenz stammt aus einer Sichtprüfung von Luftbildern durch einen KI-Agenten (Claude, 05.11.2026), "
+             "ohne zweite Bewertung; Referenz und Luftbildklammer lesen dieselben Bilder (pruefen/B3_protokoll.md). Seit dem Wikidata-Export rechnet der "
              "Rücktest die Kaskade ein zweites Mal **ohne Stufe 1** (Protokoll, Nachtrag N3): Kein Prüfgebäude "
              "kennt dort sein genaues Jahr, die Wikidata-Jahre werden selbst zum dritten Prüfsatz. Die Stufen in den "
              "Tabellen sind die dieses Laufs. Gemessen wird die Klasse aus der Kaskade "
