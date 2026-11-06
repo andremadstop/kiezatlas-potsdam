@@ -70,15 +70,22 @@ haben keine Lücken und sind gültige Geometrien; jede Zelle wird genau einmal g
 
 - **Zensus-Geheimhaltung:** Fallzahlen sind mit der Cell-Key-Methode leicht verändert; Summen über viele
   Zellen weichen etwas von amtlichen Gebietssummen ab, kleine Einzelwerte sind unscharf.
-- **Gebäudehöhen** in der 3D-Ansicht sind genähert (Geschosse × 3 m). Gemessene Höhen (LoD2) gibt es in der
-  Einzelfassung für Potsdam-West; für die ganze Stadt wäre der CityGML-Download der LGB der richtige Weg,
-  nicht tausende WFS-Abfragen.
+- **Gebäudehöhen** in der 3D-Ansicht sind seit 06.11.2026 die ALKIS-Objekthöhe aus dem NAS-Auszug der LGB
+  (50.356 von 52.309 Gebäuden), sonst Geschosse × 3 m bzw. 3 m; Dächer sind flach dargestellt. Dachformen
+  (LoD2) gäbe es als CityGML-Download der LGB, für die ganze Stadt nicht geprüft
+  (Beleg: `belege/3D_grundkarte_20261106.md`).
 - **Nicht im Repository:** Rohdaten und die Datenbank. Die Seite liest nur die erzeugten Dateien in `daten/`.
 
 ## Lizenz
 
 Code: Apache-2.0. Mitgelieferte Bibliotheken und Schriften unter ihren eigenen Lizenzen (`vendor/README.txt`,
 `fonts/OFL.txt`). Daten: siehe Tabelle; die Quellenvermerke stehen auf der Seite und in der Kartenattribution.
+
+## Code-Karte
+
+[Code-Karte](docs/codekarte/README.md) (Stand Commit `77bd0d6`, 06.11.2026): der Code als Stadt, Fläche nach
+Codezeilen, Höhe und Farbe nach Komplexität, erzeugt mit CodeCharta im Container ohne Netz; fremde Bibliotheken
+und erzeugte Daten nicht gezählt.
 
 ## Kolophon
 
