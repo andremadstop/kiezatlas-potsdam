@@ -36,7 +36,8 @@ window.KIEZ_THEMEN = {
   TEIL, FARBE, BEZIRKFARBE, proBezirk,   // Stadtteile
   fmt, fmt1, rundEw, proz, name, kachel, esc,   // Text
   ebenen,  laden,  v,             // Ebenen-Register, Nachladen, Cache-Busting
-  grundkarte, grundLuft, GRUNDKARTE   // Vektor-Grundkarte (daten/grundkarte.js) einsetzen, Luftbild-Umschaltung, ob geladen
+  grundkarte, grundLuft, GRUNDKARTE,  // Vektor-Grundkarte (daten/grundkarte.js) einsetzen, Luftbild-Umschaltung, ob geladen
+  HQ                                   // Klartext zur Herkunft der Gebäudehöhe (Feld hq), seit 06.11.2026
 };
 ```
 

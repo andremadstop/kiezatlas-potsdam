@@ -228,7 +228,7 @@ async function bewegung() {
   const SEITEN = { "index.html": "index.html", "karte.html": "karte.html", "planer.html": "planer.html", "planer-methode.html": "planer.html",
     "planer-daten.html": "planer.html", "jahre.html": "jahre.html", "jahre-methode.html": "jahre.html", "jahre-daten.html": "jahre.html", "404.html": null };
   // jahre-methode.html gehört im Audit-Durchgang einer anderen Gruppe; bis ihr Kopf nachgezogen ist, nur Hinweis statt Befund
-  const AUSSTEHEND = new Set(["jahre-methode.html"]);
+  const AUSSTEHEND = new Set([]);
   console.log("Kopfzeile (K31)");
   for (const [datei, eigen] of Object.entries(SEITEN)) {
     const t = fs.readFileSync(path.join(WURZEL, datei), "utf8");

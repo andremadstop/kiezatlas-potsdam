@@ -8,7 +8,7 @@ robots-Befund je Datei stehen in der `HERKUNFT.md` des jeweiligen Ordners unter 
 | Datei | Bezug | Einträge |
 |---|---|---:|
 | [`rohdaten.sha256`](rohdaten.sha256) | Repo-Wurzel (`rohdaten/` ist ein Verweis auf `../kiezatlas-potsdam-west/rohdaten`) | 7 |
-| [`rohdaten.kiez_daten.sha256`](rohdaten.kiez_daten.sha256) | `$KIEZ_DATEN` | 80 |
+| [`rohdaten.kiez_daten.sha256`](rohdaten.kiez_daten.sha256) | `$KIEZ_DATEN` | 78 |
 
 Nachprüfen (ohne Netz):
 
@@ -47,6 +47,10 @@ Für jede Datei wurde die Prüfsumme am 06.11.2026 neu berechnet und in der `HER
 Ergebnis: 74 von 80 stehen dort mit genau diesem Wert, 3 weitere dort gekürzt (Anfang und Ende stimmen),
 3 hatten keinen. Keine Datei weicht von einer dokumentierten Prüfsumme ab, und jede Prüfsumme in diesen
 `HERKUNFT.md` gehört zu einer vorhandenen Datei.
+
+Nicht in der Liste (seit 06.11.2026): die zwei Eingangsdateien, die unter den Nutzungsbedingungen der
+Landeshauptstadt Potsdam stehen und nur intern genutzt werden (Grundschuleinzugsgebiete, Grünflächen-Portal);
+ihre Prüfsummen stehen nur in `$KIEZ_DATEN/eingang/HERKUNFT.md`. Die Liste hat deshalb 78 Einträge.
 
 | Ordner | Dateien | wie in HERKUNFT.md | Anmerkung |
 |---|---:|---:|---|

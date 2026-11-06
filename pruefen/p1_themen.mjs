@@ -121,7 +121,7 @@ async function probe(basis, art) {
     return o;
   });
 
-  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
+  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "HQ", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
     "grundLuft", "grundkarte", "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
   pruef(JSON.stringify(r.schluessel) === JSON.stringify(soll), `Objekt KIEZ_THEMEN hat genau die ${soll.length} Namen des Vertrags`);
   pruef(r.paare.slice(0, 7).join(",") === "stadtteile/stadtteile,ew/ew,d_alter/alter,q_u18/u18,q_65p/65p,q_v1949/vor1949,q_fern/fern" && r.hashOk,
@@ -143,7 +143,7 @@ async function probe(basis, art) {
   pruef(r.hoeheFaktor && r.hoeheEins, "hoehe: faktor wirkt, faktor 1 = Standard");
   pruef(r.text.join("|") === "182.673|17,9|182.700|460|k. A.|20,2 %|Potsdam|" + r.text[7] + "|&lt;a &quot;b&quot;&gt;&amp;" && r.text[7] !== "Potsdam",
     `Texthelfer: ${r.text.join(" | ")}`);
-  pruef(S.ganz && S.teile === 32 && S.umriss === 2 && S.polys && S.farbe === 32 && S.bezirk >= 7 && S.stufen === 5 && S.grau === "#d5d8d3", `Geometrie und Farben: ${JSON.stringify(S)}`);
+  pruef(S.ganz && S.teile === 32 && S.umriss === 2 && S.polys && S.farbe === 32 && S.bezirk >= 7 && S.stufen === 5 && S.grau === "#cdc8be", `Geometrie und Farben: ${JSON.stringify(S)}`);
   pruef(typeof r.leer.ausdruck === "string" && /^#/.test(r.leer.ausdruck) && !r.leer.gemerkt && !r.leer.mapFehler,
     `Ebenen-Thema ohne Werte: einfarbig ${JSON.stringify(r.leer.ausdruck)}, nicht gemerkt, MapLibre nimmt es an`);
   pruef(r.fuss === 3443 && r.gemischt.klassen && r.gemischt.klassen.grenzen.length >= 1 && r.gemischt.klassen.grenzen.every((g) => typeof g === "number") && !r.gemischt.mapFehler,

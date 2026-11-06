@@ -26,7 +26,7 @@ Ergänzungen dieses Kastens; der Weg aller Skripte steht in [`docs/rundgang.md`]
 | Bauzeit je Gebäude, Stufen 1 bis 6: 106 / 0 / 815 / 17.294 / 8.501 / 25.593 Gebäude | `berichte/B4_holdout.md` | `skripte/24_jahre_kaskade.py` |
 | Rücktest an 193 Gebäuden in Bornstedt: Zensus-Verteilung trifft 125 von 169 (74,0 %) | `berichte/B4_holdout.md` | `skripte/24_jahre_kaskade.py ruecktest` |
 | Einzeljahr nur bei 53 Gebäuden, keines davon mit Wohnraum | `berichte/B4_holdout.md`; Vertrag `daten/schema/jahre_gebaeude.json` geprüft in `pruefstand-20261106-1cf8d56/pruefen.log` (`daten.py`) | `skripte/24_jahre_kaskade.py` |
-| Rohdaten: 7 Kerndateien und 80 Dateien unter `$KIEZ_DATEN` mit SHA256 | `belege/rohdaten.md` | `./pruefen.sh` |
+| Rohdaten: 7 Kerndateien und 78 Dateien unter `$KIEZ_DATEN` mit SHA256 (ohne die 2 nur intern genutzten) | `belege/rohdaten.md` | `./pruefen.sh` |
 
 Nicht belegt sind bisher: welcher Stand der Geodaten-Import-Pipeline die Laufberichte vom 04. und 05.11.2026
 erzeugt hat, und eine Sicherung des Gebäudestands `auswertung.gebaeude_stand_20261105` außerhalb der Datenbank
