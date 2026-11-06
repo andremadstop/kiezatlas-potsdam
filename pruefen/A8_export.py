@@ -17,7 +17,9 @@ Prüft ein Export-Verzeichnis (Standard daten/export/):
      Stile (Dateien und layer_styles) wohlgeformt, Klassenfelder vorhanden, jede vorkommende Kategorie hat
      eine eigene Farbe, keine Orange- oder Gelbtöne.
   8. Steckbriefe: einer je Raumeinheit, Werte wie planer.js, keine Platzhalter (None, nan, undefined), keine
-     Gedankenstrich-Ketten.
+     Gedankenstrich-Ketten; Spalte Potsdam aus planer.js gesamt (Audit K24).
+  9. csv_de/ und csv_odbl_de/ (Audit K5): dieselben Dateien, Spalten und Werte wie csv/ bzw. csv_odbl/, Zahlen mit
+     Dezimalkomma und ohne Tausendertrenner, Texte gleich; Zähler, Nenner und Kinder je Raum wie planer.js (K14).
 
 Aufruf: python -I pruefen/A8_export.py [--ziel daten/export] [--quelle daten] [--odbl-erwartet]
 Mit PGHOST/PGUSER/PGPASSWORD (Leserolle) werden zusätzlich die Zeilen gegen die Datenbank gezählt.
@@ -275,10 +277,13 @@ def main() -> int:
             and bool(z[ix["vorlaeufig"]]) == bool(w.get("vorlaeufig", False))
             and z[ix["unsicherheit"]] == w.get("unsicherheit")
             and zahl_gleich(z[ix["richtwert"]], (w.get("richtwert") or {}).get("wert"))
+            and all(zahl_gleich(z[ix[k]], w.get(k)) for k in ("zaehler", "nenner", "differenz"))
+            and all(z[ix[k]] == w.get(k) for k in ("zaehler_text", "nenner_text"))
         ):
             abw += 1
     pruef(
-        abw == 0, f"versorgung: alle {len(quellwerte)} Werte mit Status, vorläufig, Maßstab, Unsicherheit wie planer.js"
+        abw == 0, f"versorgung: alle {len(quellwerte)} Werte mit Status, vorläufig, Maßstab, Unsicherheit, Zähler und "
+        "Nenner wie planer.js"
     )
     pruef(
         all(z[ix["status"]] in ("amtlich", "orientierung") for z in zeilen),
@@ -298,11 +303,15 @@ def main() -> int:
         r = planer["raeume"][z[ix["nr"]]]
         if z[ix["ew"]] != r["ew"] or z[ix["name"]] != r["name"]:
             abw += 1
+        for k in ("u3", "3_bis_5", "6_bis_unter_12"):
+            if not zahl_gleich(z[ix[f"kinder_{k}"]], (r.get("kinder") or {}).get(k)):
+                abw += 1
         vs = [v for v in T["versorgung"][1] if v[T["versorgung"][0].index("raum_nr")] == z[ix["nr"]]]
         for v in vs:
             if not zahl_gleich(z[ix[v[T["versorgung"][0].index("spalte")]]], v[T["versorgung"][0].index("wert")]):
                 abw += 1
-    pruef(abw == 0, "raumeinheit: Name, Einwohner und jede Kennzahlspalte wie versorgung bzw. planer.js")
+    pruef(abw == 0, "raumeinheit: Name, Einwohner, Kinder je Zielgruppe und jede Kennzahlspalte wie versorgung bzw. "
+          "planer.js")
     pruef(
         all(z[ix["ew"]] is None or z[ix["ew"]] % planer["rundung"]["ew"] == 0 for z in zeilen),
         f"raumeinheit: Einwohner auf {planer['rundung']['ew']} gerundet",
@@ -394,13 +403,13 @@ def main() -> int:
 
     print("\n[3] Keine Adresse, keine Kontakte, kein Personenbezug")
     alle_spalten = {s.lower() for sp in g["spalten"].values() for s in sp}
-    for p in (ziel / "csv").glob("*.csv"):
+    for p in [*(ziel / "csv").glob("*.csv"), *(ziel / "csv_de").glob("*.csv")]:
         alle_spalten |= {s.lower() for s in csv_lesen(p)[0]}
     pruef(
         not (alle_spalten & ADRESSFELDER), f"keine Adress- oder Kontaktspalte ({sorted(alle_spalten & ADRESSFELDER)})"
     )
     texte = [t for t in g["text"] if not t.lstrip().startswith(("<!DOCTYPE qgis", "<qgis"))]
-    for p in (ziel / "csv").glob("*.csv"):
+    for p in [*(ziel / "csv").glob("*.csv"), *(ziel / "csv_de").glob("*.csv")]:
         _, cz = csv_lesen(p)
         texte.extend(v for z in cz for v in z if v and not v.startswith(("POLYGON", "MULTIPOLYGON")))
     for p in sorted((ziel / "steckbriefe").glob("*.html")):
@@ -475,8 +484,10 @@ def main() -> int:
         all("Zensus 2022" in (z[vsp.index("vermerk")] or "") for z in T["versorgung"][1]),
         "versorgung: jeder Zeilenvermerk nennt den Zensus 2022",
     )
-    osm_csv = [p.name for p in (ziel / "csv").glob("*.csv") if OSM_MUSTER.search(p.read_text(encoding="utf-8-sig"))]
-    pruef(not osm_csv, f"csv/: kein OSM-Wert ({osm_csv})")
+    osm_csv = [f"{p.parent.name}/{p.name}" for p in [*(ziel / "csv").glob("*.csv"), *(ziel / "csv_de").glob("*.csv")]
+               if OSM_MUSTER.search(p.read_text(encoding="utf-8-sig"))]
+    pruef(not osm_csv, f"csv/: kein OSM-Wert, auch nicht in csv_de/ ({osm_csv})")
+    pruef(not any(p.name.endswith("_odbl.csv") for p in (ziel / "csv_de").glob("*")), "csv_de/ ohne _odbl-Datei")
     osm_sb = [p.name for p in (ziel / "steckbriefe").glob("*.html") if OSM_MUSTER.search(p.read_text(encoding="utf-8"))]
     pruef(not osm_sb, f"steckbriefe/: kein OSM-Wert ({osm_sb[:3]})")
     pruef(not any(p.name.endswith("_odbl.csv") for p in (ziel / "csv").glob("*")), "csv/ ohne _odbl-Datei")
@@ -500,10 +511,12 @@ def main() -> int:
                 all(n.endswith("_odbl") for n in go["contents"] if n not in ("lizenz", "layer_styles")),
                 "_odbl.gpkg: Ebenennamen enden auf _odbl",
             )
-            pruef(
-                all(p.name.endswith("_odbl.csv") for p in (ziel / "csv_odbl").glob("*.csv") if p.name != "lizenz.csv"),
-                "csv_odbl/: nur _odbl-Dateien",
-            )
+            for o in ("csv_odbl", "csv_odbl_de"):
+                pruef(
+                    (ziel / o).is_dir()
+                    and all(p.name.endswith("_odbl.csv") for p in (ziel / o).glob("*.csv") if p.name != "lizenz.csv"),
+                    f"{o}/: nur _odbl-Dateien",
+                )
             if "einrichtung_odbl" in go["tabellen"]:
                 pruef("name" not in go["spalten"]["einrichtung_odbl"], "einrichtung_odbl: ohne Namen")
             if "versorgung_fuss_odbl" in go["tabellen"]:
@@ -690,6 +703,48 @@ def main() -> int:
         print(f"  HINWEIS planer.js (A6) enthält Platzhalter in unsicherheit, wörtlich übernommen: {fremd}")
     pruef(not strich, f"keine Gedankenstriche oder Strich-Ketten ({strich[:3]})")
     pruef(not werte_fehlen, f"jede Zahl aus planer.js steht im Steckbrief ({werte_fehlen[:3]})")
+    G = planer.get("gesamt")
+    if G:
+        stadt_fehlt = []
+        for p in sb:
+            t = p.read_text(encoding="utf-8")
+            for w in G["werte"]:
+                if w.get("wert") is None:
+                    continue
+                v = w["wert"]
+                txt = f"{v:.2f}".replace(".", ",") if isinstance(v, float) else f"{v:,}".replace(",", ".")
+                if f'<td class="wert stadt">{txt}' not in t:
+                    stadt_fehlt.append(f"{p.stem}:{w['kennzahl']}:{txt}")
+        pruef(not stadt_fehlt, f"Spalte Potsdam: jeder Wert aus planer.js gesamt in jedem Steckbrief ({stadt_fehlt[:3]})")
+    else:
+        pruef(fixture, "planer.js ohne gesamt (nur bei Beispieldaten erlaubt)")
+
+    print("\n[9] CSV mit Dezimalkomma (csv_de/, csv_odbl_de/)")
+    paare = [("csv", "csv_de")] + ([("csv_odbl", "csv_odbl_de")] if (ziel / "csv_odbl").is_dir() else [])
+    for alt_o, neu_o in paare:
+        alt_d = sorted(p.name for p in (ziel / alt_o).glob("*.csv"))
+        neu_d = sorted(p.name for p in (ziel / neu_o).glob("*.csv")) if (ziel / neu_o).is_dir() else []
+        pruef(alt_d and alt_d == neu_d, f"{neu_o}/: dieselben {len(neu_d)} Dateien wie {alt_o}/")
+        abw, punkt, zahlen = 0, 0, 0
+        for name in alt_d if alt_d == neu_d else []:
+            k1, z1 = csv_lesen(ziel / alt_o / name)
+            k2, z2 = csv_lesen(ziel / neu_o / name)
+            if k1 != k2 or len(z1) != len(z2):
+                abw += 1
+                continue
+            for a1, a2 in zip(z1, z2, strict=True):
+                for v1, v2 in zip(a1, a2, strict=True):
+                    if re.fullmatch(r"-?\d+\.\d+", v1):
+                        zahlen += 1
+                        abw += v2 != v1.replace(".", ",")
+                    else:
+                        abw += v2 != v1
+                    punkt += bool(re.fullmatch(r"-?\d+\.\d+", v2))
+        pruef(abw == 0 and punkt == 0 and zahlen > 0,
+              f"{neu_o}/: Spalten, Zeilen und Texte wie {alt_o}/, {zahlen} Dezimalzahlen mit Komma, ohne Tausender"
+              f"trenner ({abw} Abweichungen, {punkt} Zahlen mit Punkt)")
+    pruef("csv_de/" in readme and "Excel" in readme and "LibreOffice" in readme,
+          "README nennt, welche CSV-Fassung man in Excel oder LibreOffice öffnet")
 
     print(f"\n{len(befunde)} Befunde")
     for b in befunde:

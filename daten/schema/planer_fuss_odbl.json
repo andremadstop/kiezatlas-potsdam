@@ -58,115 +58,12 @@
    "type": "object",
    "minProperties": 1,
    "additionalProperties": {
-    "type": "object",
-    "required": [
-     "name",
-     "ew",
-     "werte"
-    ],
-    "additionalProperties": false,
-    "properties": {
-     "name": {
-      "type": "string"
-     },
-     "ew": {
-      "type": [
-       "integer",
-       "null"
-      ]
-     },
-     "werte": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "additionalProperties": false,
-       "required": [
-        "kennzahl",
-        "art",
-        "wert",
-        "einheit",
-        "methode",
-        "status",
-        "q",
-        "stand",
-        "unsicherheit"
-       ],
-       "properties": {
-        "kennzahl": {
-         "type": "string",
-         "description": "z. B. anteil_in_radius, ew_je_einrichtung, plaetze_je_kind, oepnv_erschliessung, gruen_m2_je_ew"
-        },
-        "art": {
-         "type": "string"
-        },
-        "wert": {
-         "type": [
-          "number",
-          "null"
-         ]
-        },
-        "einheit": {
-         "type": "string"
-        },
-        "methode": {
-         "const": "fussweg"
-        },
-        "status": {
-         "enum": [
-          "amtlich",
-          "orientierung"
-         ]
-        },
-        "vorlaeufig": {
-         "type": "boolean",
-         "description": "true bei Grundschulwerten ohne Schulbezirk (H2)"
-        },
-        "richtwert": {
-         "type": "object",
-         "required": [
-          "wert",
-          "einheit",
-          "q"
-         ],
-         "properties": {
-          "wert": {
-           "type": "number"
-          },
-          "einheit": {
-           "type": "string"
-          },
-          "q": {
-           "type": "string"
-          },
-          "seite": {
-           "type": "string"
-          }
-         }
-        },
-        "zielgruppe": {
-         "type": "string"
-        },
-        "q": {
-         "type": "string",
-         "description": "Schlüssel in quellen"
-        },
-        "stand": {
-         "type": "string",
-         "description": "Stichtag der Daten, z. B. 'Zensus 15.05.2022, Plätze 05.11.2026'"
-        },
-        "unsicherheit": {
-         "type": "string",
-         "description": "Hinweis zu Cell-Key-Rauschen, Rundung, Stichtag"
-        },
-        "prognose": {
-         "type": "object",
-         "description": "Prognose 2030/2035 je Raumeinheit, sobald H11 vorliegt"
-        }
-       }
-      }
-     }
-    }
+    "$ref": "#/$defs/raum"
    }
+  },
+  "gesamt": {
+   "$ref": "#/$defs/raum",
+   "description": "ganz Potsdam (Audit K24): je Quote die Summe der veröffentlichten Zähler und Nenner; Raumeinheiten ohne Wert zählen nicht (stehen in unsicherheit)"
   }
  },
  "$defs": {
@@ -199,6 +96,145 @@
     }
    },
    "additionalProperties": false
+  },
+  "raum": {
+   "type": "object",
+   "required": [
+    "name",
+    "ew",
+    "werte"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "ew": {
+     "type": [
+      "integer",
+      "null"
+     ]
+    },
+    "werte": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "kennzahl",
+       "art",
+       "wert",
+       "einheit",
+       "methode",
+       "status",
+       "q",
+       "stand",
+       "unsicherheit"
+      ],
+      "properties": {
+       "kennzahl": {
+        "type": "string",
+        "description": "z. B. anteil_in_radius, ew_je_einrichtung, plaetze_je_kind, oepnv_erschliessung, gruen_m2_je_ew"
+       },
+       "art": {
+        "type": "string"
+       },
+       "wert": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "einheit": {
+        "type": "string"
+       },
+       "methode": {
+        "const": "fussweg"
+       },
+       "status": {
+        "enum": [
+         "amtlich",
+         "orientierung"
+        ]
+       },
+       "vorlaeufig": {
+        "type": "boolean",
+        "description": "true bei Grundschulwerten ohne Schulbezirk (H2)"
+       },
+       "richtwert": {
+        "type": "object",
+        "required": [
+         "wert",
+         "einheit",
+         "q"
+        ],
+        "properties": {
+         "wert": {
+          "type": "number"
+         },
+         "einheit": {
+          "type": "string"
+         },
+         "q": {
+          "type": "string"
+         },
+         "seite": {
+          "type": "string"
+         }
+        }
+       },
+       "zielgruppe": {
+        "type": "string"
+       },
+       "q": {
+        "type": "string",
+        "description": "Schlüssel in quellen"
+       },
+       "stand": {
+        "type": "string",
+        "description": "Stichtag der Daten, z. B. 'Zensus 15.05.2022, Plätze 05.11.2026'"
+       },
+       "unsicherheit": {
+        "type": "string",
+        "description": "Hinweis zu Cell-Key-Rauschen, Rundung, Stichtag"
+       },
+       "prognose": {
+        "type": "object",
+        "description": "Prognose 2030/2035 je Raumeinheit, sobald H11 vorliegt"
+       },
+       "zaehler": {
+        "type": [
+         "number",
+         "null"
+        ],
+        "description": "Zähler der Quote (Audit K14). Personen und Bedarfsplätze auf rundung.ew gerundet, Plätze, Schüler und Standorte genau; null, wenn wert null ist (Ausnahme Einwohner je Standort ohne Standort)"
+       },
+       "nenner": {
+        "type": [
+         "number",
+         "null"
+        ],
+        "description": "Nenner der Quote, gerundet wie zaehler"
+       },
+       "zaehler_text": {
+        "type": "string",
+        "description": "was der Zähler zählt, z. B. 'Plätze in Krippe, Kindergarten und Hort'"
+       },
+       "nenner_text": {
+        "type": "string",
+        "description": "was der Nenner zählt, z. B. 'Bedarfsplätze'"
+       },
+       "differenz": {
+        "type": [
+         "number",
+         "null"
+        ],
+        "description": "nur plaetze_je_bedarf: zaehler minus richtwert × nenner aus den ungerundeten Zahlen, in Plätzen, auf rundung.ew gerundet; negativ = rechnerisch fehlende Plätze"
+       }
+      }
+     }
+    }
+   }
   }
  }
 }

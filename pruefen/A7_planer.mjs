@@ -143,6 +143,27 @@ async function planerEcht(basis, art) {
     const c = document.querySelector(".maplibregl-popup-content"); const t = c ? c.textContent : ""; document.querySelectorAll(".maplibregl-popup").forEach((x) => x.remove()); return t;
   });
   pruef(!!popup && /dl-de/.test(popup) && /Daten verändert/.test(popup), `Klick auf Einrichtung mit echten Daten: ${(popup || "").slice(0, 90)}…`);
+  // Audit K14/K24: Zähler und Nenner („a von b“) und ganz Potsdam an den Zeilen, Vergleich aller Planungsräume
+  const zn = await page.evaluate(() => {
+    const P = window.KIEZ_PLANER, R = P.raeume["403"], fmt = new Intl.NumberFormat("de-DE");
+    const mitZn = R.werte.filter((w) => w.zaehler != null && w.nenner != null).length;
+    const texte = [...document.querySelectorAll(".vs-zn")].map((e) => e.textContent);
+    const erste = R.werte.find((w) => w.zaehler != null && w.nenner != null);
+    return { mitZn, zn: texte.length, passt: !!erste && texte.some((x) => x.startsWith(fmt.format(erste.zaehler) + " von " + fmt.format(erste.nenner))),
+      stadt: document.querySelectorAll(".vs-stadt").length, gesamt: P.gesamt ? P.gesamt.werte.length : 0 };
+  });
+  pruef(zn.mitZn > 0 && zn.zn === zn.mitZn && zn.passt && zn.stadt === zn.gesamt && zn.gesamt > 0,
+    `Zähler und Nenner an ${zn.zn} von ${zn.mitZn} Zeilen („a von b“ wie planer.js ${zn.passt}), ganz Potsdam an ${zn.stadt} Zeilen (gesamt ${zn.gesamt})`);
+  await page.click("#vg-laden"); await warteBereit(page);
+  const vg = await page.evaluate(() => {
+    const P = window.KIEZ_PLANER, sel = document.getElementById("vg-kennzahl"), tab = document.querySelector(".vg-tabelle");
+    const zeilen = tab ? tab.querySelectorAll("tbody tr").length : 0, fuss = tab ? tab.querySelector("tfoot")?.textContent || "" : "";
+    const opt = sel.options.length; sel.selectedIndex = Math.min(4, opt - 1); sel.dispatchEvent(new Event("change"));
+    const zeilen2 = document.querySelectorAll(".vg-tabelle tbody tr").length;
+    return { zeilen, zeilen2, fuss, opt, raeume: Object.keys(P.raeume).length, caption: !!(tab && tab.querySelector("caption")), vsZeilen: document.querySelectorAll(".vs-zeile").length };
+  });
+  pruef(vg.zeilen === vg.raeume && vg.zeilen2 === vg.raeume && /Ganz Potsdam/.test(vg.fuss) && vg.opt > 5 && vg.caption && vg.vsZeilen === z.zeilen,
+    `Vergleich „Alle Planungsräume“: ${vg.zeilen} Zeilen (Räume ${vg.raeume}), Zeile ganz Potsdam ${/Ganz Potsdam/.test(vg.fuss)}, ${vg.opt} Kennzahlen, nach Wechsel ${vg.zeilen2} Zeilen, Tabellenzeilen der Versorgung unverändert ${vg.vsZeilen}`);
   const verstoss = await axe(page);
   pruef(verstoss.length === 0, `axe mit echten Daten: ${verstoss.length} Verstöße ${verstoss.join(", ")}`);
   pruef(fehler.length === 0, `Konsole ohne Fehler mit echten Daten (${fehler.length}${fehler.length ? ": " + fehler.slice(0, 3).join(" | ") : ""})`);
@@ -314,6 +335,16 @@ async function textseiten(basis, art) {
   const r = await m.page.evaluate(() => ({ zeilen: document.querySelectorAll("#richtwerte tbody tr").length,
     orient: [...document.querySelectorAll("#richtwerte tbody tr")].filter((t) => /Orientierung, kein Richtwert/.test(t.textContent)).length,
     vermerk: [...document.querySelectorAll("#richtwerte tbody tr")].every((t) => /dl-de|ODbL|CC BY|Lizenz/.test(t.textContent)) }));
+  // Audit K28: Prüfwerte im Text aus planer.js (pruefwerte), nicht fest im HTML
+  const pw = await m.page.evaluate(() => {
+    const P = window.KIEZ_PLANER || {}, PW = P.pruefwerte || {}, n = [...document.querySelectorAll("[data-pw]")];
+    const st = { ganz: { maximumFractionDigits: 0 }, eins: { minimumFractionDigits: 1, maximumFractionDigits: 1 }, genau: { maximumFractionDigits: 3 } };
+    const falsch = n.filter((e) => { const x = PW[e.dataset.pw]; return !x || e.textContent !== new Intl.NumberFormat("de-DE", st[e.dataset.format || "genau"]).format(x.wert); }).map((e) => e.dataset.pw);
+    const belege = [...document.querySelectorAll("[data-pw-beleg]")].filter((e) => !PW[e.dataset.pwBeleg] || e.textContent !== PW[e.dataset.pwBeleg].beleg).length;
+    return { n: n.length, falsch, belege, schluessel: Object.keys(PW).length };
+  });
+  pruef(pw.n >= 6 && !pw.falsch.length && !pw.belege && pw.schluessel >= 4,
+    `planer-methode.html über ${art}: ${pw.n} Prüfwerte aus planer.js gefüllt (${pw.schluessel} mit Beleg), abweichend ${pw.falsch.join(", ") || "keiner"}, Beleg falsch ${pw.belege}`);
   const v1 = await axe(m.page);
   pruef(r.zeilen > 0 && r.orient > 0 && r.vermerk && v1.length === 0 && m.fehler.length === 0,
     `planer-methode.html über ${art}: ${r.zeilen} Maßstäbe aus der Datei, ${r.orient} als Orientierung, Vermerk je Zeile ${r.vermerk}, axe ${v1.length}, Fehler ${m.fehler.length}`);

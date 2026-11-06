@@ -34,6 +34,12 @@ Regeln (Bauplan A6 und Prüfbericht 4, 8, 9, 13, 15):
   - Strittige Lage (N4): Schulen, deren Ortsangabe „Potsdam/OT …“ den Koordinaten widerspricht, zählen für keine
     Entfernung (nächstes anderes Ziel, nur lesend neu gerechnet) und sperren die Grundschulwerte der betroffenen
     Raumeinheiten; der Punkt trägt in einrichtungen.js das Feld hinweis.
+  - Schulen mit Primarstufe (Audit K4): Schulform „G/…“ (art sek1) zählt für Entfernung und Einwohner je Standort
+    als Grundschulstandort mit (nur lesend nachgerechnet wie bei der strittigen Lage); „Grundschüler je Kind“ steht
+    in Raumeinheiten mit einer solchen Schule ohne Wert, weil sich die Schülerzahl nicht nach Stufe teilen lässt.
+  - Zähler und Nenner (Audit K14) je Quote: Personen und Bedarfsplätze auf rundung_ew gerundet, Plätze, Schüler und
+    Standorte genau; ohne Wert auch ohne Zähler und Nenner. gesamt (K24) = Summe der veröffentlichten Zähler und
+    Nenner, Raumeinheiten ohne Wert zählen nicht und stehen im Hinweis.
 
 Aufruf (aus dem Worktree; Passwort nur aus der .env):
     KIEZ_DATEN=../kiezatlas-daten ../kiezatlas-potsdam-west/.venv/bin/python -I skripte/03_planungsraeume.py \
@@ -41,9 +47,8 @@ Aufruf (aus dem Worktree; Passwort nur aus der .env):
     set -a; . ../kiezatlas-potsdam/.env; set +a
     PGHOST=127.0.0.1 PGPORT=55461 PGDATABASE=kiezatlas PGUSER=mosidi_lesen PGPASSWORD="$LESE_PASSWORD" \\
     KIEZ_DATEN=../kiezatlas-daten \\
-    uv run -q --offline --no-project --with-requirements ../geodaten-import-pipeline/requirements.txt \\
-        --with numpy --with scipy python -I skripte/15_planer.py
-numpy und scipy braucht nur der Fußweg-Nachbau ohne Standorte mit strittiger Lage (strittig_neu_rechnen, N4).
+    uv run -q --offline --python 3.13 --no-project --with-requirements requirements.txt python -I skripte/15_planer.py
+numpy und scipy braucht der Fußweg-Nachbau (strittige Lage N4, Schulen mit Primarstufe K4).
 """
 
 from __future__ import annotations
@@ -70,8 +75,21 @@ CCBY = "https://creativecommons.org/licenses/by/4.0/"
 VERAENDERT = "Daten verändert (eigene Berechnung)"
 # Stand des OSM-Auszugs (BBBike Potsdam), laut $KIEZ_DATEN/osm/2026-11-05/HERKUNFT.md
 OSM_STAND = "31.10.2026"
-# Anteil der amtlichen Kita-Standorte (MBJS), die auch in OSM stehen (A3, belege/N1_osm_fussweg_20261105.md)
-OSM_KITA_VOLLSTAENDIG = "78 %"
+# Prüfwerte aus Belegen (Audit K28): Zahl und Stand werden beim Lauf aus der Datei gelesen, nicht im Code geführt.
+# Schlüssel → (Beleg, Muster für den Wert, Muster für das Datum, Einheit). Findet ein Muster nichts: Abbruch.
+PRUEFWERTE = {
+    # Anteil der amtlichen Kita-Standorte (MBJS), die auch im OSM-Auszug stehen (A3)
+    "osm_kita_vollstaendig": ("belege/N1_osm_fussweg_20261105.md", r"Vollständigkeit gegen MBJS \| Kita (\d+,\d+) %",
+                              r"Lauf (\d{2}\.\d{2}\.\d{4})", "%"),
+    # Median Fußweg / Luftlinie über alle Zellen und Arten (A5b, K3)
+    "fussweg_umweg_median": ("belege/N1_osm_fussweg_20261105.md", r"Median Fußweg/Luftlinie (\d+,\d+)",
+                             r"Lauf (\d{2}\.\d{2}\.\d{4})", "Faktor"),
+    # Landeszuordnung der Haltestellen (E7): geprüfte Haltepunkte und falsch zugeordnete
+    "landfilter_haltepunkte": ("belege/A5b_landfilter_kreuzprobe.txt", r"Haltepunkte im Rechteck: (\d+)",
+                               r"vbb_gtfs/(\d{4}-\d{2}-\d{2})/", "Haltepunkte"),
+    "landfilter_falsch": ("belege/A5b_landfilter_kreuzprobe.txt", r"falsch zugeordnet: (\d+)",
+                          r"vbb_gtfs/(\d{4}-\d{2}-\d{2})/", "Haltepunkte"),
+}
 ODBL_KOPF = (
     "/* Abgeleitet aus OpenStreetMap. © OpenStreetMap-Mitwirkende, Open Database License 1.0 (ODbL), "
     f"{ODBL}. Inhalte unter der Database Contents License 1.0. {VERAENDERT}. */\n"
@@ -102,7 +120,7 @@ QUELLEN = {
         "stand": "2026-11-05",
     },
     "vbb": {
-        "quelle": "VBB-Fahrplandaten (GTFS), Fahrplan ab 03.11.2026, Stichtag 10.11.2026",
+        "quelle": "VBB-Fahrplandaten (GTFS)",   # Fahrplantag ergänzt vbb_quelle() aus config/richtwerte.yaml
         "lizenz": "CC BY 4.0",
         "vermerk": f"VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 ({CCBY}), {VERAENDERT}",
         "url": "https://www.vbb.de/gtfs",
@@ -216,6 +234,35 @@ def prozent(z: float, n: float) -> int | None:
     return None if not n else int(math.floor(100.0 * z / n + 0.5))
 
 
+def zn_merken(w: dict, z: float, n: float, z_rund: str, n_rund: str, z_text: str, n_text: str) -> None:
+    """Ungerundete Zähler und Nenner am Wert merken; zn_abschliessen rundet sie und entfernt den Merker."""
+    w["_zn"] = (z, n, z_rund, n_rund, z_text, n_text)
+
+
+def zn_abschliessen(werte: list[dict], rd: int) -> None:
+    """Zähler, Nenner und (bei Plätzen je Bedarfsplatz) Differenz ausgeben; ohne Wert auch ohne Zähler und Nenner.
+
+    Personen und Bedarfsplätze („ew“) auf rd gerundet wie die Einwohner, Plätze, Schüler, Standorte („genau“) als
+    ganze Zahl. Ausnahme Einwohner je Standort: Zähler und Nenner auch ohne Wert, wenn es keinen Standort gibt."""
+    def r(x, art):
+        return rund(x, rd) if art == "ew" else int(math.floor(x + 0.5))
+
+    for w in werte:
+        zn = w.pop("_zn", None)
+        if zn is None:
+            continue
+        z, n, zr, nr, zt, nt = zn
+        w["zaehler_text"], w["nenner_text"] = zt, nt
+        ohne_standort = w["kennzahl"] == "ew_je_einrichtung" and n == 0 and not w.get("_gesperrt")
+        if w.get("wert") is None and not ohne_standort:
+            w["zaehler"] = w["nenner"] = None
+        else:
+            w["zaehler"], w["nenner"] = r(z, zr), r(n, nr)
+        if w["kennzahl"] == "plaetze_je_bedarf":
+            w["differenz"] = None if w.get("wert") is None else rund(z - w["richtwert"]["wert"] * n, rd)
+        w.pop("_gesperrt", None)
+
+
 def gew_median(paare: list[tuple[float, float]]) -> float | None:
     """Nach Gewicht w gewichteter Median der Werte v (Paare v, w)."""
     paare = sorted((v, w) for v, w in paare if v is not None and w and w > 0)
@@ -269,6 +316,40 @@ def richtwert(rw: dict, pfad: str) -> tuple[dict, str, str]:
 def js_schreiben(pfad: Path, variable: str, inhalt: dict, kopf: str = "") -> None:
     text = json.dumps(inhalt, ensure_ascii=False, separators=(",", ":"))
     pfad.write_text(f"{kopf}window.{variable}={text};\n", encoding="utf-8")
+
+
+def pruefwerte_lesen() -> dict:
+    """Prüfwerte mit Beleg (PRUEFWERTE): Wert und Stand aus der Belegdatei; fehlt ein Muster, Abbruch."""
+    aus = {}
+    for k, (beleg, muster, muster_stand, einheit) in PRUEFWERTE.items():
+        text = (WURZEL / beleg).read_text(encoding="utf-8")
+        m, s = re.search(muster, text), re.search(muster_stand, text)
+        if not m or not s:
+            raise SystemExit(f"Prüfwert {k}: Muster nicht gefunden in {beleg}")
+        roh = m.group(1).replace(",", ".")
+        wert = float(roh) if "." in roh else int(roh)
+        st = s.group(1)
+        stand = "-".join(reversed(st.split("."))) if "." in st else st
+        aus[k] = {"wert": wert, "einheit": einheit, "stand": stand, "beleg": beleg}
+    return aus
+
+
+WOCHENTAG = ("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
+
+
+def fahrplan_text(rw: dict) -> str:
+    """„Fahrplan für Dienstag, 10.11.2026 (Schultag), 6 bis 9 Uhr (GTFS gültig ab 3.11.2026)“ aus oepnv.messung."""
+    m = rw["oepnv"]["messung"]
+    tag, ab = m["stichtag"], m["fahrplan_gueltig_ab"]
+    von, bis = (int(x.split(":")[0]) for x in m["hvz_fenster"])
+    return (
+        f"Fahrplan für {WOCHENTAG[tag.weekday()]}, {tag:%d.%m.%Y} ({m['stichtag_art']}), {von} bis {bis} Uhr "
+        f"(GTFS gültig ab {ab.day}.{ab.month}.{ab.year})"
+    )
+
+
+def vbb_quelle(rw: dict) -> dict:
+    return {**QUELLEN["vbb"], "quelle": f"VBB-Fahrplandaten (GTFS), {fahrplan_text(rw)}"}
 
 
 # ---------------------------------------------------------------------------------------------- Lesen
@@ -470,6 +551,68 @@ def strittig_neu_rechnen(cur, d: dict, meldungen: list) -> None:
 
 def fussweg_ohne(cur, art: str, aus: list[str]) -> dict:
     """Fußweg jeder Zelle zum nächsten Ziel der Art ohne die IDs in aus (Netz und Verfahren von A5b)."""
+    return fussweg_zu(cur, "art = %s AND id <> ALL(%s::text[])", (art, aus), art)
+
+
+def primarstufe_ids(d: dict, rw: dict) -> list[str]:
+    """Schulen mit Primarstufe (Schulform „G/…“, Audit K4), ohne Standorte mit strittiger Lage."""
+    vor = rw["grundschule"]["primarstufe_schulform_praefix"]
+    strittig = {a["id"] for a in d.get("ort_abweichung", [])}
+    return sorted(e["id"] for e in d["einrichtungen"]
+                  if e["art"] == "sek1" and (e.get("unterart") or "").startswith(vor) and e["id"] not in strittig)
+
+
+def primarstufe_einrechnen(cur, d: dict, rw: dict, meldungen: list) -> None:
+    """Grundschul-Entfernungen mit den Schulen mit Primarstufe als weiteren Zielen (Audit K4), nur lesend.
+
+    Das nächste Ziel aus Grundschulen und Schulen mit Primarstufe ist das nähere von beiden: Wert der Tabelle (bzw.
+    der Neurechnung ohne strittige Lage) gegen die Entfernung zur nächsten Schule mit Primarstufe, je Zelle das
+    Minimum. Luftlinie wie A5a (KNN, 0,1 m), Fußweg mit den Funktionen von A5b."""
+    ids = primarstufe_ids(d, rw)
+    info = {"ids": ids, "luftlinie": 0, "fussweg": 0}
+    d["primarstufe"] = info
+    if not ids:
+        return
+    luft = d["erreichbar"]["luftlinie"].get("grundschule") or {}
+    zellen = sorted(luft)
+    if zellen:
+        cur.execute(
+            """SELECT z.gitter_id, round(ST_Distance(ST_Transform(z.geom, 25833), n.geom)::numeric, 1), n.id
+               FROM public.zensus_zelle z
+               CROSS JOIN LATERAL (SELECT e.geom, e.id FROM auswertung.einrichtung e WHERE e.id = ANY(%s::text[])
+                                   ORDER BY e.geom <-> ST_Transform(z.geom, 25833), e.id LIMIT 1) n
+               WHERE z.gitter_id = ANY(%s)""",
+            (ids, zellen),
+        )
+        for g, m, zid in cur.fetchall():
+            m = float(m)
+            if luft.get(g) is not None and m < luft[g]:
+                luft[g] = m
+                d["ziel"]["luftlinie"]["grundschule"][g] = zid
+                info["luftlinie"] += 1
+    fuss = d["erreichbar"]["fussweg"].get("grundschule") or {}
+    if fuss:
+        neu = fussweg_zu(cur, "id = ANY(%s::text[])", (ids,), "grundschule")
+        for g, m in neu.items():
+            alt = fuss.get(g)
+            if m is None or g not in fuss or (alt is not None and m >= alt):
+                continue
+            if luft.get(g) is not None and m < luft[g]:
+                raise SystemExit(f"Primarstufe: Fußweg < Luftlinie in Zelle {g}")
+            fuss[g] = m
+            info["fussweg"] += 1
+    meldungen.append(
+        f"Schulen mit Primarstufe als Grundschulziel (K4): {len(ids)} Standorte ({', '.join(ids)}); näher als die "
+        f"bisherige Grundschule in {info['luftlinie']} Zellen Luftlinie, {info['fussweg']} Zellen Fußweg "
+        "(nur lesend, zelle_erreichbar unverändert)"
+    )
+
+
+_A5B: dict = {}
+
+
+def fussweg_zu(cur, wo: str, par: tuple, art: str) -> dict:
+    """Fußweg jeder Zelle zum nächsten Ziel aus auswertung.einrichtung WHERE wo (Netz und Verfahren von A5b)."""
     import importlib.util
 
     try:
@@ -481,20 +624,21 @@ def fussweg_ohne(cur, art: str, aus: list[str]) -> dict:
             "--with numpy --with scipy python -I skripte/15_planer.py"
         ) from e
 
-    spec = importlib.util.spec_from_file_location("a5b_fussweg", WURZEL / "skripte" / "14b_fussweg.py")
-    a5b = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = a5b   # dataclasses in 14b_fussweg.py brauchen das Modul in sys.modules
-    spec.loader.exec_module(a5b)
-    netz = a5b.netz_laden(cur)
-    ids, xy, _ = a5b.zellen_laden(cur)
+    if not _A5B:
+        spec = importlib.util.spec_from_file_location("a5b_fussweg", WURZEL / "skripte" / "14b_fussweg.py")
+        a5b = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = a5b   # dataclasses in 14b_fussweg.py brauchen das Modul in sys.modules
+        spec.loader.exec_module(a5b)
+        _A5B["modul"], _A5B["netz"], _A5B["zellen"] = a5b, a5b.netz_laden(cur), a5b.zellen_laden(cur)
+    a5b, netz, (ids, xy, _) = _A5B["modul"], _A5B["netz"], _A5B["zellen"]
     cur.execute(
-        """SELECT GeometryType(geom), ST_X(geom), ST_Y(geom) FROM auswertung.einrichtung
-           WHERE art = %s AND id <> ALL(%s::text[]) ORDER BY id""",
-        (art, aus),
+        f"""SELECT GeometryType(geom), ST_X(geom), ST_Y(geom) FROM auswertung.einrichtung
+           WHERE {wo} ORDER BY id""",
+        par,
     )
     ziele = cur.fetchall()
     if any(t != "POINT" for t, _, _ in ziele):
-        raise SystemExit(f"{art}: Ziele ohne Punktgeometrie, Fußweg ohne strittige Lage nicht nachgebaut")
+        raise SystemExit(f"{art}: Ziele ohne Punktgeometrie, Fußweg nicht nachgebaut")
     ziel_xy = np.array([(x, y) for _, x, y in ziele], dtype=np.float64).reshape(-1, 2)
     meter, _ = a5b.naechstes_ziel(netz, ziel_xy, xy)
     meter = a5b.auf_zehntel(meter)
@@ -579,6 +723,33 @@ class Rechner:
         self.zg_cache: dict = {}
         self.geheim_null = 0
         self.statbezirk = False   # ÖPNV-Klasse eines Stadtteils aus den statistischen Bezirken benutzt (Vermerk)
+        self.primar = set(primarstufe_ids(d, rw))
+        pw = d.get("pruefwerte") or pruefwerte_lesen()
+        self.osm_kita = f"{math.floor(pw['osm_kita_vollstaendig']['wert'] + 0.5)} %"
+        # Audit K27: Kitas (eine id_kita) mit Häusern „#haus<n>“ in mehreren Raumeinheiten
+        haeuser: dict = defaultdict(list)
+        for e in d["einrichtungen"]:
+            if e["art"] in ("kita", "hort") and e.get("raum"):
+                haeuser[e["id"].split("#")[0]].append(e)
+        self.ueber: dict = {}
+        for k, es in sorted(haeuser.items()):
+            raeume = sorted({e["raum"] for e in es})
+            haupt = next((e for e in es if e["id"] == k), None)
+            if len(raeume) > 1 and haupt:
+                self.ueber[k] = {"name": haupt["name"], "plaetze": haupt["plaetze"] or 0, "haupt": haupt["raum"],
+                                 "raeume": raeume}
+
+    def ueber_text(self, raum) -> str:
+        """Hinweis auf Kitas, deren Häuser in mehreren Raumeinheiten liegen (alle Plätze am Hauptstandort)."""
+        t = []
+        for k, u in self.ueber.items():
+            if raum in u["raeume"]:
+                t.append(
+                    f"Die Einrichtung „{u['name']}“ (MBJS {k}) hat Häuser in den Raumeinheiten {' und '.join(u['raeume'])}; "
+                    f"ihre {u['plaetze']} Plätze zählen alle am Hauptstandort in {u['haupt']}, wie sie sich auf die "
+                    "Häuser verteilen, steht nicht in den Daten."
+                )
+        return " ".join(t)
 
     def zg(self, name):
         if name not in self.zg_cache:
@@ -647,6 +818,8 @@ class Rechner:
             teile.append(f"Weniger als {self.min_zg} Personen der Zielgruppe: kein belastbarer Anteil.")
         else:
             w["wert"] = prozent(zaehler, nenner)
+        zg_text = self.rw["planer"]["zielgruppen"][zg]["text"]
+        zn_merken(w, zaehler, nenner, "ew", "ew", f"{zg_text} bis {radius:g} m", zg_text)
         teile.append(
             f"{self.basis_u} Anteil gegen die Summe der Altersklassen, ganzzahlig gerundet."
             if fein
@@ -676,8 +849,8 @@ class Rechner:
         if art == "grundschule":
             w["vorlaeufig"] = True
             teile.append(
-                "Vorläufig, ohne Schulbezirk: Grundschulen werden über Schulbezirke geplant; "
-                "Grundschulteile kombinierter Schulformen zählen nicht mit."
+                "Vorläufig, ohne Schulbezirk: Grundschulen werden über Schulbezirke geplant. Schulen mit "
+                "Primarstufe (Oberschule oder Schulzentrum mit Grundschulteil) zählen als Standort mit."
             )
         if art in ("kita", "hort"):
             teile.append(
@@ -711,7 +884,7 @@ class Rechner:
             + ("; Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen (Bedarfsplanung)"
                if art == "arzt" else "")
             + ". OpenStreetMap ist freiwillig erfasst, die Vollständigkeit für diese Art ist ungeprüft (zum "
-            f"Vergleich: von den amtlichen Kita-Standorten stehen {OSM_KITA_VOLLSTAENDIG} in OpenStreetMap); fehlt "
+            f"Vergleich: von den amtlichen Kita-Standorten stehen {self.osm_kita} in OpenStreetMap); fehlt "
             "ein Standort, ist die Entfernung zu groß. Standorte in Berlin zählen nicht: am Stadtrand teils nur "
             "Obergrenze." + self.neubau(raum, ebene),
         }
@@ -746,6 +919,7 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
     """Prüfbericht 9: Kombinierte Einrichtungen nicht still mischen. Drei Kennzahlen (siehe richtwerte.yaml)."""
     rw = r.rw
     bl = rw["baulandmodell"]
+    st_kz = bl.get("status_je_kennzahl") or {}
     q = {k: v["quote_prozent"] / 100 for k, v in bl["quoten"].items()}
     f612 = bl["zensus_6_bis_unter_12"]
     kap = [e for e in ein if e["status"] == "kapazitaet" and e["plaetze"]]
@@ -763,21 +937,24 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
     geheim = r.geheim(raum)
     stand = f"Kinder: {r.stand_zensus}; Plätze: MBJS 05.11.2026"
     gemein = (
-        f"{r.basis_u} Plätze = Kapazität laut Betriebserlaubnis (MBJS), nicht belegte Plätze; Kindertagespflege fehlt. "
-        "Wunsch- und Wahlrecht: Kinder besuchen auch Einrichtungen in anderen Raumeinheiten."
+        f"{r.basis_u} Genehmigte Plätze laut Betriebserlaubnis (MBJS); wie viele frei sind, steht nicht in den Daten. "
+        "Kindertagespflege fehlt. Wunsch- und Wahlrecht: Kinder besuchen auch Einrichtungen in anderen Raumeinheiten."
     )
+    ueber = r.ueber_text(raum)
     neubau = r.neubau(raum, ebene)
 
     def zeile(
-        art, zielgruppe, zaehler, nenner, einheit, extra, kennzahl="plaetze_je_kind", rwobj=None, q="mbjs"
+        art, zielgruppe, zaehler, nenner, einheit, extra, kennzahl="plaetze_je_kind", rwobj=None, q="mbjs",
+        gemein_text=None, zn=None,
     ) -> dict:
+        status = (st_kz.get(kennzahl) or {}).get("status", "amtlich") if rwobj else "amtlich"
         w = {
             "kennzahl": kennzahl,
             "art": art,
             "zielgruppe": zielgruppe,
             "einheit": einheit,
             "methode": "luftlinie",
-            "status": "amtlich",
+            "status": status,
             "q": q,
             "stand": stand,
         }
@@ -794,7 +971,11 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             extra = f"Weniger als {r.min_zg} Kinder der Zielgruppe: keine belastbare Relation. " + extra
         else:
             w["wert"] = rund2(zaehler / nenner)
-        w["unsicherheit"] = (extra + " " + gemein + neubau).strip()
+        if zn:
+            zn_merken(w, zaehler, nenner, "genau", "ew", *zn)
+        grund = (st_kz.get(kennzahl) or {}).get("grund", "") if rwobj and status == "orientierung" else ""
+        teile = [extra, grund, gemein if gemein_text is None else gemein_text]
+        w["unsicherheit"] = (" ".join(x for x in teile if x) + neubau).strip()
         return w
 
     aus = []
@@ -812,7 +993,8 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             kita_rein,
             s["i_u3"] + s["i_3_5"],
             "Plätze je Kind",
-            "Plätze reiner Krippen und Kindergärten." + komb_txt,
+            "Plätze reiner Krippen und Kindergärten." + komb_txt + (" " + ueber if ueber else ""),
+            zn=("Plätze in Krippen und Kindergärten", "Kinder unter 6"),
         )
     )
     w = zeile(
@@ -822,7 +1004,8 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
         s["i_6_9"],
         "Plätze je Kind",
         "Plätze reiner Horte gegen Kinder 6 bis 9 Jahre (Hortalter reicht bis unter 12)."
-        + (" Hortplätze kombinierter Kitas fehlen hier." if kita_komb else ""),
+        + (" Hortplätze kombinierter Kitas fehlen hier." if kita_komb else "") + (" " + ueber if ueber else ""),
+        zn=("Plätze in reinen Horten", "Kinder 6 bis 9"),
     )
     if not hort_rein and kita_komb and w["wert"] is not None:
         w["wert"] = None
@@ -844,13 +1027,16 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             f"{bl['quoten']['kindergarten']['quote_prozent']} % der 3- bis 5-Jährigen, "
             f"{bl['quoten']['hort']['quote_prozent']} % der 6- bis unter 12-Jährigen. Die Quoten sind um "
             "Kapazitätsreserven vermindert (rechnerischer Mindestbedarf). 6 bis unter 12 geschätzt: "
-            "Zensus 6 bis 9 plus ein Drittel von 10 bis 15 (gleich verteilt angenommen).",
+            "Zensus 6 bis 9 plus ein Drittel von 10 bis 15 (gleich verteilt angenommen)."
+            + (" " + ueber if ueber else ""),
             kennzahl="plaetze_je_bedarf",
             rwobj=rwobj,
+            zn=("Plätze in Krippe, Kindergarten und Hort", "Bedarfsplätze"),
         )
     )
     # Grundschule: Schülerzahl laut MBJS gegen Kinder 6 bis unter 12 (Quote 100 %)
     gs = [e for e in ein if e["art"] == "grundschule" and e["schueler"]]
+    primar = [e for e in ein if e["id"] in r.primar]
     stand_s = sorted({e["schueler_stand"] for e in gs if e["schueler_stand"]})
     w = zeile(
         "grundschule",
@@ -858,8 +1044,8 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
         sum(e["schueler"] for e in gs),
         k6_12,
         "Schüler je Kind",
-        "Schülerzahl der Grundschulen (Schulform G) in der Raumeinheit, nicht Kapazität; Grundschulteile "
-        "kombinierter Schulformen fehlen. Vorläufig, ohne Schulbezirk. 6 bis unter 12 geschätzt wie oben.",
+        "Schülerzahl der Grundschulen (Schulform G) in der Raumeinheit, nicht Kapazität. Vorläufig, ohne "
+        "Schulbezirk.",
         kennzahl="schueler_je_kind",
         rwobj={
             "wert": bl["quoten"]["grundschule"]["quote_prozent"] / 100,
@@ -867,7 +1053,20 @@ def plaetze(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             "q": "baulandmodell",
             "seite": bl["seite"],
         },
+        gemein_text=(
+            f"{r.basis_u} Schüler laut MBJS am Schulort, Kinder am Wohnort: Schulwege über die Grenze der "
+            "Raumeinheit verschieben die Relation. 6 bis unter 12 geschätzt: Zensus 6 bis 9 plus ein Drittel von "
+            "10 bis 15 (gleich verteilt angenommen)."
+        ),
+        zn=("Schüler der Grundschulen", "Kinder 6 bis unter 12 (geschätzt)"),
     )
+    if primar:
+        w["wert"] = None
+        namen = ", ".join(f"{e['name']} (MBJS {e['id']})" for e in primar)
+        w["unsicherheit"] = (
+            "Schule mit Primarstufe im Raum, Schülerzahl nicht nach Stufe teilbar: kein Wert. "
+            f"Betroffen: {namen}. " + w["unsicherheit"]
+        )
     w["vorlaeufig"] = True
     w["stand"] = f"Kinder: {r.stand_zensus}; Schüler: MBJS, Stand {', '.join(stand_s) or 'k. A.'}"
     aus.append(w)
@@ -883,6 +1082,8 @@ def ew_je(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             continue
         # eine Kita zählt je id_kita einmal (weitere Häuser „#haus<n>“ nicht)
         n = len([e for e in ein if e["art"] == art and "#haus" not in e["id"]])
+        n_primar = len([e for e in ein if e["id"] in r.primar]) if art == "grundschule" else 0
+        n += n_primar
         lgb = any(e["id"].startswith("alkis:") for e in r.d["einrichtungen"] if e["art"] == art)
         w = {
             "kennzahl": "ew_je_einrichtung",
@@ -895,6 +1096,7 @@ def ew_je(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             "q": "lgb" if lgb else "mbjs",
             "stand": f"Einwohner: {r.stand_zensus}; Standorte 05.11.2026",
         }
+        zn_merken(w, ew, n, "ew", "genau", "Einwohner", "Standorte")
         txt = [
             (f"{n} Standort in der Raumeinheit." if n == 1 else f"{n} Standorte in der Raumeinheit.")
             + (f" Weniger als {r.min_zg} Einwohner: keine belastbare Relation." if n and ew < r.min_zg else "")
@@ -909,7 +1111,14 @@ def ew_je(r: Rechner, raum: str, ein: list[dict], ebene: str) -> list[dict]:
             )
         if art == "grundschule":
             w["vorlaeufig"] = True
+            if n_primar:
+                txt.append(
+                    f"Darunter {n_primar} {'Schule' if n_primar == 1 else 'Schulen'} mit Primarstufe (Oberschule "
+                    "oder Schulzentrum mit Grundschulteil)."
+                )
             txt.append("Vorläufig, ohne Schulbezirk.")
+        if art == "kita" and r.ueber_text(raum):
+            txt.append(r.ueber_text(raum) + " Als Standort zählt nur der Hauptstandort.")
         txt.append("Raumgrenzen schneiden Einzugsbereiche: Standorte nahe der Grenze versorgen auch Nachbarräume.")
         w["unsicherheit"] = " ".join(txt) + r.neubau(raum, ebene)
         aus.append(w)
@@ -953,8 +1162,11 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
     aus = []
     for kennzahl, mit_takt, zusatz in OEPNV_KENNZAHLEN:
         w = oepnv_wert(r, kennzahl, rwobj)
+        zn_merken(w, 0, 0, "ew", "ew", "Einwohner im Einzugsradius", "Einwohner")   # ohne Klasse: ohne Wert
         if klasse in KLASSEN_RANG:
             w["wert"] = rund(anteil(klasse, mit_takt), 1)
+            zn_merken(w, sum(z["ew"] for _, z in zellen if erschlossen(z, klasse, mit_takt)),
+                      sum(z["ew"] for _, z in zellen), "ew", "ew", "Einwohner im Einzugsradius", "Einwohner")
             txt = f"Gebietsklasse {klasse} laut NVP Tab. 4.1 ({gk.get('zuordnung')}). "
             if gk.get("zuordnung") == "bezirke":
                 r.statbezirk = True
@@ -972,7 +1184,7 @@ def oepnv(r: Rechner, raum: str, ebene: str) -> list[dict] | None:
             txt = "Keine Gebietsklasse zugeordnet (" + (gk.get("hinweis") or "offen") + "). "
         klein = oepnv_kleinraum(r, raum, w)
         w["unsicherheit"] = (
-            klein + txt + basis + zusatz + NVP_GELTUNG + r.neubau(raum, ebene)
+            klein + txt + basis + zusatz.format(fahrplan=fahrplan_text(r.rw)) + NVP_GELTUNG + r.neubau(raum, ebene)
         ).strip()
         aus.append(w)
     return aus
@@ -991,7 +1203,7 @@ OEPNV_KENNZAHLEN = (
         "oepnv_takt",
         True,
         " Zusätzlich muss die Haltestelle den Soll-Takt der Gebietsklasse in der Hauptverkehrszeit "
-        "erreichen (NVP Tab. 4.3, Taktklasse je Haltestelle aus A4, Stichtag 10.11.2026).",
+        "erreichen (NVP Tab. 4.3, Taktklasse je Haltestelle aus A4). Gezählt: {fahrplan}.",
     ),
 )
 
@@ -1040,7 +1252,7 @@ def oepnv_wert(r: Rechner, kennzahl: str, rwobj: dict) -> dict:
         "status": "orientierung",
         "richtwert": rwobj,
         "q": "vbb",
-        "stand": f"Einwohner: {r.stand_zensus}; Fahrplan Stichtag 10.11.2026",
+        "stand": f"Einwohner: {r.stand_zensus}; {fahrplan_text(r.rw)}",
     }
 
 
@@ -1094,6 +1306,7 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
         w = oepnv_wert(r, kennzahl, rwobj)
         nenner = sum(z["ew"] for z, _ in mit)
         zaehler = sum(z["ew"] for z, k in mit if erschlossen(z, k, mit_takt))
+        zn_merken(w, zaehler, nenner, "ew", "ew", "Einwohner im Einzugsradius", "Einwohner mit eindeutiger Gebietsklasse")
         if nenner and 100.0 * ohne / ew_ges <= grenze:
             w["wert"] = rund(100.0 * zaehler / nenner, 1)
             grund = ""
@@ -1116,7 +1329,7 @@ def oepnv_je_zelle(r: Rechner, raum: str, zellen: list, st_klassen: dict, erschl
                 )
         klein = oepnv_kleinraum(r, raum, w)
         w["unsicherheit"] = (
-            klein + txt + grund + basis + zusatz + NVP_GELTUNG + r.neubau(raum, "planungsraum")
+            klein + txt + grund + basis + zusatz.format(fahrplan=fahrplan_text(r.rw)) + NVP_GELTUNG + r.neubau(raum, "planungsraum")
         ).strip()
         aus.append(w)
     return aus
@@ -1237,12 +1450,19 @@ def erreichbar_datei(d: dict, rw: dict, methode: str, ids: list[str]) -> dict | 
     else:
         # Haltestellen als Ziel stammen aus dem VBB-GTFS (CC BY 4.0), auch im Fußweg-Zweig zu nennen
         q = {k: QUELLEN[k] for k in ("zensus", "mbjs", "lgb", "osm") + (("vbb",) if "haltestelle" in werte else ())}
+        if "vbb" in q:
+            q["vbb"] = vbb_quelle(rw)
         hinweis = (
             f"Fußweg über das Wegenetz aus OpenStreetMap (Auszug {OSM_STAND}) vom Mittelpunkt der 100-m-Zelle, auf "
             f"{rd} m gerundet. null = Zelle ohne Einwohner oder ohne Netzanschluss. Standorte in Brandenburg "
             "außerhalb der Stadt zählen mit, Berlin nicht (Standorte aus OpenStreetMap nach dem Land der nächsten "
             "VBB-Haltestelle): am Stadtrand teils nur Obergrenze. Kitas, Schulen, Gemeinbedarf und Grün sind amtliche "
             "Standorte (MBJS, ALKIS), Haltestellen aus dem VBB-Fahrplan, die übrigen Arten aus OpenStreetMap."
+        )
+    if (d.get("primarstufe") or {}).get("ids") and "grundschule" in werte:
+        hinweis += (
+            " grundschule: nächste Grundschule oder Schule mit Primarstufe (Oberschule oder Schulzentrum mit "
+            "Grundschulteil, Schulform G/…)."
         )
     for art, info in sorted(d.get("strittig", {}).items()):
         namen = {a["id"]: a["name"] for a in d.get("ort_abweichung", [])}
@@ -1296,7 +1516,9 @@ def einrichtungen_datei(d: dict) -> dict:
         "stand": date.today().isoformat(),
         "hinweis": (
             "Kitas, Horte und Schulen laut MBJS (Plätze je Kita einmal am Hauptstandort, weitere Häuser "
-            "ohne Plätze), Gemeinbedarf aus ALKIS nur als Lage ohne Kapazität. Ohne Adresse und Kontakt."
+            "ohne Plätze), Gemeinbedarf aus ALKIS nur als Lage ohne Kapazität. Schulen mit Primarstufe (unterart "
+            "G/…) stehen bei der Sekundarstufe I und zählen für die Grundschul-Entfernungen mit. Ohne Adresse und "
+            "Kontakt."
             + "".join(
                 f" {a['name']} (MBJS {a['id']}): {strittig_text(a)}"
                 for a in d.get("ort_abweichung", [])
@@ -1349,6 +1571,7 @@ def ort_abweichung_anwenden(d: dict, raeume: dict, meldungen: list) -> None:
             for w in raeume[nr]["werte"]:
                 if (w["kennzahl"], w["art"]) in GS_KENNZAHLEN:
                     w["wert"] = None
+                    w["_gesperrt"] = True
                     w["unsicherheit"] = txt + w["unsicherheit"]
                     n += 1
         meldungen.append(f"Ortsangabe widerspricht Lage: MBJS {a['id']} ({a['ot']} ≠ {a['stadtteil']}), "
@@ -1366,10 +1589,22 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         prognose_anhaengen(werte, nr, prog)
         raeume[nr] = {"name": name, "ew": rund(r.ew_roh[nr], r.rd_ew), "werte": werte}
     ort_abweichung_anwenden(d, raeume, meldungen)
+    for x in raeume.values():
+        zn_abschliessen(x["werte"], r.rd_ew)
+    if methode == "luftlinie":
+        for nr, x in raeume.items():
+            x["kinder"] = kinder_je_raum(r, nr)
+    gesamt = gesamt_bilden(raeume, r, methode)
     meldungen.append(
         f"{methode}: {len(raeume)} Raumeinheiten, {sum(len(x['werte']) for x in raeume.values())} Werte, "
-        f"{r.geheim_null} Werte wegen Geheimhaltung null"
+        f"{r.geheim_null} Werte wegen Geheimhaltung null; gesamt {len(gesamt['werte'])} Werte "
+        f"({sum(w['wert'] is not None for w in gesamt['werte'])} mit Wert)"
     )
+    if methode == "luftlinie" and r.ueber:
+        meldungen.append(
+            f"Kitas mit Häusern in mehreren Raumeinheiten (K27): {len(r.ueber)} ("
+            + "; ".join(f"MBJS {k} in {', '.join(u['raeume'])}" for k, u in r.ueber.items()) + ")"
+        )
     benutzt = {w["q"] for x in raeume.values() for w in x["werte"]} | {"zensus"}
     if methode == "fussweg":
         benutzt.add("osm")   # Wegenetz aus OpenStreetMap, auch bei amtlichen Zielen
@@ -1378,7 +1613,7 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
     benutzt_rw = {w["richtwert"]["q"] for x in raeume.values() for w in x["werte"] if "richtwert" in w}
     if r.statbezirk:
         benutzt.add("statbezirk")
-    quellen = {k: QUELLEN[k] for k in sorted(benutzt)}
+    quellen = {k: (vbb_quelle(rw) if k == "vbb" else QUELLEN[k]) for k in sorted(benutzt)}
     quellen.update({k: DOKUMENTE[k] for k in sorted(benutzt_rw)})
     hinweis = (
         (
@@ -1392,18 +1627,113 @@ def planer_datei(d: dict, rw: dict, methode: str, rand: dict, prog: dict, meldun
         f"{rw['geheimhaltung']['rundung_ew']} gerundet; Werte aus feinen Altersklassen nur bei Raumeinheiten ab "
         f"{rw['geheimhaltung']['min_ew_raumeinheit']} Einwohnern. Status amtlich: Maßstab aus einem geltenden "
         "Potsdamer Dokument mit gelesener Fundstelle bzw. bei Werten ohne Maßstab nur amtliche Daten; orientierung: "
-        "Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung (NVP 2019) oder Berliner Methode."
+        "Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung (NVP 2019), Berliner Methode oder "
+        "eine Rechenweise, die vom Dokument abweicht (Baulandmodell: ohne angrenzende Planungsräume, Schüler am "
+        "Schulort gegen eine Bedarfsquote). Zähler und Nenner: Personen und Bedarfsplätze auf "
+        f"{rw['geheimhaltung']['rundung_ew']} gerundet, Plätze, Schüler und Standorte genau; der Wert ist aus den "
+        "ungerundeten Zahlen gerechnet. gesamt: ganz Potsdam als Summe der veröffentlichten Zähler und Nenner."
     )
     if methode == "luftlinie":
         hinweis += " Fußweg-Werte stehen in einer eigenen Datei unter eigener Lizenz."
-    return {
+    aus = {
         "stand": date.today().isoformat(),
         "raumebene": ebene,
         "rundung": {"ew": rw["geheimhaltung"]["rundung_ew"]},
         "hinweis": hinweis,
         "quellen": quellen,
         "raeume": raeume,
+        "gesamt": gesamt,
     }
+    if methode == "luftlinie":
+        aus["pruefwerte"] = d.get("pruefwerte") or pruefwerte_lesen()
+    return aus
+
+
+def kinder_je_raum(r: Rechner, raum: str) -> dict | None:
+    """Kinder der Zielgruppen je Raumeinheit (Summe der Zensus-Zellen), gerundet; unter der Mindestgröße null."""
+    if r.geheim(raum):
+        return None
+    f612 = r.rw["baulandmodell"]["zensus_6_bis_unter_12"]
+    s = defaultdict(float)
+    for st in r.d["struktur"].values():
+        if st["raum"] == raum:
+            for k in ("i_u3", "i_3_5", "i_6_9", "i_10_15"):
+                s[k] += st[k]
+    return {
+        "u3": rund(s["i_u3"], r.rd_ew),
+        "3_bis_5": rund(s["i_3_5"], r.rd_ew),
+        "6_bis_unter_12": rund(s["i_6_9"] * f612["i_6_9"] + s["i_10_15"] * f612["i_10_15"], r.rd_ew),
+    }
+
+
+def gesamt_bilden(raeume: dict, r: Rechner, methode: str) -> dict:
+    """Ganz Potsdam (Audit K24): je Quote die Summe der veröffentlichten Zähler und Nenner der Raumeinheiten.
+
+    Nur Raumeinheiten mit Wert zählen (keine Rückrechnung zurückgehaltener Werte); welche fehlen, steht im Hinweis.
+    Mediane (Grün, Entfernung) haben keinen Zähler und Nenner und stehen nicht in gesamt."""
+    rd = r.rd_ew
+    st_kz = r.rw["baulandmodell"].get("status_je_kennzahl") or {}
+    gruppen: dict = {}
+    for nr, x in raeume.items():
+        for w in x["werte"]:
+            if "zaehler_text" not in w:
+                continue
+            k = (w["kennzahl"], w["art"], w.get("zielgruppe"), (w.get("richtwert") or {}).get("wert"))
+            gruppen.setdefault(k, []).append((nr, w))
+    werte = []
+    for (kennzahl, art, _, _), grp in gruppen.items():
+        publ = [(nr, w) for nr, w in grp if w["zaehler"] is not None and w["nenner"] is not None]
+        ohne = [nr for nr, w in grp if (nr, w) not in publ]
+        v = {k: x for k, x in grp[0][1].items()
+             if k not in ("wert", "zaehler", "nenner", "differenz", "unsicherheit", "prognose")}
+        z, n = sum(w["zaehler"] for _, w in publ), sum(w["nenner"] for _, w in publ)
+        teile = []
+        primar = [nr for nr, w in grp if "Schule mit Primarstufe im Raum" in (w.get("unsicherheit") or "")]
+        if kennzahl == "schueler_je_kind" and primar:
+            v["wert"] = v["zaehler"] = v["nenner"] = None
+            teile.append(
+                "Schulen mit Primarstufe in Potsdam, Schülerzahl nicht nach Stufe teilbar: kein Wert für die ganze "
+                f"Stadt (Raumeinheiten {', '.join(primar)})."
+            )
+        else:
+            if not n:
+                wert = None
+            elif kennzahl == "ew_je_einrichtung":
+                wert = rund(z / n, rd)
+            elif v["einheit"] == "%":
+                wert = prozent(z, n)
+            else:
+                wert = rund2(z / n)
+            v["wert"], v["zaehler"], v["nenner"] = wert, z, n
+        if kennzahl == "plaetze_je_bedarf":
+            v["differenz"] = None if v["wert"] is None else rund(z - v["richtwert"]["wert"] * n, rd)
+        teile.append(
+            f"Ganz Potsdam: Summe der veröffentlichten Zähler und Nenner aus {len(publ)} von {len(grp)} Raumeinheiten"
+            + (f", ohne {', '.join(ohne)} (dort kein Wert, Grund im Hinweis der Raumeinheit)" if ohne else "") + "."
+        )
+        teile.append(
+            "Zähler und Nenner sind gerundet (Personen und Bedarfsplätze auf "
+            f"{rd}), der Wert ist aus diesen Summen gerechnet und kann von den Raumeinheiten leicht abweichen."
+        )
+        if v.get("zielgruppe", "").startswith(("Kinder", "rechnerischer")):
+            teile.append(r.basis_u)
+        grund = (st_kz.get(kennzahl) or {}).get("grund") if v.get("status") == "orientierung" else None
+        if grund and v.get("richtwert", {}).get("q") == "baulandmodell":
+            teile.append(grund)
+        if art == "oepnv":
+            teile.append(NVP_GELTUNG.strip())
+        if art == "grundschule":
+            teile.append("Vorläufig, ohne Schulbezirk.")
+        teile.append("Neubau nach dem Zensus-Stichtag (u. a. Krampnitz, Bornstedter Feld, Golm) fehlt in den Einwohnern.")
+        v["unsicherheit"] = " ".join(teile)
+        werte.append(v)
+    kinder = [x.get("kinder") for x in raeume.values()]
+    aus = {"name": "Potsdam", "ew": sum(x["ew"] or 0 for x in raeume.values()), "werte": werte}
+    if methode == "luftlinie":
+        aus["kinder"] = (
+            None if any(k is None for k in kinder) else {k: sum(x[k] for x in kinder) for k in kinder[0]}
+        ) if kinder else None
+    return aus
 
 
 def main() -> int:
@@ -1422,6 +1752,8 @@ def main() -> int:
         d = lesen(cur)
         meldungen_strittig: list[str] = []
         strittig_neu_rechnen(cur, d, meldungen_strittig)
+        primarstufe_einrechnen(cur, d, rw, meldungen_strittig)
+    d["pruefwerte"] = pruefwerte_lesen()
     ids = zellen_reihenfolge()
     meldungen: list[str] = [
         f"Raumebene: {d['raumebene']} ({len(d['raeume'])} Raumeinheiten, aus {d['raum_herkunft']})",
