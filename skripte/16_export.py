@@ -11,6 +11,8 @@ Ausgabe (Standard daten/export/):
   kiezatlas_potsdam_odbl.gpkg     nur wenn *_odbl.js vorliegen (A3/A5b), Open Database License 1.0
   csv/<ebene>.csv                 dieselben Inhalte als CSV (Semikolon, UTF-8 mit BOM, Punkt als Dezimalzeichen)
   csv_odbl/<ebene>.csv            dito für die ODbL-Ebenen
+  csv_de/<ebene>.csv              dieselben CSV mit Dezimalkomma für deutsches Excel/LibreOffice (Audit K5)
+  csv_odbl_de/<ebene>.csv         dito für die ODbL-Ebenen
   kiezatlas_potsdam.qgz           QGIS-Projekt mit relativen Pfaden und Stilen nach DESIGN.md
   stile/<ebene>.qml               dieselben Stile als Dateien (auch als Standardstil in der GPKG, layer_styles)
   steckbriefe/<nr>.html           druckbarer Steckbrief je Raumeinheit (A4, WeasyPrint, Karte nur aus eigenen Daten)
@@ -505,6 +507,10 @@ def titel_kennzahl(w: dict) -> str:
     return f"{k} ({art})"
 
 
+# Zielgruppen je Raumeinheit aus planer.js (raeume.<nr>.kinder, Audit K14): Spalte kinder_<schlüssel>
+KINDER = ("u3", "3_bis_5", "6_bis_unter_12")
+
+
 # Quoten je Raumeinheit ohne Entfernungsbezug: Messart „raumeinheit“ statt „luftlinie“ im Export
 OHNE_WEG = {"plaetze_je_kind", "plaetze_je_bedarf", "schueler_je_kind", "ew_je_einrichtung"}
 
@@ -537,6 +543,22 @@ def richtwert_text(w: dict, quellen: dict) -> str:
     if rw.get("seite"):
         herkunft += f", {rw['seite']}"
     return f"{teile[0]} ({herkunft})"
+
+
+def schluessel(w: dict) -> tuple:
+    """Gleiche Kennzahl in Raumeinheit und gesamt: Kennzahl, Art, Maßstab (wie wertSchluessel in planer.js)."""
+    return (w["kennzahl"], w["art"], (w.get("richtwert") or {}).get("wert"))
+
+
+def zn_html(w: dict) -> str:
+    """„479 von 910“ unter dem Wert (Audit K14), Differenz in Plätzen bei Plätzen je Bedarfsplatz."""
+    if w.get("zaehler") is None or w.get("nenner") is None:
+        return ""
+    t = f'<br><span class="zn">{zahl(w["zaehler"])} von {zahl(w["nenner"])}</span>'
+    if w.get("differenz") is not None:
+        d = w["differenz"]
+        t += f'<br><span class="zn">{zahl(abs(d))} Plätze {"fehlen" if d < 0 else "mehr"}</span>'
+    return t
 
 
 def zahl(w) -> str:
@@ -785,26 +807,38 @@ def zip_fest(pfad: Path, dateien: dict[str, bytes]) -> None:
 
 
 # ---------------------------------------------------------------------------------------------- CSV
-def csv_schreiben(pfad: Path, felder: list[str], zeilen: list[list]) -> None:
+def csv_zelle(v, komma: bool):
+    """CSV-Wert: leer für None, Wahrheitswerte als 1/0; mit komma Dezimalkomma ohne Tausendertrenner (Zahlen als
+    Zahlen in deutschem Excel und LibreOffice), Texte unverändert (auch WKT)."""
+    if v is None:
+        return ""
+    if isinstance(v, bool):
+        return int(v)
+    if komma and isinstance(v, float):
+        return repr(v).replace(".", ",")
+    return v
+
+
+def csv_schreiben(pfad: Path, felder: list[str], zeilen: list[list], komma: bool = False) -> None:
     pfad.parent.mkdir(parents=True, exist_ok=True)
     with pfad.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f, delimiter=";", lineterminator="\n")
         w.writerow(felder)
         for z in zeilen:
-            w.writerow(["" if v is None else (int(v) if isinstance(v, bool) else v) for v in z])
+            w.writerow([csv_zelle(v, komma) for v in z])
 
 
-def ebenen_csv(ordner: Path, ebenen: list) -> None:
+def ebenen_csv(ordner: Path, ebenen: list, komma: bool = False) -> None:
     """Eine CSV je Ebene: Punkte mit x/y, Flächen mit WKT (aus dem Geometrie-Tupel), Tabellen ohne Geometrie."""
     for name, _, geom, felder, zeilen in ebenen:
         namen = [n for n, _ in felder]
         if geom == "POINT":
             out = [z[:-1] + list(struct.unpack("<dd", z[-1][0][5:21])) for z in zeilen]
-            csv_schreiben(ordner / f"{name}.csv", namen + ["x", "y"], out)
+            csv_schreiben(ordner / f"{name}.csv", namen + ["x", "y"], out, komma)
         elif geom:
-            csv_schreiben(ordner / f"{name}.csv", namen + ["wkt"], [z[:-1] + [z[-1][2]] for z in zeilen])
+            csv_schreiben(ordner / f"{name}.csv", namen + ["wkt"], [z[:-1] + [z[-1][2]] for z in zeilen], komma)
         else:
-            csv_schreiben(ordner / f"{name}.csv", namen, zeilen)
+            csv_schreiben(ordner / f"{name}.csv", namen, zeilen, komma)
 
 
 # ---------------------------------------------------------------------------------------------- Steckbrief
@@ -851,6 +885,8 @@ td.leer{font:500 8pt "Barlow",sans-serif;color:var(--muted);white-space:normal;t
 .status.orientierung{color:var(--muted)}
 .status.amtlich{color:var(--ink)}
 .hinweis{font-size:7.2pt;color:var(--muted)}
+td.wert .zn{font:500 7pt "Barlow",sans-serif;color:var(--muted);white-space:nowrap}
+td.wert.stadt{color:var(--muted)}
 .quellen{font-size:7.5pt;color:var(--muted);padding-left:4mm}
 .quellen li{margin-bottom:1mm}
 .fuss{margin-top:5mm;font-size:7.5pt;color:var(--muted);border-top:1px solid var(--line);padding-top:2mm}
@@ -922,22 +958,37 @@ def steckbrief(
 ) -> str:
     quellen = planer["quellen"]
     ebene_text = "Planungsraum" if raumebene == "planungsraum" else "Stadtteil"
+    gesamt = {schluessel(g): g for g in (planer.get("gesamt") or {}).get("werte", [])}
     zeilen = []
+
+    def zahl_mit_einheit(w: dict) -> str:
+        einheit = w.get("einheit", "")
+        einheit = "" if einheit in ("Plätze je Kind", "Schüler je Kind", "Plätze je Bedarfsplatz") else einheit
+        return f"{escape(zahl(w['wert']))}{(' ' + escape(einheit)) if einheit else ''}"
+
     for w in raum["werte"]:
         titel = titel_kennzahl(w)
         if w.get("wert") is None:
             wert_html = '<td class="wert leer">keine Aussage</td>'
         else:
-            einheit = w.get("einheit", "")
-            einheit = "" if einheit in ("Plätze je Kind", "Schüler je Kind", "Plätze je Bedarfsplatz") else einheit
-            wert_html = f'<td class="wert">{escape(zahl(w["wert"]))}{(" " + escape(einheit)) if einheit else ""}</td>'
+            wert_html = f'<td class="wert">{zahl_mit_einheit(w)}{zn_html(w)}</td>'
+        g = gesamt.get(schluessel(w))
+        if g is None:
+            stadt_html = '<td class="wert leer">ohne Stadtwert</td>'
+        elif g.get("wert") is None:
+            stadt_html = '<td class="wert leer">keine Aussage</td>'
+        else:
+            stadt_html = f'<td class="wert stadt">{zahl_mit_einheit(g)}{zn_html(g)}</td>'
         zusatz = " · vorläufig, ohne Schulbezirk" if w.get("vorlaeufig") else ""
         q = quellen.get(w.get("q"), {})
         status = escape(w.get("status") or "")
         zeilen.append(
             f'<tr><td><b>{escape(titel)}</b><br><span class="status {status}">{escape(status_text(w))}'
-            f'{zusatz}</span><br><span class="hinweis">{escape(w.get("unsicherheit") or "")}</span></td>'
-            f'{wert_html}<td class="hinweis">{escape(richtwert_text(w, quellen))}</td>'
+            f'{zusatz}</span><br><span class="hinweis">{escape(w.get("unsicherheit") or "")}</span>'
+            + (f'<br><span class="hinweis">Zähler: {escape(w["zaehler_text"])}; Nenner: {escape(w["nenner_text"])}.</span>'
+               if w.get("zaehler_text") else "")
+            + '</td>'
+            f'{wert_html}{stadt_html}<td class="hinweis">{escape(richtwert_text(w, quellen))}</td>'
             f'<td class="hinweis">{escape(q.get("quelle", w.get("q", "")))}<br>'
             f"Stand: {escape(w.get('stand') or '')}</td></tr>"
         )
@@ -994,20 +1045,24 @@ Unsicherheit. Stand der Auswertung {escape(datum_de(planer["stand"]))}.</p>
 Freizeitflächen (blass). Kreis: Kita oder Hort, Quadrat: Schule und Gemeinbedarf. Karte nur aus eigenen Daten,
 EPSG:25833.</figcaption></figure>
 <h2>Versorgung</h2>
-<table><thead><tr><th style="width:52%">Kennzahl, Status, Unsicherheit</th><th style="width:14%;text-align:right">Wert</th>
-<th style="width:17%">Maßstab</th><th style="width:17%">Quelle</th></tr></thead><tbody>
+<table><thead><tr><th style="width:44%">Kennzahl, Status, Unsicherheit</th><th style="width:13%;text-align:right">Wert</th>
+<th style="width:13%;text-align:right">Potsdam</th><th style="width:15%">Maßstab</th><th style="width:15%">Quelle</th></tr></thead><tbody>
 {"".join(zeilen)}
 </tbody></table>
 <h2>Einrichtungen in der Raumeinheit</h2>
 <table><thead><tr><th>Art</th><th style="text-align:right">Standorte</th><th style="text-align:right">Plätze</th>
 <th style="text-align:right">Schüler</th></tr></thead><tbody>{ein_zeilen}</tbody></table>
-<p class="hinweis">Plätze laut Betriebserlaubnis (MBJS), je Kita einmal am Hauptstandort. Gemeinbedarf aus
+<p class="hinweis">Genehmigte Plätze laut Betriebserlaubnis (MBJS), je Kita einmal am Hauptstandort; wie viele frei
+sind, steht nicht in den Daten. Gemeinbedarf aus
 ALKIS-Gebäudefunktionen nur als Lage, ohne Kapazität. Ohne Adressen.</p>
 <h2>Lesehilfe</h2>
 <p class="hinweis"><b>amtlicher Maßstab</b>: Maßstab aus einem geltenden Potsdamer Dokument mit gelesener
 Fundstelle. <b>amtliche Daten, kein Maßstab</b>: Zahl aus amtlichen Quellen, für die es keine Norm gibt.
 <b>Orientierung, kein Richtwert</b>: Maßstab ohne Primärbeleg, ungelesene Fundstelle, abgelaufene Geltung
-(Nahverkehrsplan 2019) oder Berliner Methode. <b>vorläufig</b>: Grundschulwerte ohne Schulbezirk. <b>keine Aussage</b>: der Grund
+(Nahverkehrsplan 2019), Berliner Methode oder eine Rechenweise, die vom Dokument abweicht (Baulandmodell: ohne
+angrenzende Planungsräume, Schüler am Schulort gegen eine Bedarfsquote). <b>a von b</b> unter dem Wert: Zähler und
+Nenner, Personen und Bedarfsplätze auf 10 gerundet, Plätze, Schüler und Standorte genau. <b>Potsdam</b>: ganz
+Potsdam als Summe der veröffentlichten Zähler und Nenner; Raumeinheiten ohne Wert zählen dort nicht mit. <b>vorläufig</b>: Grundschulwerte ohne Schulbezirk. <b>keine Aussage</b>: der Grund
 steht im ersten Satz des Hinweises daneben. Einwohner und Kinder stammen aus dem
 Zensus 2022 (Stichtag 15.05.2022, Cell-Key-Verfahren: kleine Werte sind verändert, Summen vieler Zellen weichen
 ab); Neubau danach fehlt. Entfernungen in Luftlinie vom Zellmittelpunkt, aussagekräftig auf rund 50 m.
@@ -1113,7 +1168,7 @@ def main() -> int:
         raise SystemExit(f"Adress- oder Kontaktfelder in den Einrichtungen: {sorted(fremd & ADRESS_SPALTEN)}")
     ziel.mkdir(parents=True, exist_ok=True)
     # Nur eigene Ausgaben entfernen, damit kein Rest eines früheren Laufs (etwa ODbL-CSV) liegen bleibt
-    for alt in ("csv", "csv_odbl", "stile", "steckbriefe"):
+    for alt in ("csv", "csv_odbl", "csv_de", "csv_odbl_de", "stile", "steckbriefe"):
         if (ziel / alt).is_dir():
             for f in (ziel / alt).iterdir():
                 if f.is_file() and f.suffix in (".csv", ".qml", ".html"):
@@ -1190,6 +1245,7 @@ def main() -> int:
             ("zellen", "INTEGER"),
         ]
         + [(k, "REAL") for k in spalten_breit]
+        + [(f"kinder_{k}", "INTEGER") for k in KINDER]
         + [("stand", "TEXT"), ("vermerk_grenze", "TEXT")]
     )
     zellen_je_raum: dict[str, int] = {}
@@ -1204,6 +1260,7 @@ def main() -> int:
         r_zeilen.append(
             [nr, r["name"], raumebene, r["ew"], geo["km2"], zellen_je_raum.get(nr, 0)]
             + [werte.get(k) for k in spalten_breit]
+            + [(r.get("kinder") or {}).get(k) for k in KINDER]
             + [stand, raum_vermerk, (geo["wkb"], geo["huelle"], geo["wkt"])]
         )
     v_felder = [
@@ -1217,6 +1274,11 @@ def main() -> int:
         ("zielgruppe", "TEXT"),
         ("wert", "REAL"),
         ("einheit", "TEXT"),
+        ("zaehler", "REAL"),
+        ("nenner", "REAL"),
+        ("zaehler_text", "TEXT"),
+        ("nenner_text", "TEXT"),
+        ("differenz", "REAL"),
         ("methode", "TEXT"),
         ("status", "TEXT"),
         ("vorlaeufig", "BOOLEAN"),
@@ -1269,6 +1331,11 @@ def main() -> int:
                         w.get("zielgruppe"),
                         w.get("wert"),
                         w.get("einheit"),
+                        w.get("zaehler"),
+                        w.get("nenner"),
+                        w.get("zaehler_text"),
+                        w.get("nenner_text"),
+                        w.get("differenz"),
                         methode_export(w),
                         w.get("status"),
                         bool(w.get("vorlaeufig", False)),
@@ -1446,6 +1513,7 @@ def main() -> int:
     gp.stile(stile, {n: g is not None for n, _, g, _, _ in ebenen})
     gp.schliessen()
     ebenen_csv(ziel / "csv", ebenen)
+    ebenen_csv(ziel / "csv_de", ebenen, komma=True)
     # Stile als Dateien
     (ziel / "stile").mkdir(exist_ok=True)
     for name, qml in stile.items():
@@ -1526,6 +1594,7 @@ def main() -> int:
         go.schliessen()
         # Lizenzzeilen auch als CSV, damit die Vermerke (VBB, Zensus) die CSV-Weitergabe begleiten
         ebenen_csv(ziel / "csv_odbl", [*odbl_ebenen, ("lizenz", "Lizenz", None, l_felder, odbl_lizenz)])
+        ebenen_csv(ziel / "csv_odbl_de", [*odbl_ebenen, ("lizenz", "Lizenz", None, l_felder, odbl_lizenz)], komma=True)
         for name, qml in odbl_stile.items():
             (ziel / "stile" / f"{name}.qml").write_text(qml, encoding="utf-8")
         meldungen.append(f"ODbL: {', '.join(n for n, *_ in odbl_ebenen)} geschrieben")
@@ -1662,6 +1731,10 @@ def readme_schreiben(
     def feldliste(felder):
         return ", ".join(f"`{n}`" for n, _ in felder)
 
+    # Fahrplantag der Taktklassen aus der Quelle in planer.js (15_planer.py, config/richtwerte.yaml oepnv.messung)
+    fahrplan = ((planer["quellen"].get("vbb") or {}).get("quelle") or "").removeprefix("VBB-Fahrplandaten (GTFS), ")
+    fahrplan = fahrplan or "Fahrplantag siehe config/richtwerte.yaml (oepnv.messung)"
+
     zeilen = "\n".join(
         f"| `{n}` | {'Tabelle' if g is None else g} | {len(z)} | {feldliste(f)} |" for n, _, g, f, z in ebenen
     )
@@ -1701,6 +1774,8 @@ der Projektdatenbank. Raumebene: **{"Planungsraum (die 19 Planungsräume der Lan
 | `kiezatlas_potsdam_odbl.gpkg` | Ebenen aus OpenStreetMap (Fußweg, weitere Einrichtungen) | Open Database License 1.0 |
 | `csv/*.csv` | dieselben Ebenen als CSV | wie die GeoPackage-Ebene |
 | `csv_odbl/*.csv` | die ODbL-Ebenen als CSV | Open Database License 1.0 |
+| `csv_de/*.csv` | dieselben Ebenen wie `csv/`, mit Dezimalkomma für Excel und LibreOffice | wie die GeoPackage-Ebene |
+| `csv_odbl_de/*.csv` | die ODbL-Ebenen wie `csv_odbl/`, mit Dezimalkomma | Open Database License 1.0 |
 | `kiezatlas_potsdam.qgz` | QGIS-Projekt (relative Pfade, liegt neben der GPKG) | Apache-2.0 (Projektdatei) |
 | `stile/*.qml` | QGIS-Stile; dieselben Stile stehen als Standardstil in der GPKG (`layer_styles`) | Apache-2.0 |
 | `steckbriefe/<nr>.html` | druckbarer Steckbrief je Raumeinheit (A4) | wie die Werte |
@@ -1708,8 +1783,11 @@ der Projektdatenbank. Raumebene: **{"Planungsraum (die 19 Planungsräume der Lan
 Jede Zeile trägt in `lizenz` das Kürzel ihrer Lizenz; der vollständige Vermerk steht in der Tabelle `lizenz`
 (GPKG und `csv/lizenz.csv`) und unten.
 
-CSV: Trennzeichen Semikolon, UTF-8 mit BOM, Dezimalpunkt. Punkte mit Spalten `x`, `y`, Flächen mit `wkt`, beides
-in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
+CSV: Trennzeichen Semikolon, UTF-8 mit BOM. `csv/` und `csv_odbl/` mit Dezimalpunkt für GIS-Werkzeuge, Skripte
+und englische Tabellenprogramme. **In Excel oder LibreOffice mit deutscher Einstellung `csv_de/` bzw.
+`csv_odbl_de/` öffnen:** dort steht das Dezimalkomma, ohne Tausendertrenner, sodass Flächen und Quoten als Zahlen
+ankommen (mit Dezimalpunkt würde etwa 1.036 km² als 1036 gelesen). Texte und `wkt` sind in beiden Fassungen gleich.
+Punkte mit Spalten `x`, `y`, Flächen mit `wkt`, beides in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 
 ## Ebenen ohne OpenStreetMap (`kiezatlas_potsdam.gpkg`, `csv/`)
 
@@ -1717,16 +1795,24 @@ in EPSG:25833 auf 1 cm. Wahrheitswerte als 1 und 0.
 |---|---|---|---|
 {zeilen}
 
-- `raumeinheit`: Grenzen mit Einwohnern und je Kennzahl einer Spalte (Kurzname wie in `versorgung.spalte`).
+- `raumeinheit`: Grenzen mit Einwohnern und je Kennzahl einer Spalte (Kurzname wie in `versorgung.spalte`), dazu
+  die Kinder der Zielgruppen `kinder_u3`, `kinder_3_bis_5`, `kinder_6_bis_unter_12` (Summe der Zensus-Zellen,
+  infrastrukturelle Altersgruppen, auf 10 gerundet, leer unter 100 Einwohnern; 6 bis unter 12 ist geschätzt:
+  6 bis 9 plus ein Drittel von 10 bis 15, keine Zensusklasse).
 - `versorgung`: jede Kennzahl als eigene Zeile mit `status`, `vorlaeufig`, Maßstab (`richtwert`, Quelle,
   Fundstelle), `unsicherheit`, Quelle und Stand. Die Breitform in `raumeinheit` enthält nur die Zahl; lesen Sie
-  die Zahl immer mit dieser Zeile.
+  die Zahl immer mit dieser Zeile. Zu jeder Quote `zaehler` und `nenner` mit ihrer Bedeutung (`zaehler_text`,
+  `nenner_text`): Personen und Bedarfsplätze auf 10 gerundet, Plätze, Schüler und Standorte genau, leer, wenn der
+  Wert leer ist; der Wert ist aus den ungerundeten Zahlen gerechnet. `differenz` nur bei Plätzen je Bedarfsplatz:
+  Plätze minus Bedarfsplätze, auf 10 gerundet, negativ = rechnerisch fehlende Plätze. Mediane (Grün je Einwohner)
+  haben keinen Zähler und Nenner. Den Wert für ganz Potsdam (Summe der veröffentlichten Zähler und Nenner) führen
+  `daten/planer.js` (`gesamt`) und die Steckbriefe (Spalte Potsdam).
 - `einrichtung`: Kitas, Horte und Schulen (MBJS) mit Plätzen bzw. Schülern, Gemeinbedarf aus ALKIS nur als Lage.
   `raum_nr` ist leer bei Standorten außerhalb Potsdams (sie zählen bei den Entfernungen mit).
 - `zelle`: bewohnte 100-m-Zellen des Zensus 2022 mit Einwohnern und der Luftlinie in Metern zum nächsten
   Standort je Art (`m_<art>`, auf 10 m gerundet; leer = Zelle ohne Einwohner). Keine Altersklassen je Zelle.
 - `gruenflaeche`: ALKIS-Nutzung; `zaehlt_gruenversorgung` = {", ".join(sorted(gruen_zaehlt))}.
-- `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019.
+- `haltestelle`: Haltestellen mit Fahrten in der Hauptverkehrszeit und Taktklasse nach NVP 2019; {fahrplan}.
 - `stadtteil`: die 32 Stadtteile mit Nummer, Name und Fläche, ohne Werte. In `zelle` steht der Stadtteil jeder
   Zelle in `stadtteil`, die Raumeinheit in `raum_nr`.
 - `einrichtung.hinweis`: nur bei Standorten mit strittiger Lage (Ortsangabe widerspricht den Koordinaten). Ein
@@ -1777,13 +1863,19 @@ Zahl mit Fundstelle übernommen, nicht als Text. Der Code des Kiezatlas steht un
   Einwohner einer Raumeinheit, steht statt eines Werts ein Hinweis in `unsicherheit`.
 - **Status:** `amtlich` mit `richtwert` = amtlicher Maßstab aus einem geltenden Potsdamer Dokument mit gelesener
   Fundstelle; `amtlich` ohne `richtwert` = amtliche Daten, kein Maßstab. `orientierung` = Maßstab ohne
-  Primärbeleg, Fundstelle nicht gelesen, abgelaufene Geltung (Nahverkehrsplan 2019, Geltung bis 2023) oder
-  Berliner Methode; kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
+  Primärbeleg, Fundstelle nicht gelesen, abgelaufene Geltung (Nahverkehrsplan 2019, Geltung bis 2023),
+  Berliner Methode oder eine Rechenweise, die vom Dokument abweicht (Plätze je Bedarfsplatz ohne die angrenzenden
+  Planungsräume nach Nr. 3.4.4 des Baulandmodells, Grundschüler je Kind gegen eine Bedarfsquote); kein Richtwert. `vorlaeufig` = Grundschulwert ohne Schulbezirk.
 - **Methode:** `luftlinie` = Entfernung bzw. Radius in Luftlinie; `raumeinheit` = Quote je Raumeinheit ohne
   Entfernungsbezug (Plätze je Kind, Plätze je Bedarfsplatz, Schüler je Kind, Einwohner je Standort).
 - **Vermerk:** `vermerk` nennt die Quelle der Einrichtungen bzw. Daten und immer den Zensus, weil jede Kennzahl
   gegen Zensus-Einwohner oder -Zielgruppen gerechnet ist.
-- **Kita:** Kapazität laut Betriebserlaubnis, nicht Belegung; Kinder 2022, Plätze 2026. Tagespflege fehlt.
+- **Kita:** genehmigte Plätze laut Betriebserlaubnis, wie viele frei sind, steht nicht in den Daten; Kinder 2022,
+  Plätze 2026. Tagespflege fehlt. Eine Kita mit Häusern in mehreren Raumeinheiten führt alle Plätze am
+  Hauptstandort (steht in `unsicherheit` der betroffenen Raumeinheiten).
+- **Grundschule:** Schulen mit Primarstufe (`einrichtung.unterart` beginnt mit `G/`) zählen für `zelle.m_grundschule`
+  und Einwohner je Standort als Grundschulstandort mit; „Grundschüler je Kind“ ist in Raumeinheiten mit einer solchen
+  Schule leer, weil sich ihre Schülerzahl nicht nach Stufe teilen lässt.
 - **Grün:** vereinfachte Berliner Methode (Grünanlagen und Parks aus ALKIS im 500-m-Kreis je Einwohner), ohne
   Mindestgröße; SPSG-Parks lassen sich nicht abgrenzen und zählen mit.
 

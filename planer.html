@@ -98,6 +98,18 @@
         <div id="vs-inhalt"></div>
       </div>
 
+      <div class="block" id="block-vergleich">
+        <h2 class="block__titel">Alle Planungsräume</h2>
+        <p class="fuss">Eine Kennzahl für jede Raumeinheit und für ganz Potsdam nebeneinander, mit Zähler und Nenner. Ganz Potsdam ist die Summe der veröffentlichten Zähler und Nenner.</p>
+        <button class="knopf knopf--rand" type="button" id="vg-laden"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Vergleich zeigen</span></button>
+        <div id="vg-auswahl" hidden>
+          <label class="suche"><span>Kennzahl</span>
+            <select id="vg-kennzahl" disabled></select>
+          </label>
+        </div>
+        <div class="tabellenrahmen vg-rahmen" id="vg-inhalt" aria-live="polite"></div>
+      </div>
+
       <div class="block seite__fuss">
         <p class="fuss" id="fuss-quellen">Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Planungsräume © Landeshauptstadt Potsdam, dl-de/by-2-0, Daten verändert (Grenzen vereinfacht). Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0. Grundkarte © <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert. Weitere Quellen je Zahl in der Tabelle und unter <a class="link" href="planer-daten.html">Daten</a>.</p>
         <p class="fuss" id="fuss-odbl" hidden>Fußwege und Einrichtungen aus OpenStreetMap: © OpenStreetMap-Mitwirkende, ODbL 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). Die abgeleiteten Dateien stehen unter <a class="link" href="planer-daten.html">Daten</a>.</p>

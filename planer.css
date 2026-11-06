@@ -48,6 +48,17 @@
 .vs-richt sup{font-size:.7em;margin-left:1px}
 .vs-quellen{margin:12px 0 0;padding-left:1.6em;font-size:.8125rem;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
 .vs-quellen li{padding:2px 0}
+.vs-zn,.vs-stadt{font-size:.8125rem;line-height:1.4;margin:4px 0 0}
+.vs-stadt{color:var(--muted)}
+
+/* ---------- Vergleich aller Raumeinheiten */
+.vg-rahmen{overflow-x:auto;max-width:100%;margin-top:10px}
+#vg-laden[hidden],#vg-auswahl[hidden]{display:none}
+.vg-tabelle{font-size:.8125rem}
+.vg-tabelle th[scope=row]{text-align:left;font-weight:500;color:var(--ink);padding-left:0;overflow-wrap:anywhere}
+.vg-tabelle td{white-space:nowrap}
+.vg-tabelle tfoot th,.vg-tabelle tfoot td{font-weight:600;border-top:1px solid var(--ink)}
+.vg-hinweis{margin-top:6px}
 
 /* ---------- Karte */
 .planerseite .legende{max-width:300px}
