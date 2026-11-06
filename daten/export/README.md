@@ -82,7 +82,7 @@ dieser Bedingung bleiben.
 Bei Weitergabe oder Veröffentlichung den Vermerk der genutzten Ebenen übernehmen:
 
 - **Grenzen der Raumeinheiten:** © Landeshauptstadt Potsdam, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
-- **Grenzen der Stadtteile:** © Landeshauptstadt Potsdam, dl-zero-de/2.0 (https://www.govdata.de/dl-de/zero-2-0)
+- **Grenzen der Stadtteile:** © Landeshauptstadt Potsdam, dl-de/zero-2-0 (https://www.govdata.de/dl-de/zero-2-0)
 - **Einwohner, Zellen:** © Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Kitas, Horte, Schulen:** © Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)
 - **Gemeinbedarf, Grünflächen:** © GeoBasis-DE/LGB, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung)

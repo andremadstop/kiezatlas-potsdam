@@ -7,7 +7,7 @@ auswertung.gruenflaeche, auswertung.haltestelle). Die Werte stammen damit aus de
 Rundung, Geheimhaltung und Unsicherheitshinweise von A6 gelten unverändert.
 
 Ausgabe (Standard daten/export/):
-  kiezatlas_potsdam.gpkg          GeoPackage EPSG:25833 ohne OSM-Anteil (dl-de/by-2-0, dl-zero-de/2.0, CC BY 4.0)
+  kiezatlas_potsdam.gpkg          GeoPackage EPSG:25833 ohne OSM-Anteil (dl-de/by-2-0, dl-de/zero-2-0, CC BY 4.0)
   kiezatlas_potsdam_odbl.gpkg     nur wenn *_odbl.js vorliegen (A3/A5b), Open Database License 1.0
   csv/<ebene>.csv                 dieselben Inhalte als CSV (Semikolon, UTF-8 mit BOM, Punkt als Dezimalzeichen)
   csv_odbl/<ebene>.csv            dito für die ODbL-Ebenen
@@ -70,7 +70,7 @@ VERMERK = {
     "zensus": f"© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
     "mbjs": f"© Ministerium für Bildung, Jugend und Sport, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
     "lgb": f"© GeoBasis-DE/LGB, dl-de/by-2-0 ({DLDE}), {VERAENDERT}",
-    "stadtteil": f"© Landeshauptstadt Potsdam, dl-zero-de/2.0 ({DLZERO})",
+    "stadtteil": f"© Landeshauptstadt Potsdam, dl-de/zero-2-0 ({DLZERO})",
     "vbb": f"VBB Verkehrsverbund Berlin-Brandenburg GmbH, CC BY 4.0 ({CCBY}), {VERAENDERT}",
     "osm": f"© OpenStreetMap-Mitwirkende, Open Database License 1.0 ({ODBL}), {VERAENDERT}",
 }
@@ -1147,8 +1147,8 @@ def main() -> int:
                 raum_vermerk = a.raum_lizenz or pr_quelle["vermerk"]
                 raum_lizenz = "siehe Vermerk" if a.raum_lizenz else pr_quelle.get("lizenz", "")
             else:
-                raum_vermerk, raum_lizenz = VERMERK["stadtteil"], "dl-zero-de/2.0"
-            raum_link = {"dl-de/by-2-0": DLDE, "dl-zero-de/2.0": DLZERO}.get(raum_lizenz, "")
+                raum_vermerk, raum_lizenz = VERMERK["stadtteil"], "dl-de/zero-2-0"
+            raum_link = {"dl-de/by-2-0": DLDE, "dl-de/zero-2-0": DLZERO}.get(raum_lizenz, "")
             fehlend = [f for f in ein["features"] if f["properties"]["id"] not in d["einrichtung"]]
             if fehlend and not fixture:
                 raise SystemExit(f"{len(fehlend)} Einrichtungen aus einrichtungen.js fehlen in auswertung.einrichtung")
@@ -1466,7 +1466,7 @@ def main() -> int:
             raum_vermerk,
             raum_link,
         ],
-        ["stadtteil", "dl-zero-de/2.0", VERMERK["stadtteil"], DLZERO],
+        ["stadtteil", "dl-de/zero-2-0", VERMERK["stadtteil"], DLZERO],
         [
             "raumeinheit, versorgung (Werte)",
             "dl-de/by-2-0; ÖPNV-Werte CC BY 4.0",

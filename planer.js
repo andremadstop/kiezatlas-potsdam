@@ -165,7 +165,7 @@ function hashSchreiben() {
 var RAUMEBENE = {
   pr: { name: "Planungsräume", einzahl: "Planungsraum", datei: "planungsraum", fc: PR,
     att: 'Planungsräume © Landeshauptstadt Potsdam, <a href="' + DLDE + '">dl-de/by-2-0</a>, Daten verändert' },
-  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" }
+  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" }
 };
 var RAUMEBENE_DATEI = { stadtteil: "Stadtteilen", planungsraum: "Planungsräumen" };
 var RAUM = {};
@@ -196,9 +196,10 @@ var map = new maplibregl.Map(Object.assign({
       { id: "ein", type: "circle", source: "ein", paint: {} }
     ] }, { vor: "ein_odbl" }),
   maxZoom: 19, maxPitch: 60, attributionControl: false, fadeDuration: RUHIG ? 0 : 300,
-  locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
 }, start));
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }), "top-right");
+map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 window.KIEZ_KARTE = map;
 

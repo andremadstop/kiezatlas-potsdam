@@ -341,9 +341,9 @@ async function textseiten(basis, art) {
     const st = { ganz: { maximumFractionDigits: 0 }, eins: { minimumFractionDigits: 1, maximumFractionDigits: 1 }, genau: { maximumFractionDigits: 3 } };
     const falsch = n.filter((e) => { const x = PW[e.dataset.pw]; return !x || e.textContent !== new Intl.NumberFormat("de-DE", st[e.dataset.format || "genau"]).format(x.wert); }).map((e) => e.dataset.pw);
     const belege = [...document.querySelectorAll("[data-pw-beleg]")].filter((e) => !PW[e.dataset.pwBeleg] || e.textContent !== PW[e.dataset.pwBeleg].beleg).length;
-    return { n: n.length, falsch, belege, schluessel: Object.keys(PW).length };
+    return { n: n.length, falsch, belege, schluessel: Object.keys(PW).length, osm: Object.keys(PW).some((k) => /osm|fussweg/.test(k)) };
   });
-  pruef(pw.n >= 6 && !pw.falsch.length && !pw.belege && pw.schluessel >= 4,
+  pruef(pw.n >= 2 && !pw.falsch.length && !pw.belege && pw.schluessel >= 2 && !pw.osm,
     `planer-methode.html über ${art}: ${pw.n} Prüfwerte aus planer.js gefüllt (${pw.schluessel} mit Beleg), abweichend ${pw.falsch.join(", ") || "keiner"}, Beleg falsch ${pw.belege}`);
   const v1 = await axe(m.page);
   pruef(r.zeilen > 0 && r.orient > 0 && r.vermerk && v1.length === 0 && m.fehler.length === 0,

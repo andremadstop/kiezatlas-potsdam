@@ -77,13 +77,16 @@ VERAENDERT = "Daten verändert (eigene Berechnung)"
 OSM_STAND = "31.10.2026"
 # Prüfwerte aus Belegen (Audit K28): Zahl und Stand werden beim Lauf aus der Datei gelesen, nicht im Code geführt.
 # Schlüssel → (Beleg, Muster für den Wert, Muster für das Datum, Einheit). Findet ein Muster nichts: Abbruch.
-PRUEFWERTE = {
+# Nur Werte ohne OSM-Anteil: daten/planer.js ist keine ODbL-Datei (Entscheidung A1). Die aus OpenStreetMap
+# abgeleiteten Prüfwerte (Kita-Vollständigkeit 78,1 %, Umwegfaktor 1,367) stehen als belegter Text mit ODbL-Vermerk
+# auf planer-methode.html (Gegenprobe zum Audit, 06.11.2026). Sie werden nur für Texte der OSM-Kennzahlen gelesen,
+# die in der _odbl-Datei stehen.
+PRUEFWERTE_OSM = {
     # Anteil der amtlichen Kita-Standorte (MBJS), die auch im OSM-Auszug stehen (A3)
     "osm_kita_vollstaendig": ("belege/N1_osm_fussweg_20261105.md", r"Vollständigkeit gegen MBJS \| Kita (\d+,\d+) %",
                               r"Lauf (\d{2}\.\d{2}\.\d{4})", "%"),
-    # Median Fußweg / Luftlinie über alle Zellen und Arten (A5b, K3)
-    "fussweg_umweg_median": ("belege/N1_osm_fussweg_20261105.md", r"Median Fußweg/Luftlinie (\d+,\d+)",
-                             r"Lauf (\d{2}\.\d{2}\.\d{4})", "Faktor"),
+}
+PRUEFWERTE = {
     # Landeszuordnung der Haltestellen (E7): geprüfte Haltepunkte und falsch zugeordnete
     "landfilter_haltepunkte": ("belege/A5b_landfilter_kreuzprobe.txt", r"Haltepunkte im Rechteck: (\d+)",
                                r"vbb_gtfs/(\d{4}-\d{2}-\d{2})/", "Haltepunkte"),
@@ -318,10 +321,10 @@ def js_schreiben(pfad: Path, variable: str, inhalt: dict, kopf: str = "") -> Non
     pfad.write_text(f"{kopf}window.{variable}={text};\n", encoding="utf-8")
 
 
-def pruefwerte_lesen() -> dict:
+def pruefwerte_lesen(tabelle: dict | None = None) -> dict:
     """Prüfwerte mit Beleg (PRUEFWERTE): Wert und Stand aus der Belegdatei; fehlt ein Muster, Abbruch."""
     aus = {}
-    for k, (beleg, muster, muster_stand, einheit) in PRUEFWERTE.items():
+    for k, (beleg, muster, muster_stand, einheit) in (PRUEFWERTE if tabelle is None else tabelle).items():
         text = (WURZEL / beleg).read_text(encoding="utf-8")
         m, s = re.search(muster, text), re.search(muster_stand, text)
         if not m or not s:
@@ -724,7 +727,7 @@ class Rechner:
         self.geheim_null = 0
         self.statbezirk = False   # ÖPNV-Klasse eines Stadtteils aus den statistischen Bezirken benutzt (Vermerk)
         self.primar = set(primarstufe_ids(d, rw))
-        pw = d.get("pruefwerte") or pruefwerte_lesen()
+        pw = pruefwerte_lesen(PRUEFWERTE_OSM)   # nur für den Text der OSM-Kennzahlen (_odbl-Datei)
         self.osm_kita = f"{math.floor(pw['osm_kita_vollstaendig']['wert'] + 0.5)} %"
         # Audit K27: Kitas (eine id_kita) mit Häusern „#haus<n>“ in mehreren Raumeinheiten
         haeuser: dict = defaultdict(list)

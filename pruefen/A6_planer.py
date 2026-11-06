@@ -664,9 +664,8 @@ def main() -> int:
     pw = P.get("pruefwerte") or {}
     n1 = (WURZEL / "belege" / "N1_osm_fussweg_20261105.md").read_text(encoding="utf-8")
     kp = (WURZEL / "belege" / "A5b_landfilter_kreuzprobe.txt").read_text(encoding="utf-8")
-    soll = {"osm_kita_vollstaendig": float(re.search(r"Kita (\d+,\d) %", n1).group(1).replace(",", ".")),
-            "fussweg_umweg_median": float(re.search(r"Fußweg/Luftlinie (\d+,\d+)", n1).group(1).replace(",", ".")),
-            "landfilter_haltepunkte": int(re.search(r"Rechteck: (\d+)", kp).group(1)),
+    del n1  # OSM-Prüfwerte stehen nicht in planer.js (ODbL-Grenze A1), nur als belegter Text auf der Methodenseite
+    soll = {"landfilter_haltepunkte": int(re.search(r"Rechteck: (\d+)", kp).group(1)),
             "landfilter_falsch": int(re.search(r"zugeordnet: (\d+)", kp).group(1))}
     pruef({k: (v or {}).get("wert") for k, v in pw.items()} == soll
           and all((WURZEL / v["beleg"]).exists() for v in pw.values()),

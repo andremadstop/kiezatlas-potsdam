@@ -374,7 +374,8 @@ def main() -> int:
            and "Häuser in den Raumeinheiten A und B" in
            next(w for w in PK["raeume"]["B"]["werte"] if w["kennzahl"] == "plaetze_je_bedarf")["unsicherheit"],
            "K27: Kita mit Häusern in zwei Raumeinheiten in beiden genannt")
-        ok(set(PK["pruefwerte"]) == set(p.PRUEFWERTE) and PK["pruefwerte"]["osm_kita_vollstaendig"]["wert"] == 78.1,
+        ok(set(PK["pruefwerte"]) == set(p.PRUEFWERTE) and PK["pruefwerte"]["landfilter_haltepunkte"]["wert"] == 1800
+           and not ({"osm_kita_vollstaendig", "fussweg_umweg_median"} & set(PK["pruefwerte"])),
            "K28: Prüfwerte aus den Belegen gelesen")
         ok(p.fahrplan_text(rw) == "Fahrplan für Dienstag, 10.11.2026 (Schultag), 6 bis 9 Uhr (GTFS gültig ab "
            "3.11.2026)", "K32: Fahrplantext aus config/richtwerte.yaml")
