@@ -6,8 +6,18 @@ der Zensus aus den einmal geladenen Destatis-Dateien (Crawl-delay 30 eingehalten
 
 Ausgang: vorbereitet/stadtteile.csv  (nr; name; wkt in EPSG:4326)
          vorbereitet/zensus_potsdam.csv (gitter_id; x; y in EPSG:3035; Zählwerte je Thema)
+         vorbereitet/zensus_struktur.csv (Paket A1: Strukturmerkmale für public.zensus_struktur,
+             gitter_id; x; y; Spalten = Zielspalten aus config/potsdam.yaml; geaendert)
 Nur Zellen im Rechteck um Potsdam (plus 100 m); welche Zelle zu welchem Stadtteil gehört,
 rechnet PostGIS in der Auswertung.
+
+Strukturmerkmale (A1): Die Destatis-Zips liegen außerhalb des Repos unter $KIEZ_DATEN/zensus/2022/
+(HERKUNFT.md dort). Zählwerte: „–“ heißt laut Datensatzbeschreibung „genau Null oder auf Null
+geändert“ (Cell-Key-Methode) und wird 0; das Feld steht dann in geaendert (kommagetrennt). Fehlt
+eine Zelle in einer Themen-Datei, gibt es dort keine Personen bzw. Haushalte (0, kein Eintrag in
+geaendert). Mittelwerte (Miete, Leerstand, Wohnfläche): Zelle fehlt = leer (kein Wert, nie 0);
+„–“ = 0 und in geaendert; Zeichen KLAMMERN („Aussagewert eingeschränkt“) steht als <feld>:unsicher
+in geaendert. Feine Klassen gehen nie je Zelle in eine daten/-Datei (Bauplan A1, Geheimhaltung).
 
 Aufruf: ../kiezatlas-potsdam-west/.venv/bin/python -I skripte/01_vorbereiten.py
 """
@@ -16,6 +26,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import subprocess  # nosec B404
 import sys
 import zipfile
@@ -32,6 +43,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 WURZEL = Path(__file__).resolve().parent.parent
 ROH = WURZEL / "rohdaten"
 AUS = WURZEL / "vorbereitet"
+KIEZ_DATEN = Path(os.environ.get("KIEZ_DATEN") or WURZEL.parent / "kiezatlas-daten")
 nach_3035 = Transformer.from_crs(4326, 3035, always_xy=True).transform
 
 # Thema: (Datei, Muster im CSV-Namen, Kodierung, Quellspalte -> Zielspalte)
@@ -59,6 +71,101 @@ ZENSUS = {
                  "a2014_bis_2019": "w_2014_19", "a2020_und_spaeter": "w_2020p"}),
 }
 GEHEIM = {"–", "-", "—"}
+
+# Paket A1: Strukturmerkmale je 100-m-Zelle (Zensus 2022, Stichtag 15.05.2022), Ziel public.zensus_struktur.
+# Thema: (Datei unter $KIEZ_DATEN/zensus/2022/, Muster im CSV-Namen, Quellspalte -> Zielspalte)
+STRUKTUR_ORDNER = "zensus/2022"
+STRUKTUR = {
+    "alter_infr": ("Alter_in_infrastrukturellen_Altersgruppen.zip", "_100m-Gitter",
+                   {"Insgesamt_Bevoelkerung": "i_ges", "Unter3": "i_u3", "a3bis5": "i_3_5", "a6bis9": "i_6_9",
+                    "a10bis15": "i_10_15", "a16bis18": "i_16_18", "a19bis24": "i_19_24",
+                    "a25bis39": "i_25_39", "a40bis59": "i_40_59", "a60bis66": "i_60_66",
+                    "a67bis74": "i_67_74", "a75undaelter": "i_75p"}),
+    "hh_groesse": ("Zensus2022_Groesse_des_privaten_Haushalts_in_Gitterzellen.zip", "_100m-Gitter",
+                   {"Insgesamt_Haushalte": "hh_ges", "1_Person": "hh_1", "2_Personen": "hh_2",
+                    "3_Personen": "hh_3", "4_Personen": "hh_4", "5_Personen": "hh_5",
+                    "6_Personen_und_mehr": "hh_6p"}),
+    "hh_typ": ("Typ_des_privaten_Haushalts_Familien.zip", "_100m-Gitter",
+               {"Insgesamt_Haushalte": "ht_ges", "EinpersHH_SingleHH": "ht_single",
+                "Paare_ohneKind": "ht_paar_ohne", "Paare_mitKind": "ht_paar_mit",
+                "Alleinerziehende": "ht_alleinerz", "MehrpersHHohneKernfam": "ht_mehrpers"}),
+    "kernfamilie": ("Typ_der_Kernfamilie_nach_Kindern.zip", "_100m-Gitter",
+                    {"Insgesamt_Familie": "kf_ges", "Ehep_ohneKind": "kf_ehe_ohne",
+                     "Ehep_mind_1Kind_unter18": "kf_ehe_u18", "Ehep_Kinder_ab18": "kf_ehe_ab18",
+                     "EingetrLP_ohneKind": "kf_lp_ohne", "EingetrLP_mind_1Kind_unter18": "kf_lp_u18",
+                     "EingetrLP_Kinder_ab18": "kf_lp_ab18", "NichtehelLG_ohneKind": "kf_nel_ohne",
+                     "NichtehelLG_mind_1Kind_unter18": "kf_nel_u18", "NichtehelLG_Kinder_ab18": "kf_nel_ab18",
+                     "Vater_mind_1Kind_unter18": "kf_vater_u18", "Vater_Kinder_ab18": "kf_vater_ab18",
+                     "Mutter_mind_1Kind_unter18": "kf_mutter_u18", "Mutter_Kinder_ab18": "kf_mutter_ab18"}),
+    "senioren": ("Seniorenstatus_eines_privaten_Haushalts.zip", "_100m-Gitter",
+                 {"Insgesamt_Haushalte": "sen_ges", "HH_nurSenioren": "sen_nur", "HH_mitSenioren": "sen_mit",
+                  "HH_ohneSenioren": "sen_ohne"}),
+    "staat": ("Zensus2022_Staatsangehoerigkeit_Gruppen_in_Gitterzellen.zip", "_100m-Gitter",
+              {"Insgesamt_Bevoelkerung": "st_ges", "Deutschland": "st_de", "Ausland_Sonstige": "st_ausland",
+               "EU27_Land": "st_eu27", "Sonstiges_Europa": "st_europa", "Sonstige_Welt": "st_welt",
+               "Sonstige": "st_sonst"}),
+    "miete": ("Zensus2022_Durchschn_Nettokaltmiete.zip", "_100m-Gitter", {"durchschnMieteQM": "miete_qm"}),
+    "leerstand": ("Leerstandsquote_in_Gitterzellen.zip", "_100m-Gitter", {"Leerstandsquote": "leer_quote"}),
+    "wohnflaeche": ("Durchschnittliche_Wohnflaeche_je_Bewohner_in_Gitterzellen.zip", "_100m-Gitter",
+                    {"durchschnFlaechejeBew": "wfl_je_bew"}),
+}
+MITTELWERTE = {"miete_qm", "leer_quote", "wfl_je_bew"}  # in config/potsdam.yaml als zahl_felder
+
+
+def struktur_lesen(minx: float, miny: float, maxx: float, maxy: float) -> None:
+    """Paket A1: Strukturmerkmale aus den Destatis-Zips nach vorbereitet/zensus_struktur.csv."""
+    ordner = KIEZ_DATEN / STRUKTUR_ORDNER
+    if not ordner.is_dir():  # z. B. frischer Klon ohne Rohdaten: Bestand bleibt lauffähig
+        print(f"Zensus-Struktur übersprungen: {STRUKTUR_ORDNER} fehlt unter KIEZ_DATEN", file=sys.stderr)
+        return
+    zellen: dict[str, dict] = {}
+    for thema, (datei, muster, spalten) in STRUKTUR.items():
+        with zipfile.ZipFile(ordner / datei) as z:
+            namen = [n for n in z.namelist() if n.endswith(muster + ".csv")]
+            assert len(namen) == 1, (datei, namen)
+            with z.open(namen[0]) as roh:
+                leser = csv.reader(io.TextIOWrapper(roh, encoding="utf-8"), delimiter=";")
+                kopf = next(leser)
+                assert kopf[0].upper() == "GITTER_ID_100M", (datei, kopf[0])
+                fehlt = [k for k in spalten if k not in kopf]
+                assert not fehlt, (datei, "Spalten fehlen", fehlt)
+                idx = {k: kopf.index(k) for k in spalten}
+                zeichen = kopf.index("werterlaeuternde_Zeichen") if "werterlaeuternde_Zeichen" in kopf else None
+                n = 0
+                for zeile in leser:
+                    x, y = zellmitte(zeile[0])
+                    if not (minx - 100 <= x <= maxx + 100 and miny - 100 <= y <= maxy + 100):
+                        continue
+                    c = zellen.setdefault(zeile[0], {"gitter_id": zeile[0], "x": f"{x:.0f}", "y": f"{y:.0f}",
+                                                     "_geaendert": []})
+                    for alt, neu in spalten.items():
+                        s = zeile[idx[alt]].strip()
+                        if s in GEHEIM:
+                            c[neu] = "0"
+                            c["_geaendert"].append(neu)
+                        elif s == "":
+                            raise ValueError(f"{datei}: leerer Wert in {zeile[0]} ({alt})")
+                        else:
+                            c[neu] = s.replace(",", ".")
+                            float(c[neu])  # bricht ab, wenn Destatis ein unbekanntes Zeichen liefert
+                        if zeichen is not None and zeile[zeichen].strip():
+                            assert zeile[zeichen].strip() == "KLAMMERN", (datei, zeile[zeichen])
+                            c["_geaendert"].append(f"{neu}:unsicher")
+                    n += 1
+        print(f"Zensus-Struktur {thema}: {n} Zellen im Rechteck", file=sys.stderr)
+
+    felder = ["gitter_id", "x", "y"] + [neu for _, _, sp in STRUKTUR.values() for neu in sp.values()] \
+        + ["geaendert"]
+    with (AUS / "zensus_struktur.csv").open("w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=felder, delimiter=";", restval="0")
+        w.writeheader()
+        for gid in sorted(zellen):
+            c = zellen[gid]
+            for m in MITTELWERTE:
+                c.setdefault(m, "")  # Zelle ohne Wohnungen bzw. ohne Wert: leer, nie 0
+            c["geaendert"] = ",".join(c.pop("_geaendert"))
+            w.writerow(c)
+    print(f"Zensus-Struktur: Zellen gesamt {len(zellen)}", file=sys.stderr)
 
 
 def zellmitte(gitter_id: str) -> tuple[float, float]:
@@ -125,6 +232,8 @@ def main() -> None:
             c.setdefault("d_alter", "")
             w.writerow(c)
     print(f"Zellen gesamt: {len(zellen)}", file=sys.stderr)
+
+    struktur_lesen(minx, miny, maxx, maxy)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daten: Kiezatlas Potsdam</title>
+<meta name="description" content="Alle Dateien des Kiezatlas Potsdam zum Weiterverwenden, mit Lizenz und Quellenvermerk je Datei; Dateien mit OpenStreetMap-Anteil getrennt unter ODbL.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/planer-daten.html">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="planer.css">
+</head>
+<body class="textseite" data-seite="daten">
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+  <nav aria-label="Seiten">
+    <ul>
+      <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+      <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+      <li><a class="nav" href="planer-methode.html"><span>Methode</span></a></li>
+      <li><a class="nav" href="planer-daten.html" aria-current="true"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt">
+  <h1>Daten zum Weiterverwenden</h1>
+  <p class="lede">Jede Datei, aus der die Seiten zeichnen, steht hier mit Lizenz und Quellenvermerk. Wer sie weitergibt, nennt den Vermerk. Dateien mit OpenStreetMap-Anteil sind getrennt und stehen unter der Open Database License.</p>
+  <p>Die Dateien sind JavaScript mit GeoJSON bzw. JSON darin (eine Zeile <code>window.KIEZ_… = {…}</code>), damit die Seiten auch ohne Server laufen. Der Aufbau jeder Datei ist in <code>daten/schema/</code> im Quellcode beschrieben. Was noch nicht berechnet ist, steht als „folgt“ ohne Link.</p>
+
+  <h2>Planer: Einrichtungen, Entfernungen, Versorgung</h2>
+  <ul class="dateiliste">
+    <li data-datei="einrichtungen.js" data-schema="einrichtungen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/einrichtungen.js">einrichtungen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kitas, Horte und Schulen (Bildungsministerium Brandenburg) und Gemeinbedarf aus dem Liegenschaftskataster als Punkte, ohne Adresse und ohne Kontaktdaten.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>). Vermerk je Quelle in der Datei, mit „Daten verändert (eigene Berechnung)“.</p>
+    </li>
+    <li data-datei="einrichtungen_odbl.js" data-schema="einrichtungen_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/einrichtungen_odbl.js">einrichtungen_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze aus OpenStreetMap als Punkte, ohne Namen.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz.</p>
+    </li>
+    <li data-datei="erreichbar.js" data-schema="erreichbar.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/erreichbar.js">erreichbar.js</a><span class="stand">vorhanden</span>
+      <p class="was">Entfernung in Luftlinie von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung je Art, in der Reihenfolge von <code>zellen.js</code>.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="erreichbar_fuss_odbl.js" data-schema="erreichbar_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/erreichbar_fuss_odbl.js">erreichbar_fuss_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap (Stand 31.10.2026), in der Reihenfolge von <code>zellen.js</code>.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
+    </li>
+    <li data-datei="planer.js" data-schema="planer.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planer.js">planer.js</a><span class="stand">vorhanden</span>
+      <p class="was">Versorgung je Raumeinheit in Luftlinie: Anteile in Reichweite, Einwohner je Einrichtung, Plätze je Kind, Grün je Einwohner. Jeder Wert mit Methode, Status, Stand, Unsicherheit und Quelle.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="planer_fuss_odbl.js" data-schema="planer_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/planer_fuss_odbl.js">planer_fuss_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Versorgungswerte als Fußweg.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
+    </li>
+  </ul>
+
+  <h2>Grundlage: Gitter, Stadtteile, Gebäude</h2>
+  <ul class="dateiliste">
+    <li data-datei="zellen.js" data-schema="zellen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/zellen.js">zellen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Bewohnte Zellen des Zensus-Gitters (100 m) mit Einwohnern, Alter, Wohnungen nach Baujahr und Fernwärme.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="stadtteile.js" data-schema="stadtteile.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/stadtteile.js">stadtteile.js</a><span class="stand">vorhanden</span>
+      <p class="was">Die amtlichen Stadtteile mit Nummer, Name und Fläche.</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, dl-zero-de/2.0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
+    </li>
+    <li data-datei="planungsraeume.js" data-schema="planungsraeume.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planungsraeume.js">planungsraeume.js</a><span class="stand">vorhanden</span>
+      <p class="was">Die 19 Planungsräume der Stadt mit Nummer, Name und Fläche; auf dieser Ebene rechnet die Versorgungstabelle.</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (Grenzen auf 3 m vereinfacht, Koordinaten gerundet, Felder ausgewählt).</p>
+    </li>
+    <li data-datei="kennzahlen.js" data-schema="kennzahlen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/kennzahlen.js">kennzahlen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kennzahlen und Verteilungen je Stadtteil und für die Stadt; dieselben Werte als <a class="link" href="daten/kennzahlen.json">kennzahlen.json</a>.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; Gebäudezahlen © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="gebaeude/*.js" data-schema="gebaeude.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/gebaeude/11.js">gebaeude/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
+      <p class="was">Gebäudeumrisse je Stadtteil, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11).</p>
+      <p class="lizenz">© GeoBasis-DE/LGB, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+  </ul>
+
+  <h2>Gebäudejahre</h2>
+  <ul class="dateiliste">
+    <li data-datei="jahre_zellen.js" data-schema="jahre_zellen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_zellen.js">jahre_zellen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Gebäude mit Wohnraum nach Baujahr je Zelle aus dem Zensus 2022.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="jahre/*.js" data-schema="jahre_gebaeude.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre/11.js">jahre/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
+      <p class="was">Bauzeitklasse je Gebäude, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11); Schätzungen gekennzeichnet, keine Aussage über einzelne Grundstücke, kein Einzeljahr bei Gebäuden mit Wohnraum.</p>
+      <p class="lizenz">dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>); Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="jahre_methode.js" data-schema="jahre_methode.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_methode.js">jahre_methode.js</a><span class="stand">vorhanden</span>
+      <p class="was">Zahlen der Methodenseite „Bauzeiten“: Gebäude je Stufe der Schätzung, Rücktest je Bauzeit und Stufe mit Fallzahl, Vergleich mit dem Zensus.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+  </ul>
+
+  <h2>Für Geoinformationssysteme</h2>
+  <p>Für die Arbeit in QGIS oder ArcGIS stehen dieselben Inhalte als GeoPackage und CSV bereit, Koordinaten in ETRS89 / UTM 33N (EPSG:25833). Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>. Raumebene sind die 19 Planungsräume der Stadt; die 32 Stadtteile liegen als eigene Ebene zur Orientierung bei.</p>
+  <ul class="dateiliste">
+    <li data-export="gpkg" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.gpkg" download>kiezatlas_potsdam.gpkg</a><span class="stand">vorhanden</span>
+      <p class="was">GeoPackage ohne OpenStreetMap-Anteil: Raumeinheiten mit Versorgungswerten, Versorgungstabelle, Einrichtungen, Zellen mit Entfernungen, Grünflächen, Haltestellen; QGIS-Stile sind eingebettet.</p>
+      <p class="lizenz">Je Ebene: Planungsräume dl-de/by-2-0, Stadtteile dl-zero-de/2.0, Zensus-, MBJS- und LGB-Werte dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung), Haltestellen CC BY 4.0 (<a class="link" href="https://creativecommons.org/licenses/by/4.0/">Lizenztext</a>). Vermerke in der Tabelle <code>lizenz</code>.</p></li>
+    <li data-export="gpkg_odbl" data-da="ja" data-odbl="ja"><a class="datei link" href="daten/export/kiezatlas_potsdam_odbl.gpkg" download>kiezatlas_potsdam_odbl.gpkg</a><span class="stand">vorhanden</span>
+      <p class="was">GeoPackage mit OpenStreetMap-Anteil: Einrichtungen aus OpenStreetMap (ohne Namen), Zellen mit Fußweg zum nächsten Standort, Versorgungstabelle im Fußweg. Dieselben Ebenen als CSV: <a class="link" href="daten/export/csv_odbl/einrichtung_odbl.csv">einrichtung_odbl</a>, <a class="link" href="daten/export/csv_odbl/zelle_fuss_odbl.csv">zelle_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/versorgung_fuss_odbl.csv">versorgung_fuss_odbl</a>, <a class="link" href="daten/export/csv_odbl/lizenz.csv">lizenz</a>.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz; amtliche Anteile und Haltestellen (VBB, CC BY 4.0) mit ihrem Vermerk in der Tabelle <code>lizenz</code>.</p></li>
+    <li data-export="csv" data-da="ja" data-odbl="nein"><span class="datei">CSV je Ebene</span><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Ebenen als CSV (Semikolon, UTF-8): <a class="link" href="daten/export/csv/raumeinheit.csv">raumeinheit</a>, <a class="link" href="daten/export/csv/versorgung.csv">versorgung</a>, <a class="link" href="daten/export/csv/einrichtung.csv">einrichtung</a>, <a class="link" href="daten/export/csv/zelle.csv">zelle</a>, <a class="link" href="daten/export/csv/gruenflaeche.csv">gruenflaeche</a>, <a class="link" href="daten/export/csv/haltestelle.csv">haltestelle</a>, <a class="link" href="daten/export/csv/stadtteil.csv">stadtteil</a>, <a class="link" href="daten/export/csv/lizenz.csv">lizenz</a>.</p></li>
+    <li data-export="readme" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/README.md">README.md</a><span class="stand">vorhanden</span>
+      <p class="was">Was in jeder Ebene steht, wie es berechnet ist, Vermerke und Lizenzen.</p></li>
+    <li data-export="qgis" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/kiezatlas_potsdam.qgz" download>kiezatlas_potsdam.qgz</a><span class="stand">vorhanden</span>
+      <p class="was">QGIS-Projekt mit relativen Pfaden; neben <code>kiezatlas_potsdam.gpkg</code> speichern, dann öffnet es die Ebenen mit denselben Klassen wie die Karte.</p></li>
+    <li data-export="steckbrief" data-da="ja" data-odbl="nein"><a class="datei link" href="daten/export/steckbriefe/403.html">Steckbrief je Planungsraum</a><span class="stand">vorhanden</span>
+      <p class="was">Die Versorgungstabelle eines Planungsraums als Druckseite (A4, über den Druckdialog als PDF); eine Datei je Planungsraumnummer, der Link zeigt 403 Babelsberg Süd.</p></li>
+  </ul>
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-methode.html">Methode</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+</footer>
+</body>
+</html>

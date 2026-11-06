@@ -1,0 +1,9 @@
+# A3: Gegenprobe des eigenen PBF-Lesers gegen GDAL (OSM-Treiber), 2026-11-05
+# Datei: pyogrio-Testdatei sample.osm.pbf, 9653 Byte, SHA256 40a25059d31a82521dcf49e3f1c9df385f1759b574d9bb1ca4ea37db91416992
+# GDAL: pyogrio 0.13.0 3.12.4
+Datei sample.osm.pbf: Programm 'osmconvert 0.7G', Pflicht ['OsmSchema-V0.6', 'DenseNodes'], optional ['Sort.Type_then_ID']
+eigener Leser: 290 Knoten, 44 Wege, 5 Relationen, 10 getaggte Knoten
+GDAL-Schicht points: 8 Objekte verglichen, größte Abweichung 0.00e+00 Grad
+GDAL-Schicht lines: 36 Objekte verglichen, größte Abweichung 7.11e-15 Grad
+Abweichende Knotenzahl oder fehlende Knoten: 0
+# Ausgang 0

@@ -1,0 +1,40 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Stadtteile (Bestand)",
+ "x-datei": "stadtteile.js",
+ "x-global": "^KIEZ_STADTTEILE$",
+ "type": "object",
+ "required": [
+  "type",
+  "features"
+ ],
+ "properties": {
+  "type": {
+   "const": "FeatureCollection"
+  },
+  "features": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "geometry",
+     "properties"
+    ],
+    "properties": {
+     "properties": {
+      "type": "object",
+      "required": [
+       "nr",
+       "name",
+       "flaeche_km2",
+       "bezirk",
+       "lx",
+       "ly"
+      ]
+     }
+    }
+   }
+  }
+ }
+}

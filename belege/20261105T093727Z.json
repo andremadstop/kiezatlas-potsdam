@@ -1,0 +1,54 @@
+{
+  "lauf_id": "20261105T093727Z",
+  "start": "2026-11-05T09:37:27.672341+00:00",
+  "probelauf": false,
+  "sprache": "de",
+  "quellen": [
+    {
+      "quelle": "alkis_nutzung",
+      "typ": "wfs",
+      "status": "ok",
+      "zaehler": {
+        "gelesen": 28121,
+        "neu": 28121,
+        "geaendert": 0,
+        "unveraendert": 0,
+        "geloescht": 0,
+        "uebernommen": 0,
+        "zurueckgehalten": 0
+      },
+      "warnungen": [],
+      "hinweise": [
+        "Dienst meldet ImplementsResultPaging=FALSE, Abruf per Kachelung"
+      ],
+      "info": {
+        "ziel": "alkis_nutzung",
+        "kontakt": {
+          "anbieter": "Landesvermessung und Geobasisinformation Brandenburg (LGB)",
+          "email": "kundenservice@geobasis-bb.de"
+        },
+        "titel": "WFS BB ALKIS Vereinfacht",
+        "beschreibung": "Das Liegenschaftskataster wird in elektronischer Form im Amtlichen Liegenschaftskatasterinformationssystem (ALKIS) geführt. Der vorliegende Web Feature Service ermöglicht das gezielte Herunterladen von in ALKIS geführten Geo-Objekten auf Basis einer Suchanfrage (Direktzugriffs-Downloaddienst). Der Dienst stellt ausschließlich folgende Geo-Objekte beschränkt auf die wesentlichen Eigenschaften im Format eines vereinfachten Datenaustauschschemas bereit, das in dieser Produktspezifikation festgelegt ist: Flurstücke, Gebäude, Tatsächliche Nutzungen, Verwaltungseinheiten, Katasterbezirke. Der Dienst ist konzipiert zur Nutzung in einfachen praxisgängigen GIS-Clients ohne komplexe Funktionalitäten.",
+        "update_sequence": null,
+        "felder": [
+          "aktualit",
+          "bez",
+          "geometrie",
+          "name",
+          "nutzart",
+          "oid"
+        ],
+        "objekte": 28121,
+        "metadaten": 0
+      },
+      "letzte_abfrage": "https://isk.geobasis-bb.de/ows/alkis_vereinf_wfs?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAMES=ave%3ANutzung&SRSNAME=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A25833&COUNT=10000&BBOX=374000%2C5819000%2C376000%2C5820000%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A25833",
+      "unvollstaendig": false,
+      "laufzeit_s": 149.74
+    }
+  ],
+  "laufzeit_s": 149.75,
+  "fehlgeschlagen": [],
+  "angehalten": [],
+  "unvollstaendig": [],
+  "karte": "20261105T093727Z-karte.html"
+}

@@ -1,0 +1,4 @@
+Importlauf 20261105T093727Z · 149.75 s
+  alkis_nutzung            ok     neu 28121  geändert     0  gelöscht     0  unverändert     0
+      Hinweis: Dienst meldet ImplementsResultPaging=FALSE, Abruf per Kachelung
+  Änderungskarte: 20261105T093727Z-karte.html

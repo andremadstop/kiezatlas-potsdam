@@ -1,0 +1,205 @@
+1. Eingang
+        Statistische Bezirke © Landeshauptstadt Potsdam, Stand 31.12.2021; Einwohner © Statistische Ämter des Bundes und der Länder, Zensus 2022; beide dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung). Haltestellen: VBB, CC BY 4.0.
+  ok    statistische-bezirke-in-potsdam.geojson: SHA256 wie in eingang/HERKUNFT.md (e5949434ec7b…)
+  ok    86 statistische Bezirke (Erwartung 86)
+2. Bezirke liegen in Stadtteilen
+  ok    alle 86 Bezirke zu ≥ 99 % in dem Stadtteil ihrer ersten zwei Ziffern
+        Einwohner (Zensus 2022) in Potsdam außerhalb jedes Bezirks: 0
+3. Einträge für die Stadtteile 11, 13, 32, 43, 44, 64, 72, 84, 86
+  ok    statistische_bezirke deckt genau deren Bezirke ab
+  ok    Bezirksnamen wie in der GeoJSON (ja)
+4. Klasse je Bezirk gegen Tab. 4.1
+  ok    111 Bornim Nord: III = Tab. 4.1 ['III'] (Institut Bornim)
+  ok    112 Bornim Ortslage: II = Tab. 4.1 ['II'] (Bornim)
+  ok    113 Katharinenholz: II = Tab. 4.1 ['II'] (Bornim)
+  ok    114 Schlangenbruch: III = Tab. 4.1 ['III'] (Institut Bornim)
+  ok    131 Das Kurze Feld: III = Tab. 4.1 ['III'] (Das kurze Feld)
+  ok    132 Bornstedter Feld: I = Tab. 4.1 ['I'] (Bornstedter Feld)
+  ok    133 Bornstedter Ortslage: II = Tab. 4.1 ['II'] (Bornstedter Ortslage)
+  ok    321 Potsdam West Zentrum: I = Tab. 4.1 ['I'] (Potsdam West)
+  ok    322 Luftschiffhafen: I = Tab. 4.1 ['I'] (Potsdam West)
+  ok    323 Forststraße: III = Tab. 4.1 ['III'] (Forststraße)
+  ok    324 Wildpark: ohne Klasse (Wildpark laut Tab. 4.1)
+  ok    431 Zentrum Ost: I = Tab. 4.1 ['I'] (Südliche Innenstadt)
+  ok    432 Nuthepark: I = Tab. 4.1 ['I'] (Südliche Innenstadt)
+  ok    441 Brauhausberg Nord: I = Tab. 4.1 ['I'] (Südliche Innenstadt)
+  ok    442 Hauptbahnhof: I = Tab. 4.1 ['I'] (Südliche Innenstadt)
+  ok    641 Waldstadt I Nord: nicht eindeutig, möglich ['I', 'II'] (Tab. 4.1: ['II'])
+  ok    642 Stadtrandsiedlung: nicht eindeutig, möglich ['I', 'II'] (Tab. 4.1: ['II'])
+  ok    643 Waldstadt I Süd: nicht eindeutig, möglich ['I', 'II'] (Tab. 4.1: ['II'])
+  ok    644 Industriegelände: II = Tab. 4.1 ['II'] (Industriegelände)
+  ok    721 Drewitz Ortslage: III = Tab. 4.1 ['III'] (Alt Drewitz)
+  ok    722 Gewerbegebiet Drewitz: I = Tab. 4.1 ['I'] (Drewitz)
+  ok    723 Drewitz I: I = Tab. 4.1 ['I'] (Drewitz)
+  ok    724 Drewitz II: I = Tab. 4.1 ['I'] (Drewitz)
+  ok    725 Drewitzer Nuthewiesen: I = Tab. 4.1 ['I'] (Drewitz)
+  ok    842 Krampnitz Ortslage: III = Tab. 4.1 ['III'] (Krampnitz Ort)
+  ok    843 Kartzow: III = Tab. 4.1 ['III'] (Kartzow)
+  ok    844 Fahrland Ortslage: II = Tab. 4.1 ['II'] (Fahrland)
+  ok    845 Krampnitz: II = Tab. 4.1 ['II'] (Kaserne Krampnitz)
+  ok    860 Groß Glienicke: nicht eindeutig, möglich ['II', 'III'] (Tab. 4.1: ['II', 'III'])
+5. Anker-Haltestellen
+  ok    111 Bornim Nord: Haltestelle „Institut für Agrartechnik“ liegt im Bezirk
+  ok    112 Bornim Ortslage: Haltestelle „Kirche Bornim“ liegt im Bezirk
+  ok    114 Schlangenbruch: Haltestelle „Heineberg“ liegt im Bezirk
+  ok    114 Schlangenbruch: Haltestelle „Sacrow-Paretzer Kanal“ liegt im Bezirk
+  ok    441 Brauhausberg Nord: Haltestelle „Am Havelblick“ liegt im Bezirk
+  ok    442 Hauptbahnhof: Haltestelle „Schlaatzstr.“ liegt im Bezirk
+  ok    641 Waldstadt I Nord: Haltestelle „Unter den Eichen“ liegt im Bezirk
+  ok    641 Waldstadt I Nord: Haltestelle „Drewitzer Str./Erich-Weinert-Str.“ liegt im Bezirk
+  ok    642 Stadtrandsiedlung: Haltestelle „Am Fenn“ liegt im Bezirk
+  ok    721 Drewitz Ortslage: Haltestelle „Drewitz-Ort“ liegt im Bezirk
+  ok    842 Krampnitz Ortslage: Haltestelle „Rotkehlchenweg“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „An der Windmühle“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „Schule Fahrland“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „Kaiserplatz“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „Kienhorststr.“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „Am Upstall“ liegt im Bezirk
+  ok    844 Fahrland Ortslage: Haltestelle „Eisbergstücke“ liegt im Bezirk
+  ok    845 Krampnitz: Haltestelle „Fahrländer See“ liegt im Bezirk
+  ok    860 Groß Glienicke: Haltestelle „Theodor-Fontane-Str.“ liegt im Bezirk
+  ok    860 Groß Glienicke: Haltestelle „Landesumweltamt“ liegt im Bezirk
+  ok    860 Groß Glienicke: Haltestelle „Waldsiedlung Groß Glienicke“ liegt im Bezirk
+6. Stadtteile
+        11: 111 Bornim Nord → III (560 EW); 112 Bornim Ortslage → II (2.760 EW); 113 Katharinenholz → II (240 EW); 114 Schlangenbruch → III (< 100 EW)
+  ok    Stadtteil 11: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 11: anteil_ew_prozent {'II': 83, 'III': 17} = berechnet {'III': 17, 'II': 83}
+        13: 131 Das Kurze Feld → III (2.190 EW); 132 Bornstedter Feld → I (10.950 EW); 133 Bornstedter Ortslage → II (1.920 EW)
+  ok    Stadtteil 13: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 13: anteil_ew_prozent {'I': 73, 'II': 13, 'III': 15} = berechnet {'III': 15, 'I': 73, 'II': 13}
+        32: 321 Potsdam West Zentrum → I (5.930 EW); 322 Luftschiffhafen → I (1.010 EW); 323 Forststraße → III (1.150 EW); 324 Wildpark → – (< 100 EW)
+  ok    Stadtteil 32: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 32: anteil_ew_prozent {'I': 85, 'III': 14, 'ohne': 1} = berechnet {'I': 85, 'III': 14, 'ohne': 1}
+        43: 431 Zentrum Ost → I (5.460 EW); 432 Nuthepark → I (640 EW)
+  ok    Stadtteil 43: klasse I (aus den Bezirken: I)
+  ok    Stadtteil 43: anteil_ew_prozent {'I': 100} = berechnet {'I': 100}
+        44: 441 Brauhausberg Nord → I (2.010 EW); 442 Hauptbahnhof → I (1.140 EW)
+  ok    Stadtteil 44: klasse I (aus den Bezirken: I)
+  ok    Stadtteil 44: anteil_ew_prozent {'I': 100} = berechnet {'I': 100}
+        64: 641 Waldstadt I Nord → ['I', 'II'] (4.140 EW); 642 Stadtrandsiedlung → ['I', 'II'] (730 EW); 643 Waldstadt I Süd → ['I', 'II'] (1.370 EW); 644 Industriegelände → II (100 EW)
+  ok    Stadtteil 64: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 64: anteil_ew_prozent {'I/II': 98, 'II': 2} = berechnet {'I/II': 98, 'II': 2}
+        72: 721 Drewitz Ortslage → III (1.240 EW); 722 Gewerbegebiet Drewitz → I (460 EW); 723 Drewitz I → I (2.340 EW); 724 Drewitz II → I (3.360 EW); 725 Drewitzer Nuthewiesen → I (< 100 EW)
+  ok    Stadtteil 72: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 72: anteil_ew_prozent {'I': 83, 'III': 17} = berechnet {'III': 17, 'I': 83}
+        84: 842 Krampnitz Ortslage → III (< 100 EW); 843 Kartzow → III (150 EW); 844 Fahrland Ortslage → II (4.750 EW); 845 Krampnitz → II (< 100 EW)
+  ok    Stadtteil 84: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 84: anteil_ew_prozent {'II': 96, 'III': 4} = berechnet {'III': 4, 'II': 96}
+        86: 860 Groß Glienicke → ['II', 'III'] (4.730 EW)
+  ok    Stadtteil 86: klasse None (aus den Bezirken: nicht eindeutig)
+  ok    Stadtteil 86: anteil_ew_prozent {'II/III': 100} = berechnet {'II/III': 100}
+
+Einwohner ohne eindeutige Gebietsklasse (Information für A6, oepnv_je_zelle):
+        11: Klasse je Stadtteil 3.600, je Bezirk 0 von 3.600
+        13: Klasse je Stadtteil 15.060, je Bezirk 0 von 15.060
+        32: Klasse je Stadtteil 8.160, je Bezirk < 100 von 8.160
+        43: Klasse je Stadtteil 0, je Bezirk 0 von 6.100
+        44: Klasse je Stadtteil 0, je Bezirk 0 von 3.150
+        64: Klasse je Stadtteil 6.350, je Bezirk 6.250 von 6.350
+        72: Klasse je Stadtteil 7.420, je Bezirk 0 von 7.420
+        84: Klasse je Stadtteil 5.030, je Bezirk 0 von 5.030
+        86: Klasse je Stadtteil 4.730, je Bezirk 4.730 von 4.730
+        zusammen: je Stadtteil 50.340, je Bezirk 11.050
+
+Soll-Ist je Potsdamer Haltestelle (Fahrten je Stunde und Richtung, HVZ, Stichtag 2026-11-10, gegen die Untergrenze der Tab. 4.3 für die Klasse des Bezirks):
+        111 Abzweig nach Nedlitz                       bus              2.7  Soll III ≥ 1  erfüllt
+        111 Institut für Agrartechnik                  bus              2.3  Soll III ≥ 1  erfüllt
+        111 Kläranlage Potsdam-Nord                    bus              1.7  Soll III ≥ 1  erfüllt
+        111 Schneiderremise                            bus              1.7  Soll III ≥ 1  erfüllt
+        111 TÜV-Akademie                               bus              2.7  Soll III ≥ 1  erfüllt
+        112 Gutsstr.                                   bus              2.0  Soll II ≥ 2  erfüllt
+        112 Hermann-Struve-Str.                        bus              2.0  Soll II ≥ 2  erfüllt
+        112 Hugstr.                                    bus              3.7  Soll II ≥ 2  erfüllt
+        112 Kirche Bornim                              bus              6.7  Soll II ≥ 2  erfüllt
+        112 Lindstedter Chaussee                       bus              5.0  Soll II ≥ 2  erfüllt
+        112 Rückertstr.                                bus              4.7  Soll II ≥ 2  erfüllt
+        112 Sportplatz Bornim                          bus              3.7  Soll II ≥ 2  erfüllt
+        113 Amundsenstr./Potsdamer Str.                bus             10.0  Soll II ≥ 2  erfüllt
+        113 Florastr.                                  bus              6.7  Soll II ≥ 2  erfüllt
+        114 Heineberg                                  bus              4.3  Soll III ≥ 1  erfüllt
+        114 Sacrow-Paretzer Kanal                      bus              2.7  Soll III ≥ 1  erfüllt
+        132 Am Pfingstberg                             bus              4.7  Soll I ≥ 6  UNTER SOLL
+        132 Am Schragen                                bus+tram        12.7  Soll I ≥ 6  erfüllt
+        132 Campus Fachhochschule                      bus+tram        13.3  Soll I ≥ 6  erfüllt
+        132 Erich-Arendt-Str.                          tram             6.0  Soll I ≥ 6  erfüllt
+        132 Hannes-Meyer-Str.                          tram             5.3  Soll I ≥ 6  UNTER SOLL
+        132 Johan-Bouman-Platz                         bus+tram        10.3  Soll I ≥ 6  erfüllt
+        132 Kirschallee                                bus+tram        12.7  Soll I ≥ 6  erfüllt
+        132 Rote Kaserne                               bus+tram         6.3  Soll I ≥ 6  erfüllt
+        132 Schlegelstr./Pappelallee                   bus              3.0  Soll I ≥ 6  UNTER SOLL
+        132 Volkspark                                  bus+tram         6.3  Soll I ≥ 6  erfüllt
+        132 Wiesenpark                                 tram             5.3  Soll I ≥ 6  UNTER SOLL
+        133 Katharinenholzstr.                         bus              4.7  Soll II ≥ 2  erfüllt
+        133 Ribbeckstr.                                bus              2.0  Soll II ≥ 2  erfüllt
+        133 Thaerstr.                                  bus             11.3  Soll II ≥ 2  erfüllt
+        321 Kastanienallee/Zeppelinstr.                bus+tram        16.7  Soll I ≥ 6  erfüllt
+        321 Park Sanssouci Bhf                         bus+spnv        13.7  Soll I ≥ 6  erfüllt
+        322 Im Bogen/Zeppelinstr.                      bus+tram        10.7  Soll I ≥ 6  erfüllt
+        322 Luftschiffhafen                            bus+tram        12.0  Soll I ≥ 6  erfüllt
+        322 Schillerplatz/Schafgraben                  bus+tram        11.3  Soll I ≥ 6  erfüllt
+        323 Im Bogen/Forststr.                         bus              3.0  Soll III ≥ 1  erfüllt
+        323 Schlüterstr./Forststr.                     bus              3.0  Soll III ≥ 1  erfüllt
+        323 Sonnenlandstr.                             bus              3.0  Soll III ≥ 1  erfüllt
+        324 Geltow, Kuckucksweg                        bus              5.7  Klasse offen
+        324 Bayrisches Haus                            bus              5.7  Klasse offen
+        324 Kuhfort                                    bus              1.3  Klasse offen
+        324 Pirschheide Bhf                            bus+spnv+tram    7.0  Klasse offen
+        324 Wasserwerk Wildpark                        bus              1.3  Klasse offen
+        324 Werderscher Damm/Forststr.                 bus              4.3  Klasse offen
+        324 Zum Bahnhof Pirschheide                    bus             10.0  Klasse offen
+        431 Humboldtring/Lotte-Pulewka-Str.            bus              3.3  Soll I ≥ 6  UNTER SOLL
+        431 Humboldtring/Nuthestr.                     tram             5.7  Soll I ≥ 6  UNTER SOLL
+        431 Wiesenstr./Lotte-Pulewka-Str.              bus              3.7  Soll I ≥ 6  UNTER SOLL
+        432 Lange Brücke                               bus+tram        24.3  Soll I ≥ 6  erfüllt
+        432 S Potsdam Hauptbahnhof/Nord ILB            bus              3.3  Soll I ≥ 6  UNTER SOLL
+        441 Am Havelblick                              bus              2.7  Soll I ≥ 6  UNTER SOLL
+        441 Finkenweg                                  bus              4.3  Soll I ≥ 6  UNTER SOLL
+        442 Schlaatzstr.                               bus              6.0  Soll I ≥ 6  erfüllt
+        442 S Potsdam Hauptbahnhof                     bus+spnv+tram   56.0  Soll I ≥ 6  erfüllt
+        641 Drewitzer Str./Erich-Weinert-Str.          bus              3.7  Klasse offen: Soll I ≥ 6 unter, Soll II ≥ 2 erfüllt
+        641 E.-Claudius-Str./Drewitzer Str.            bus              3.7  Klasse offen: Soll I ≥ 6 unter, Soll II ≥ 2 erfüllt
+        641 Unter den Eichen                           bus              3.7  Klasse offen: Soll I ≥ 6 unter, Soll II ≥ 2 erfüllt
+        642 Am Fenn                                    bus              3.7  Klasse offen: Soll I ≥ 6 unter, Soll II ≥ 2 erfüllt
+        644 An der Brauerei                            bus              3.0  Soll II ≥ 2  erfüllt
+        644 Drewitzer Str./Am Buchhorst                bus              3.0  Soll II ≥ 2  erfüllt
+        644 Zum Heizwerk                               bus              2.0  Soll II ≥ 2  erfüllt
+        721 Clara-Schumann-Str./Trebbiner Str.         bus              0.0  Soll III ≥ 1  UNTER SOLL
+        721 Drewitz-Ort                                bus              3.0  Soll III ≥ 1  erfüllt
+        721 Trebbiner Str.                             bus              3.0  Soll III ≥ 1  erfüllt
+        722 Gerlachstr.                                bus              9.7  Soll I ≥ 6  erfüllt
+        722 Konrad-Wolf-Allee/Sternstr.                bus              6.7  Soll I ≥ 6  erfüllt
+        722 Stern-Center/Gerlachstr.                   bus              9.0  Soll I ≥ 6  erfüllt
+        722 Stern-Center/Nuthestr.                     bus             11.7  Soll I ≥ 6  erfüllt
+        723 Hans-Albers-Str.                           bus+tram        12.3  Soll I ≥ 6  erfüllt
+        724 Robert-Baberske-Str.                       bus+tram        12.3  Soll I ≥ 6  erfüllt
+        842 Rotkehlchenweg                             bus              1.3  Soll III ≥ 1  erfüllt
+        843 Kartzow                                    bus              1.3  Soll III ≥ 1  erfüllt
+        843 Kirche Kartzow                             bus              1.3  Soll III ≥ 1  erfüllt
+        844 Am Upstall                                 bus              5.0  Soll II ≥ 2  erfüllt
+        844 An der Windmühle                           bus              2.7  Soll II ≥ 2  erfüllt
+        844 Eisbergstücke                              bus              5.0  Soll II ≥ 2  erfüllt
+        844 Kaiserplatz                                bus              2.7  Soll II ≥ 2  erfüllt
+        844 Ketziner Str./Königsweg                    bus              2.7  Soll II ≥ 2  erfüllt
+        844 Kienhorststr.                              bus              4.3  Soll II ≥ 2  erfüllt
+        844 Kietzer Str.                               bus              1.7  Soll II ≥ 2  UNTER SOLL
+        844 Marquardter Str.                           bus              1.7  Soll II ≥ 2  UNTER SOLL
+        844 Schule Fahrland                            bus              2.7  Soll II ≥ 2  erfüllt
+        845 Fahrländer See                             bus              1.0  Soll II ≥ 2  UNTER SOLL
+        845 Krampnitzer Tor                            bus              3.0  Soll II ≥ 2  erfüllt
+        845 Krampnitz-Mitte                            bus              3.0  Soll II ≥ 2  erfüllt
+        845 Krampnitzsee                               bus              5.7  Soll II ≥ 2  erfüllt
+        860 Am Anger                                   bus              3.7  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Am Park                                    bus              5.0  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Am Schlahn                                 bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Birkenweg                                  bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Bullenwinkel                               bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 F.-Günther-Park                            bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Hechtsprung                                bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Kirche Groß Glienicke                      bus              4.0  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Landesumweltamt                            bus              2.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Sacrower Allee/ R.-Wagner-Str.             bus              3.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        860 Theodor-Fontane-Str.                       bus              1.7  Klasse offen: Soll II ≥ 2 unter, Soll III ≥ 1 erfüllt
+        860 Waldsiedlung Groß Glienicke                bus              2.3  Klasse offen: Soll II ≥ 2 erfüllt, Soll III ≥ 1 erfüllt
+        75 Haltestellen mit Klasse, davon 14 unter dem Soll
+
+0 Befund(e)

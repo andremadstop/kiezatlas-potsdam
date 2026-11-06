@@ -1,0 +1,199 @@
+/* Kiezatlas Potsdam: Bauzeiten (B5). Baut auf atlas.css auf (Tokens, Kopf, Chips, Knöpfe, Fragen).
+   Bauzeit-Farben: Grenzviolett über ein gedämpftes Mittel zum Tiefblau, kein Farbton zwischen 20° und 70°. */
+:root{
+  --b0:#42194d; --b1:#613878; --b2:#756092; --b3:#8c87a9; --b4:#74a1aa; --b5:#428293; --b6:#226174; --b7:#1c4a5b;
+  --papier:#fafbf8;
+}
+
+/* ---------- Auftakt ---------- */
+.j-vorzeile{font:500 .9375rem/1 var(--f-display);color:var(--muted);margin:0 0 18px;letter-spacing:.02em}
+.j-profil{margin:0 0 22px;max-width:34rem}
+.j-profil__titel{font-size:.875rem;color:var(--muted);margin:0 0 6px}
+.j-schicht{display:flex;gap:1px;height:26px;background:var(--papier);outline:1px solid var(--ink);outline-offset:0}
+.j-schicht__teil{flex:0 0 0;min-width:0;transform-origin:0 50%}
+.j-schicht__marken{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 12px;font-size:.8125rem;line-height:1.25}
+.j-schicht__marken li{display:grid;grid-template-columns:10px 1fr;column-gap:6px;align-items:baseline}
+.j-schicht__marken i{width:10px;height:10px;align-self:center}
+.j-schicht__marken span{color:var(--muted)}
+.j-schicht__marken b{grid-column:2;font:600 1rem/1.1 var(--f-display)}
+.j-zahlen{grid-template-columns:repeat(2,minmax(0,1fr));min-height:0}
+.j-fixture{margin:14px 0 0;padding:10px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);font-size:.9375rem;max-width:36rem}
+
+@media (prefers-reduced-motion:no-preference){
+  .j-schicht__teil{animation:j-aufrichten .9s var(--ease) both}
+  .j-schicht__teil:nth-child(2){animation-delay:.05s}.j-schicht__teil:nth-child(3){animation-delay:.1s}.j-schicht__teil:nth-child(4){animation-delay:.15s}
+  .j-schicht__teil:nth-child(5){animation-delay:.2s}.j-schicht__teil:nth-child(6){animation-delay:.25s}.j-schicht__teil:nth-child(7){animation-delay:.3s}.j-schicht__teil:nth-child(8){animation-delay:.35s}
+}
+@keyframes j-aufrichten{from{scale:0 1}to{scale:1 1}}
+
+/* ---------- Bühne: Karte oben, Leiste darunter ---------- */
+.j-buehne{display:grid;grid-template-rows:minmax(0,1fr) auto}
+.j-buehne #karte{position:relative;inset:auto;min-height:0}
+.jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 58px);bottom:auto}
+.jahreseite .maplibregl-ctrl-bottom-right{bottom:0}
+.jahreseite .maplibregl-ctrl-attrib{background:rgba(250,251,248,.92)}
+
+.j-leiste{position:relative;z-index:2;background:var(--papier);border-top:1px solid var(--ink);padding:10px 14px 10px}
+.j-leiste:focus{outline:none}
+.j-leiste__kopf{display:flex;align-items:baseline;gap:12px;min-height:28px}
+.j-leiste__titel{font:600 1rem/1 var(--f-display);margin:0}
+.j-leiste__status{margin:0;font-size:.875rem;color:var(--muted);flex:1;min-width:0}
+.j-abspielen{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 10px;border:1px solid var(--ink);background:none;font:500 .8125rem/1 var(--f-text);color:var(--ink);cursor:pointer;border-radius:0}
+.j-abspielen__zeichen{width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.j-abspielen[aria-pressed="true"] .j-abspielen__zeichen{width:8px;height:10px;border:0;border-left:3px solid currentColor;border-right:3px solid currentColor}
+@media (hover:hover){.j-abspielen:hover{background:var(--ink);color:#fff}}
+
+.j-leiste__klassen{display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:2px;margin-top:6px}
+.j-klasse{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-height:44px;padding:0 0 4px;border:0;border-bottom:3px solid transparent;background:none;color:var(--ink);font:500 .75rem/1.1 var(--f-text);cursor:pointer;border-radius:0;text-align:center}
+.j-klasse__balken{position:relative;display:block;height:28px;background:var(--line-soft)}
+.j-klasse__balken i{position:absolute;left:0;right:0;bottom:0;transform-origin:50% 100%;transition:scale .5s var(--ease),opacity .3s}
+.j-klasse__name{display:block;padding:0 1px}
+.j-klasse[aria-pressed="true"]{border-bottom-color:var(--ink);font-weight:600}
+.j-leiste:not(.ist-ueberblick) .j-klasse[aria-pressed="false"] .j-klasse__balken i{opacity:.35}
+.j-klasse:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (hover:hover){.j-klasse:hover .j-klasse__balken{background:var(--line)}}
+
+.j-regler{position:relative;height:26px;margin:2px 0 4px}
+.j-regler::before{content:"";position:absolute;left:calc(100% / (2 * var(--n,8)));right:calc(100% / (2 * var(--n,8)));top:12px;height:2px;background:var(--line)}
+.j-regler__spanne{position:absolute;top:11px;height:4px;background:var(--ink);left:calc((var(--von,0) + .5) * 100% / var(--n,8));width:calc((var(--bis,0) - var(--von,0)) * 100% / var(--n,8))}
+.j-regler input{position:absolute;top:0;margin:0;height:26px;left:calc(100% / (2 * var(--n,8)) - 9px);width:calc(100% * (var(--n,8) - 1) / var(--n,8) + 18px);-webkit-appearance:none;appearance:none;background:none;pointer-events:none}
+.j-regler input::-webkit-slider-runnable-track{background:none;height:26px}
+.j-regler input::-moz-range-track{background:none}
+.j-regler input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;pointer-events:auto;width:18px;height:18px;margin-top:4px;background:var(--ink);border:2px solid var(--papier);box-shadow:0 0 0 1px var(--ink);border-radius:0;cursor:grab}
+.j-regler input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;background:var(--ink);border:2px solid var(--papier);box-shadow:0 0 0 1px var(--ink);border-radius:0;cursor:grab}
+.j-regler input:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--accent)}
+.j-regler input:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--accent)}
+.j-regler input:focus{outline:none}
+.j-regler.ist-aus .j-regler__spanne{opacity:0}
+.j-regler.ist-aus input::-webkit-slider-thumb{background:var(--papier)}
+.j-regler.ist-aus input::-moz-range-thumb{background:var(--papier)}
+
+.j-leiste__fuss{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;font-size:.75rem;line-height:1.3;color:var(--muted)}
+.j-legende__skala{display:inline-flex;flex-direction:column;gap:1px}
+.j-legende__stufen{display:flex;gap:1px}
+.j-legende__stufen i{width:26px;height:10px}
+.j-legende__marken{display:flex;justify-content:space-between;width:134px;margin-left:-3px;font-size:.6875rem}
+.j-legende__eintrag{display:inline-flex;align-items:center;gap:5px}
+.j-legende__muster{width:12px;height:12px;flex:0 0 auto;outline:1px solid var(--line)}
+.j-legende__muster--schraffur{background:repeating-linear-gradient(135deg,var(--ink) 0 1px,var(--papier) 1px 4px)}
+.j-legende__muster--punkte{background:radial-gradient(circle,var(--ink) 0 1.2px,var(--papier) 1.4px) 0 0/5px 5px}
+.j-legende__muster--blass{background:var(--b5);opacity:.4}
+.j-legende__quelle{flex-basis:100%}
+/* Gebäude ab Zoom 14: geschätzt heller, belegt kräftig mit Rand, nicht datiert grau, andere Bauzeit blass.
+   Die Muster zeigen nur Helligkeit und Rand, keine Klassenfarbe (die Farbe steht in der Klassenleiste). */
+.j-legende__muster--geschaetzt{background:var(--ink);opacity:.42}
+.j-legende__muster--belegt{background:var(--ink);outline:1.5px solid var(--ink);outline-offset:1px}
+.j-legende__muster--nd{background:#bcc0ba}
+.j-legende__muster--rest{background:#e5e7e2;outline-color:#9da39b}
+.j-legende__hinweis{font-weight:500;color:var(--ink)}
+.pop-status{font-weight:600}
+.pop-status--geschaetzt{font-style:italic}
+
+.j-punkt{display:inline-block;width:10px;height:10px;margin-right:7px;vertical-align:-1px}
+.pop-tab td:first-child{white-space:nowrap}
+
+/* ---------- Vergleich der Gebiete ---------- */
+.j-register{padding:clamp(64px,8vw,112px) var(--gut);border-top:1px solid var(--ink);background:var(--ground)}
+.j-register__kopf{max-width:72rem;margin-bottom:24px}
+.j-sortierung{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:0;margin:0;padding:0}
+.j-sortierung legend{float:left;margin-right:8px;font-size:.875rem;color:var(--muted)}
+.j-register__koerper{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,64px);align-items:start}
+.j-liste{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.j-zeile{position:relative;width:100%;display:grid;grid-template-columns:2.6em minmax(0,11em) minmax(0,1fr) 4.6em;align-items:center;gap:12px;min-height:44px;padding:6px 6px 6px 12px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:400 .9375rem/1.2 var(--f-text);text-align:left;cursor:pointer;border-radius:0}
+.j-zeile::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:4px;background:var(--accent);transform-origin:50% 100%;scale:1 0;transition:scale .35s var(--ease)}
+.j-zeile__nr{font:600 .9375rem/1 var(--f-display);color:var(--muted)}
+.j-zeile__name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.j-zeile__schicht{height:14px;outline:0}
+.j-zeile__wert{text-align:right;font-weight:600}
+.j-zeile[aria-pressed="true"]{background:var(--surface)}
+.j-zeile[aria-pressed="true"]::before{scale:1 1}
+.j-zeile:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media (hover:hover){.j-zeile:hover::before{scale:1 1}}
+
+.j-steckbrief{position:sticky;top:calc(var(--kopf) + 16px);border-top:3px solid var(--ink);padding-top:14px}
+.j-steckbrief__art{margin:0;font-size:.875rem;color:var(--muted)}
+.j-steckbrief__name{font:600 var(--t-l)/1.05 var(--f-display);margin:2px 0 6px}
+.j-steckbrief__g{margin:0 0 12px}
+.j-steckbrief__aktion{margin-top:16px}
+.j-tabelle{width:100%;border-collapse:collapse;font-size:.9375rem}
+.j-tabelle th,.j-tabelle td{padding:6px 0;border-bottom:1px solid var(--line);text-align:right;font-weight:400}
+.j-tabelle th:first-child{text-align:left}
+.j-tabelle thead th{font-size:.8125rem;color:var(--muted);border-bottom:1px solid var(--ink)}
+.j-tabelle tr.ist-gewaehlt th,.j-tabelle tr.ist-gewaehlt td{font-weight:600}
+.j-tabelle tbody th{white-space:nowrap}
+
+/* ---------- Textseiten: Methode und Daten ---------- */
+.j-blatt{padding:calc(var(--kopf) + clamp(40px,7vw,96px)) var(--gut) clamp(48px,6vw,88px)}
+.j-blatt__kopf{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:0 clamp(24px,4vw,64px);margin-bottom:clamp(40px,6vw,80px)}
+.j-blatt__titel{font:600 var(--t-mega)/.88 var(--f-display);letter-spacing:-.03em;margin:0 0 .25em -.04em;grid-column:1 / -1}
+.j-blatt__lede{grid-column:2;font-size:var(--t-m);line-height:1.42;margin:0;max-width:44ch}
+.j-teil{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:12px clamp(24px,4vw,64px);padding:28px 0 32px;border-top:1px solid var(--line)}
+.j-teil h2{font:600 var(--t-m)/1.15 var(--f-display);margin:0}
+.j-teil__text>*:first-child{margin-top:0}
+.j-teil__text p,.j-teil__text li{max-width:68ch}
+.j-teil__text ul{padding-left:1.1em}
+.j-teil__text li{margin-bottom:.4em}
+.j-zitat{font-size:.9375rem;background:var(--surface);border-left:3px solid var(--ink);padding:10px 14px;margin:12px 0;overflow-wrap:anywhere}
+.j-dateien{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.j-dateien li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.j-dateien h3{font:600 1.15rem/1.2 var(--f-display);margin:0}
+.j-dateien p{margin:2px 0 0;font-size:.9375rem;color:var(--muted);max-width:60ch}
+.j-dateien .knopf{justify-self:end}
+.j-dateien .knopf[disabled]::after{display:none}
+.j-status{min-height:1.5em;font-size:.9375rem;margin:12px 0 0}
+.j-blatt .methode{margin:clamp(40px,6vw,72px) calc(-1 * var(--gut))}
+.j-blatt .kette__nr{color:var(--b3)}
+.j-blatt .methode .kette__nr{color:#b8b2cf}
+.j-blatt .methode .fuss{color:var(--tief-muted)}
+
+/* Desktop: Bühne beginnt unter der festen Kopfleiste, damit Leiste und Legende ganz im Bild stehen */
+@media (min-width:861px){
+  .j-erzaehlung .j-buehne{top:var(--kopf);height:calc(100svh - var(--kopf))}
+  .j-buehne .werkzeug{top:10px}
+  .jahreseite .maplibregl-ctrl-top-right{top:58px}
+}
+
+/* ---------- Breiten ---------- */
+@media (max-width:1100px){
+  .j-schicht__marken{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .j-buehne{height:68svh}
+  .j-leiste{padding:6px 10px 6px}
+  .j-leiste__kopf{min-height:24px}
+  .j-leiste__titel{display:none}
+  .j-leiste__status{font-size:.8125rem}
+  .j-klasse{font-size:.6875rem;min-height:40px}
+  .j-klasse__balken{height:18px}
+  .j-legende__quelle{display:none}
+  .jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 48px)}
+  .j-register__koerper{grid-template-columns:minmax(0,1fr)}
+  .j-steckbrief{position:static}
+  .j-zeile{grid-template-columns:2.2em minmax(0,1fr) 4.2em;row-gap:6px}
+  .j-zeile__schicht{grid-column:2 / -1;grid-row:2}
+  .j-blatt__kopf,.j-teil{grid-template-columns:minmax(0,1fr)}
+  .j-blatt__lede{grid-column:1}
+  .j-dateien li{grid-template-columns:minmax(0,1fr)}
+  .j-dateien .knopf{justify-self:start}
+}
+@media (max-width:420px){
+  .j-schicht__marken{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .j-abspielen__text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+.j-tabelle--links td{text-align:left;padding-left:16px}
+.j-tabelle code{font-size:.875rem}
+.j-wege{padding-left:1.3em}
+.j-wege li{margin-bottom:.5em}
+.j-unter{font:600 1.05rem/1.2 var(--f-display);margin:28px 0 4px}
+#j-m-ruecktest .j-tabelle{margin:10px 0 6px}
+#j-m-ruecktest .j-tabelle th:first-child{white-space:normal}
+#j-m-ruecktest .j-tabelle :is(th,td)+:is(th,td){padding-left:12px}
+@media (max-width:860px){#j-m-ruecktest .j-tabelle{font-size:.8125rem}#j-m-ruecktest .j-tabelle thead th{font-size:.75rem}}
+/* LHP-Gegenprobe (6 Spalten): Abstand zwischen den Spalten, am Handy kleiner */
+#j-m-lhp :is(th,td)+:is(th,td){padding-left:10px}
+@media (max-width:860px){#j-m-lhp{font-size:.8125rem}#j-m-lhp thead th{font-size:.75rem;hyphens:auto}#j-m-lhp :is(th,td)+:is(th,td){padding-left:6px}}
+
+/* Reduzierte Bewegung: auf den Bauzeit-Seiten keine Übergänge und keine Animation, auch nicht aus atlas.css */
+@media (prefers-reduced-motion:reduce){
+  .jahreseite *,.jahreseite *::before,.jahreseite *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}

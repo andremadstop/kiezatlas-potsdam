@@ -27,8 +27,11 @@ ALKIS-Gebäude ─────────────┴───────�
    Kennzahlen, Verteilungen, den Grenzfall-Vergleich, und schreibt `daten/` für die Seite.
 4. `index.html` zeigt das Ergebnis; Gebäude eines Stadtteils werden erst bei seiner Auswahl geladen.
 
-Alles auf einmal: `skripte/lauf.sh` (braucht Docker, uv, `.env` mit drei Passwörtern, daneben das
-Repository der Pipeline).
+Schrittweise: `skripte/lauf.sh vorbereiten | laden --nur QUELLE | auswerten | einrichten` (braucht Docker,
+uv, `.env` mit den Passwörtern, daneben das Repository der Pipeline). Seit dem Ausbau lädt jeder Lauf nur
+eine Quelle; Rohdaten liegen außerhalb des Repos unter `KIEZ_DATEN` (`../kiezatlas-daten`), Herkunft und
+Lizenzen in `QUELLEN.md`, Lizenz der Dateien in `daten/` in `daten/LIZENZ.md`. Prüfen: `node pruefen/seiten.mjs`
+und `python -I pruefen/daten.py`.
 
 ## Die Seite
 

@@ -1,0 +1,23 @@
+Prüfung A5a, 2026-11-05T10:51:39Z
+Zellen mit Mittelpunkt in Potsdam: 3443, davon bewohnt: 3411; Arten: ['bibliothek', 'feuerwehr', 'foerderschule', 'grundschule', 'gymnasium', 'hort', 'kita', 'osz', 'sek1', 'sonstige_schule', 'sonstiger_gemeinbedarf', 'sport'] + gruen
+[ok] 1a Abdeckung bewohnte Zellen × Arten: 3411 Zellen × 13 Arten = 44343 erwartet, fehlend 0
+[ok] 1b Abdeckung Zellen von zellen.js: 3443 Zellen, fehlend 0, Luftlinie-Zeilen 44759
+[ok] 1c keine Zeile für Zellen außerhalb: 0 Zeilen
+[ok] 2a Gegenrechnung Meter (Python, alle Standorte, ohne KNN): 41316 Werte, Abweichung > 0,1 m: 0 []
+[ok] 2b ziel_id liegt im angegebenen Abstand: 0 Abweichungen
+[ok] 3 Gegenrechnung Grünabstand (60 Zellen, ST_Distance über alle Flächen): Abweichungen > 0,1 m: 0 []
+[ok] 4a Einrichtungen außerhalb der Stadt gerechnet: 166 Standorte außerhalb in auswertung.einrichtung; 1363 Zeilen mit Ziel außerhalb
+[ok] 4b Golm: Randzelle mit näherer Einrichtung außerhalb als innerhalb: 459 Fälle (Zelle × Art), 130 Zellen; Beispiele CRS3035RES100mN3257100E4523000 kita: außerhalb 59 m (KTS 05050), nächste in Potsdam 2374 m; CRS3035RES100mN3257100E4522500 kita: außerhalb 554 m (KTS 05050), nächste in Potsdam 2304 m; CRS3035RES100mN3258100E4521100 kita: außerhalb 1004 m (KTS 04656), nächste in Potsdam 1856 m
+[ok] 5a methode in jeder Zeile gesetzt: 0 Zeilen ohne methode
+[ok] 5b minuten bei Luftlinie leer: 0 Zeilen mit minuten
+     Fußweg-Zeilen (A5b, nicht von A5a): zelle_erreichbar 0, zelle_gruen 0
+[ok] 6 Lizenzvermerk je Zeile und Teil (dl-de mit Link, verändert, Zensus; kein OSM/ODbL): 3 verschiedene Vermerke, davon fehlerhaft 0
+[ok] 6b jede ziel_id existiert: 0 ohne Ziel
+[ok] 7a zelle_gruen r=500: eine Zeile je Zelle: 3443 Zeilen
+[ok] 7b 0 ≤ m2_gruen ≤ Kreisfläche (r=500): 0 außerhalb
+[ok] 7c m2_je_ew = m2_gruen / Einwohner im Kreis (r=500, Python, alle Zellen): 0 Abweichungen []
+[ok] 7d Grünfläche per 10-m-Punktraster nachgezählt (r=500, 40 Zellen, Toleranz 1 % der Kreisfläche oder 3 %): 0 Abweichungen []
+[ok] 8 Randliste: Zellen, Arten, Gründe gültig: A5a_rand_unsicher_20261105.csv: 6569 Zeilen, 0 ungültig
+[ok] 9a 14_erreichbarkeit.py schreibt nur eigene Tabellen: Schreibziele ['auswertung.zelle_erreichbar', 'auswertung.zelle_gruen']
+[ok] 9b kein Netzmodul in Skript und Prüfung: keins
+Ergebnis: 0 Befunde

@@ -1,0 +1,176 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Einrichtungen (amtlich, ohne OSM)",
+ "x-datei": "einrichtungen.js",
+ "x-global": "^KIEZ_EINRICHTUNGEN$",
+ "x-odbl": false,
+ "x-eigentuemer": "A6 (skripte/15_planer.py)",
+ "description": "Punkte in EPSG:4326. Keine Adresse, kein Telefon, keine E-Mail.",
+ "type": "object",
+ "required": [
+  "type",
+  "stand",
+  "quellen",
+  "features"
+ ],
+ "additionalProperties": false,
+ "properties": {
+  "fixture": {
+   "const": true,
+   "description": "nur in daten/fixtures/: klar unechte Beispielwerte"
+  },
+  "stand": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "description": "Tag der Auswertung"
+  },
+  "hinweis": {
+   "type": "string"
+  },
+  "type": {
+   "const": "FeatureCollection"
+  },
+  "quellen": {
+   "type": "object",
+   "minProperties": 1,
+   "additionalProperties": {
+    "$ref": "#/$defs/quelle"
+   }
+  },
+  "features": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "type",
+     "geometry",
+     "properties"
+    ],
+    "properties": {
+     "type": {
+      "const": "Feature"
+     },
+     "geometry": {
+      "type": "object",
+      "required": [
+       "type",
+       "coordinates"
+      ],
+      "properties": {
+       "type": {
+        "const": "Point"
+       },
+       "coordinates": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+         "type": "number"
+        }
+       }
+      }
+     },
+     "properties": {
+      "type": "object",
+      "required": [
+       "id",
+       "art",
+       "q",
+       "status",
+       "in_potsdam"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "art": {
+        "type": "string"
+       },
+       "unterart": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "q": {
+        "type": "string",
+        "description": "Schlüssel in quellen"
+       },
+       "name": {
+        "type": [
+         "string",
+         "null"
+        ],
+        "description": "Name der Einrichtung (amtlich, kein Personenname)"
+       },
+       "plaetze": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "schueler": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "schueler_stand": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "status": {
+        "enum": [
+         "kapazitaet",
+         "lage_ohne_kapazitaet"
+        ]
+       },
+       "in_potsdam": {
+        "type": "boolean"
+       },
+       "hinweis": {
+        "type": "string",
+        "description": "Nur bei Standorten mit strittiger Lage (Ortsangabe widerspricht den Koordinaten); der Standort zählt dann für keine Entfernung"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "$defs": {
+  "quelle": {
+   "type": "object",
+   "required": [
+    "quelle",
+    "lizenz",
+    "vermerk"
+   ],
+   "properties": {
+    "quelle": {
+     "type": "string",
+     "minLength": 3
+    },
+    "lizenz": {
+     "type": "string",
+     "minLength": 3
+    },
+    "vermerk": {
+     "type": "string",
+     "minLength": 10,
+     "description": "Namensnennung wie gefordert. Bei dl-de/by-2-0 mit Link zum Lizenztext und, wenn verändert, 'Daten verändert (eigene Berechnung)'."
+    },
+    "url": {
+     "type": "string"
+    },
+    "stand": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false
+  }
+ }
+}

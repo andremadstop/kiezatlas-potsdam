@@ -3,9 +3,9 @@
    wird aus den eigenen Gitter- und Stadtteildaten gezeichnet. Maße in Millimetern. */
 (function () {
 "use strict";
-var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN, A = window.KIEZ;
-if (!A) return;
-var fmt = A.fmt, fmt1 = A.fmt1, PT = 0.3528, NB = " ";
+var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN, A = window.KIEZ, KT = window.KIEZ_THEMEN;
+if (!A || !KT) return;
+var fmt = KT.fmt, fmt1 = KT.fmt1, PT = 0.3528, NB = " ";
 var INK = "#13212a", MUTED = "#4f5d64", LINE = "#cdd1cc", ACC = "#6a2c82";
 var TINTEN = ["#13212a", "#3b7684", "#6a2c82", "#8fb5b3"];
 var FORMATE = [
@@ -27,7 +27,7 @@ var RUBRIKEN = [
 var ZAEHLER = 0;
 var STICHTAG = (K.stadt.kacheln[0].quelle.match(/Stichtag ([\d.]+)/) || [])[1] || "";
 
-function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+var esc = KT.esc;
 function n2(v) { return Math.round(v * 100) / 100; }
 function breite(s, pt, fam) { return s.length * pt * PT * (fam === "d" ? 0.47 : 0.5); }
 function umbruch(s, maxW, pt, fam) {
@@ -54,7 +54,7 @@ function G(nr) { return nr ? K.stadtteile[nr] : K.stadt; }
 function kopf(o, x, y, w, klein) {
   var s = "", h = 0, ein = o.gebiete.length === 1, nr = o.gebiete[0];
   s += T(x, y + 3, "Kiezatlas Potsdam", { pt: 8, w: 600, fill: ACC }); h += 6;
-  var titel = ein ? A.name(nr) + " in Zahlen" : o.gebiete.map(A.name).join(", ").replace(/, ([^,]*)$/, " und $1") + " im Vergleich";
+  var titel = ein ? KT.name(nr) + " in Zahlen" : o.gebiete.map(KT.name).join(", ").replace(/, ([^,]*)$/, " und $1") + " im Vergleich";
   var t = zeilen(x, y + h, titel, w, { pt: klein ? 17 : 24, fam: "d", w: 600, lh: 1.02 }); s += t.s; h += t.h + 1.5;
   var sub = ein ? (nr ? "Stadtteil " + nr + " der Landeshauptstadt Potsdam, " : "Landeshauptstadt Potsdam, ") + fmt1.format(G(nr).flaeche_km2) + " km². "
     : "Vergleich von " + o.gebiete.length + " Gebieten. ";
@@ -67,7 +67,7 @@ function kopf(o, x, y, w, klein) {
 function kennwerte(nr, o) {
   var g = G(nr), l = [];
   if (o.rubriken.kennzahlen) g.kacheln.forEach(function (k) {
-    l.push({ titel: k.anzeige === "summe" ? k.titel + " (gerundet)" : k.titel, wert: k.wert == null ? "k. A." : k.anzeige === "summe" ? A.rundEw(k.wert) : fmt1.format(k.wert) + NB + "%" });
+    l.push({ titel: k.anzeige === "summe" ? k.titel + " (gerundet)" : k.titel, wert: k.wert == null ? "k. A." : k.anzeige === "summe" ? KT.rundEw(k.wert) : fmt1.format(k.wert) + NB + "%" });
   });
   if (o.rubriken.gebaeude) l.push({ titel: "Gebäude laut ALKIS, davon " + fmt.format((g.gebaeude || {}).wohngebaeude || 0) + " Wohngebäude", kurz: "Gebäude laut ALKIS", wert: fmt.format((g.gebaeude || {}).anzahl || 0) });
   if (o.rubriken.gebaeude && o.gebiete.length > 1) l.push({ titel: "davon Wohngebäude", wert: fmt.format((g.gebaeude || {}).wohngebaeude || 0) });
@@ -101,7 +101,7 @@ function vergleichstabelle(o, x, y, w) {
   var spalten = o.gebiete, lw = w * (w < 100 ? 0.36 : 0.4), vw = (w - lw) / spalten.length, s = "", h = 0, kopfH = 0;
   var ref = kennwerte(spalten[0], o); if (!ref.length) return { s: "", h: 0 };
   spalten.forEach(function (nr, j) {
-    var xx = x + lw + (j + 1) * vw, t = umbruch(A.name(nr), vw - 2, 8.5, "t");
+    var xx = x + lw + (j + 1) * vw, t = umbruch(KT.name(nr), vw - 2, 8.5, "t");
     t.forEach(function (z, k) { s += T(xx, y + 3.2 + k * 3.6, z, { pt: 8.5, w: 600, anchor: "end" }); });
     s += rect(xx - vw + 2, y + 3.2 + t.length * 3.6 - 1.6, vw - 2, 0.8, TINTEN[j]);
     kopfH = Math.max(kopfH, t.length * 3.6 + 3);
@@ -154,7 +154,7 @@ function legendeGebiete(o, x, y, w) {
   if (o.gebiete.length < 2) return { s: "", h: 0 };
   var s = "", xx = x, h = 0;
   o.gebiete.forEach(function (nr, j) {
-    var lab = A.name(nr), bw = breite(lab, 8.5, "t") + 8;
+    var lab = KT.name(nr), bw = breite(lab, 8.5, "t") + 8;
     if (xx + bw > x + w && xx > x) { xx = x; h += 5; }
     s += rect(xx, y + h + 1, 3, 3, TINTEN[j]) + T(xx + 4.5, y + h + 3.8, lab, { pt: 8.5 }); xx += bw;
   });
@@ -165,35 +165,35 @@ function legendeGebiete(o, x, y, w) {
 function karte(o, x, y, w, maxH) {
   var alle = o.gebiete.indexOf("") > -1, teile = alle ? ST.features.map(function (f) { return f.properties.nr; }) : o.gebiete.filter(Boolean);
   var b = [180, 90, -180, -90];
-  teile.forEach(function (nr) { var u = A.umriss(A.TEIL[nr]); b[0] = Math.min(b[0], u[0][0]); b[1] = Math.min(b[1], u[0][1]); b[2] = Math.max(b[2], u[1][0]); b[3] = Math.max(b[3], u[1][1]); });
+  teile.forEach(function (nr) { var u = KT.umriss(KT.TEIL[nr]); b[0] = Math.min(b[0], u[0][0]); b[1] = Math.min(b[1], u[0][1]); b[2] = Math.max(b[2], u[1][0]); b[3] = Math.max(b[3], u[1][1]); });
   var lat0 = (b[1] + b[3]) / 2, kx = Math.cos(lat0 * Math.PI / 180) * 111320, ky = 110540;
   var mw = (b[2] - b[0]) * kx * 1.06, mh = (b[3] - b[1]) * ky * 1.06, sk = Math.min(w / mw, (maxH - 12) / mh);
   var kw = mw * sk, kh = mh * sk, ox = x + (w - kw) / 2, oy = y;
   var cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
   function P(c) { return n2(ox + kw / 2 + (c[0] - cx) * kx * sk) + "," + n2(oy + kh / 2 - (c[1] - cy) * ky * sk); }
-  function pfad(f) { return A.polys(f).map(function (p) { return p.map(function (r) { return "M" + r.map(P).join("L") + "Z"; }).join(""); }).join(""); }
+  function pfad(f) { return KT.polys(f).map(function (p) { return p.map(function (r) { return "M" + r.map(P).join("L") + "Z"; }).join(""); }).join(""); }
   var kid = "sg-kc-" + (++ZAEHLER);
   var s = '<g><clipPath id="' + kid + '"><rect x="' + n2(ox) + '" y="' + n2(oy) + '" width="' + n2(kw) + '" height="' + n2(kh) + '"/></clipPath><g clip-path="url(#' + kid + ')">';
-  var t = A.THEMA[o.kartenthema], gitter = t.id !== "stadtteile", wahl = {}; teile.forEach(function (nr) { wahl[nr] = 1; });
+  var t = KT.THEMA[o.kartenthema], gitter = t.id !== "stadtteile", wahl = {}; teile.forEach(function (nr) { wahl[nr] = 1; });
   ST.features.forEach(function (f) {
     var nr = f.properties.nr, an = wahl[nr];
-    s += '<path d="' + pfad(f) + '" fill="' + (!gitter && an ? A.FARBE[nr] : an ? "#eef0ec" : "#f3f4f1") + '" stroke="#ffffff" stroke-width="0.25" fill-rule="evenodd"/>';
+    s += '<path d="' + pfad(f) + '" fill="' + (!gitter && an ? KT.FARBE[nr] : an ? "#eef0ec" : "#f3f4f1") + '" stroke="#ffffff" stroke-width="0.25" fill-rule="evenodd"/>';
   });
   if (gitter) {
     var farben = {};
     Z.features.forEach(function (f) {
       var p = f.properties; if (!wahl[p.st] || p[t.id] == null) return;
-      var c = A.unscharf(t, p) ? A.GRAU : A.STUFEN[A.klasse(t, p[t.id])];
+      var c = KT.unscharf(t, p) ? KT.GRAU : KT.STUFEN[KT.klasse(t, p[t.id])];
       (farben[c] = farben[c] || []).push("M" + f.geometry.coordinates[0].slice(0, 4).map(P).join("L") + "Z");
     });
     Object.keys(farben).forEach(function (c) { s += '<path d="' + farben[c].join("") + '" fill="' + c + '"/>'; });
   }
-  if (!alle) teile.forEach(function (nr) { s += '<path d="' + pfad(A.TEIL[nr]) + '" fill="none" stroke="' + ACC + '" stroke-width="0.4" fill-rule="evenodd"/>'; });
+  if (!alle) teile.forEach(function (nr) { s += '<path d="' + pfad(KT.TEIL[nr]) + '" fill="none" stroke="' + ACC + '" stroke-width="0.4" fill-rule="evenodd"/>'; });
   else s += ST.features.map(function (f) { return '<path d="' + pfad(f) + '" fill="none" stroke="#9aa3a0" stroke-width="0.15"/>'; }).join("");
   s += "</g></g>";
   // Nummern
   var schrift = alle ? 6.5 : 8;
-  teile.forEach(function (nr) { var f = A.TEIL[nr], q = P([f.properties.lx, f.properties.ly]).split(","); s += '<text x="' + q[0] + '" y="' + q[1] + '" font-family="Barlow Semi Condensed, sans-serif" font-weight="600" font-size="' + n2(schrift * PT) + '" fill="' + INK + '" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="0.6">' + nr + "</text>"; });
+  teile.forEach(function (nr) { var f = KT.TEIL[nr], q = P([f.properties.lx, f.properties.ly]).split(","); s += '<text x="' + q[0] + '" y="' + q[1] + '" font-family="Barlow Semi Condensed, sans-serif" font-weight="600" font-size="' + n2(schrift * PT) + '" fill="' + INK + '" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="0.6">' + nr + "</text>"; });
   // Maßstab und Norden
   var km = kw / (mw / 1000) > 30 ? 0.5 : 1, mm = km * 1000 * sk, by = oy + kh - 3;
   s += linie(ox + 2, by, ox + 2 + mm, by, 0.5) + T(ox + 2, by - 1.4, (km === 1 ? "1 km" : "500 m"), { pt: 7, fill: INK, halo: true });
@@ -202,13 +202,13 @@ function karte(o, x, y, w, maxH) {
   // Legende
   var lg = "", lx = Math.max(x, ox);
   if (gitter) {
-    var kl = A.KLASSEN[t.id], r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
+    var kl = KT.KLASSEN[t.id], r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
     lg += T(lx, y + h + 3, t.name + " (" + t.einheit + ")" + (t.id === "ew" ? "" : ", je 100-m-Zelle"), { pt: 8, w: 600 });
     var sw = Math.min(14, (w - 2) / 5);
-    A.STUFEN.slice(0, kl.grenzen.length + 1).forEach(function (c, i) { lg += rect(lx + i * sw, y + h + 4.5, sw - 0.4, 2.4, c); });
+    KT.STUFEN.slice(0, kl.grenzen.length + 1).forEach(function (c, i) { lg += rect(lx + i * sw, y + h + 4.5, sw - 0.4, 2.4, c); });
     var marken = [kl.min].concat(kl.grenzen, [kl.max]);
     marken.forEach(function (v, i) { lg += T(lx + i * sw, y + h + 10, r(v), { pt: 7, fill: MUTED, anchor: i === 0 ? "start" : i === marken.length - 1 ? "end" : "middle" }); });
-    if (t.nenner) lg += rect(lx + 5 * sw + 3, y + h + 4.5, 2.4, 2.4, A.GRAU) + T(lx + 5 * sw + 6.5, y + h + 6.7, "unscharf, unter 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen"), { pt: 7, fill: MUTED });
+    if (t.nenner) lg += rect(lx + 5 * sw + 3, y + h + 4.5, 2.4, 2.4, KT.GRAU) + T(lx + 5 * sw + 6.5, y + h + 6.7, "unscharf, unter 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen"), { pt: 7, fill: MUTED });
     h += 12;
   } else { lg += T(lx, y + h + 3, "Stadtteile, Farbton je Stadtbezirk", { pt: 8, w: 600 }); h += 6; }
   return { s: s + lg, h: h + 3 };
@@ -254,7 +254,7 @@ function baueEinmal(o) {
   var hoehe = (y - y0) + Math.max.apply(null, spalten.map(function (s) { return s.h; }));
   var verfuegbar = footY - 3 - y0, sk = Math.min(1, verfuegbar / Math.max(hoehe, 1));
   var tr = sk < 1 ? ' transform="translate(' + n2(r + cw * (1 - sk) / 2) + "," + n2(y0) + ") scale(" + n2(sk * 1000) / 1000 + ") translate(" + n2(-r) + "," + n2(-y0) + ')"' : "";
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Schaugrafik: ' + esc(o.gebiete.map(A.name).join(", ")) + '">' +
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Schaugrafik: ' + esc(o.gebiete.map(KT.name).join(", ")) + '">' +
     "<!--FONTS-->" + rect(0, 0, W, H, "#ffffff") + k.s + "<g" + tr + ">" + body + "</g>" +
     linie(r, footY, r + cw, footY, 0.25) + '<g transform="translate(0,' + n2(footY) + ')">' + ft.s + "</g></svg>";
   return { svg: svg, w: W, h: H, skala: sk, format: f };
@@ -291,7 +291,7 @@ RUBRIKEN.forEach(function (x) { rb.appendChild(haken("rubrik", x.id, x.name, x.a
 var fb = document.getElementById("schau-format");
 FORMATE.forEach(function (x, i) { fb.appendChild(haken("format", x.id, x.name, i === 0, "radio", x.w + " × " + x.h + " mm")); });
 var kt = document.getElementById("schau-kartenthema");
-A.THEMEN.forEach(function (t) { kt.appendChild(new Option(t.name, t.id)); }); kt.value = "ew";
+KT.THEMEN.forEach(function (t) { kt.appendChild(new Option(t.name, t.id)); }); kt.value = "ew";
 
 function lesen() {
   var g = [].slice.call(form.querySelectorAll('input[name="gebiet"]:checked')).map(function (i) { return i.value; });
@@ -323,7 +323,7 @@ A.schauGebiet = function (nr) {
 function schriften() {
   return new Promise(function (ok, fehler) {
     if (window.KIEZ_SCHRIFTEN) return ok(window.KIEZ_SCHRIFTEN);
-    var s = document.createElement("script"); s.src = "fonts/einbettung.js";
+    var s = document.createElement("script"); s.src = window.KIEZ_THEMEN ? KIEZ_THEMEN.v("fonts/einbettung.js") : "fonts/einbettung.js";
     s.onload = function () { ok(window.KIEZ_SCHRIFTEN); }; s.onerror = fehler; document.body.appendChild(s);
   });
 }
@@ -334,7 +334,7 @@ function mitSchriften(svg, F) {
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + svg.replace("<!--FONTS-->", "<defs><style>" + css + "</style></defs>");
 }
 function dateiname(ext) {
-  var o = lesen(), n = o.gebiete.map(function (g) { return A.name(g).toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }).join("_");
+  var o = lesen(), n = o.gebiete.map(function (g) { return KT.name(g).toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }).join("_");
   return "kiezatlas-" + n + "-" + o.format + "." + ext;
 }
 function laden(blob, name) {
