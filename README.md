@@ -15,17 +15,17 @@ Ergänzungen dieses Kastens; der Weg aller Skripte steht in [`docs/rundgang.md`]
 
 | Angabe | Beleg | Skript |
 |---|---|---|
-| 182.673 Einwohner in 3.443 Gitterzellen mit Mittelpunkt in Potsdam, 32 Stadtteile ohne Abweichung | `belege/pruefstand-20261106-*/pruefen.log` (Abschnitt `pruefen/daten.py`) | `skripte/02_auswerten.py`, geprüft von `pruefen/daten.py` |
-| 52.309 Gebäude in den 32 Stadtteilen, 85.046 im Abrufrechteck | `belege/20261104T132333Z.txt`, `pruefen.log` (`daten.py`) | Pipeline, `skripte/02_auswerten.py` |
+| 182.673 Einwohner in 3.443 Gitterzellen mit Mittelpunkt in Potsdam und Einwohnerwert, 32 Stadtteile ohne Abweichung | `belege/pruefstand-20261106-1cf8d56/pruefen.log` (Abschnitt `pruefen/daten.py`) | `skripte/02_auswerten.py`, geprüft von `pruefen/daten.py` |
+| 52.309 Gebäude in den 32 Stadtteilen, 85.046 im Abrufrechteck | `belege/20261104T132333Z.txt`, `pruefstand-20261106-1cf8d56/pruefen.log` (`daten.py`) | Pipeline, `skripte/02_auswerten.py` |
 | Gebäudehöhe: 50.356 von 52.309 aus der ALKIS-Objekthöhe, 73 aus Geschossen × 3 m, 1.880 mit 3 m | `belege/3D_grundkarte_20261106.md` | `skripte/20_alkis_nas.py`, `skripte/02_auswerten.py` |
 | Planer auf 19 Planungsräumen | `belege/A6_planer_20261105.md`, `belege/N4_planer_lauf_20261105.txt` | `skripte/15_planer.py` |
 | 315 Haltestellen, 283 davon in Potsdam, je mit Taktklasse | `belege/a4_pruefung_20261105.txt` | `skripte/13_oepnv.py` |
 | Fußwegnetz aus OSM: 128.921 Knoten, 144.709 Kanten | `belege/N1_osm_fussweg_20261105.md` | `skripte/12_osm.py` |
-| Landesfilter E7 (Ziele in Brandenburg zählen, in Berlin nicht): 15 von 1.800 Haltepunkten falsch zugeordnet (0,8 %) | `belege/A5b_landfilter_kreuzprobe.txt`, `pruefen.log` | `pruefen/a5b_landfilter_kreuzprobe.py` |
+| Landesfilter E7 (Ziele in Brandenburg zählen, in Berlin nicht): 15 von 1.800 Haltepunkten falsch zugeordnet (0,8 %) | `belege/A5b_landfilter_kreuzprobe.txt`, `pruefstand-20261106-1cf8d56/pruefen.log` | `pruefen/a5b_landfilter_kreuzprobe.py` |
 | Zensus-Baujahr: 2.869 Zellen mit 23.155 Gebäuden mit Wohnraum | `belege/B1_zensus_jahre.md` | `skripte/21_jahre_zensus.py` |
 | Bauzeit je Gebäude, Stufen 1 bis 6: 106 / 0 / 815 / 17.294 / 8.501 / 25.593 Gebäude | `berichte/B4_holdout.md` | `skripte/24_jahre_kaskade.py` |
 | Rücktest an 193 Gebäuden in Bornstedt: Zensus-Verteilung trifft 125 von 169 (74,0 %) | `berichte/B4_holdout.md` | `skripte/24_jahre_kaskade.py ruecktest` |
-| Einzeljahr nur bei 53 Gebäuden, keines davon mit Wohnraum | `berichte/B4_holdout.md`, `pruefen.log` (`daten.py`) | `skripte/24_jahre_kaskade.py` |
+| Einzeljahr nur bei 53 Gebäuden, keines davon mit Wohnraum | `berichte/B4_holdout.md`; Vertrag `daten/schema/jahre_gebaeude.json` geprüft in `pruefstand-20261106-1cf8d56/pruefen.log` (`daten.py`) | `skripte/24_jahre_kaskade.py` |
 | Rohdaten: 7 Kerndateien und 80 Dateien unter `$KIEZ_DATEN` mit SHA256 | `belege/rohdaten.md` | `./pruefen.sh` |
 
 Nicht belegt sind bisher: welcher Stand der Geodaten-Import-Pipeline die Laufberichte vom 04. und 05.11.2026
@@ -86,7 +86,8 @@ Datenbank nennt der Rundgang.
 
 Python 3.13 über uv, Pakete mit exakten Versionen und Prüfsummen in `requirements.txt` (dazu
 `requirements-pruefen.txt` für pytest), aufgelöst ohne Netz aus dem lokalen Zwischenspeicher; wie die Versionen
-ermittelt wurden, steht im Rundgang. Die Geodaten-Import-Pipeline bringt ihre eigene `requirements.txt` mit. Ihr
+ermittelt wurden, steht im Rundgang. Auf einem neuen Rechner füllt ein Aufruf ohne `--offline` den Zwischenspeicher einmal (Rundgang). Die
+Geodaten-Import-Pipeline bringt ihre eigene `requirements.txt` mit. Ihr
 Stand am 06.11.2026 ist Commit `d7a90a0` mit nicht eingecheckten Änderungen; einen festen Stand (Commit oder Tag)
 gibt es dafür noch nicht.
 

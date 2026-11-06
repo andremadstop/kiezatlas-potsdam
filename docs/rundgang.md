@@ -39,6 +39,10 @@ Ohne Netz, am 06.11.2026. Bis dahin gab es keine Versionsliste: `skripte/lauf.sh
    --python-version 3.13` aus `requirements.in` bzw. `requirements-pruefen.in` erzeugt; die Prüfsummen stammen aus
    den im Zwischenspeicher abgelegten Paketdaten des Paketindex, ein Netzabruf fand nicht statt. Ein `uv.lock`
    ist nicht angelegt, weil das Repository kein Python-Paket ist.
+   Auf einem neuen Rechner ist der Zwischenspeicher leer, dann scheitert `--offline`. Einmal denselben Aufruf
+   ohne `--offline` ausführen (`uv run --python 3.13 --no-project --with-requirements requirements.txt
+   --with-requirements requirements-pruefen.txt python -c pass`) füllt ihn; die Prüfsummen in
+   `requirements.txt` stellen sicher, dass es dieselben Pakete sind.
 4. Gegenprobe: `01_vorbereiten.py` mit der neuen Umgebung erzeugt `vorbereitet/stadtteile.csv` und
    `vorbereitet/zensus_potsdam.csv` byte-gleich zu den Dateien vom 04.11.2026 im Haupt-Repo; die Tests von
    `12_osm.sh test` und `14b_fussweg.sh test` laufen grün (Prüfstand unten).
@@ -70,7 +74,10 @@ Fehlerausgabe; ein fester Stand zum Festschreiben (Commit oder Tag der Pipeline)
 ## Schritte
 
 Reihenfolge so, wie sie aufeinander aufbauen. „DB“ heißt Datenbank mit der genannten Rolle. Aufrufe mit allen
-Umgebungsvariablen stehen im Kopf jedes Skripts.
+Umgebungsvariablen stehen im Kopf jedes Skripts. Die Python-Umgebung in diesen Köpfen ist der Stand vor dem
+06.11.2026 (`.venv` von `kiezatlas-potsdam-west` in 01, 03, 15, 25 und `pruefen/b1_jahre.py`, sonst die
+`requirements.txt` der Pipeline); seitdem gilt `requirements.txt` dieses Repositorys, also
+`uv run --offline --python 3.13 --no-project --with-requirements requirements.txt python -I skripte/…`.
 
 | Nr | Schritt | Skript, Aufruf | liest | schreibt | Prüfung |
 |---|---|---|---|---|---|
@@ -101,8 +108,8 @@ Umgebungsvariablen stehen im Kopf jedes Skripts.
 Hilfsskripte: `skripte/abruf.py` (jeder Netzabruf, mit Mindestabstand je Rechner und Eintrag in
 `$KIEZ_DATEN/abrufprotokoll.tsv`), `skripte/osm_pbf.py` (PBF-Leser für Schritt 8).
 
-Berichte unter `berichte/` sind in `.gitignore` eingetragen; eingecheckt sind nur die, die mit `git add -f`
-dazukamen (Übersicht in `belege/README.md`). `berichte/A3_vollstaendigkeit.md` und `berichte/A5b_fussweg.md`
+Berichte unter `berichte/` sind in `.gitignore` eingetragen; einige sind trotzdem eingecheckt (Übersicht in
+`belege/README.md`). `berichte/A3_vollstaendigkeit.md` und `berichte/A5b_fussweg.md`
 fehlen im Repository; die tragenden Zahlen stehen in `belege/N1_osm_fussweg_20261105.md`.
 
 ## Prüfungen
@@ -134,7 +141,7 @@ laufen mit der Rolle aus dem Kopf des Skripts.
 Protokolle und Vorgaben ohne eigenen Lauf: `pruefen/INVENTAR.md` (Abnahmekriterien), `p1_abnahme.md`,
 `a3_hinweise.md`, `a4_nvp_lesung.md`, `a5b_hinweise.md`, `B3_protokoll.md`, `B4_protokoll.md`.
 
-Letzter Prüfstand: `belege/pruefstand-20261106-<commit>/pruefen.log` (siehe `belege/README.md`).
+Letzter Prüfstand: `belege/pruefstand-20261106-1cf8d56/pruefen.log`, 18 Prüfungen, 16 grün, 2 mit Befund (siehe `belege/README.md`).
 
 ## Neuer Datenstand
 
