@@ -142,8 +142,8 @@ const HTTP = `http://127.0.0.1:${server.address().port}/`, FILE = pathToFileURL(
 const eigen = (u) => u.startsWith("file://") || u.startsWith(HTTP) || u.startsWith("data:") || u.startsWith("blob:");
 const browser = await chromium.launch();
 
-async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 1440, hoehe = 900 } = {}) {
-  const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, reducedMotion: bewegung, acceptDownloads: true });
+async function oeffnen(basis, datei, { hash = "", bewegung = "reduce", breite = 1440, hoehe = 900, touch = false } = {}) {
+  const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, reducedMotion: bewegung, acceptDownloads: true, hasTouch: touch, isMobile: touch });
   const page = await ctx.newPage(), fehler = [], abgewiesen = [], geladen = [];
   await page.route("**/*", (r) => { const u = r.request().url(); if (eigen(u)) return r.continue(); abgewiesen.push(u); return r.fulfill(fremdAntwort(r.request().url())); });
   page.on("console", (m) => { if (m.type() !== "error") return; const ort = (m.location() || {}).url || ""; if (!(/ERR_ABORTED/.test(m.text()) && (!ort || !eigen(ort)))) fehler.push(m.text().split("\n")[0]); });
@@ -292,6 +292,14 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const popG = await klickGeb("geb-farbe", "geschaetzt");
       pruef(/Bauzeit \d|Bauzeit vor|Bauzeit ab/.test(popG) && /geschätzt/.test(popG) && /Quelle: /.test(popG) && /Daten verändert \(eigene Berechnung\)/.test(popG) && /keine Aussage über einzelne Grundstücke/.test(popG) && !/Gebäude mit Wohnraum<|Zelle \d/.test(popG),
         `Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (${popG.slice(0, 70)}…)`);
+      // K22: Schätzweg statt „Stufe X von 6“, Rücktest der Stufe aus daten/jahre_methode.js (je Prüfsatz, mit n)
+      const Mx = await page.evaluate(() => window.KIEZ_JAHRE_METHODE);
+      const stufeG = await page.evaluate(() => { const m = window.KIEZ_KARTE; const f = m.queryRenderedFeatures({ layers: ["geb-farbe"] }).filter((x) => x.properties.g === "geschaetzt"); return f.length ? f.map((x) => x.properties.s) : []; });
+      const rtErw = (s) => Mx.ruecktest.map((r) => r.je_stufe.find((y) => parseInt(y.stufe, 10) === +s)).filter((x) => x && x.bewertet)
+        .map((x) => `${x.treffer.toLocaleString("de-DE")} von ${x.bewertet.toLocaleString("de-DE")} Prüfgebäuden` + (x.bewertet >= Mx.darstellung.mindest_n ? ` (etwa ${Math.round(x.quote / 10)} von 10)` : ""));
+      const passt = [...new Set(stufeG)].some((s) => rtErw(s).length && rtErw(s).every((t) => popG.includes(t)));
+      pruef(/Schätzweg: /.test(popG) && !/Stufe \d von 6/.test(popG) && /Im Rücktest traf dieser Schätzweg/.test(popG) && passt,
+        `Gebäude-Popup: Schätzweg und Rücktest der Stufe mit n aus daten/jahre_methode.js, kein „Stufe X von 6“ (${(popG.match(/Im Rücktest[^.]*\./) || [""])[0].slice(0, 90)}…)`);
       const popN = await klickGeb("geb-nd");
       pruef(/Nicht datiert/.test(popN) && /Umriss: .*GeoBasis-DE\/LGB/.test(popN), "Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses");
       // Zeitfilter: Leiste und Regler filtern die Gebäude, ohne neu zu laden
@@ -339,9 +347,26 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       const M = await page.evaluate(() => window.KIEZ_JAHRE_METHODE);
       const m = await page.evaluate(() => ({ stufen: document.querySelectorAll("#j-m-stufen tbody tr").length, tabs: [...document.querySelectorAll("#j-m-ruecktest table")].map((t) => t.querySelectorAll("tbody tr").length), rt: document.getElementById("j-m-ruecktest").textContent, sf: document.querySelectorAll("#j-m-schieflage tbody tr").length, text: document.getElementById("inhalt").textContent }));
       const erwRt = M.ruecktest.flatMap((r) => [r.je_bauzeit.length, r.je_stufe.length]);
-      const quoten = M.ruecktest.flatMap((r) => r.je_bauzeit.concat(r.je_stufe)).filter((x) => x.bewertet != null).map((x) => `${x.treffer.toLocaleString("de-DE")} von ${x.bewertet.toLocaleString("de-DE")} (${x.quote.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`);
-      pruef(m.stufen === 7 && JSON.stringify(m.tabs) === JSON.stringify(erwRt) && quoten.every((q) => m.rt.includes(q)) && m.sf === M.schieflage.length,
-        `Methode: Stufentabelle, ${m.tabs.length} Rücktest-Tabellen je Bauzeit und Stufe (${quoten.length} Quoten mit n, gleich daten/jahre_methode.js), Vergleich mit dem Zensus`);
+      const rtZeilen = M.ruecktest.flatMap((r) => r.je_bauzeit.concat(r.je_stufe)).filter((x) => x.bewertet != null), mind = M.darstellung.mindest_n;
+      const quoten = rtZeilen.map((x) => `${x.treffer.toLocaleString("de-DE")} von ${x.bewertet.toLocaleString("de-DE")}` + (x.bewertet >= mind ? ` (${Math.round(x.quote).toLocaleString("de-DE")}\u00a0%)${Math.round(x.ki.unten)} bis ${Math.round(x.ki.oben)}\u00a0%` : ""));
+      const zellen = await page.evaluate(() => [...document.querySelectorAll("#j-m-ruecktest tbody tr")].map((tr) => [...tr.children].map((c) => c.textContent)));
+      const klein = zellen.filter((z) => z[3] !== "–" && !/%/.test(z[3]));
+      const kleinErw = rtZeilen.filter((x) => x.bewertet < mind).length;
+      pruef(m.stufen === 7 && JSON.stringify(m.tabs) === JSON.stringify(erwRt) && quoten.every((q) => m.rt.includes(q)) && m.sf === M.schieflage.length && klein.length === kleinErw && klein.every((z) => z[4] === "–"),
+        `Methode: Stufentabelle, ${m.tabs.length} Rücktest-Tabellen je Bauzeit und Stufe (${quoten.length} Quoten mit n und 95-%-Bereich nach Wilson, gleich daten/jahre_methode.js; ${klein.length} mit n < ${mind} nur als Zählung), Vergleich mit dem Zensus`);
+      // K23: Wilson-Bereich in der Datei nachrechnen, Kennzeichnung als Darstellung auf der Seite
+      const wilson = (t, n) => { const z = M.darstellung.z, p = t / n, z2 = z * z, mi = (p + z2 / (2 * n)) / (1 + z2 / n), h = z * Math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n); return [Math.round(1000 * Math.max(0, mi - h)) / 10, Math.round(1000 * Math.min(1, mi + h)) / 10]; };
+      const kiOk = M.ruecktest.flatMap((r) => r.je_bauzeit.concat(r.je_stufe)).every((x) => x.bewertet == null ? x.ki === null : (Math.abs(x.ki.unten - wilson(x.treffer, x.bewertet)[0]) < 0.06 && Math.abs(x.ki.oben - wilson(x.treffer, x.bewertet)[1]) < 0.06 && x.ki.unten <= x.quote && x.quote <= x.ki.oben));
+      pruef(kiOk && /nur Darstellung/.test(m.text) && /Wilson/.test(m.text) && /Regeln und Ergebnisse der Schätzung ändern sich dadurch nicht/.test(m.text),
+        "Methode: 95-%-Bereich je Quote nach Wilson nachgerechnet, Quote liegt im Bereich, als Darstellung gekennzeichnet");
+      // K28: Höhenzählung aus der Datei, kein fester Wert im HTML, Kopfsatz eingeschränkt
+      const hz = await page.evaluate(() => Object.fromEntries(["g-h-kataster", "g-h-geschosse", "g-h-ersatz", "g-h-kataster-p", "g-h-ohne-p", "g-umrisse-stand", "g-mindest-n"].map((k) => [k, (document.querySelector(`[data-j="${k}"]`) || {}).textContent])));
+      const roh = fs.readFileSync(path.join(WURZEL, "jahre-methode.html"), "utf8");
+      const hSumme = M.hoehe.kataster + M.hoehe.geschosse + M.hoehe.ersatz;
+      pruef(hSumme === M.gebaeude && hz["g-h-kataster"] === M.hoehe.kataster.toLocaleString("de-DE") && hz["g-h-geschosse"] === M.hoehe.geschosse.toLocaleString("de-DE") && hz["g-h-ersatz"] === M.hoehe.ersatz.toLocaleString("de-DE")
+        && hz["g-umrisse-stand"] && hz["g-umrisse-stand"] !== "…" && hz["g-mindest-n"] === String(mind)
+        && !/\d\.\d{3} der \d\.\d{3} Gebäude|\d+,\d\s?%/.test(roh) && !/Alle Zahlen auf dieser Seite rechnet der Browser/.test(roh),
+        `Methode: Höhe aus der Datei (Kataster ${hz["g-h-kataster"]}, Geschosse ${hz["g-h-geschosse"]}, Ersatz ${hz["g-h-ersatz"]}, Summe = ${M.gebaeude} Gebäude, ${hz["g-h-kataster-p"]}), keine feste Zählung im HTML, Kopfsatz eingeschränkt`);
       const sp = await page.evaluate(() => Object.fromEntries(["g-sf-alt", "g-sf-ddr", "g-sf-alt-w", "g-sf-ddr-w", "g-sf-alt-k", "g-sf-ddr-k", "g-nd", "g-neben"].map((k) => [k, document.querySelector(`[data-j="${k}"]`).textContent])));
       const ndDatei = M.je_g.nicht_datiert.toLocaleString("de-DE");
       pruef(sp["g-nd"] === ndDatei && sp["g-neben"] !== "…" && sp["g-neben"] !== sp["g-nd"], `Methode: „Nicht datiert“ nennt alle ${sp["g-nd"]}, davon ${sp["g-neben"]} Nebengebäude`);
@@ -500,6 +525,18 @@ console.log("\nHash und Bewegung");
     pruef(quer[0] <= quer[1] && quer[2] > 0 && va.length === 0, `375 px Gebäudeansicht: kein waagrechtes Scrollen (${quer[0]} ≤ ${quer[1]}), axe ${va.length} ${va.join(", ")}`);
     await bild(h.page, "B5_375_gebaeude.png");
     await h.ctx.close();
+  }
+  // K32: Zwei-Finger-Schutz bei Touch (wie atlas.js), Maus/Feinzeiger ohne
+  {
+    const t = await oeffnen(FILE, "jahre.html", { breite: 375, hoehe: 812, touch: true });
+    const k = await t.page.evaluate(() => ({ an: window.KIEZ_KARTE.cooperativeGestures.isEnabled(), fein: matchMedia("(hover:hover) and (pointer:fine)").matches, text: (document.querySelector(".maplibregl-cooperative-gesture-screen") || {}).textContent || "" }));
+    const va = await axe(t.page);
+    pruef(k.an && !k.fein && /zwei Fingern/.test(k.text) && va.length === 0 && t.fehler.length === 0, `Touch 375 px: Zwei-Finger-Schutz an, deutscher Hinweis („${k.text.trim().slice(0, 40)}“), axe ${va.length} ${va.join(", ")}, Konsolenfehler ${t.fehler.length}`);
+    await t.ctx.close();
+    const f = await oeffnen(FILE, "jahre.html");
+    const kf = await f.page.evaluate(() => window.KIEZ_KARTE.cooperativeGestures.isEnabled());
+    pruef(!kf, "Feinzeiger 1440 px: Zwei-Finger-Schutz aus");
+    await f.ctx.close();
   }
   const b = await oeffnen(FILE, "jahre.html", { bewegung: "no-preference" });
   pruef(!(await b.page.$eval("#j-abspielen", (x) => x.hidden)), "ohne reduzierte Bewegung: „Nacheinander“ sichtbar");
