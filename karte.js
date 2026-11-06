@@ -43,7 +43,7 @@ var map = new maplibregl.Map(Object.assign({
       dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
         attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
       zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, eigene Auswertung' },
-      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" },
+      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" },
       gebaeude: { type: "geojson", data: LEER, attribution: 'Gebäude © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert)' } },
     layers: [
       { id: "papier", type: "background", paint: { "background-color": "#e6e9e4" } },
@@ -58,9 +58,10 @@ var map = new maplibregl.Map(Object.assign({
       { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
     ] }),
   maxZoom: 19, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: false,
-  locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
 }, start));
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 window.KIEZ_KARTE = map;
 var nummern = ST.features.map(function (f) { var e = el("div", "teilnr", f.properties.nr); e.setAttribute("aria-hidden", "true"); return new maplibregl.Marker({ element: e }).setLngLat([f.properties.lx, f.properties.ly]); });
@@ -118,7 +119,7 @@ function legende(t) {
   if (t.id === "stadtteile") {
     var bz = el("div", "bezirke");
     Object.keys(BEZIRKFARBE).forEach(function (b) { var s = el("span"), i = el("i"); i.style.background = BEZIRKFARBE[b]; s.appendChild(i); s.appendChild(document.createTextNode("Bezirk " + b)); bz.appendChild(s); });
-    L.appendChild(bz); L.appendChild(el("p", "legende__q", "Ein Farbton je Stadtbezirk (erste Ziffer der Stadtteilnummer). Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0."));
+    L.appendChild(bz); L.appendChild(el("p", "legende__q", "Ein Farbton je Stadtbezirk (erste Ziffer der Stadtteilnummer). Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0."));
     return;
   }
   var s = KLASSEN[t.id], st = el("div", "stufen"); st.setAttribute("aria-hidden", "true");

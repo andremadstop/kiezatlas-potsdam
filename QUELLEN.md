@@ -38,7 +38,7 @@ Spalten: Paket = wer die Quelle nutzt. Weg: A = automatisch (Werkzeug), H = Hand
 
 | # | Quelle | Paket | URL | Lizenz | Vermerk | Weg | Stand / Abruf |
 |---|---|---|---|---|---|---|---|
-| 1 | Stadtteile der Landeshauptstadt Potsdam | Bestand | opendata.potsdam.de (Datensatz Stadtteile) | dl-zero-de/2.0 | © Landeshauptstadt Potsdam, dl-zero-de/2.0 | H (robots sperrt /api/ und Downloads) | 04.11.2026 |
+| 1 | Stadtteile der Landeshauptstadt Potsdam | Bestand | opendata.potsdam.de (Datensatz Stadtteile) | dl-de/zero-2-0 | © Landeshauptstadt Potsdam, dl-de/zero-2-0 | H (robots sperrt /api/ und Downloads) | 04.11.2026 |
 | 2 | Zensus 2022, 100-m-Gitter: Bevölkerung, Alter (5 Klassen), Durchschnittsalter, Heizungsart, Energieträger, Wohnungen nach Baujahr | Bestand | https://www.destatis.de/static/DE/zensus/gitterdaten/ | dl-de/by-2-0 | © Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0), Daten verändert (eigene Berechnung) | L (rohdaten/, Crawl-delay 30 eingehalten) | 03.11.2026 |
 | 3 | Zensus 2022, 100-m-Gitter: infrastrukturelle Altersgruppen, Haushaltsgröße, Haushaltstyp, Kernfamilie, Seniorenstatus, Staatsangehörigkeit (Gruppen), Nettokaltmiete, Leerstandsquote, Wohnfläche je Bewohner | A1, A6 | https://www.destatis.de/static/DE/zensus/gitterdaten/<Datei>.zip | dl-de/by-2-0 | wie 2 | A (P0), 31 s Abstand; A1 lädt offline per `skripte/lauf.sh laden --nur zensus_struktur` | 05.11.2026, `zensus/2022/`; `public.zensus_struktur` 6.334 Zellen (Lauf 20261105T101043Z) |
 | 4 | Zensus 2022: Gebäude nach Baujahr (Jahrzehnte), Gebäude nach Baujahr (Mikrozensus-Klassen), Gebäude mit Wohnraum nach Gebäudetyp | B1, B3 (Gegenprobe), B4 | wie 3 | dl-de/by-2-0 | wie 2 | A (P0), 31 s Abstand; B1 liest die Zips selbst (`skripte/21_jahre_zensus.py`) | 05.11.2026, `zensus/2022/`; `auswertung.zensus_gebaeude_jahr` 60.480 Zeilen, `daten/jahre_zellen.js` |
@@ -82,7 +82,7 @@ in `daten/jahre/` keine Gebäudekennung (oid, gml_id).
 
 | Ausgabe | Paket | Grundlage (Nr.) | Lizenz | veröffentlicht |
 |---|---|---|---|---|
-| `daten/zellen.js`, `kennzahlen.js`, `kennzahlen.json`, `gebaeude/<nr>.js`, `stadtteile.js` | Bestand | 1, 2, 5 | dl-de/by-2-0 bzw. dl-zero-de/2.0 | ja |
+| `daten/zellen.js`, `kennzahlen.js`, `kennzahlen.json`, `gebaeude/<nr>.js`, `stadtteile.js` | Bestand | 1, 2, 5 | dl-de/by-2-0 bzw. dl-de/zero-2-0 | ja |
 | `daten/einrichtungen.js` | A2, A6 | 5, 6, 7, 8 | dl-de/by-2-0 | ja, ohne Adresse und Kontakt |
 | `daten/erreichbar.js` (Luftlinie) | A5a, A6 | 2, 5–8 | dl-de/by-2-0 | ja |
 | `daten/planer.js` (Versorgung je Planungsraum) | A6 | 2, 3, 5–8, 10, 12, 17, 20 | dl-de/by-2-0 und CC BY 4.0 (ÖPNV-Werte) | ja |

@@ -213,7 +213,7 @@ function karte() {
         dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
           attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
         zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung)' },
-        teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" },
+        teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" },
         gebaeude: { type: "geojson", data: LEER, attribution: 'Gebäude © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung); Bauzeit je Gebäude geschätzt' } },
       layers: [
         { id: "papier", type: "background", paint: { "background-color": "#e6e9e4" } },
@@ -233,12 +233,13 @@ function karte() {
         { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
       ] }),
     maxZoom: 18, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: !FEIN,
-    locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden",
+    locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden",
       "CooperativeGesturesHandler.MobileHelpText": "Mit zwei Fingern die Karte bewegen",
       "CooperativeGesturesHandler.WindowsHelpText": "Strg + Mausrad zum Zoomen", "CooperativeGesturesHandler.MacHelpText": "⌘ + Mausrad zum Zoomen" }
   }, start));
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+  map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
   map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
   window.KIEZ_KARTE = map;
 

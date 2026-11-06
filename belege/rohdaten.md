@@ -37,7 +37,7 @@ ist, dass `01_vorbereiten.py` am 06.11.2026 aus ihnen byte-gleiche `vorbereitet/
 | `rohdaten/zensus/Zensus2022_Energietraeger.zip` | 24318600 | `e0eaad323c03892b9447ab27e1aed496543f7ca667d88ae0e5291a1598f2de40` |
 | `rohdaten/zensus/Wohnungen_mod_MZ_Baujahresklassen_in_Gitterzellen.zip` | 15364464 | `f8e80783abdc4c111d94c930c2a4b50f615bce8f76a9a260f41ae198614f380d` |
 
-Herkunft: Stadtteile Handdownload vom Open-Data-Portal der Landeshauptstadt (dl-zero-de/2.0), Zensus-Gitter von
+Herkunft: Stadtteile Handdownload vom Open-Data-Portal der Landeshauptstadt (dl-de/zero-2-0), Zensus-Gitter von
 Destatis (dl-de/by-2-0), beides laut `QUELLEN.md` Nr. 1 und 2. Eine `HERKUNFT.md` mit Abrufzeit gibt es für diese
 Dateien nicht.
 

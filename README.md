@@ -126,7 +126,7 @@ haben keine Lücken und sind gültige Geometrien; jede Zelle wird genau einmal g
 
 | Daten | Herkunft | Abruf |
 |---|---|---|
-| Stadtteile | Landeshauptstadt Potsdam, Open-Data-Portal, dl-zero-de/2.0 | von Hand: Die robots.txt des Portals sperrt `/api/` und die Downloads für Programme; eine Anfrage bei der Stadt läuft |
+| Stadtteile | Landeshauptstadt Potsdam, Open-Data-Portal, dl-de/zero-2-0 | von Hand: Die robots.txt des Portals sperrt `/api/` und die Downloads für Programme; eine Anfrage bei der Stadt läuft |
 | Zensus 2022, 100-m-Gitter (Bevölkerung, Alter, Durchschnittsalter, Heizungsart, Energieträger, Baujahr der Wohnungen) | © Statistische Ämter des Bundes und der Länder; Destatis: freie Nutzung mit Namensnennung | einmalig, mit 30 s Pause (Crawl-delay der robots.txt) |
 | Gebäude, ALKIS vereinfacht | © GeoBasis-DE/LGB, dl-de/by-2-0 | WFS `isk.geobasis-bb.de/ows/alkis_vereinf_wfs`, 1-km-Kacheln, 1 s Pause; der Dienst hat keine robots.txt, Bedingungen in den Capabilities |
 | Gegenproben | Regionaldatenbank Deutschland (12411-01-01-5-B); Stadt Potsdam, „Stadtteile im Blick 2022“ | je eine Zahl von Hand übernommen |

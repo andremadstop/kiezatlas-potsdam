@@ -28,6 +28,6 @@ keywords:
   - Open Data
 notes: >-
   Die Lizenz Apache-2.0 gilt für Code und eigene Texte. Die Daten in daten/ behalten die Lizenzen ihrer Quellen
-  (dl-de/by-2-0, dl-zero-de/2.0, CC0, CC BY 4.0, ODbL nur in *_odbl-Dateien), siehe daten/LIZENZ.md und QUELLEN.md.
+  (dl-de/by-2-0, dl-de/zero-2-0, CC0, CC BY 4.0, ODbL nur in *_odbl-Dateien), siehe daten/LIZENZ.md und QUELLEN.md.
   Grafiken aus der Schaugrafik: CC BY 4.0 mit der Bildzeile auf der Grafik (docs/entscheidungen.md, A16).
   Code entstand mit KI-Unterstützung (Claude).

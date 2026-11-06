@@ -178,7 +178,7 @@ def main():
             lambda z: [z["gitter_id"], z["stadtteil"], z["gebaeude"]] + (z["anteile"] or [None] * len(KL)) + [z["vorherrschend"], z["klassen_geheim"]])
     tabelle("stadtteile", "MULTIPOLYGON", "Bauzeiten je Stadtteil, genähert",
             "Genäherte Mischung je Stadtteil (Zellanteile mit der Gebäudezahl gewichtet), Anteile ganze Prozent, Gebäudezahlen auf 10 gerundet; "
-            "vergleichbar = 0: weniger als %d Gebäude mit bekannter Bauzeit. Stadtteilgrenzen © Landeshauptstadt Potsdam, dl-zero-de/2.0. %s." % (MINDEST, vermerk),
+            "vergleichbar = 0: weniger als %d Gebäude mit bekannter Bauzeit. Stadtteilgrenzen © Landeshauptstadt Potsdam, dl-de/zero-2-0. %s." % (MINDEST, vermerk),
             [("nr", "TEXT"), ("name", "TEXT"), ("gebaeude_rund", "INTEGER"), ("zellen", "INTEGER"), ("gebaeude_ohne_klassen_rund", "INTEGER")]
             + [(s, "INTEGER") for s in spalten] + [("vergleichbar", "INTEGER")],
             stadtteile,
@@ -187,7 +187,7 @@ def main():
     db.executemany("INSERT INTO hinweis (schluessel, wert) VALUES (?,?)", [
         ("titel", "Kiezatlas Potsdam: Bauzeiten"), ("stand", J["stand"]), ("beschriftung", J["beschriftung"]),
         ("quelle", q["quelle"]), ("lizenz", q["lizenz"]), ("lizenztext", LIZENZTEXT), ("vermerk", vermerk),
-        ("stadtteilgrenzen", "© Landeshauptstadt Potsdam, dl-zero-de/2.0"),
+        ("stadtteilgrenzen", "© Landeshauptstadt Potsdam, dl-de/zero-2-0"),
         ("hinweis", J.get("hinweis", "")), ("koordinaten", "ETRS89 / UTM zone 33N (EPSG:25833)"),
         ("inhalt", "Keine Daten aus OpenStreetMap, keine Adressen, keine Angaben zu einzelnen Gebäuden."),
     ])

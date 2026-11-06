@@ -137,7 +137,7 @@ var map = new maplibregl.Map({
         tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
         attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
       zellen: { type: "geojson", data: Z, attribution: Q_ZENSUS },
-      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0" },
+      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" },
       gebaeude: { type: "geojson", data: LEER, attribution: 'Gebäude © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert)' },
       grenze: { type: "geojson", data: GRENZ_DATEN }
     },
@@ -161,12 +161,13 @@ var map = new maplibregl.Map({
   }),
   bounds: GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 },
   maxZoom: 19, maxPitch: 70, attributionControl: false, cooperativeGestures: !FEIN, scrollZoom: !FEIN, fadeDuration: RUHIG ? 0 : 300,
-  locale: { "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern",
+  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern",
     "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden",
     "CooperativeGesturesHandler.MobileHelpText": "Mit zwei Fingern die Karte bewegen",
     "CooperativeGesturesHandler.WindowsHelpText": "Strg + Mausrad zum Zoomen", "CooperativeGesturesHandler.MacHelpText": "⌘ + Mausrad zum Zoomen" }
 });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
 window.KIEZ_KARTE = map;
@@ -295,7 +296,7 @@ function legende(t) {
     var bz = el("div", "bezirke");
     Object.keys(BEZIRKFARBE).forEach(function (b) { var s = el("span"), i = el("i"); i.style.background = BEZIRKFARBE[b]; s.appendChild(i); s.appendChild(document.createTextNode("Bezirk " + b)); bz.appendChild(s); });
     L.appendChild(bz);
-    L.appendChild(el("p", "legende__q", "Ein Farbton je Stadtbezirk (erste Ziffer der Stadtteilnummer). Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0."));
+    L.appendChild(el("p", "legende__q", "Ein Farbton je Stadtbezirk (erste Ziffer der Stadtteilnummer). Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0."));
     return;
   }
   var s = KLASSEN[t.id], st = el("div", "stufen");
@@ -635,7 +636,7 @@ document.getElementById("sb-grafik").addEventListener("click", function () {
     '<g font-family="Barlow, sans-serif" font-size="6.4" fill="#4f5d64"><line x1="8" y1="' + (W - 10) + '" x2="58" y2="' + (W - 10) + '" stroke="#13212a" stroke-width="1"/><text x="8" y="' + (W - 14) + '">50 m</text></g>' +
     '</svg>';
   box.innerHTML = svg;
-  cap.textContent = "Beispielzelle aus den Daten: die bewohnte Zelle mit den meisten Einwohnern, deren Fläche zwei Stadtteile berührt. Flächenanteile hier im Browser aus " + GZ.stichproben + " Stichpunkten geschätzt; die Tabelle rechnet PostGIS genau. Zensus 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0; Stadtteile © Landeshauptstadt Potsdam, dl-zero-de/2.0.";
+  cap.textContent = "Beispielzelle aus den Daten: die bewohnte Zelle mit den meisten Einwohnern, deren Fläche zwei Stadtteile berührt. Flächenanteile hier im Browser aus " + GZ.stichproben + " Stichpunkten geschätzt; die Tabelle rechnet PostGIS genau. Zensus 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0; Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0.";
   function modus(m) {
     document.querySelectorAll(".umschalter__k").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.modus === m)); });
     var fl = m === "flaeche";

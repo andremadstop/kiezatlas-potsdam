@@ -4,7 +4,7 @@ berichte: berichte
 sprache: de
 quellen:
   stadtteile:
-    # Amtliche Stadtteile der Landeshauptstadt Potsdam, Open-Data-Portal (dl-zero-de/2.0). Kein
+    # Amtliche Stadtteile der Landeshauptstadt Potsdam, Open-Data-Portal (dl-de/zero-2-0). Kein
     # automatischer Abruf: Die robots.txt des Portals sperrt /api/ und die Downloads für Programme,
     # die Anfrage bei der Stadt läuft (04.11.2026). Bis dahin Handdownload, aufbereitet von
     # skripte/01_vorbereiten.py.
@@ -17,7 +17,7 @@ quellen:
     srid: 4326
     spalten: {name: name}
     rhythmus: monatlich
-    lizenz: "© Landeshauptstadt Potsdam, dl-zero-de/2.0"
+    lizenz: "© Landeshauptstadt Potsdam, dl-de/zero-2-0"
     ziel:
       tabelle: stadtteil
       loeschen: false    # Raumdaten bleiben (wie Antwort 74 der TH)
