@@ -9,7 +9,7 @@ eingetragen, dort sind nur die unten genannten Dateien eingecheckt.
 
 | Datei | belegt | erzeugt von |
 |---|---|---|
-| `pruefstand-20261106-<commit>/pruefen.log` | Ergebnis aller Prüfungen ohne Netz und ohne Datenbank am genannten Commit, mit Zählung | `./pruefen.sh` |
+| `pruefstand-20261106-1cf8d56/pruefen.log` | Ergebnis aller Prüfungen ohne Netz und ohne Datenbank am Commit `1cf8d56` (sauberer Arbeitsstand): 18 Prüfungen, 16 grün, 2 mit Befund. Befunde: `pruefen/A6_test_pfade.py` (1 Fehler: „kein Luftlinien-Randhinweis am Fußweg“) und `pruefen/p1_themen.mjs` (4: `KIEZ_THEMEN` hat nicht mehr die 31 Namen des Vertrags, je per `file://` und HTTP). Beide liegen schon am Ausgangsstand `6cb7efa` vor; `p1_themen.mjs` war laut `3D_grundkarte_20261106.md` am Stand `77bd0d6` noch grün | `./pruefen.sh` |
 | `rohdaten.md`, `rohdaten.sha256`, `rohdaten.kiez_daten.sha256` | Prüfsummen der Rohdaten (7 Kerndateien nachträglich am 06.11.2026 gehasht, 80 Dateien unter `$KIEZ_DATEN`) | `sha256sum`, Abgleich mit den `HERKUNFT.md` |
 
 ## Laufberichte der Pipeline
