@@ -10,7 +10,14 @@
 // Fenstergrößen nie „load“ melden.) Erlaubt bleibt nur ERR_ABORTED bei Kacheln, die beim Weiterbewegen
 // der Karte abgebrochen werden.
 //
-// Aufruf:  node pruefen/seiten.mjs [--wurzel <ordner>] [--json <datei>]
+// Responsive (Andre 07.11.2026): index.html und karte.html über acht Breiten von 360 × 740 bis 1920 × 1080
+// (pruefen/responsiv.mjs): kein seitlicher Überstand, keine Überlappung der Bedienelemente, Tippziele ab 44 px auf
+// Touch, Mindesthöhe der Karte beim Lesen, Kopfleiste klappt ein und kommt wieder. Dazu die Startseite mit
+// 3D-Häusern: Wahl aus Liste und Register fliegt zu den Häusern, Klick in den gewählten Stadtteil wählt nicht ab,
+// „Luftbild einblenden“ lässt die Häuser stehen.
+//
+// Aufruf:  node pruefen/seiten.mjs [--wurzel <ordner>] [--json <datei>] [--nur-responsiv] [--nur-haeuser]
+//          --nur-responsiv: nur die Prüfungen vom 07.11. (Häuser und Breiten); --nur-haeuser: davon nur B1 bis B3
 // Braucht: node_modules mit playwright und axe-core (im Worktree als Verweis auf das Haupt-Repo),
 //          Chromium unter ~/.cache/ms-playwright. Rückgabe 0 = grün, 1 = Befund.
 import { chromium } from "playwright";
@@ -19,6 +26,7 @@ import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { pruefeResponsiv } from "./responsiv.mjs";
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -46,6 +54,16 @@ function pruef(ok, text) { console.log((ok ? "  ok   " : "  FEHLT ") + text); if
   for (const [re, was] of VERBOTEN) {
     const treffer = DATEIEN.filter((f) => re.test(fs.readFileSync(path.join(WURZEL, f), "utf8")));
     pruef(treffer.length === 0, `${was}${treffer.length ? ": " + treffer.join(", ") : ""}`);
+  }
+}
+
+// ---------- „Gestapelt“: dieselbe Abfrage in kopf.js (JS) und in den Stylesheets (07.11.)
+{
+  console.log("Abfrage „Gestapelt“ (kopf.js und CSS)");
+  const kopf = fs.readFileSync(path.join(WURZEL, "kopf.js"), "utf8"), m = kopf.match(/KIEZ_GESTAPELT = "([^"]+)"/);
+  for (const css of ["atlas.css", "karte.css", "jahre.css"]) {
+    const t = fs.readFileSync(path.join(WURZEL, css), "utf8");
+    pruef(!!m && t.includes("@media " + m[1] + "{"), `${css}: @media ${m ? m[1] : "(fehlt in kopf.js)"}`);
   }
 }
 
@@ -316,6 +334,56 @@ async function karte(basis, art) {
   }
 }
 
+// Startseite mit selbst eingeschalteten 3D-Häusern (Reste 07.11.): B1 Liste und Register fliegen zu den Häusern,
+// B2 Klick in den gewählten Stadtteil wählt ihn nicht ab, B3 „Luftbild einblenden“ (Frage 5) lässt die Häuser stehen
+async function startseiteHaeuser(basis, art) {
+  console.log(`index.html über ${art}: 3D-Häuser mit Liste, Register und Luftbild`);
+  const { ctx, page, fehler } = await oeffnen(basis, "index.html");
+  const ruhe = () => page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {}).then(() => page.waitForTimeout(300));
+  const haeuser = () => page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 15000 }).catch(() => {});
+  const lage = () => page.evaluate(() => { const m = window.KIEZ_KARTE, t = m.queryRenderedFeatures(m.project(m.getCenter()), { layers: ["teile-flaeche"] });
+    return { nr: document.getElementById("gebiet").value, d3: document.getElementById("dreid").checked, luft: document.getElementById("luftbild").checked,
+      n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, z: +m.getZoom().toFixed(2), p: Math.round(m.getPitch()), mitte: t.length ? t[0].properties.nr : "" }; });
+  const r = await page.evaluate(() => { const b = document.querySelector("label:has(#dreid)").getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+  await page.mouse.click(r.x, r.y); await haeuser(); await ruhe();
+  const z0 = await lage();
+  // B1 Liste (Auswahlfeld im Steckbrief)
+  await page.selectOption("#gebiet", "72"); await page.waitForTimeout(300); await haeuser(); await ruhe();
+  const z1 = await lage();
+  pruef(z0.d3 && z1.nr === "72" && z1.d3 && z1.z >= 15.5 && z1.n > 0 && z1.mitte === "72",
+    `B1 Liste: 3D an bei ${z0.nr}, Wahl „72“: Kartenmitte in ${z1.mitte || "keinem Stadtteil"}, Zoom ${z1.z}, ${z1.n} Häuser, Neigung ${z1.p}`);
+  // B1 Register (Zeile im Register, ohne die Seite zu scrollen)
+  await page.evaluate(() => document.querySelector('#teile .zeile[data-nr="15"]').click()); await page.waitForTimeout(300); await haeuser(); await ruhe();
+  const z2 = await lage();
+  pruef(z2.nr === "15" && z2.d3 && z2.z >= 15.5 && z2.n > 0 && z2.mitte === "15",
+    `B1 Register: Zeile „15“: Kartenmitte in ${z2.mitte || "keinem Stadtteil"}, Zoom ${z2.z}, ${z2.n} Häuser`);
+  // B2 Klick in den gewählten Stadtteil (Thema Stadtteile: keine Zellen, Klick trifft die Fläche) an einer Stelle ohne Haus
+  await page.check('#thema input[value="stadtteile"]', { force: true }); await page.waitForTimeout(200);
+  // Karte unabhängig vom Ergebnis von B1 auf den gewählten Stadtteil (sonst fände sich auf dem alten Stand keine Stelle)
+  await page.evaluate(() => { const m = window.KIEZ_KARTE, nr = document.getElementById("gebiet").value, xs = [], ys = [];
+    window.KIEZ_STADTTEILE.features.filter((f) => String(f.properties.nr) === nr).forEach((f) => JSON.stringify(f.geometry.coordinates).replace(/\[(-?[\d.]+),(-?[\d.]+)\]/g, (_, x, y) => { xs.push(+x); ys.push(+y); }));
+    if (xs.length) m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { animate: false, padding: 120 });
+    if (m.getZoom() < 14.2) m.jumpTo({ zoom: 14.2 }); }); await ruhe();
+  const frei = await page.evaluate(() => { const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect(), nr = document.getElementById("gebiet").value;
+    for (let y = 200; y < r.height - 80; y += 23) for (let x = 120; x < r.width - 120; x += 29) {
+      const t = m.queryRenderedFeatures([x, y], { layers: ["teile-flaeche"] });
+      if (t.length && t[0].properties.nr === nr && !m.queryRenderedFeatures([x, y], { layers: ["gebaeude3d", "gebaeude2d"] }).length && document.elementFromPoint(r.left + x, r.top + y) === m.getCanvas()) return { x: r.left + x, y: r.top + y };
+    }
+    return null; });
+  if (frei) { await page.mouse.click(frei.x, frei.y); await page.waitForTimeout(500); }
+  const z3 = await lage();
+  pruef(!!frei && z3.nr === "15" && z3.d3, `B2 Klick in den gewählten Stadtteil bei 3D-Häusern: ${frei ? "Stelle gefunden" : "keine freie Stelle"}, danach ${z3.nr || "keiner"} gewählt, 3D ${z3.d3}`);
+  // B3 Frage 5, „Luftbild einblenden“
+  await page.evaluate(() => document.querySelector('.frage[data-schritt="5"]').scrollIntoView({ block: "center" }));
+  await page.waitForFunction(() => document.querySelector('.frage[data-schritt="5"]').classList.contains("ist-aktiv"), null, { timeout: 8000 }).catch(() => {});
+  await ruhe();
+  await page.evaluate(() => document.querySelector('[data-zeige="5"][data-luftbild]').click()); await page.waitForTimeout(400); await ruhe();
+  const z4 = await lage();
+  pruef(z4.luft && z4.d3 && z4.n > 0 && z4.nr === "15" && z4.p >= 45, `B3 „Luftbild einblenden“ bei 3D-Häusern: Luftbild ${z4.luft}, 3D ${z4.d3}, ${z4.n} Häuser, Stadtteil ${z4.nr || "keiner"}, Neigung ${z4.p}`);
+  pruef(fehler.length === 0, `Konsole ohne Fehler (${fehler.length}${fehler.length ? ": " + fehler.slice(0, 3).join(" | ") : ""})`);
+  await ctx.close();
+}
+
 async function bewegung() {
   // Ohne reduzierte Bewegung (GSAP, Kamerafahrten) darf ebenfalls kein Fehler auftreten
   console.log("index.html über HTTP ohne reduzierte Bewegung");
@@ -350,11 +418,16 @@ async function bewegung() {
   }
 }
 try {
-  await startseite(FILE, "file://");
-  await startseite(HTTP, "HTTP");
-  await karte(FILE, "file://");
-  await karte(HTTP, "HTTP");
-  await bewegung();
+  if (!process.argv.includes("--nur-responsiv")) {
+    await startseite(FILE, "file://");
+    await startseite(HTTP, "HTTP");
+    await karte(FILE, "file://");
+    await karte(HTTP, "HTTP");
+    await bewegung();
+  }
+  await startseiteHaeuser(HTTP, "HTTP");
+  if (!process.argv.includes("--nur-haeuser")) await pruefeResponsiv(browser, HTTP, "index.html", pruef);
+  if (!process.argv.includes("--nur-haeuser")) await pruefeResponsiv(browser, HTTP, "karte.html", pruef);
 } catch (e) {
   befunde.push("Abbruch: " + e.message.split("\n")[0]);
   console.log("  FEHLT Abbruch: " + e.message.split("\n")[0]);

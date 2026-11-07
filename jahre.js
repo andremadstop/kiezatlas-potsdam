@@ -11,6 +11,10 @@ var T = window.KIEZ_THEMEN, K = window.KIEZ_KENNZAHLEN, Z = window.KIEZ_ZELLEN, 
 var SEITE = document.body.getAttribute("data-seite");
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var SCHMAL = matchMedia("(max-width:860px)").matches;   // nur Startwert; Kamera und Auslöseband fragen bei Bedarf neu
+// Karte oben, Text darunter (nur Handy hoch); breiter oder quer stehen Karte und Fragen nebeneinander (kopf.js, 07.11.)
+var GESTAPELT = matchMedia(window.KIEZ_GESTAPELT || "(max-width:599px)");
+// Die Kopfleiste liegt über der Bühne (seit 07.11.): beim Einpassen oben um ihre Höhe mehr Abstand
+function kopfHoehe() { var k = document.querySelector(".kopfleiste"); return k ? k.offsetHeight : 0; }
 var FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
 var fmt = T.fmt, esc = T.esc, NB = " ";
 
@@ -212,7 +216,7 @@ function karte() {
 
   // ---------- Karte
   var LEER = { type: "FeatureCollection", features: [] }, bereit = false;
-  var start = { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? 12 : 40 } };
+  var start = { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? { top: 12 + kopfHoehe(), bottom: 12, left: 12, right: 12 } : { top: 40 + kopfHoehe(), bottom: 40, left: 40, right: 40 } } };
   var map = new maplibregl.Map(Object.assign({
     container: "karte",
     style: T.grundkarte({ version: 8, transition: { duration: RUHIG ? 0 : 450, delay: 0 }, sources: {
@@ -318,8 +322,8 @@ function karte() {
     try { history.replaceState(null, "", "#" + t.join("&")); } catch (e) { /* file:// in manchen Browsern */ }
   }
   function kamera(b, neigen) {
-    // Leiste liegt unter der Karte (eigene Zeile), oben schwebt die Werkzeugleiste (Handy: Bühne unter der Kopfleiste)
-    var o = { padding: matchMedia("(max-width:860px)").matches ? { top: 56, bottom: 16, left: 12, right: 12 } : { top: 60, bottom: 30, left: 40, right: 70 }, pitch: neigen ? 50 : 0, bearing: 0 };
+    // Leiste liegt unter der Karte (eigene Zeile), oben schweben Kopfleiste und Werkzeugleiste über der Karte
+    var o = { padding: matchMedia("(max-width:860px)").matches ? { top: 56 + kopfHoehe(), bottom: 16, left: 12, right: 12 } : { top: 60 + kopfHoehe(), bottom: 30, left: 40, right: 70 }, pitch: neigen ? 50 : 0, bearing: 0 };
     if (RUHIG) { o.animate = false; map.fitBounds(b, o); } else { o.duration = 1400; o.easing = function (t) { return 1 - Math.pow(1 - t, 4); }; map.fitBounds(b, o); }
   }
   function huelle(nrs) {
@@ -390,7 +394,7 @@ function karte() {
   document.getElementById("j-dreid").addEventListener("change", function (e) { dreiDSelbst(e.target.checked); });
   // Knopf im Auftakt: auf dem Handy erst die Karte ins Bild (unter die Kopfleiste), dann zu den Häusern
   document.getElementById("j-haeuser").addEventListener("click", function () {
-    if (matchMedia("(max-width:860px)").matches) {
+    if (GESTAPELT.matches) {
       var b = document.getElementById("buehne"), oben = parseFloat(getComputedStyle(b).top) || 0;
       // Fragen, die beim Scrollen vorbeiziehen, stellen kurz nichts ein (sonst färbte Frage 1 die Häuser gleich um)
       stillBis = performance.now() + (RUHIG ? 800 : 1800);
@@ -441,6 +445,14 @@ function karte() {
   }
 
   // ---------- Nacheinander zeigen (nur ohne reduzierte Bewegung)
+  // Legende der Leiste einklappbar: am Handy (hoch oder quer) eingeklappt, damit die Karte Platz hat (Andre 07.11.)
+  (function () {
+    var knopf = document.getElementById("legende-griff"), leiste = document.getElementById("zeitleiste");
+    if (!knopf || !leiste) return;
+    function zeige(an) { leiste.classList.toggle("legende-zu", !an); knopf.setAttribute("aria-expanded", String(an)); }
+    zeige(!matchMedia(window.KIEZ_GESTAPELT + ",(max-height:500px)").matches);
+    knopf.addEventListener("click", function () { zeige(knopf.getAttribute("aria-expanded") !== "true"); });
+  })();
   var spiel = null, spielKnopf = document.getElementById("j-abspielen");
   if (!RUHIG) spielKnopf.hidden = false;
   spielKnopf.setAttribute("aria-pressed", "false");
@@ -618,9 +630,9 @@ function karte() {
   var beob = null, beobZeit = 0, beobBreite = innerWidth;
   function beobachten() {
     if (beob) beob.disconnect();
-    var rm = "-45% 0px -45% 0px", schmal = matchMedia("(max-width:860px)").matches;
+    var rm = "-45% 0px -45% 0px", schmal = GESTAPELT.matches;
     if (schmal) {
-      // die Bühne klebt unter der Kopfleiste: Lesebereich beginnt an ihrer Unterkante (oben + Höhe)
+      // die Bühne klebt oben: Lesebereich beginnt an ihrer Unterkante (oben + Höhe)
       var bu = document.getElementById("buehne"), bt = parseFloat(getComputedStyle(bu).top) || 0, bh = bu.getBoundingClientRect().height, rest = Math.max(innerHeight - bt - bh, 80);
       rm = "-" + Math.round(bt + bh + rest * 0.2) + "px 0px -" + Math.round(rest * 0.45) + "px 0px";
     }
@@ -631,6 +643,7 @@ function karte() {
     document.querySelectorAll("[data-schritt]").forEach(function (f) { beob.observe(schmal ? f.querySelector(".frage__titel, h1") || f : f); });
   }
   // nur bei echter Breitenänderung neu aufbauen (Handy-Adressleiste ändert beim Scrollen ständig die Höhe)
+  if (GESTAPELT.addEventListener) GESTAPELT.addEventListener("change", function () { clearTimeout(beobZeit); beobZeit = setTimeout(beobachten, 200); });
   window.addEventListener("resize", function () { if (innerWidth === beobBreite) return; beobBreite = innerWidth; clearTimeout(beobZeit); beobZeit = setTimeout(beobachten, 200); }, { passive: true });
 
   // ---------- Vergleich der Gebiete

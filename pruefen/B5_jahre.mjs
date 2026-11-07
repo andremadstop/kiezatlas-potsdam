@@ -12,7 +12,12 @@
 // Kein Netz: Anfragen an fremde Server (Kacheln basemap.de, Luftbild LGB) beantwortet der Browser selbst
 // mit einem leeren 1-px-PNG (wie pruefen/seiten.mjs). So entsteht kein Abruf bei fremden Diensten.
 //
-// Aufruf:  node pruefen/B5_jahre.mjs [--json <datei>] [--bilder <ordner>]      Rückgabe 0 = grün, 1 = Befund.
+// Responsive (Andre 07.11.2026, pruefen/responsiv.mjs): acht Breiten von 360 × 740 bis 1920 × 1080, kein seitlicher
+// Überstand, keine Überlappung von Chips, Kartenknöpfen, Quellen-„i“ und Leiste, Tippziele ab 44 px auf Touch,
+// Mindesthöhe der Karte beim Lesen, Leiste samt Legende nicht höher als ein Viertel (Handy hoch), Kopfleiste klappt ein.
+//
+// Aufruf:  node pruefen/B5_jahre.mjs [--json <datei>] [--bilder <ordner>] [--wurzel <ordner>] [--nur-responsiv]
+//          Rückgabe 0 = grün, 1 = Befund.
 // Grauschwelle der Farbtonprüfung: Farben mit HSL-Sättigung unter SAT_MIN haben keinen erkennbaren
 // Farbton und zählen nicht (Kartenpapier, Linien). Alles darüber muss außerhalb 20°–70° liegen.
 import { chromium } from "playwright";
@@ -22,10 +27,12 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";  // Node ≥ 22.5; für den Abgleich des GeoPackage
 import { execFileSync } from "node:child_process";
+import { pruefeResponsiv } from "./responsiv.mjs";
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
-const WURZEL = path.resolve(HIER, "..");
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
+const WURZEL = path.resolve(arg("--wurzel", path.join(HIER, "..")));   // --wurzel: z. B. ein Abzug von main (Gegenprobe vorher)
+const NUR_RESPONSIV = process.argv.includes("--nur-responsiv");
 const AXE = fs.readFileSync(path.join(WURZEL, "node_modules", "axe-core", "axe.min.js"), "utf8");
 const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
 // Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
@@ -181,7 +188,7 @@ async function gerenderteFarben(page) {
 }
 const leereFelder = (page) => page.$$eval("[data-j]", (l) => l.filter((n) => /^…?$/.test(n.textContent.trim())).map((n) => n.getAttribute("data-j")));
 
-for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
+if (!NUR_RESPONSIV) for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
   for (const seite of SEITEN) {
     console.log(`\n${seite} per ${art}`);
     const { ctx, page, fehler, abgewiesen, geladen } = await oeffnen(basis, seite);
@@ -467,7 +474,7 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
 
 // Hash-Rundreise und Bewegung erlaubt (nur file://)
 console.log("\nHash und Bewegung");
-{
+if (!NUR_RESPONSIV) {
   const { ctx, page } = await oeffnen(FILE, "jahre.html", { hash: "#ansicht=spanne&von=2&bis=3&3d=1&st=52" });
   const s = await page.evaluate(() => { const S = window.KIEZ_JAHRE.S; return [S.ansicht, S.von, S.bis, S.d3, S.nr, location.hash]; });
   pruef(s[0] === "spanne" && s[1] === 2 && s[2] === 3 && s[3] === true && s[4] === "52", `Hash wird gelesen und bleibt (${s[5]})`);
@@ -688,6 +695,7 @@ console.log("\nHash und Bewegung");
   await b.ctx.close();
 }
 
+await pruefeResponsiv(browser, HTTP, "jahre.html", pruef);
 await browser.close(); server.close();
 const ziel = arg("--json"); if (ziel) fs.writeFileSync(ziel, JSON.stringify(bericht, null, 1));
 console.log(`\n${befunde.length ? "BEFUND: " + befunde.length : "grün"} (${bericht.punkte.length} Punkte)`);

@@ -75,7 +75,7 @@
 .planerseite .werkzeug{gap:8px 12px}
 
 @media (max-width:860px){
-  .planerseite .legende{max-width:calc(100% - 92px);top:auto;bottom:74px}
+  .planerseite .legende,html.kopf-weg .planerseite .legende{max-width:min(300px,calc(100% - 92px));top:auto;bottom:74px}
   .planerseite .legende__weg{display:none}
   .planerseite .legende__vermerk{font-size:.6875rem}
   .planerseite .legende__arten{font-size:.6875rem;gap:2px 8px;margin-top:5px;padding-top:4px}

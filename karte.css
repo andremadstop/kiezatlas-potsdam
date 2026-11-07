@@ -3,7 +3,6 @@
 .kartenflaeche{position:fixed;inset:var(--kopf) 0 0 0;display:grid;grid-template-columns:minmax(0,1fr) 380px}
 .kartenrahmen{position:relative;min-width:0;background:#e6e9e4}
 .kartenseite .werkzeug{top:12px}
-.kartenseite .kopfleiste{translate:none!important}
 .seite{background:var(--surface);border-left:1px solid var(--ink);overflow:auto;overscroll-behavior:contain}
 .seite__griff{display:none}
 .block{padding:18px 20px;border-bottom:1px solid var(--line)}
@@ -33,19 +32,33 @@
 
 @media (max-width:860px){
   .kartenseite .kopfleiste ul{gap:14px}
+}
+/* Schmal oder niedrig: die Kopfleiste liegt über der Karte und klappt beim Lesen im Blatt ein (kopf.js);
+   die Karte reicht bis an den oberen Rand und bekommt die Höhe der Kopfleiste dazu (Andre 07.11.) */
+@media (max-width:860px),(max-height:500px){
+  .kartenflaeche{inset:0;grid-template-columns:minmax(0,1fr) 320px}
+  .kartenseite .werkzeug{top:calc(var(--kopf) + 8px);left:var(--sa-links);right:0;padding:0 calc(10px + var(--sa-rechts)) 4px 10px}
+  html.kopf-weg .kartenseite .werkzeug{top:8px}
+  .seite{padding-top:var(--kopf);transition:padding-top .5s var(--ease)}
+  html.kopf-weg .seite{padding-top:0}
+  .seite .block{padding-right:calc(20px + var(--sa-rechts))}
+  .kartenseite .maplibregl-ctrl-top-right{bottom:62px}
+}
+/* Gestapelt (Handy hoch, gleiche Abfrage wie window.KIEZ_GESTAPELT): Karte voll, Blatt von unten */
+@media (max-width:599px),(max-width:699px) and (orientation:portrait){
   .kartenflaeche{display:block}
-  .kartenrahmen{position:absolute;inset:0 0 64px 0}
-  .kartenseite .werkzeug{top:8px}
-  .kartenseite .legende{top:58px;bottom:auto;left:8px}
-  .kartenseite .maplibregl-ctrl-top-right{bottom:24px}
-  .seite{position:absolute;left:0;right:0;bottom:0;height:min(78dvh,640px);border-left:0;border-top:1px solid var(--ink);overflow:hidden;display:flex;flex-direction:column;z-index:6;translate:0 calc(100% - 64px);transition:translate .45s var(--ease);box-shadow:0 -8px 24px rgba(19,33,42,.12)}
+  .kartenrahmen{position:absolute;inset:0 0 calc(64px + var(--sa-unten)) 0}
+  .kartenseite .legende{top:calc(var(--kopf) + 62px);bottom:auto;left:calc(8px + var(--sa-links))}
+  html.kopf-weg .kartenseite .legende{top:62px}
+  .seite{position:absolute;left:0;right:0;bottom:0;height:min(72svh,640px);padding-top:0;border-left:0;border-top:1px solid var(--ink);overflow:hidden;display:flex;flex-direction:column;z-index:6;translate:0 calc(100% - 64px - var(--sa-unten));transition:translate .45s var(--ease);box-shadow:0 -8px 24px rgba(19,33,42,.12)}
+  html.kopf-weg .seite{padding-top:0}
   .seite.offen{translate:0 0}
   .seite__griff{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:64px;padding:8px 16px 10px;cursor:pointer;flex:0 0 auto;background:var(--surface)}
   .seite__griff:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
   .seite__griffstrich{width:44px;height:4px;background:var(--line)}
   .seite__grifftext{display:flex;gap:8px;align-items:baseline;font-size:.875rem;color:var(--muted)}
   .seite__grifftext b{font:600 1.15rem/1.1 var(--f-display);color:var(--ink)}
-  .seite__inhalt{overflow:auto;overscroll-behavior:contain;flex:1 1 auto}
+  .seite__inhalt{overflow:auto;overscroll-behavior:contain;flex:1 1 auto;padding-bottom:var(--sa-unten)}
   .seite:not(.offen) .seite__inhalt{visibility:hidden}
 }
 @media (prefers-reduced-motion:reduce){.seite{transition:none}}

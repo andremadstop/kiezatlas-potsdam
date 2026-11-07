@@ -127,9 +127,10 @@ laufen mit der Rolle aus dem Kopf des Skripts.
 | `a3_test_osm.py` (über `12_osm.sh test`) | PBF-Leser und Netzaufbau mit selbst erzeugter Mini-PBF (`a3_pbf_schreiben.py`) | nur Dateien; mit `A3_DB_TEST=1` auch DB | ja, ohne DB |
 | `a5b_test_fussweg.py` (über `14b_fussweg.sh test`) | Wege in kleinen Netzen, Fußweg ≥ Luftlinie | nur Dateien; mit `A5B_DB_TEST=1` auch DB | ja, ohne DB |
 | `a5b_landfilter_kreuzprobe.py` (über `14b_fussweg.sh kreuzprobe`) | Güte des Landesfilters E7 | GTFS unter `$KIEZ_DATEN` | ja |
-| `seiten.mjs` | Startseite und Karte per `file://` und HTTP: Konsole, axe, Fragen, Themen, Hash-Links, Export, Gewicht | Browser (Playwright) | ja |
-| `A7_planer.mjs` | Planer-Seiten wie oben, dazu Startgewicht und Nachladen | Browser | ja |
-| `B5_jahre.mjs` | Bauzeiten-Seiten, Popups, GeoPackage-Abgleich | Browser | ja |
+| `seiten.mjs` | Startseite und Karte per `file://` und HTTP: Konsole, axe, Fragen, Themen, Hash-Links, Export, Gewicht; Startseite mit 3D-Häusern (Liste, Register, Luftbild); acht Breiten (`responsiv.mjs`) | Browser (Playwright) | ja |
+| `A7_planer.mjs` | Planer-Seiten wie oben, dazu Startgewicht und Nachladen; acht Breiten (`responsiv.mjs`) | Browser | ja |
+| `B5_jahre.mjs` | Bauzeiten-Seiten, Popups, GeoPackage-Abgleich; acht Breiten (`responsiv.mjs`) | Browser | ja |
+| `responsiv.mjs` | Baustein der drei Skripte darüber; allein aufgerufen die Messtabelle vorher/nachher (Karte beim Lesen, Überstand, Überlappungen, Tippziele, Legende, Kopfleiste) | Browser, Server des Aufrufers (`--basis`) | nein (Messwerkzeug; die Prüfung läuft in den drei Skripten) |
 | `p1_themen.mjs` | `themen.js` gegen den Vertrag `daten/schema/themen.md` | Browser | ja |
 | `p1_gleich.mjs` | Zustandsabzug zweier Stände zum Vergleich | Browser, zwei Wurzeln | nein (Vergleichswerkzeug, kein Prüfergebnis) |
 | `b1_jahre.py [BASIS]` | `daten/jahre_zellen.js`, dazu dass bestimmte Dateien seit `BASIS` (Standard `ausbau/integration`) unverändert sind | Dateien, git | nein: auf dem heutigen Stand meldet es 2 Abweichungen, weil `QUELLEN.md`, `skripte/02_auswerten.py` und `daten/jahre/` seit `ausbau/integration` geändert wurden (`77bd0d6`, `6cb7efa`) |

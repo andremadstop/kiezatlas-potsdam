@@ -194,6 +194,28 @@ Zellen (Zoom 16,2, Handy 15,6), ohne Wahl in die Innenstadt. Die Regel „selbst
 nicht weg“ gilt jetzt auch auf der Startseite. Verworfen: das Gitter in 3D aus lassen und Legende und Chips dafür
 umbauen (offen bei Andre, umkehrbar). Beleg G11 bis G23.
 
+## A19: Voll responsive
+
+Anlass: Andre am 07.11.2026: Die Handy-Karte der Bauzeiten zeigte nur 223 px. Auf die Frage, ob nur die Leiste
+einklappen oder die Bühne höher: „ja mach lieber voll responsive“, danach „mach mal fertig“.
+
+Entscheidung: Auf allen vier Kartenseiten klappt die Kopfleiste beim Lesen ein und kommt beim Hochscrollen wieder; sie
+liegt über der Karte, die Bühne behält ihre Größe. Karte oben und Text darunter gibt es nur noch am Handy hoch; quer
+und am Tablet stehen Karte und Text nebeneinander, Karte und Planer mit Seitenleiste statt Blatt. Die Leiste der
+Bauzeiten hat eine einklappbare Legende, am Handy eingeklappt. Kartenknöpfe liegen über dem Quellen-„i“, niedrig
+nebeneinander. Tippziele auf Touch mindestens 44 × 44 px. Dieselbe Abfrage für „gestapelt“ steht in `kopf.js` und in
+den Stylesheets; `pruefen/seiten.mjs` prüft, dass sie gleich bleibt.
+
+Begründung: Gemessen über acht Breiten (360 × 740 bis 1920 × 1080) sah man beim Lesen am Handy hoch 24 bis 52 % der
+Höhe als Karte, quer 0 bis 52 %, und auf drei Seiten lag „Meinen Standort zeigen“ halb unter dem „i“. Die Kopfleiste
+über die Karte zu legen statt die Bühne mitwachsen zu lassen, vermeidet ein Neuzeichnen der Karte bei jedem
+Richtungswechsel und ein Flackern der Richtungserkennung. Das Mausrad scrollt am Desktop weiter die Seite.
+
+Verworfen: Bühne mit der Kopfleiste wachsen lassen (Karte zeichnet bei jedem Ein- und Ausklappen neu, die Leseposition
+springt); nur die Leiste der Bauzeiten einklappen (half einer Seite, quer blieb 0 % Karte); `dvh` statt `svh` (Karte
+springt beim Ein- und Ausfahren der Adressleiste); Kopfleiste am Desktop von Karte und Planer einklappen (dort ist
+Platz, die Seitenleiste müsste mitrutschen). Beleg `belege/responsive_20261107.md`.
+
 ## Nicht geprüft sind
 
 - Ob ein neuer Nahverkehrsplan die Gebietsklassen ändert (gerechnet mit dem Nahverkehrsplan 2019, `config/richtwerte.yaml`).
