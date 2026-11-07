@@ -171,6 +171,11 @@
   .j-erzaehlung .j-buehne{top:var(--kopf);height:calc(68svh - var(--kopf))}
   .j-buehne .werkzeug{top:8px}
   .jahreseite .maplibregl-ctrl-top-right{top:52px}
+  /* „Auf der Karte zeigen“ scrollt zu „Selbst erkunden“: Titel unter der klebenden Bühne, nicht dahinter */
+  .j-erzaehlung #frage-8{scroll-margin-top:calc(68svh - 9svh - var(--kopf))}   /* 9svh: Innenabstand der Frage oben */
+  /* vier Chips passen ins Bild wie vor „3D-Häuser“ (sonst nur „Lu…“ von Luftbild) */
+  .j-buehne .werkzeug{gap:4px;padding-left:8px;padding-right:8px}
+  .j-buehne .chip{padding:0 8px;font-size:.8125rem}
   .j-register__koerper{grid-template-columns:minmax(0,1fr)}
   .j-steckbrief{position:static}
   .j-zeile{grid-template-columns:2.2em minmax(0,1fr) 4.2em;row-gap:6px}

@@ -152,18 +152,26 @@ function teilAn(x, y) {
   return "";
 }
 // „3D-Häuser“: ein Klick zeigt Gebäude als Körper. Ohne gewählten Stadtteil nimmt die Seite den unter der
-// Kartenmitte (aus der Nähe), sonst die Innenstadt; aus der Ferne fliegt sie auf den Stadtteil. Nur auf Klick, nie beim Laden.
+// Kartenmitte (aus der Nähe), sonst die Innenstadt, und fliegt zu seinen Häusern. Nur auf Klick, nie beim Laden.
 var gebDurch3D = false;   // Gebäude hat erst „3D-Häuser“ eingeschaltet: beim Ausschalten wieder aus
+// Häuser stehen nur für den gewählten Stadtteil: nah heran wie auf der Bauzeiten-Seite (Zoom 16,2, Handy 15,6),
+// an seinen Namenspunkt oder, wenn die Kartenmitte schon in ihm liegt, dorthin; schon nah und mittendrin nur neigen
+var HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6;
+function zuDenHaeusern() {
+  if (!S.nr || !TEIL[S.nr]) return;
+  var c = map.getCenter(), hier = map.getZoom() >= 13 ? teilAn(c.lng, c.lat) : "";
+  if (map.getZoom() >= 14 && hier === S.nr) { if (S.d3 && map.getPitch() < 20) map.jumpTo({ pitch: 50 }); return; }
+  var p = TEIL[S.nr].properties, o = { center: hier === S.nr || !isFinite(p.lx) ? [c.lng, c.lat] : [p.lx, p.ly],
+    zoom: matchMedia("(max-width:860px)").matches ? HAUS_ZOOM_SCHMAL : HAUS_ZOOM, pitch: S.d3 ? 50 : map.getPitch(), bearing: map.getBearing() };
+  if (RUHIG) map.jumpTo(o); else map.flyTo(Object.assign(o, { duration: 1400, easing: function (t) { return 1 - Math.pow(1 - t, 4); } }));
+}
 document.getElementById("dreid").addEventListener("change", function (e) {
   S.d3 = e.target.checked;
   if (!S.d3) { if (gebDurch3D) S.geb = false; gebDurch3D = false; anwenden(); if (map.getPitch() > 0) map.jumpTo({ pitch: 0 }); return; }
   gebDurch3D = !S.geb; S.geb = true;
   // Kartenmitte nur, wenn schon nah (ab Zoom 13, wie auf der Bauzeiten-Seite); im Überblick läge sie in Bornim
   if (!S.nr) { var c = map.getCenter(); waehle((map.getZoom() >= 13 && teilAn(c.lng, c.lat)) || HAUS_ERSATZ); } else anwenden();
-  if (map.getZoom() < 14) {
-    var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5, pitch: 50, bearing: map.getBearing() };
-    if (RUHIG) map.fitBounds(umriss(TEIL[S.nr]), Object.assign(opt, { animate: false })); else map.fitBounds(umriss(TEIL[S.nr]), Object.assign(opt, { duration: 900 }));
-  } else if (map.getPitch() < 20) map.jumpTo({ pitch: 50 });
+  zuDenHaeusern();
 });
 document.getElementById("luftbild").addEventListener("change", function (e) { S.luft = e.target.checked; anwenden(); });
 // ohne Gebäude keine 3D-Häuser: Gebäude aus schaltet auch 3D aus
@@ -196,7 +204,8 @@ function trefferBauen() {
     var i = el("i"); i.style.background = x.nr ? FARBE[x.nr] : "#13212a"; b.appendChild(i);
     b.appendChild(el("b", null, x.nr || "")); b.appendChild(el("span", null, x.name));
     if (x.nr) b.appendChild(el("span", "nur-sr", ", rund " + rundEw(kachel(K.stadtteile[x.nr], "einwohner").wert) + " Einwohner"));
-    b.addEventListener("click", function () { waehle(x.nr); });
+    // Gebäude an: Wahl aus der Liste fliegt zu den Häusern (sie stehen nur für den gewählten Stadtteil)
+    b.addEventListener("click", function () { waehle(x.nr); if (x.nr && S.geb && bereit) { zuDenHaeusern(); if (SCHMAL) seite(false); } });
     li.appendChild(b); trefferBox.appendChild(li);
   });
   trefferMarkieren();
@@ -248,6 +257,8 @@ addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.cla
 // ---------- Klicks in der Karte (keine Kamerabewegung)
 function zeile(t, a) { return "<tr><td>" + t + "</td><td>" + a + "</td></tr>"; }
 map.on("click", function (e) {
+  // zweiter Klick eines Doppelklicks (der zoomt): nichts wählen, sonst wählte er den eben gewählten Stadtteil wieder ab
+  if (e.originalEvent && e.originalEvent.detail > 1) return;
   var lay = ["gebaeude3d", "gebaeude2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var g = lay.length ? map.queryRenderedFeatures(e.point, { layers: lay }) : [];
   if (g.length) {
@@ -266,7 +277,8 @@ map.on("click", function (e) {
       "<div class='pop-q'>Zensus 2022, 15.05.2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0. Kleine Werte sind durch die Geheimhaltung unscharf, Anteile können darum über 100 % liegen.</div>").addTo(map);
   }
   var t = map.queryRenderedFeatures(e.point, { layers: ["teile-flaeche"] });
-  if (t.length && !c.length) waehle(t[0].properties.nr === S.nr ? "" : t[0].properties.nr);
+  // Gebäude an: ein Klick wählt den gewählten Stadtteil nicht ab (ohne Stadtteil stünden keine Gebäude mehr)
+  if (t.length && !c.length) { if (t[0].properties.nr !== S.nr) waehle(t[0].properties.nr); else if (!S.geb) waehle(""); }
   else if (t.length && c.length && t[0].properties.nr !== S.nr) waehle(t[0].properties.nr);
 });
 var schild = document.getElementById("schild");

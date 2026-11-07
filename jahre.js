@@ -186,9 +186,9 @@ function karte() {
     // Blick auf die Gebäude: blick=Länge,Breite,Zoom (nur ab Zoom 14, nur innerhalb Potsdams)
     var b = (h.blick || "").split(",").map(Number), G0 = T.GANZ;
     if (b.length === 3 && b.every(isFinite) && b[2] >= GEB_ZOOM && b[2] <= 18 && b[0] >= G0[0][0] && b[0] <= G0[1][0] && b[1] >= G0[0][1] && b[1] <= G0[1][1]) { S.blick = b; hashDa = true; }
-    // geteilter Link auf 3D-Häuser (3d=1 mit blick=): die Geschichte nimmt 3D beim Weiterlesen nicht weg.
-    // Ohne blick= (alte Links aus Frage 3, als 3D noch Säulen hieß) führt die Geschichte weiter.
-    S.selbst = S.d3 && !!S.blick;
+    // geteilter Link, in dem der Nutzer 3D selbst eingeschaltet hatte (selbst=1): die Geschichte nimmt 3D beim
+    // Weiterlesen nicht weg. Ohne selbst=1 (3D aus Frage 7, alte Links aus Frage 3) führt die Geschichte weiter.
+    S.selbst = S.d3 && h.selbst === "1";
   })();
 
   // Eigenschaften an die Zellen: j_g Gebäude, j_s Zustand (0 keine, 1 Klassen geheim, 2 Gleichstand, 3 Klasse), j_a0…7, j_v, j_w
@@ -312,7 +312,7 @@ function karte() {
     if (!bereit) return;
     var t = ["ansicht=" + S.ansicht];
     if (S.ansicht === "spanne") t.push("von=" + S.von, "bis=" + S.bis);
-    if (S.d3) t.push("3d=1"); if (S.luft) t.push("luft=1"); if (S.nr) t.push("st=" + S.nr);
+    if (S.d3) t.push("3d=1"); if (S.selbst) t.push("selbst=1"); if (S.luft) t.push("luft=1"); if (S.nr) t.push("st=" + S.nr);
     var z = map.getZoom(), c = map.getCenter();
     if (z >= GEB_ZOOM) t.push("blick=" + c.lng.toFixed(5) + "," + c.lat.toFixed(5) + "," + z.toFixed(2));
     try { history.replaceState(null, "", "#" + t.join("&")); } catch (e) { /* file:// in manchen Browsern */ }
@@ -344,11 +344,12 @@ function karte() {
   }
   // 3D vom Nutzer: Schalter oder Knopf. Unter Zoom 14 stehen keine Häuser, also gleich hinfliegen.
   var folgt = false;   // nach dem Ausschalten einmal sagen, dass die Karte wieder der Geschichte folgt
-  function dreiDSelbst(an) {
+  // immer: der Knopf „Häuser in 3D ansehen“ fliegt in jedem Fall (auch wenn 3D schon an ist), der Schalter nur von fern
+  function dreiDSelbst(an, immer) {
     stopp(); popup.remove();
     if (an) { S.selbst = true; folgt = false; } else { folgt = S.selbst; S.selbst = false; }
     dreiD(an);
-    if (an && map.getZoom() < GEB_ZOOM) hausBlick();
+    if (an && (immer || map.getZoom() < GEB_ZOOM)) hausBlick();
     anwenden();
   }
 
@@ -386,7 +387,7 @@ function karte() {
       stillBis = performance.now() + (RUHIG ? 800 : 1800);
       window.scrollTo({ top: Math.max(0, b.getBoundingClientRect().top + scrollY - oben), behavior: RUHIG ? "auto" : "smooth" });
     }
-    dreiDSelbst(true);
+    dreiDSelbst(true, true);
   });
   document.getElementById("j-luft").addEventListener("change", function (e) { S.luft = e.target.checked; anwenden(); });
 
@@ -405,8 +406,10 @@ function karte() {
     var nah = map.getZoom() >= GEB_ZOOM;
     if (nah) st.textContent = (sp ? "Gebäude mit geschätzter Bauzeit " + name + " in Farbe" : "Gebäude nach geschätzter Bauzeit") + (S.d3 ? ", Höhe: Gebäudehöhe nach ALKIS" : "") + (gebMehr ? "; weitere Stadtteile beim Heranzoomen" : "");
     else st.textContent = (sp ? "Anteil " + name + " je Zelle" : "Bauzeit mit den meisten Gebäuden je Zelle") + (S.d3 ? "; 3D-Häuser stehen erst ab Zoom " + GEB_ZOOM : "");
+    var satz = st.textContent;
     if (folgt) st.textContent += ". Karte folgt wieder der Geschichte";
-    document.getElementById("kartenstatus").textContent = "Karte zeigt: " + st.textContent + (S.nr ? ", ausgewählt " + S.nr + " " + T.name(S.nr) : "") + (nah ? ", " + gebSichtText() : "") + ".";
+    // Live-Region: der Hinweis als eigener Satz hinter der Angabe, nicht mitten in ihr
+    document.getElementById("kartenstatus").textContent = "Karte zeigt: " + satz + (S.nr ? ", ausgewählt " + S.nr + " " + T.name(S.nr) : "") + (nah ? ", " + gebSichtText() : "") + "." + (folgt ? " Karte folgt wieder der Geschichte." : "");
     var L = document.getElementById("j-legende"); L.innerHTML = "";
     if (sp && !nah) {
       var stf = el("span", "j-legende__stufen"); stf.setAttribute("aria-hidden", "true");
@@ -580,10 +583,13 @@ function karte() {
     7: { ansicht: "ueberblick", d3: true, blick: [13.128, 52.379, 15.4] }
   };
   var aktiv = -1, geblaettert = !hashDa, stillBis = 0;
+  function markieren(n) { document.querySelectorAll("[data-schritt]").forEach(function (f) { f.classList.toggle("ist-aktiv", +f.getAttribute("data-schritt") === n); }); }
   function schritt(n) {
-    // während der Knopf zur Bühne scrollt: keine Frage aktivieren (Karte und Markierung bleiben beim Auftakt)
-    if (n === aktiv || performance.now() < stillBis) return; aktiv = n;
-    document.querySelectorAll("[data-schritt]").forEach(function (f) { f.classList.toggle("ist-aktiv", +f.getAttribute("data-schritt") === n); });
+    // während der Knopf zur Bühne scrollt: nur die Markierung folgt, die Karte bleibt (sonst färbte Frage 1 die
+    // eben gezeigten Häuser um); aktiv bleibt stehen, damit die Frage beim nächsten Eintreten wirkt
+    if (performance.now() < stillBis) { markieren(n); return; }
+    markieren(n);
+    if (n === aktiv) return; aktiv = n;
     var f = FRAGEN[n]; if (!f || !geblaettert) return;
     stopp(); popup.remove(); folgt = false; S.ansicht = f.ansicht; if (f.von != null) { S.von = f.von; S.bis = f.bis; }
     // 3D selbst eingeschaltet: Kamera und 3D bleiben, wie der Nutzer sie gestellt hat
@@ -673,7 +679,9 @@ function karte() {
   document.getElementById("j-sb-karte").addEventListener("click", function () {
     var ziel = document.getElementById("frage-8");
     ziel.scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "start" });
-    kamera(S.nr ? huelle([S.nr]) : T.GANZ, S.d3);
+    // 3D an: Häuser stehen erst ab Zoom 14, ein eingepasster Stadtteil läge darunter; also zu seinen Häusern fliegen.
+    // Sonst den Stadtteil einpassen, flach (gekippt ohne Häuser zeigte die Karte nur schräge Zellen)
+    if (S.d3 && S.nr) hausBlick(); else kamera(S.nr ? huelle([S.nr]) : T.GANZ, false);
   });
 
   map.on("load", function () {

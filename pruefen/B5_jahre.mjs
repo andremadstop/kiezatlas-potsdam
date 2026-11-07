@@ -553,6 +553,12 @@ console.log("\nHash und Bewegung");
         const z = await haeuser(v.page, v.geladen);
         pruef(vor === 0 && z.d && z.selbst && z.z >= 14 && z.p >= 45 && z.sicht === "visible" && z.n >= 200 && z.s3 === "none" && z.geladen.length <= 4 && z.anfragen === z.geladen.length && v.fehler.length === 0,
           `(a) ${breite} px, ${wie}: ein Klick zu den 3D-Häusern (Zoom ${z.z.toFixed(1)}, Neigung ${Math.round(z.p)}, ${z.n} Körper, Dateien ${z.geladen.join(", ")}, beim Start ${vor}, Konsolenfehler ${v.fehler.length})`);
+        if (breite === 375 && wie === "Knopf") {
+          // Gegenprobe 07.11.: Fragen, die beim Scrollen zur Bühne vorbeiziehen, bekommen die Markierung, die Karte bleibt
+          await v.page.waitForTimeout(1000);
+          const m = await v.page.evaluate(() => ({ a: (document.querySelector("[data-schritt].ist-aktiv") || {}).getAttribute?.("data-schritt") ?? null, s: window.KIEZ_JAHRE.S.ansicht }));
+          pruef(m.a !== null && m.s === "ueberblick", `375 px, Knopf: Markierung bei Frage ${m.a}, Karte bleibt beim Überblick (${m.s})`);
+        }
         if (breite === 1440 && wie === "Schalter") {
           // (b) Mausrad über der Karte scrollt die Seite (DESIGN.md, Desktop-Mausrad); die Geschichte blättert weiter,
           // nimmt 3D und Kamera aber nicht weg
@@ -571,6 +577,9 @@ console.log("\nHash und Bewegung");
           await v.page.waitForTimeout(200);
           const st = await v.page.$eval("#j-status", (e) => e.textContent);
           pruef(/Karte folgt wieder der Geschichte/.test(st) && await v.page.evaluate(() => !window.KIEZ_JAHRE.S.selbst && window.KIEZ_KARTE.getPitch() === 0), `3D aus: Statuszeile „${st.slice(-40)}“, Neigung 0`);
+          // Live-Region: der Hinweis als eigener Satz am Ende, nicht mitten in der Angabe (Gegenprobe 07.11.)
+          const ks = await v.page.$eval("#kartenstatus", (e) => e.textContent);
+          pruef(/\. Karte folgt wieder der Geschichte\.$/.test(ks) && !/Geschichte,/.test(ks), `3D aus: Live-Region „…${ks.slice(-60)}“`);
         }
         await v.ctx.close();
       }
@@ -601,8 +610,9 @@ console.log("\nHash und Bewegung");
       pruef(pt && z1 > z0 + 0.5 && n === 0, `(c) Doppelklick auf eine Zelle: Zoom ${z0.toFixed(1)} → ${z1.toFixed(1)}, ${n} Fenster offen`);
       await v.ctx.close();
     }
-    // Link mit 3D-Häusern (3d=1 und blick=) hält die Geschichte an; alter Link aus Frage 3 (3d=1 ohne blick=) nicht
-    for (const [hash, halten] of [["#ansicht=ueberblick&3d=1&blick=13.06000,52.39950,16.20", true], ["#ansicht=spanne&von=4&bis=7&3d=1", false]]) {
+    // Link mit selbst eingeschalteten 3D-Häusern (selbst=1) hält die Geschichte an; Link aus Frage 7 (3d=1 und blick=,
+    // ohne selbst=1) und alter Link aus Frage 3 (3d=1 ohne blick=) nicht
+    for (const [hash, halten] of [["#ansicht=ueberblick&3d=1&selbst=1&blick=13.06000,52.39950,16.20", true], ["#ansicht=ueberblick&3d=1&blick=13.12800,52.37900,15.40", false], ["#ansicht=spanne&von=4&bis=7&3d=1", false]]) {
       const v = await oeffnen(FILE, "jahre.html", { hash });
       const z0 = await v.page.evaluate(() => window.KIEZ_KARTE.getZoom());
       await v.page.$eval("#frage-5", (e) => e.scrollIntoView({ block: "center" }));
@@ -611,6 +621,43 @@ console.log("\nHash und Bewegung");
       const z = await v.page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), d: window.KIEZ_JAHRE.S.d3, a: window.KIEZ_JAHRE.S.ansicht }));
       const ok = halten ? z.d && Math.abs(z.z - z0) < 0.01 && z.a === "ueberblick" : !z.d && Math.abs(z.z - z0) > 0.01 && z.a === "ueberblick";
       pruef(ok && v.fehler.length === 0, `Link ${hash.slice(0, 40)}…: nach Frage 5 ${halten ? "3D und Kamera unverändert" : "führt die Geschichte (3D aus)"} (d3 ${z.d}, Zoom ${z0.toFixed(1)} → ${z.z.toFixed(1)})`);
+      await v.ctx.close();
+    }
+    // Gegenprobe 07.11.: Adresse aus Frage 7 neu laden, zu Frage 2: die Geschichte führt (3D aus); Knopf schreibt selbst=1
+    {
+      const v = await oeffnen(FILE, "jahre.html");
+      await v.page.mouse.wheel(0, 40); await v.page.waitForTimeout(150);
+      await v.page.$eval("#frage-7", (e) => e.scrollIntoView({ block: "center" }));
+      await v.page.waitForFunction(() => window.KIEZ_JAHRE.S.d3 && window.KIEZ_KARTE.getZoom() >= 14, null, { timeout: 8000 }).catch(() => {});
+      await v.page.waitForTimeout(300);
+      const hash = await v.page.evaluate(() => location.hash);
+      await v.page.click("#j-haeuser"); await v.page.waitForTimeout(400);
+      const hashK = await v.page.evaluate(() => location.hash);
+      await v.ctx.close();
+      const w = await oeffnen(FILE, "jahre.html", { hash });
+      await w.page.$eval("#frage-2", (e) => e.scrollIntoView({ block: "center" }));
+      await w.page.waitForFunction(() => document.getElementById("frage-2").classList.contains("ist-aktiv"), null, { timeout: 5000 }).catch(() => {});
+      await w.page.waitForTimeout(300);
+      const z = await w.page.evaluate(() => ({ d: window.KIEZ_JAHRE.S.d3, s: window.KIEZ_JAHRE.S.selbst, z: window.KIEZ_KARTE.getZoom() }));
+      pruef(/3d=1/.test(hash) && !/selbst=1/.test(hash) && /selbst=1/.test(hashK) && !z.d && !z.s && z.z < 14 && w.fehler.length === 0,
+        `Adresse aus Frage 7 (${hash.slice(0, 48)}…) neu geladen, Frage 2: 3D aus (d3 ${z.d}, Zoom ${z.z.toFixed(1)}); nach dem Knopf steht selbst=1 in der Adresse`);
+      await w.ctx.close();
+    }
+    // Gegenprobe 07.11.: Knopf fliegt auch bei 3D und nah zum neu gewählten Stadtteil; „Auf der Karte zeigen“ bei 3D zu
+    // seinen Häusern (nicht gekippt unter Zoom 14); auf dem Handy steht der Titel von „Selbst erkunden“ unter der Bühne
+    for (const [breite, hoehe] of [[1440, 900], [375, 812]]) {
+      const v = await oeffnen(FILE, "jahre.html", { breite, hoehe });
+      const zeile = (nr) => v.page.evaluate((nr) => [...document.querySelectorAll(".j-zeile")].find((b) => b.querySelector(".j-zeile__nr").textContent === nr).click(), nr);
+      await v.page.click("#j-haeuser"); await v.page.waitForTimeout(500);
+      await zeile("13"); await v.page.click("#j-haeuser");
+      const a = await haeuser(v.page, v.geladen);
+      const lp = await v.page.evaluate(() => { const c = window.KIEZ_KARTE.getCenter(), f = window.KIEZ_STADTTEILE.features.find((x) => x.properties.nr === "13").properties; return Math.hypot(c.lng - f.lx, c.lat - f.ly); });
+      await zeile("72"); await v.page.click("#j-sb-karte");
+      const b = await haeuser(v.page, v.geladen);
+      const t = await v.page.evaluate(() => { const r = document.querySelector("#frage-8 .frage__titel").getBoundingClientRect(), u = document.getElementById("buehne").getBoundingClientRect(); return { oben: r.top, unten: u.bottom, h: innerHeight }; });
+      const titelOk = breite > 860 || (t.oben >= t.unten && t.oben < t.h);
+      pruef(lp < 0.001 && a.im_bild.includes("13") && a.n > 0 && b.z >= 14 && b.p >= 45 && b.im_bild.includes("72") && b.n > 0 && titelOk && v.fehler.length === 0,
+        `${breite} px: Knopf nach Wahl von 13 fliegt hin (${a.n} Körper aus ${a.im_bild.join(", ")}); „Auf der Karte zeigen“ 72 bei 3D: Zoom ${b.z.toFixed(1)}, Neigung ${Math.round(b.p)}, ${b.n} Körper${breite > 860 ? "" : `, Titel „Selbst erkunden“ bei ${Math.round(t.oben)} unter der Bühne (${Math.round(t.unten)})`}`);
       await v.ctx.close();
     }
     // (d) 3D über die Adresse, Überblick (Zoom um 10): keine Zellsäulen
