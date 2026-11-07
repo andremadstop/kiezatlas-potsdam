@@ -153,7 +153,11 @@ y 88 bzw. 92). Nachher: siehe Zählung unten.
 Die Messtabelle oben („Zählungen vorher und nachher“) bleibt gültig: `node pruefen/responsiv.mjs` nach der Gegenprobe
 ergibt dieselben Werte für „Karte beim Lesen“, Legende bzw. Leiste und Kopfleiste in allen 32 Zeilen.
 
-Zählung nach der Gegenprobe: `./pruefen.sh` vollständig auf `286f781` (Arbeitsstand sauber): 18 Prüfungen, 17 grün,
+Nachtrag aus der eigenen Nachprüfung zu G2: Die Legenden-Ebene scrollt, war aber nicht fokussierbar (axe
+`scrollable-region-focusable` für `#j-legende` bei 844 × 390 und 740 × 360). Jetzt `role="group"`, `aria-label`
+„Legende“, `tabindex="0"` mit Fokusrahmen (`c378810`); axe danach ohne Befund bei 844 × 390, 740 × 360 und 1440 × 900.
+
+Zählung nach der Gegenprobe: `./pruefen.sh` vollständig auf `c378810` (Arbeitsstand sauber): 18 Prüfungen, 17 grün,
 0 mit Befund, 1 übersprungen (Prüfsummen Kerndaten, `rohdaten/` fehlt im Worktree, wie bisher); darin Seiten grün,
 A7 grün, B5 grün mit 251 Punkten, 900 Einzelpunkte „ok“. `pruefen/p1_gleich.mjs` `main` gegen `286f781`: gleich,
 0 Abweichungen (Desktop der Startseite und der Karte unverändert). Bildschirmfotos der Gegenprobe liegen außerhalb des
