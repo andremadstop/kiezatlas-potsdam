@@ -5,6 +5,10 @@
 var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN;
 var T = window.KIEZ_THEMEN, fmt = T.fmt, fmt1 = T.fmt1, NB = "\u00a0";
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches, SCHMAL = matchMedia("(max-width:860px)").matches, FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
+// Blatt von unten nur gestapelt (Handy hoch); breiter oder quer steht es als Seitenleiste neben der Karte (kopf.js, 07.11.)
+var GESTAPELT = matchMedia(window.KIEZ_GESTAPELT || "(max-width:599px)");
+// schmal oder niedrig liegt die Kopfleiste über der Karte: Abstand oben beim Einpassen um ihre Höhe größer
+function kopfUeber() { var f = document.querySelector(".kartenflaeche"), k = document.querySelector(".kopfleiste"); return f && k && f.getBoundingClientRect().top < 1 ? k.offsetHeight : 0; }
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
 var rundEw = T.rundEw, proz = T.proz, name = T.name, kachel = T.kachel, esc = T.esc;
 
@@ -40,7 +44,7 @@ function hashSchreiben() {
 
 // ---------- Karte
 var LEER = { type: "FeatureCollection", features: [] }, bereit = false;
-var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 } };
+var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: GANZ, fitBoundsOptions: { padding: SCHMAL ? { top: 16 + kopfUeber(), bottom: 16, left: 16, right: 16 } : 40 } };
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
   style: T.grundkarte({ version: 8, sources: {
@@ -193,10 +197,10 @@ document.getElementById("gebaeude").addEventListener("change", function (e) {
   anwenden();
 });
 document.getElementById("zoom-teil").addEventListener("click", function () {
-  var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5, pitch: map.getPitch(), bearing: map.getBearing() };
+  var opt = { padding: SCHMAL ? { top: 70 + kopfUeber(), bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5, pitch: map.getPitch(), bearing: map.getBearing() };
   var b = S.nr ? umriss(TEIL[S.nr]) : GANZ;
   if (RUHIG) map.fitBounds(b, Object.assign(opt, { animate: false })); else map.fitBounds(b, Object.assign(opt, { duration: 700 }));
-  if (SCHMAL) seite(false);
+  if (GESTAPELT.matches) seite(false);
 });
 document.getElementById("link-teilen").addEventListener("click", function () {
   hashSchreiben();
@@ -217,7 +221,7 @@ function trefferBauen() {
     b.appendChild(el("b", null, x.nr || "")); b.appendChild(el("span", null, x.name));
     if (x.nr) b.appendChild(el("span", "nur-sr", ", rund " + rundEw(kachel(K.stadtteile[x.nr], "einwohner").wert) + " Einwohner"));
     // Gebäude an: Wahl aus der Liste fliegt zu den Häusern (sie stehen nur für den gewählten Stadtteil)
-    b.addEventListener("click", function () { waehle(x.nr); if (x.nr && S.geb && bereit) { zuDenHaeusern(); if (SCHMAL) seite(false); } });
+    b.addEventListener("click", function () { waehle(x.nr); if (x.nr && S.geb && bereit) { zuDenHaeusern(); if (GESTAPELT.matches) seite(false); } });
     li.appendChild(b); trefferBox.appendChild(li);
   });
   trefferMarkieren();
@@ -264,7 +268,7 @@ function steckbrief() {
 var seiteEl = document.getElementById("seite"), griff = document.getElementById("seite-griff");
 function seite(an) { seiteEl.classList.toggle("offen", an); griff.setAttribute("aria-expanded", String(an)); }
 griff.addEventListener("click", function () { seite(!seiteEl.classList.contains("offen")); });
-addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.classList.contains("offen") && SCHMAL) { seite(false); griff.focus(); } });
+addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.classList.contains("offen") && GESTAPELT.matches) { seite(false); griff.focus(); } });
 
 // ---------- Klicks in der Karte (keine Kamerabewegung)
 function zeile(t, a) { return "<tr><td>" + t + "</td><td>" + a + "</td></tr>"; }

@@ -11,14 +11,15 @@
   --k1:#dce6e2; --k2:#a8c7c2; --k3:#6fa1a3; --k4:#3b7684; --k5:#1c4a5b;
   --f-display:"Barlow Semi Condensed","Barlow","Arial Narrow",sans-serif;
   --f-text:"Barlow",system-ui,sans-serif;
-  --gut:clamp(16px,2vw,28px);
+  --sa-oben:env(safe-area-inset-top,0px); --sa-unten:env(safe-area-inset-bottom,0px); --sa-links:env(safe-area-inset-left,0px); --sa-rechts:env(safe-area-inset-right,0px);
+  --gut:max(clamp(16px,2vw,28px),var(--sa-links),var(--sa-rechts));
   --ease:cubic-bezier(.2,.8,.2,1);
   --t-mega:clamp(3.4rem,1.4rem + 5.6vw,7.4rem);
   --t-xl:clamp(2.1rem,1.3rem + 2.6vw,3.6rem);
   --t-l:clamp(1.45rem,1.2rem + .9vw,2.05rem);
   --t-m:clamp(1.15rem,1.05rem + .35vw,1.35rem);
   --t-body:clamp(1rem,.96rem + .18vw,1.125rem);
-  --kopf:56px;
+  --kopf:calc(56px + var(--sa-oben));
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--kopf) + 8px)}
@@ -34,7 +35,7 @@ b{font-weight:600}
 .sprung:focus{top:10px}
 
 /* ---------- Kopfleiste ---------- */
-.kopfleiste{position:fixed;inset:0 0 auto 0;height:var(--kopf);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 var(--gut);background:rgba(241,242,238,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);transition:translate .5s var(--ease)}
+.kopfleiste{position:fixed;inset:0 0 auto 0;height:var(--kopf);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:var(--sa-oben) var(--gut) 0;background:rgba(241,242,238,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);transition:translate .5s var(--ease)}
 html.kopf-weg .kopfleiste{translate:0 -100%}
 .marke{display:flex;align-items:center;gap:10px;font:600 1.05rem/1 var(--f-display);letter-spacing:.01em;text-decoration:none;white-space:nowrap;min-height:32px}
 .marke__zeichen{width:14px;height:14px;background:linear-gradient(var(--accent) 0 0) 0 0/50% 50% no-repeat,linear-gradient(var(--ink) 0 0) 100% 100%/50% 50% no-repeat;outline:1px solid var(--ink);outline-offset:0}
@@ -43,8 +44,8 @@ html.kopf-weg .kopfleiste{translate:0 -100%}
 .nav::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--accent);scale:0 1;transform-origin:left;transition:scale .4s var(--ease)}
 .nav[aria-current]::after{scale:1 1}
 /* Zwei Zeilen: oben dieselben vier Teile auf jeder Seite, darunter die Rubriken der Seite (html.kopf-zwei) */
-html.kopf-zwei{--kopf-z1:56px;--kopf-z2:36px;--kopf:calc(var(--kopf-z1) + var(--kopf-z2))}
-.kopf-zwei .kopfleiste{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;padding:0}
+html.kopf-zwei{--kopf-z1:56px;--kopf-z2:36px;--kopf:calc(var(--kopf-z1) + var(--kopf-z2) + var(--sa-oben))}
+.kopf-zwei .kopfleiste{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;padding:var(--sa-oben) 0 0}
 .kopfleiste__zeile{flex:1;display:flex;align-items:center;justify-content:space-between;gap:16px;height:100%;min-width:0}
 .kopf-zwei .kopfleiste__zeile{flex:none;height:var(--kopf-z1);padding:0 var(--gut)}
 .kopf-unter{display:flex;align-items:center;height:var(--kopf-z2);padding:0 var(--gut);border-top:1px solid var(--line-soft);min-width:0}
@@ -96,6 +97,13 @@ main a:not(.knopf):not(.nav){text-decoration-thickness:1px;text-underline-offset
 .stadtzahlen dd small{font-size:.6em;font-weight:500;margin-left:.1em}
 .stadtzahlen div{display:flex;flex-direction:column}
 .stadtzahlen dd{order:1}
+/* Kopfzahlen nach der Breite der Spalte, nicht des Fensters: unter 480 px zwei Spalten, die erste Zahl über beide.
+   Drei Spalten in 304 bis 406 px brachen „rund 182.700“ um (Tablet, quer, schon auf main bei 900 bis 1100 px Breite) */
+.auftakt{container-type:inline-size}
+@container (max-width:479px){
+  #stadtzahlen{grid-template-columns:repeat(2,minmax(0,1fr));min-height:14rem}
+  #stadtzahlen div:first-child{grid-column:1/-1}
+}
 .stadtzahlen__quelle{font-size:.8125rem;color:var(--muted);margin:.8em 0 0;max-width:58ch}
 .auftakt__aktion{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:28px}
 .entwurf{font-size:.8125rem;color:var(--muted)}
@@ -302,7 +310,7 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .kette li:nth-child(4){padding-left:0}
 }
 @media (max-width:860px){
-  :root{--kopf:52px}
+  :root{--kopf:calc(52px + var(--sa-oben))}
   html.kopf-zwei{--kopf-z1:52px;--kopf-z2:36px}
   .kopf-unter{padding:0}
   .kopf-unter .nav{padding:8px 0}
@@ -315,25 +323,6 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .marke{font-size:0;gap:0}
   .marke__zeichen{width:18px;height:18px}
   .marke{min-width:36px;min-height:36px;justify-content:center}
-  .erzaehlung{display:block}
-  .auftakt.frage{min-height:auto;padding:32px var(--gut) 36px}
-  .lede{max-width:none}
-  .buehne{position:sticky;top:0;height:52svh;border-left:0;border-top:1px solid var(--line);border-bottom:1px solid var(--ink);z-index:5}
-  .werkzeug{left:0;right:0;top:calc(var(--kopf) + 6px);flex-wrap:nowrap;overflow-x:auto;padding:0 10px 4px;scrollbar-width:none}
-  html.kopf-weg .werkzeug{top:6px}
-  .werkzeug::-webkit-scrollbar{display:none}
-  .werkzeug{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
-  .themen{flex-wrap:nowrap}
-  .legende{left:8px;bottom:34px;width:auto;max-width:calc(100% - 92px);padding:8px 10px 6px}
-  .legende__q,.bezirke,.legende__auswahl{display:none}
-  .legende{max-width:190px}
-  .legende__titel{font-size:.8125rem}
-  .marken{font-size:.6875rem}
-  .stufen{height:22px}
-  .maplibregl-ctrl-top-right{bottom:96px}
-  .fragen{padding:0 var(--gut) 20svh}
-  .frage{min-height:auto;padding:9svh 0 26svh 18px}
-  .frage::before{top:9svh}
   .register,.schaugrafik,.grenzfall{display:block}
   .grenzfall{display:flex;flex-direction:column}
   .grenz__text{order:-1;margin-top:0!important;margin-bottom:28px}
@@ -342,7 +331,43 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .grenz__text{margin-top:28px}
   .grenz__tabelle{margin-top:36px;overflow-x:auto}
   .tabelle th:first-child{min-width:9.5em}
-  .methode__absaetze{grid-template-columns:1fr}
+  .methode__absaetze{grid-template-columns:minmax(0,1fr)}
+  .methode__absaetze code{overflow-wrap:anywhere}   /* langer Belegpfad schob die Startseite bei 360 px um 29 px über */
+}
+/* Chipzeile in einer Zeile, seitlich wischbar: schmal und auf Touch (sonst brechen neun Chips am Tablet in drei Zeilen um) */
+@media (max-width:860px),(pointer:coarse){
+  .werkzeug{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .werkzeug::-webkit-scrollbar{display:none}
+  .themen{flex-wrap:nowrap}
+  .buehne .werkzeug{left:0;right:0;top:calc(var(--kopf) + 6px);padding:0 calc(10px + var(--sa-rechts)) 4px 10px}
+  html.kopf-weg .buehne .werkzeug{top:6px}
+}
+/* Nebeneinander, schmal oder niedrig: die Bühne beginnt schon beim Laden an der Oberkante, unter der Kopfleiste (wie danach
+   beim Kleben). Sonst lagen die Chips bis zum ersten Scrollen eine Kopfleistenhöhe zu tief und die Knöpfe unten
+   abgeschnitten (Gegenprobe 07.11.). Gestapelt setzt es unten zurück. Auch auf Touch ab 861 px (Tablet quer 1024 × 768):
+   dort stand die Bühne schon auf main unter der Kopfleiste und „Meinen Standort zeigen“ halb unter dem Fensterrand.
+   Desktop mit Maus bleibt wie bisher. */
+@media (max-width:860px),(max-height:500px),(pointer:coarse){
+  .buehne{margin-top:calc(-1 * var(--kopf))}
+}
+/* Legende kompakt: schmal und bei niedriger Höhe (Handy quer) */
+@media (max-width:860px),(max-height:500px){
+  .legende{left:8px;bottom:34px;width:auto;max-width:min(190px,calc(100% - 92px));padding:8px 10px 6px}
+  .legende__q,.bezirke,.legende__auswahl{display:none}
+  .legende__titel{font-size:.8125rem}
+  .marken{font-size:.6875rem}
+  .stufen{height:22px}
+}
+/* Gestapelt (Handy hoch): Karte oben, Text darunter. Dieselbe Abfrage steht als window.KIEZ_GESTAPELT in kopf.js;
+   breiter oder quer stehen Karte und Text nebeneinander wie am Desktop (Andre 07.11.: „voll responsive“) */
+@media (max-width:599px),(max-width:699px) and (orientation:portrait){
+  .erzaehlung{display:block}
+  .auftakt.frage{min-height:auto;padding:32px var(--gut) 36px}
+  .lede{max-width:none}
+  .buehne{position:sticky;top:0;height:60svh;margin-top:0;border-left:0;border-top:1px solid var(--line);border-bottom:1px solid var(--ink);z-index:5}
+  .fragen{padding:0 var(--gut) 20svh}
+  .frage{min-height:auto;padding:9svh 0 26svh 18px}
+  .frage::before{top:9svh}
 }
 @media (max-width:560px){
   .stadtzahlen{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -398,3 +423,28 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
 .nav--karte::after{background:var(--accent);bottom:0;height:3px}
 .frage__knoepfe{display:flex;flex-wrap:wrap;gap:8px}
 .steckbrief-k .vert h3{font:600 1.2rem/1.15 var(--f-display);margin:0 0 4px;padding-top:10px;border-top:1px solid var(--ink)}
+
+/* ---------- Responsive (Andre 07.11.2026), am Ende, damit es die Grundregeln oben überstimmt ---------- */
+/* Kartenknöpfe über dem Quellen-„i“ (vorher lag „Meinen Standort zeigen“ halb darunter); niedrig (Handy quer) nebeneinander */
+@media (max-width:860px),(pointer:coarse){
+  .maplibregl-ctrl-top-right{bottom:62px}
+}
+@media (max-height:500px){
+  .maplibregl-ctrl-top-right{display:flex;flex-direction:row-reverse;align-items:flex-end}
+  .maplibregl-ctrl-top-right .maplibregl-ctrl-group{display:flex}
+  .maplibregl-ctrl-top-right .maplibregl-ctrl-group button+button{border-top:0;border-left:1px solid #ddd}
+}
+/* Tippziele auf Touch mindestens 44 × 44 px: Chips, Kartenknöpfe, Quellen-„i“, Hauptnavigation */
+@media (pointer:coarse){
+  .chip{min-height:44px}
+  .maplibregl-ctrl-group button{width:44px;height:44px}
+  .maplibregl-ctrl-attrib.maplibregl-compact{min-height:40px;padding-right:44px;border-radius:22px}
+  .maplibregl-ctrl-attrib.maplibregl-compact-show{padding:2px 48px 2px 10px}
+  .maplibregl-ctrl-attrib-button{width:44px;height:44px;border-radius:22px;background-repeat:no-repeat;background-position:center}
+  .kopf-haupt .nav{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding-block:0}
+  .marke{min-width:44px;min-height:44px}
+}
+/* Rechte Aussparung (Handy quer mit Kerbe): Kartenknöpfe und Quellen nicht darunter */
+.maplibregl-ctrl-top-right,.maplibregl-ctrl-bottom-right{right:var(--sa-rechts)}
+.maplibregl-ctrl-bottom-left{left:var(--sa-links)}
+

@@ -69,6 +69,7 @@ Seit dem Ausbau (05. und 06.11.2026) kommen drei Teile dazu, jeder mit eigenen S
   `26_jahre_methode.py`).
 - **Export** (`planer-daten.html`, `daten/export/`): GeoPackage, CSV, QGIS-Projekt und Steckbriefe (`16_export.py`);
   Grundkarte aus dem Vektorstil von basemap.de (`27_grundkarte.py`).
+- **Vorschaubild** (`og.png`): eigene Aufnahme der Bauzeiten-Seite mit 3D-Häusern (`28_vorschaubild.mjs`).
 
 Was jedes Skript liest und schreibt und womit es geprüft wird, steht in [`docs/rundgang.md`](docs/rundgang.md),
 dort auch der Abschnitt „Neuer Datenstand“. Schrittweise für den Grundatlas: `skripte/lauf.sh vorbereiten |

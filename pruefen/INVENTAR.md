@@ -20,6 +20,7 @@ der unveränderte Stand `e737b50`, geprüft mit `node pruefen/seiten.mjs` und `p
 | S10 | Barrierefreiheit: axe ohne Verstoß | `seiten.mjs` (per `file://` ohne CSS-Vorladen von axe) | 0 Verstöße auf beiden Seiten |
 | S11 | Steckbrief mit Gebietswahl, Gegenprobe, Verteilungen; Grenzfall-Abschnitt; Methode und Quellen | Sichtprüfung (nicht automatisiert) | vorhanden |
 | S12 | Gewicht beim Start (eigene Dateien bis `KIEZ_BEREIT`, gzip -9) | `seiten.mjs` | `index.html` 468 KB gz JS / 601 KB gz gesamt; `karte.html` 407 KB gz JS / 536 KB gz gesamt |
+| S13 | Responsive (seit 07.11.2026, A19): acht Breiten von 360 × 740 bis 1920 × 1080 je Kartenseite ohne seitlichen Überstand und ohne Überlappung der Bedienelemente, Tippziele ab 44 px auf Touch, Mindesthöhe der Karte beim Lesen, Kopfleiste klappt ein und kommt wieder; Startseite mit 3D-Häusern: Liste und Register fliegen zu den Häusern, Klick in den gewählten Stadtteil wählt nicht ab, „Luftbild einblenden“ lässt die Häuser stehen | `seiten.mjs`, `B5_jahre.mjs`, `A7_planer.mjs` (gemeinsam `responsiv.mjs`); vorher gegen `main` rot | neu, grün |
 
 Keine Fremdabrufe beim Prüfen: Kacheln von basemap.de und das Luftbild der LGB beantwortet der Prüfbrowser
 selbst mit einem leeren Bild (je Lauf rund 110 bzw. 70 Anfragen ersetzt).

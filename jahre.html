@@ -2,7 +2,7 @@
 <html lang="de" class="kopf-zwei">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bauzeiten Potsdam: Kiezatlas Potsdam</title>
 <meta name="description" content="Wann wurde gebaut, wo in Potsdam heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum im 100-Meter-Gitter des Zensus 2022, aus der Nähe Haus für Haus geschätzt, auch als 3D-Häuser, mit Quelle bei jeder Angabe.">
 <meta name="robots" content="noindex">
@@ -76,6 +76,7 @@
         <p class="j-leiste__titel" id="j-leiste-titel">Bauzeit</p>
         <p class="j-leiste__status" id="j-status" aria-live="polite"></p>
         <button class="j-abspielen" type="button" id="j-abspielen" hidden><span aria-hidden="true" class="j-abspielen__zeichen"></span><span class="j-abspielen__text">Nacheinander</span></button>
+        <button class="j-legende-knopf" type="button" id="legende-griff" aria-expanded="true" aria-controls="j-legende">Legende</button>
       </div>
       <div class="j-leiste__klassen" id="j-klassen"></div>
       <div class="j-regler" id="j-regler">
@@ -85,7 +86,7 @@
         <label class="nur-sr" for="j-bis">Bauzeit bis</label>
         <input type="range" id="j-bis" min="0" max="7" step="1" value="0">
       </div>
-      <div class="j-leiste__fuss" id="j-legende"></div>
+      <div class="j-leiste__fuss" id="j-legende" role="group" aria-label="Legende" tabindex="0"></div>
     </div>
     <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
   </div>
@@ -192,6 +193,7 @@
 </footer>
 
 <script defer src="daten/kennzahlen.js"></script>
+<script defer src="kopf.js"></script>
 <script defer src="daten/stadtteile.js"></script>
 <script defer src="daten/zellen.js"></script>
 <script defer src="vendor/maplibre-gl.js"></script>

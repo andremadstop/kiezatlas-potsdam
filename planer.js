@@ -130,6 +130,10 @@ if (SEITE !== "karte") return;
 
 // ======================================================================= Planer-Karte
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches, SCHMAL = matchMedia("(max-width:860px)").matches;
+// Blatt von unten nur gestapelt (Handy hoch); breiter oder quer steht es als Seitenleiste neben der Karte (kopf.js, 07.11.)
+var GESTAPELT = matchMedia(window.KIEZ_GESTAPELT || "(max-width:599px)");
+// schmal oder niedrig liegt die Kopfleiste über der Karte: Abstand oben beim Einpassen um ihre Höhe größer
+function kopfUeber() { var f = document.querySelector(".kartenflaeche"), k = document.querySelector(".kopfleiste"); return f && k && f.getBoundingClientRect().top < 1 ? k.offsetHeight : 0; }
 var KL_M = { grenzen: [300, 500, 1000, 2000], min: 0, max: 3000 }, KL_MIN = { grenzen: [5, 10, 15, 20], min: 0, max: 30 };
 var ZU_START = ["kita", "hort", "grundschule", "gruen"];
 
@@ -175,7 +179,7 @@ if (!RAUM[S.r]) S.r = "";
 
 // ---------- Karte
 var LEER = { type: "FeatureCollection", features: [] };
-var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? 16 : 40 } };
+var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch, bearing: S.kam.bearing } : { bounds: T.GANZ, fitBoundsOptions: { padding: SCHMAL ? { top: 16 + kopfUeber(), bottom: 16, left: 16, right: 16 } : 40 } };
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
   style: T.grundkarte({ version: 8, sources: {
@@ -581,7 +585,7 @@ function fragenBauen() {
       document.querySelectorAll('#ein input').forEach(function (r) { r.checked = S.ein.indexOf(r.value) > -1; });
       einAnwenden(); zuAnwenden();
       if (F.raum) { if (PR && !FIXTURE && S.raum !== "pr") ebeneSetzen("pr"); var v = $("block-raum"); v.scrollIntoView({ block: "start", behavior: RUHIG ? "auto" : "smooth" }); var f = $("raeume").querySelector(".treffer"); if (f) f.focus({ preventScroll: true }); }
-      else if (SCHMAL) seite(false);
+      else if (GESTAPELT.matches) seite(false);
     });
     li.appendChild(b); ul.appendChild(li);
   });
@@ -597,10 +601,10 @@ function ebeneSetzen(k) {
 }
 $("raumebene").addEventListener("change", function (e) { ebeneSetzen(e.target.value); });
 $("zoom-raum").addEventListener("click", function () {
-  var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5 };
+  var opt = { padding: SCHMAL ? { top: 70 + kopfUeber(), bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5 };
   var b = S.r ? T.umriss(RAUM[S.r]) : T.GANZ;
   map.fitBounds(b, Object.assign(opt, RUHIG ? { animate: false } : { duration: 700 }));
-  if (SCHMAL) seite(false);
+  if (GESTAPELT.matches) seite(false);
 });
 $("link-teilen").addEventListener("click", function () {
   hashSchreiben();
@@ -612,7 +616,7 @@ $("link-teilen").addEventListener("click", function () {
 var seiteEl = $("seite"), griff = $("seite-griff");
 function seite(an) { seiteEl.classList.toggle("offen", an); griff.setAttribute("aria-expanded", String(an)); }
 griff.addEventListener("click", function () { seite(!seiteEl.classList.contains("offen")); });
-addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.classList.contains("offen") && SCHMAL) { seite(false); griff.focus(); } });
+addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.classList.contains("offen") && GESTAPELT.matches) { seite(false); griff.focus(); } });
 var letzteMeldung = "";
 function meldung(t) { letzteMeldung = t; $("kartenstatus").textContent = t; var h = $("teilen-hinweis"); if (h) h.textContent = t; }
 function status() {

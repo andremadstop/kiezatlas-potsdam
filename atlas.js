@@ -8,7 +8,9 @@ var T = window.KIEZ_THEMEN;                     // gemeinsamer Themenkern (theme
 var fmt = T.fmt, fmt1 = T.fmt1;
 var NB = " ";
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches;
-var SCHMAL = matchMedia("(max-width:860px)").matches;
+var SCHMAL = matchMedia("(max-width:860px)").matches;   // Kamera: Abstände und Zoom für eine schmale Karte
+// Karte oben, Text darunter (nur Handy hoch); breiter oder quer stehen Karte und Fragen nebeneinander (kopf.js)
+var GESTAPELT = matchMedia(window.KIEZ_GESTAPELT || "(max-width:599px)");
 var FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
 var SCHWELLE = 1000;                            // Mindestgröße für Vergleiche von Anteilen (Methode, keine Ergebniszahl)
 
@@ -391,7 +393,8 @@ map.on("click", function (e) {
     return;
   }
   var t = map.queryRenderedFeatures(e.point, { layers: ["teile-flaeche"] });
-  if (t.length) zustand({ nr: t[0].properties.nr === gewaehlt ? "" : t[0].properties.nr });
+  // 3D-Häuser an: ein Klick in den gewählten Stadtteil wählt ihn nicht ab (ohne Stadtteil stünden keine Häuser mehr, wie karte.js)
+  if (t.length) { var tn = t[0].properties.nr; if (tn !== gewaehlt) zustand({ nr: tn }); else if (!S.geb3d) zustand({ nr: "" }); }
 });
 var schild = document.getElementById("schild");
 map.on("mousemove", function (e) {
@@ -450,10 +453,11 @@ document.querySelectorAll("[data-zeige]").forEach(function (b) {
   b.addEventListener("click", function () {
     var i = +b.dataset.zeige, z = Object.assign({}, SCHRITTE[i]);
     if (b.dataset.gebaeude) { z.geb3d = true; z.kamera = "haus"; z.pitch = 58; z.bearing = -20; }
-    if (b.dataset.luftbild) { z.luftbild = !S.luftbild; delete z.kamera; }
+    // „Luftbild einblenden“ schaltet nur das Luftbild; selbst eingeschaltete 3D-Häuser bleiben samt Stadtteil und Kamera stehen
+    if (b.dataset.luftbild) { z.luftbild = !S.luftbild; delete z.kamera; if (S.selbst) z = { luftbild: z.luftbild, thema: z.thema, grenze: false }; }
     aktiv = i; zustand(z);
-    S.selbst = !!b.dataset.gebaeude;
-    if (SCHMAL) document.getElementById("buehne").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "start" });
+    if (!b.dataset.luftbild) S.selbst = !!b.dataset.gebaeude;
+    if (GESTAPELT.matches) document.getElementById("buehne").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "start" });
   });
 });
 
@@ -464,14 +468,11 @@ function scrollSteuerung() {
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
-  var linie = SCHMAL ? "top 78%" : "top 55%", ende = SCHMAL ? "bottom 78%" : "bottom 55%";
+  var linie = GESTAPELT.matches ? "top 78%" : "top 55%", ende = GESTAPELT.matches ? "bottom 78%" : "bottom 55%";
   document.querySelectorAll(".erzaehlung .frage").forEach(function (f) {
     ScrollTrigger.create({ trigger: f, start: linie, end: ende, onToggle: function (s) { if (s.isActive) schritt(+f.dataset.schritt); } });
   });
-  // Kopfleiste weicht beim Scrollen nach unten aus und kommt beim Hochscrollen zurück
-  ScrollTrigger.create({ start: 0, end: "max", onUpdate: function (s) {
-    document.documentElement.classList.toggle("kopf-weg", s.direction > 0 && s.scroll() > 200);
-  } });
+  // Kopfleiste: klappt seit 07.11. für alle Kartenseiten in kopf.js ein und aus
   // aktuelle Rubrik in der Navigation
   ["fragen", "stadtteile", "schaugrafik", "grenzfall", "methode"].forEach(function (id) {
     var a = document.querySelector('.nav[href="#' + id + '"]'), z = document.getElementById(id);
@@ -500,7 +501,18 @@ function scrollSteuerung() {
 var sel = document.getElementById("gebiet");
 sel.appendChild(new Option("Ganz Potsdam", ""));
 ST.features.forEach(function (f) { sel.appendChild(new Option(f.properties.nr + " " + f.properties.name, f.properties.nr)); });
-sel.addEventListener("change", function () { zustand({ nr: sel.value }); });
+sel.addEventListener("change", function () { ausListe(sel.value); });
+// Wahl aus Liste oder Register: mit 3D-Häusern zu den Häusern des Stadtteils (wie karte.js zuDenHaeusern); liegt die
+// Kartenmitte schon nah in ihm, bleibt die Kamera und wird nur geneigt
+function ausListe(nr) {
+  var z = { nr: nr };
+  if (S.geb3d && nr && bereit) {
+    var hier = map.getZoom() >= 13 ? teilInDerMitte() : "", p = map.getPitch() >= 20 ? map.getPitch() : 58;
+    if (map.getZoom() >= 14 && hier === nr) { if (map.getPitch() < 20) map.easeTo({ pitch: 58, duration: RUHIG ? 0 : 600 }); }
+    else { z.kamera = "haus"; z.pitch = p; z.bearing = map.getBearing(); if (hier === nr) { var c = map.getCenter(); z.mitte = [c.lng, c.lat]; } }
+  }
+  zustand(z);
+}
 var kurzQuelle = function (qq) { var m = qq.match(/\(([^)]+)\)\s*$/); return "Zensus 2022, " + (m ? m[1] : ""); };
 var TITEL = { alter: "Alter", baujahr: "Baujahr des Gebäudes", heizung: "Überwiegende Heizungsart", energie: "Energieträger der Heizung" };
 A.TITEL = TITEL;
@@ -575,7 +587,7 @@ function zeileBau(nr, s, max) {
   var wert = el("span", "zeile__wert", k.anzeige === "summe" ? rundEw(k.wert) : proz(k.wert));
   wert.appendChild(el("span", "nur-sr", k.anzeige === "summe" ? " Einwohner, gerundet" : " " + k.titel));
   b.appendChild(wert);
-  b.addEventListener("click", function () { zustand({ nr: nr === gewaehlt ? "" : nr }); });
+  b.addEventListener("click", function () { ausListe(nr === gewaehlt && !S.geb3d ? "" : nr); });
   li.appendChild(b); return li;
 }
 function register(sortId) {

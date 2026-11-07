@@ -7,13 +7,18 @@
 // Kein Netz: Jede Anfrage, die nicht an file:// oder den eigenen Prüfserver geht (Kacheln von basemap.de),
 // beantwortet der Prüfbrowser selbst mit einem leeren 1-px-PNG (wie pruefen/seiten.mjs).
 //
-// Aufruf: node pruefen/A7_planer.mjs [--wurzel <ordner>] [--json <datei>]   Rückgabe 0 = grün, 1 = Befund.
+// Responsive (Andre 07.11.2026, pruefen/responsiv.mjs): acht Breiten von 360 × 740 bis 1920 × 1080, kein seitlicher
+// Überstand, keine Überlappung von Chips, Kartenknöpfen, Quellen-„i“, Legende und Blatt, Tippziele ab 44 px auf Touch,
+// Mindesthöhe der Karte beim Lesen im Blatt, Kopfleiste klappt schmal und niedrig ein und kommt wieder.
+//
+// Aufruf: node pruefen/A7_planer.mjs [--wurzel <ordner>] [--json <datei>] [--nur-responsiv]   Rückgabe 0 = grün, 1 = Befund.
 import { chromium } from "playwright";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { pruefeResponsiv } from "./responsiv.mjs";
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -412,7 +417,7 @@ function downloadsPruefen(liste) {
 }
 
 try {
-  for (const [basis, art] of [[FILE, "file://"], [HTTP, "HTTP"]]) {
+  if (!process.argv.includes("--nur-responsiv")) for (const [basis, art] of [[FILE, "file://"], [HTTP, "HTTP"]]) {
     await planerEcht(basis, art);
     await planer(basis, art);
     await rundreise(basis, art);
@@ -421,10 +426,13 @@ try {
     await steckbriefUndKita(basis, art);
     if (art === "HTTP") downloadsPruefen(liste);
   }
-  await raumebeneFremd(true);
-  await raumebeneFremd(false);
-  await fussFehlschlag();
-  await ruhig();
+  if (!process.argv.includes("--nur-responsiv")) {
+    await raumebeneFremd(true);
+    await raumebeneFremd(false);
+    await fussFehlschlag();
+    await ruhig();
+  }
+  await pruefeResponsiv(browser, HTTP, "planer.html", pruef);
 } catch (e) { pruef(false, "Abbruch: " + (e && e.message ? e.message.split("\n")[0] : e)); }
 await browser.close(); server.close();
 bericht.befunde = befunde;
