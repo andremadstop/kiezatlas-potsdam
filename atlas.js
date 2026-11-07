@@ -339,11 +339,13 @@ document.getElementById("dreid").addEventListener("change", function (e) {
   var an = e.target.checked, z = { geb3d: an, grenze: false };
   if (an) {
     // ohne Wahl der Stadtteil unter der Kartenmitte (aus der Nähe, ab Zoom 13), sonst die Innenstadt (wie auf der Karte);
-    // schon nah und mittendrin nur neigen, sonst zu den dichtesten Zellen fliegen
+    // liegt die Kartenmitte im Stadtteil, dorthin, sonst zu seinen dichtesten Zellen
     var hier = map.getZoom() >= 13 ? teilInDerMitte() : "", nr = S.nr || hier || HAUS_ERSATZ;
     if (!S.nr) z.nr = nr;
     z.kamera = "haus"; z.pitch = 58; z.bearing = -20;
-    if (hier === nr) { var c = map.getCenter(); z.mitte = [c.lng, c.lat]; if (map.getZoom() >= 14) { delete z.kamera; if (map.getPitch() < 20) map.easeTo({ pitch: 58, duration: RUHIG ? 0 : 600 }); } }
+    // nur neigen, wenn schon fast so nah wie das Ziel: die Fragen 3 und 5 enden bei Zoom 14, dort sind Häuser Krümel
+    var nah = (SCHMAL ? HAUS_ZOOM_SCHMAL : HAUS_ZOOM) - 0.5;
+    if (hier === nr) { var c = map.getCenter(); z.mitte = [c.lng, c.lat]; if (map.getZoom() >= nah) { delete z.kamera; if (map.getPitch() < 20) map.easeTo({ pitch: 58, duration: RUHIG ? 0 : 600 }); } }
   }
   zustand(z);
   S.selbst = an;

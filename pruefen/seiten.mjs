@@ -185,6 +185,17 @@ async function startseite(basis, art) {
   const z0 = await zellen();
   pruef(h3.n > 0 && h3.p >= 45 && h3.z >= 15.5 && z3.s3 === "none" && z3.n3 === 0 && z3.s2 === "visible" && z3.n2 > 0 && z0.p === 0 && z0.n3 === 0,
     `„3D-Häuser“: ${h3.n} Häuser, Zoom ${h3.z.toFixed(1)}, Neigung ${h3.p}, zellen-3d ${z3.s3}/${z3.n3}, flache Zellen darunter ${z3.s2}/${z3.n2} (Thema ${z3.t}, y ${z3.y}); aus: Neigung ${z0.p}`);
+  // Gegenprobe 2: aus Frage 5 (Zoom 14, mitten im Stadtteil) fliegt der Schalter nah heran, statt nur zu neigen
+  await page.evaluate(() => document.querySelector('.frage[data-schritt="5"]').scrollIntoView({ block: "center" }));
+  await page.waitForFunction(() => document.querySelector('.frage[data-schritt="5"]').classList.contains("ist-aktiv"), null, { timeout: 8000 }).catch(() => {});
+  await ruhe();
+  const f5 = await page.evaluate(() => window.KIEZ_KARTE.getZoom());
+  await chip3d();
+  await page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 20000 }).catch(() => {});
+  await ruhe();
+  const h5 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, z: m.getZoom() }; });
+  await chip3d(); await ruhe();
+  pruef(h5.z >= 15.5 && h5.n > 0, `„3D-Häuser“ aus Frage 5 (Zoom ${f5.toFixed(1)}): Zoom ${h5.z.toFixed(1)}, ${h5.n} Häuser`);
   // Gegenprobe 2: „3D-Häuser“ steht vor den Themen (auf dem Handy im ersten Bild)
   const erster = await page.$eval(".werkzeug .chip", (e) => e.innerText.trim());
   pruef(erster === "3D-Häuser", `erster Chip der Leiste: ${erster}`);
