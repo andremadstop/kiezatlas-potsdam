@@ -324,7 +324,8 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .grenz__text{margin-top:28px}
   .grenz__tabelle{margin-top:36px;overflow-x:auto}
   .tabelle th:first-child{min-width:9.5em}
-  .methode__absaetze{grid-template-columns:1fr}
+  .methode__absaetze{grid-template-columns:minmax(0,1fr)}
+  .methode__absaetze code{overflow-wrap:anywhere}   /* langer Belegpfad schob die Startseite bei 360 px um 29 px über */
 }
 /* Chipzeile in einer Zeile, seitlich wischbar: schmal und auf Touch (sonst brechen neun Chips am Tablet in drei Zeilen um) */
 @media (max-width:860px),(pointer:coarse){
