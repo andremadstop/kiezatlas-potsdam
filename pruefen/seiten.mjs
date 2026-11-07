@@ -131,14 +131,74 @@ async function startseite(basis, art) {
   const fragen = await page.$$eval(".erzaehlung .frage", (l) => l.map((f) => +f.dataset.schritt));
   pruef(fragen.filter((s) => s >= 1 && s <= 7).length === 7, `sieben Fragen vorhanden (Schritte ${fragen.join(",")})`);
   let scrollOk = true;
+  // keine Zellsäulen (07.11.): je Frage zellen-3d aus und 0 gerendert, Zellen flach (zellen-2d) und von oben
+  const flach = [];
+  const zellen = () => page.evaluate(() => { const m = window.KIEZ_KARTE, n = (l) => m.queryRenderedFeatures({ layers: [l] }).length;
+    return { s3: m.getLayoutProperty("zellen-3d", "visibility"), n3: n("zellen-3d"), s2: m.getLayoutProperty("zellen-2d", "visibility"), n2: n("zellen-2d"), p: Math.round(m.getPitch()), t: (document.querySelector("#thema input:checked") || {}).value, y: Math.round(scrollY) }; });
+  const ruhe = () => page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {}).then(() => page.waitForTimeout(300));
   for (const s of [1, 3, 5, 7]) {
     await page.locator(`.frage[data-schritt="${s}"]`).scrollIntoViewIfNeeded();
     await page.evaluate((s) => document.querySelector(`.frage[data-schritt="${s}"]`).scrollIntoView({ block: "center" }), s);
     const ok = await page.waitForFunction((s) => document.querySelector(`.frage[data-schritt="${s}"]`).classList.contains("ist-aktiv"), s, { timeout: 8000 }).then(() => true, () => false);
     scrollOk = scrollOk && ok;
     if (!ok) console.log(`     Schritt ${s} wurde beim Scrollen nicht aktiv`);
+    await ruhe();
+    flach.push([s, await zellen()]);
   }
   pruef(scrollOk, "Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv");
+  pruef(flach.every(([, z]) => z.s3 === "none" && z.n3 === 0 && z.s2 === "visible" && z.n2 > 0 && z.p === 0),
+    `keine Zellsäulen: ${flach.map(([s, z]) => `Frage ${s} zellen-3d ${z.s3}/${z.n3}, flach ${z.n2}, Neigung ${z.p}`).join("; ")}`);
+  // eine flache Zelle anklicken öffnet ihr Fenster
+  const punkt = await page.evaluate(() => { const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect();
+    for (let y = 120; y < r.height - 80; y += 17) for (let x = 80; x < r.width - 120; x += 19) {
+      if (m.queryRenderedFeatures([x, y], { layers: ["zellen-2d"] }).length && document.elementFromPoint(r.left + x, r.top + y) === m.getCanvas()) return { x: r.left + x, y: r.top + y };
+    }
+    return null; });
+  if (punkt) { await page.mouse.click(punkt.x, punkt.y); await page.waitForTimeout(400); }
+  const fenster = await page.$eval(".maplibregl-popup", (e) => e.textContent).catch(() => "");
+  pruef(punkt && /Gitterzelle/.test(fenster), `Klick auf eine flache Zelle öffnet ihr Fenster (${fenster.slice(0, 40)}…)`);
+  await page.evaluate(() => document.querySelectorAll(".maplibregl-popup").forEach((e) => e.remove()));
+  // Gegenprobe 2 (07.11.): Doppelklick auf eine Zelle zoomt und lässt kein Fenster offen
+  if (punkt) {
+    const z0 = await page.evaluate(() => window.KIEZ_KARTE.getZoom());
+    await page.mouse.dblclick(punkt.x, punkt.y); await page.waitForTimeout(400); await ruhe();
+    const d = await page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), f: document.querySelectorAll(".maplibregl-popup").length }));
+    pruef(d.z > z0 + 0.5 && d.f === 0, `Doppelklick auf eine Zelle: Zoom ${z0.toFixed(2)} → ${d.z.toFixed(2)}, ${d.f} Fenster offen`);
+  }
+  // „3D-Häuser“: Gebäude als Körper, nah heran, Zellen flach darunter, keine Säulen; aus: wieder von oben.
+  // Klick auf die sichtbare Stelle des Chips: page.check scrollt die Seite erst (y 5624 → 4682) und schaltet so Frage 6 dazwischen
+  const chip3d = async () => { const r = await page.evaluate(() => { const b = document.querySelector("label:has(#dreid)").getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+    await page.mouse.click(r.x, r.y); };
+  await chip3d();
+  await page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 20000 }).catch(() => {});
+  await ruhe();
+  const h3 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, p: Math.round(m.getPitch()), z: m.getZoom() }; });
+  const z3 = await zellen();
+  // Gegenprobe 2: selbst eingeschaltet, nimmt die nächste Frage die Häuser nicht weg; sie färbt nur die Zellen
+  await page.evaluate(() => document.querySelector('.frage[data-schritt="8"]').scrollIntoView({ block: "center" }));
+  await page.waitForFunction(() => document.querySelector('.frage[data-schritt="8"]').classList.contains("ist-aktiv"), null, { timeout: 8000 }).catch(() => {});
+  await ruhe();
+  const w = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { d3: document.getElementById("dreid").checked, n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length,
+    p: Math.round(m.getPitch()), t: (document.querySelector("#thema input:checked") || {}).value }; });
+  pruef(w.d3 && w.n > 0 && w.p >= 45 && w.t === "q_u18", `Weiterlesen bei 3D-Häusern (Frage 8): 3D ${w.d3}, ${w.n} Häuser, Neigung ${w.p}, Thema ${w.t}`);
+  await chip3d(); await ruhe();
+  const z0 = await zellen();
+  pruef(h3.n > 0 && h3.p >= 45 && h3.z >= 15.5 && z3.s3 === "none" && z3.n3 === 0 && z3.s2 === "visible" && z3.n2 > 0 && z0.p === 0 && z0.n3 === 0,
+    `„3D-Häuser“: ${h3.n} Häuser, Zoom ${h3.z.toFixed(1)}, Neigung ${h3.p}, zellen-3d ${z3.s3}/${z3.n3}, flache Zellen darunter ${z3.s2}/${z3.n2} (Thema ${z3.t}, y ${z3.y}); aus: Neigung ${z0.p}`);
+  // Gegenprobe 2: aus Frage 5 (Zoom 14, mitten im Stadtteil) fliegt der Schalter nah heran, statt nur zu neigen
+  await page.evaluate(() => document.querySelector('.frage[data-schritt="5"]').scrollIntoView({ block: "center" }));
+  await page.waitForFunction(() => document.querySelector('.frage[data-schritt="5"]').classList.contains("ist-aktiv"), null, { timeout: 8000 }).catch(() => {});
+  await ruhe();
+  const f5 = await page.evaluate(() => window.KIEZ_KARTE.getZoom());
+  await chip3d();
+  await page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 20000 }).catch(() => {});
+  await ruhe();
+  const h5 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, z: m.getZoom() }; });
+  await chip3d(); await ruhe();
+  pruef(h5.z >= 15.5 && h5.n > 0, `„3D-Häuser“ aus Frage 5 (Zoom ${f5.toFixed(1)}): Zoom ${h5.z.toFixed(1)}, ${h5.n} Häuser`);
+  // Gegenprobe 2: „3D-Häuser“ steht vor den Themen (auf dem Handy im ersten Bild)
+  const erster = await page.$eval(".werkzeug .chip", (e) => e.innerText.trim());
+  pruef(erster === "3D-Häuser", `erster Chip der Leiste: ${erster}`);
   // Register-Sortierung
   const sorten = await page.$$eval('#sortierung input[name="sort"]', (l) => l.map((i) => i.value));
   const ersteJe = {};
@@ -206,6 +266,54 @@ async function karte(basis, art) {
   pruef(z1.thema === "q_fern" && z1.d3 && z1.luft && z1.geb && z1.hash === "#thema=fern&st=52&3d=1&luft=1&geb=1"
     && JSON.stringify({ ...z1, k: 0 }) === JSON.stringify({ ...z2, k: 0 }) && kGleich(z1.k, z2.k),
     `Hash-Rundreise: ${z1.hash}&k=${z1.k} -> neu geladen gleich (${z2.hash}&k=${z2.k})`);
+
+  // 3D = Häuser (07.11.): „3D-Häuser“ ohne Stadtteil wählt einen, lädt seine Gebäude, der Hinweis ist danach leer;
+  // keine Zellsäulen. Auf dem Handy steht der Schalter ganz im Bild.
+  for (const breite of [1440, 390]) {
+    const c = await oeffnen(basis, "karte.html", { breite });
+    const box = await c.page.locator("label:has(#dreid)").boundingBox();
+    await c.page.check("#gebaeude", { force: true }); await c.page.waitForTimeout(200);
+    const hin0 = await c.page.$eval("#teilen-hinweis", (e) => e.textContent);
+    await c.page.check("#dreid", { force: true });
+    await c.page.waitForFunction(() => { const m = window.KIEZ_KARTE; return m.loaded() && m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0; }, null, { timeout: 20000 }).catch(() => {});
+    const z = await c.page.evaluate(() => { const m = window.KIEZ_KARTE; return { hin: document.getElementById("teilen-hinweis").textContent, griff: document.getElementById("griff-name").textContent,
+      g3: m.getLayoutProperty("gebaeude3d", "visibility"), n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, s3: m.getLayoutProperty("zellen-3d", "visibility"), z: m.getZoom(), p: m.getPitch(), hash: location.hash.replace(/&k=.*$/, "") }; });
+    pruef(/zuerst einen Stadtteil/.test(hin0) && z.hin === "" && z.griff !== "Ganz Potsdam" && z.g3 === "visible" && z.n > 0 && z.s3 === "none" && z.p >= 45 && /st=\d+&3d=1&geb=1/.test(z.hash)
+      && (breite > 400 || box.x + box.width <= breite) && c.fehler.length === 0,
+      `${breite} px: „3D-Häuser“ ohne Stadtteil wählt ${z.griff}, ${z.n} Häuser, Zoom ${z.z.toFixed(1)}, Neigung ${Math.round(z.p)}, Hinweis danach leer (vorher „${hin0.slice(0, 30)}…“), Schalter rechts bei ${Math.round(box.x + box.width)} px`);
+    // Gegenprobe 07.11.: nah genug für Körper (Zoom 16,2 bzw. 15,6), Themen auf dem Handy ab dem zweiten Chip
+    const chips = await c.page.$$eval(".werkzeug .chip", (l) => l.map((e) => [e.innerText.trim(), Math.round(e.getBoundingClientRect().right)]));
+    const imBild = chips.filter(([, r]) => r <= breite).map(([t]) => t);
+    pruef(z.z >= 15.5 && (breite > 400 || (chips[0][0] === "3D-Häuser" && imBild.length >= 4)), `${breite} px: Zoom nach „3D-Häuser“ ${z.z.toFixed(1)}; Chips ganz im Bild: ${imBild.join(", ")}`);
+    if (breite > 400) {
+      // Doppelklick auf den Nachbarn wählt ihn (der zweite Klick wählt ihn nicht wieder ab); ein Klick in den gewählten
+      // Stadtteil wählt nichts ab; Wahl aus der Liste fliegt zu den Häusern
+      const griff = () => c.page.$eval("#griff-name", (e) => e.textContent);
+      const n3d = () => c.page.evaluate(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length);
+      const ruhe = () => c.page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {}).then(() => c.page.waitForTimeout(300));
+      const g0 = await griff();
+      // freier Punkt ohne Haus, im gewählten Stadtteil (gleich) oder in einem anderen
+      const frei = async (gleich) => c.page.evaluate(([nr, gleich]) => { const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect();
+        for (let y = 200; y < r.height - 60; y += 23) for (let x = 120; x < r.width - 120; x += 29) {
+          const t = m.queryRenderedFeatures([x, y], { layers: ["teile-flaeche"] });
+          if (t.length && (t[0].properties.nr === nr) === gleich && !m.queryRenderedFeatures([x, y], { layers: ["gebaeude3d"] }).length && document.elementFromPoint(r.left + x, r.top + y) === m.getCanvas()) return { x: r.left + x, y: r.top + y };
+        }
+        return null; }, [(await griff()).split(" ")[0], gleich]);
+      await c.page.evaluate(() => window.KIEZ_KARTE.jumpTo({ zoom: 14.6 })); await ruhe();   // bei 16,2 liegt nur die Innenstadt im Bild
+      const leer = await frei(false);
+      if (leer) { await c.page.mouse.dblclick(leer.x, leer.y); await c.page.waitForTimeout(300); await ruhe(); }
+      const g1 = await griff();
+      const leer2 = await frei(true);
+      if (leer2) { await c.page.mouse.click(leer2.x, leer2.y); await c.page.waitForTimeout(400); }
+      const g2 = await griff();
+      await c.page.evaluate(() => document.querySelector('.treffer[data-nr="72"]').click()); await c.page.waitForTimeout(300);
+      await c.page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 15000 }).catch(() => {}); await ruhe();
+      const g3 = await griff(), n3 = await n3d();
+      pruef(leer && leer2 && g1 !== g0 && /^\d\d /.test(g1) && g2 === g1 && /^72 /.test(g3) && n3 > 0 && c.fehler.length === 0,
+        `Doppelklick auf einen Nachbarn von ${g0}: ${g1} gewählt; Klick in ihn: weiter ${g2}; Liste „72“: ${g3}, ${n3} Häuser im Bild`);
+    }
+    await c.ctx.close();
+  }
 }
 
 async function bewegung() {

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bauzeiten Potsdam: Kiezatlas Potsdam</title>
-<meta name="description" content="Wann wurde gebaut, wo in Potsdam heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum im 100-Meter-Gitter des Zensus 2022, aus der Nähe Haus für Haus geschätzt, mit Quelle bei jeder Angabe.">
+<meta name="description" content="Wann wurde gebaut, wo in Potsdam heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum im 100-Meter-Gitter des Zensus 2022, aus der Nähe Haus für Haus geschätzt, auch als 3D-Häuser, mit Quelle bei jeder Angabe.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#f1f2ee">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -44,6 +44,9 @@
     <p class="j-vorzeile">Kiezatlas Potsdam, Teil Gebäude</p>
     <h1 class="titel" id="titel"><span class="titel__z"><span>Bauzeiten</span></span><span class="titel__z"><span>Potsdam</span></span></h1>
     <p class="lede">Wann wurde gebaut, wo heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum, Zelle für Zelle im 100-Meter-Gitter des Zensus 2022, und aus der Nähe Haus für Haus geschätzt.</p>
+    <div class="auftakt__aktion">
+      <button class="knopf knopf--voll" type="button" id="j-haeuser"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Häuser in 3D ansehen</span></button>
+    </div>
     <div class="j-profil" aria-labelledby="j-profil-titel">
       <p class="j-profil__titel" id="j-profil-titel">Ganz Potsdam nach Bauzeit, genähert</p>
       <div class="j-schicht" id="j-stadtschicht" role="img" aria-label="Anteile der acht Bauzeiten an allen Gebäuden mit Wohnraum in Potsdam"></div>
@@ -62,7 +65,7 @@
         <label class="chip"><input type="radio" name="ansicht" value="spanne"><span>Gewählte Bauzeit</span></label>
       </fieldset>
       <div class="schalter">
-        <label class="chip chip--schalter"><input type="checkbox" id="j-dreid"><span>3D</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="j-dreid"><span>3D-Häuser</span></label>
         <label class="chip chip--schalter"><input type="checkbox" id="j-luft"><span>Luftbild</span></label>
       </div>
     </div>
@@ -106,7 +109,7 @@
       <p class="frage__nr">Frage 3</p>
       <h2 class="frage__titel">Wo wuchs Potsdam nach 1990?</h2>
       <p>Seit 1991 sind hochgerechnet rund <b data-j="f3-n">…</b> Gebäude mit Wohnraum entstanden, etwa <b data-j="f3-p">…</b> des Bestands von 2022. Die höchsten Anteile haben <span data-j="f3-top">…</span>.</p>
-      <p class="frage__kann"><b>So geht’s:</b> 3D stellt die Zellen als Säulen auf. Die Höhe zeigt, wie viele Gebäude der gewählten Bauzeit ungefähr in der Zelle stehen, die Farbe ihren Anteil.</p>
+      <p class="frage__kann"><b>So geht’s:</b> „3D-Häuser“ fliegt mit einem Klick nah heran und stellt die Gebäude als Körper auf. Wer 3D selbst einschaltet, behält beim Weiterlesen Ausschnitt und 3D; die Fragen stellen nur noch Ansicht und Bauzeit ein.</p>
     </li>
     <li class="frage" id="frage-4" data-schritt="4">
       <p class="frage__nr">Frage 4</p>
@@ -134,7 +137,7 @@
       <p>Aus der Nähe zeichnet die Karte die Gebäudeumrisse der Landesvermessung, jedes mit einer Bauzeit. Von <b data-j="g-alle">…</b> Gebäuden in Potsdam tragen <b data-j="g-geschaetzt">…</b> (<span data-j="g-geschaetzt-p">…</span>) eine geschätzte Bauzeit, <b data-j="g-nd">…</b> sind nicht datiert, die meisten davon Garagen, Lauben und Schuppen. Mit einer belegten Bauzeit aus einer Quelle: <b data-j="g-belegt">…</b>.</p>
       <p>Geschätzt heißt: Die Zensuszahlen jeder Zelle werden nach der Gebäudeform auf die Häuser verteilt; dazu kommen die belegten Bauzeiten der Großsiedlungen und, wo beides fehlt, die Bauzeit der Nachbargebäude. Über die ganze Stadt zeigt die Gebäudekarte dadurch <span data-j="g-sf-alt-w">…</span> Häuser aus der Zeit <span data-j="g-sf-alt-k">…</span> als der Zensus (<span data-j="g-sf-alt">…</span>) und <span data-j="g-sf-ddr-w">…</span> aus <span data-j="g-sf-ddr-k">…</span> (<span data-j="g-sf-ddr">…</span>).</p>
       <p class="fuss">Eine Schätzung je Haus, keine Aussage über einzelne Grundstücke. Wohngebäude tragen kein Einzeljahr, nur eine Bauzeitklasse.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Ab Zoom 14 erscheinen die Gebäude. Ein Klick auf eines zeigt Bauzeit, „geschätzt“ oder „belegt“, den Weg der Schätzung und die Quelle. Die Leiste filtert auch die Gebäude. Wie oft die Schätzung trifft, steht in der <a class="link" href="jahre-methode.html#m-gebaeude">Methode</a>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Ab Zoom 14 erscheinen die Gebäude, mit „3D-Häuser“ als Körper in Katasterhöhe. Ein Klick auf eines zeigt Bauzeit, „geschätzt“ oder „belegt“, den Weg der Schätzung und die Quelle. Die Leiste filtert auch die Gebäude. Wie oft die Schätzung trifft, steht in der <a class="link" href="jahre-methode.html#m-gebaeude">Methode</a>.</p>
     </li>
     <li class="frage frage--frei" id="frage-8" data-schritt="8">
       <p class="frage__nr">Selbst erkunden</p>

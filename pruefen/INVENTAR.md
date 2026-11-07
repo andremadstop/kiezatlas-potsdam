@@ -9,12 +9,12 @@ der unveränderte Stand `e737b50`, geprüft mit `node pruefen/seiten.mjs` und `p
 | # | Was muss funktionieren | Wie geprüft | Ausgangswert 05.11.2026 |
 |---|---|---|---|
 | S1 | `index.html` und `karte.html` laden per Doppelklick (`file://`) und per HTTP, ohne Konsolenfehler | `seiten.mjs`, beide Wege | grün, 0 Fehler |
-| S2 | Sieben Fragen (Schritte 1–7) plus Auftakt (0) und „Selbst erkunden“ (8); Scroll-Steuerung setzt die aktive Frage (GSAP ScrollTrigger, sonst IntersectionObserver) | `seiten.mjs`: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv | grün |
+| S2 | Sieben Fragen (Schritte 1–7) plus Auftakt (0) und „Selbst erkunden“ (8); Scroll-Steuerung setzt die aktive Frage (GSAP ScrollTrigger, sonst IntersectionObserver) | `seiten.mjs`: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv; seit 07.11. je Frage `zellen-3d` aus und 0 gerendert, Zellen flach (`zellen-2d`) und von oben, Klick auf eine Zelle öffnet ihr Fenster, „3D-Häuser“ zeigt Gebäude; seit Gegenprobe 2 Doppelklick ohne Fenster, „3D-Häuser“ vorn, Zoom ab 15,5, flache Zellen darunter, Weiterlesen behält 3D | grün |
 | S3 | Alle sieben Themen lassen sich auf beiden Seiten schalten | `seiten.mjs` | grün (7 Themen je Seite) |
 | S4 | Hash-Links der freien Karte: `thema`, `st`, `3d`, `luft`, `geb`, `k=zoom/lat/lng/pitch/bearing` überstehen Neuladen | `seiten.mjs` Hash-Rundreise | grün: `#thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12` |
-| S5 | Schalter 3D, Luftbild, Gebäude (freie Karte); Gebäude je Stadtteil werden erst bei Auswahl nachgeladen | `seiten.mjs` (schalten ohne Fehler) | grün |
+| S5 | Schalter 3D-Häuser, Luftbild, Gebäude (freie Karte); Gebäude je Stadtteil werden erst bei Auswahl nachgeladen. Seit 07.11.: „3D-Häuser“ zeigt nur Gebäude als Körper (keine Zensus-Säulen), wählt ohne Stadtteil einen und leert den Hinweis | `seiten.mjs` (schalten ohne Fehler; „3D-Häuser“ ohne Stadtteil bei 1440 und 390 px) | grün |
 | S6 | Schaugrafik-Export: SVG mit eingebetteten Schriften, PNG 300 dpi, Druck/PDF | `seiten.mjs`: Download SVG (524 KB, `@font-face`), PNG (832 KB), Druckblatt + PDF (226 KB) | grün |
-| S7 | Reduzierte Bewegung: Kamera und Säulen springen, keine Leerlaufdrehung; ohne Einstellung laufen Animationen fehlerfrei | `seiten.mjs` mit `reducedMotion` an und aus | grün |
+| S7 | Reduzierte Bewegung: Kamera springt (Säulen gibt es seit 07.11. auf keiner Seite mehr), keine Leerlaufdrehung; ohne Einstellung laufen Animationen fehlerfrei | `seiten.mjs` mit `reducedMotion` an und aus | grün |
 | S8 | Kopfzahlen im Auftakt: fünf Kacheln (Einwohner gerundet, unter 18, 65+, vor 1949, Fernwärme) | `seiten.mjs` | grün: rund 182.700, 17,9 %, 20,2 %, 25,7 %, 60,7 % |
 | S9 | Register der 32 Stadtteile mit sechs Sortierungen | `seiten.mjs`: je 32 Zeilen, verschiedene Spitzenreiter | grün (6 Sortierungen) |
 | S10 | Barrierefreiheit: axe ohne Verstoß | `seiten.mjs` (per `file://` ohne CSS-Vorladen von axe) | 0 Verstöße auf beiden Seiten |

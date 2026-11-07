@@ -103,8 +103,11 @@ https://souverain-systems.de/kiezatlas/ (oder `index.html` per Doppelklick, ohne
   „Wann wurde mein Viertel gebaut?“, danach „Jetzt gehört die Karte Ihnen.“ zum freien Erkunden; jede stellt
   Stadtteil, Thema und Kamera ein und erklärt nebenbei eine Funktion.
   Alle Antworten rechnet der Browser aus den Daten in `daten/`, im Text steht keine Zahl von Hand.
-- **3D-Gitter:** Jede Zensus-Zelle ist eine Säule, Höhe und Farbe zeigen denselben Wert. Gebäude in 3D und
-  das Luftbild der Landesvermessung lassen sich zuschalten.
+- **Zellgitter:** Jede Zensus-Zelle liegt flach auf der Karte, die Farbe zeigt den Wert. Das Luftbild der
+  Landesvermessung lässt sich zuschalten.
+- **3D-Häuser (alle Seiten, seit 07.11.2026):** 3D heißt nur noch Häuser als Körper in Katasterhöhe. Ein Klick auf
+  „3D-Häuser“ wählt bei Bedarf einen Stadtteil und fliegt hin; Zellsäulen gibt es auf keiner Seite mehr, auch nicht
+  auf der Startseite (Beleg `belege/3D_haeuser_20261107.md`).
 - **Register und Steckbrief** für alle 32 Stadtteile, sortierbar, mit Quelle je Zahl.
 - **Schaugrafik:** ein bis vier Gebiete, Rubriken und Format wählen (A4 hoch und quer, halbe Seite, Spalte,
   Quadrat), dann als SVG, PNG mit 300 dpi oder über die Druckansicht als PDF herunterladen. Quellen und Lizenzen
