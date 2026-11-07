@@ -97,6 +97,13 @@ main a:not(.knopf):not(.nav){text-decoration-thickness:1px;text-underline-offset
 .stadtzahlen dd small{font-size:.6em;font-weight:500;margin-left:.1em}
 .stadtzahlen div{display:flex;flex-direction:column}
 .stadtzahlen dd{order:1}
+/* Kopfzahlen nach der Breite der Spalte, nicht des Fensters: unter 480 px zwei Spalten, die erste Zahl über beide.
+   Drei Spalten in 304 bis 406 px brachen „rund 182.700“ um (Tablet, quer, schon auf main bei 900 bis 1100 px Breite) */
+.auftakt{container-type:inline-size}
+@container (max-width:479px){
+  #stadtzahlen{grid-template-columns:repeat(2,minmax(0,1fr));min-height:14rem}
+  #stadtzahlen div:first-child{grid-column:1/-1}
+}
 .stadtzahlen__quelle{font-size:.8125rem;color:var(--muted);margin:.8em 0 0;max-width:58ch}
 .auftakt__aktion{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:28px}
 .entwurf{font-size:.8125rem;color:var(--muted)}
@@ -337,8 +344,10 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
 }
 /* Nebeneinander, schmal oder niedrig: die Bühne beginnt schon beim Laden an der Oberkante, unter der Kopfleiste (wie danach
    beim Kleben). Sonst lagen die Chips bis zum ersten Scrollen eine Kopfleistenhöhe zu tief und die Knöpfe unten
-   abgeschnitten (Gegenprobe 07.11.). Gestapelt setzt es unten zurück. */
-@media (max-width:860px),(max-height:500px){
+   abgeschnitten (Gegenprobe 07.11.). Gestapelt setzt es unten zurück. Auch auf Touch ab 861 px (Tablet quer 1024 × 768):
+   dort stand die Bühne schon auf main unter der Kopfleiste und „Meinen Standort zeigen“ halb unter dem Fensterrand.
+   Desktop mit Maus bleibt wie bisher. */
+@media (max-width:860px),(max-height:500px),(pointer:coarse){
   .buehne{margin-top:calc(-1 * var(--kopf))}
 }
 /* Legende kompakt: schmal und bei niedriger Höhe (Handy quer) */
