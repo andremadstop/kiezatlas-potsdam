@@ -206,6 +206,23 @@ async function karte(basis, art) {
   pruef(z1.thema === "q_fern" && z1.d3 && z1.luft && z1.geb && z1.hash === "#thema=fern&st=52&3d=1&luft=1&geb=1"
     && JSON.stringify({ ...z1, k: 0 }) === JSON.stringify({ ...z2, k: 0 }) && kGleich(z1.k, z2.k),
     `Hash-Rundreise: ${z1.hash}&k=${z1.k} -> neu geladen gleich (${z2.hash}&k=${z2.k})`);
+
+  // 3D = Häuser (07.11.): „3D-Häuser“ ohne Stadtteil wählt einen, lädt seine Gebäude, der Hinweis ist danach leer;
+  // keine Zellsäulen. Auf dem Handy steht der Schalter ganz im Bild.
+  for (const breite of [1440, 390]) {
+    const c = await oeffnen(basis, "karte.html", { breite });
+    const box = await c.page.locator("label:has(#dreid)").boundingBox();
+    await c.page.check("#gebaeude", { force: true }); await c.page.waitForTimeout(200);
+    const hin0 = await c.page.$eval("#teilen-hinweis", (e) => e.textContent);
+    await c.page.check("#dreid", { force: true });
+    await c.page.waitForFunction(() => { const m = window.KIEZ_KARTE; return m.loaded() && m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0; }, null, { timeout: 20000 }).catch(() => {});
+    const z = await c.page.evaluate(() => { const m = window.KIEZ_KARTE; return { hin: document.getElementById("teilen-hinweis").textContent, griff: document.getElementById("griff-name").textContent,
+      g3: m.getLayoutProperty("gebaeude3d", "visibility"), n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, s3: m.getLayoutProperty("zellen-3d", "visibility"), z: m.getZoom(), p: m.getPitch(), hash: location.hash.replace(/&k=.*$/, "") }; });
+    pruef(/zuerst einen Stadtteil/.test(hin0) && z.hin === "" && z.griff !== "Ganz Potsdam" && z.g3 === "visible" && z.n > 0 && z.s3 === "none" && z.p >= 45 && /st=\d+&3d=1&geb=1/.test(z.hash)
+      && (breite > 400 || box.x + box.width <= breite) && c.fehler.length === 0,
+      `${breite} px: „3D-Häuser“ ohne Stadtteil wählt ${z.griff}, ${z.n} Häuser, Zoom ${z.z.toFixed(1)}, Neigung ${Math.round(z.p)}, Hinweis danach leer (vorher „${hin0.slice(0, 30)}…“), Schalter rechts bei ${Math.round(box.x + box.width)} px`);
+    await c.ctx.close();
+  }
 }
 
 async function bewegung() {

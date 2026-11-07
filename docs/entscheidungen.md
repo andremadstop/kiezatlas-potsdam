@@ -29,6 +29,7 @@ Entschieden hat jeweils André Stiebitz; Vorschläge, Prüfberichte und Umsetzun
 | A15 | Schulen mit Primarstufe zählen als Grundschulstandort | 06.11.2026 | Audit K4 |
 | A16 | Schaugrafik unter CC BY 4.0 | 06.11.2026 | Audit K19 |
 | A17 | Zitierfähige Stände: Version, Tag, Änderungsprotokoll, Meldeweg | 06.11.2026 | Audit K13 |
+| A18 | 3D heißt Häuser: keine Zellsäulen auf Karte und Bauzeiten, ein Klick zu den Häusern | 07.11.2026 | Beleg H1 bis H9 |
 
 ## A1: OpenStreetMap nur in eigenen `_odbl`-Dateien
 
@@ -154,6 +155,28 @@ Grafiken aus der Schaugrafik dürfen gedruckt und weitergegeben werden, mit der 
 Jeder veröffentlichte Stand bekommt einen Tag im Repository und eine Zeile in `CHANGELOG.md`; die Seiten nennen
 im Fuß Stand und Version. Zitiervorschlag in `CITATION.cff`. Fehler in Daten oder Texten bitte an
 kontakt@souverain-systems.de.
+
+## A18: 3D heißt Häuser
+
+Anlass: Andre am 07.11.2026 nach einem Sichtvergleich mit einer anderen Gebäudealterskarte: „ich komm nirgends zu
+den 3d daten und find unsere kacheln oft zu unübersichtlich“ und „genau, zu viele säulen verwirren mich“.
+
+Entscheidung: Auf der freien Karte und den Bauzeiten zeigt 3D nur noch Gebäude als Körper in Katasterhöhe, nie mehr
+Zensus-Zellen als Säulen. Der Schalter heißt „3D-Häuser“ und führt mit einem Klick zu Häusern; auf den Bauzeiten
+kommt der Knopf „Häuser in 3D ansehen“ dazu. Hat der Nutzer 3D selbst eingeschaltet, nimmt die Geschichte es beim
+Weiterlesen nicht wieder weg. Die Zellen bleiben flach und etwas leiser (ohne Rand, geringere Deckkraft, Muster mit
+halbtransparenter Tinte); Schraffur, Punkte und die acht Farben bleiben.
+
+Begründung: „3D“ bedeutete je nach Zoom zwei Dinge (unter Zoom 14 Säulen, darüber Häuser), und zu den Häusern
+führten am Desktop acht Gesten. Die Zoomschwelle selbst bleibt, weil die Gebäude nach A10 als Datei je Stadtteil
+geladen werden: Bei Zoom 13 lägen 8 bis 15 Stadtteile im Bild. Statt die Schwelle zu senken, fliegt die Karte zu
+den Häusern.
+
+Verworfen: die Schwelle auf Zoom 13 senken (Flickenteppich aus geladenen und nicht geladenen Stadtteilen); 3D schon
+beim Laden (1 bis 3 MB vor der ersten Geste, verstößt gegen „nichts beim Start aus `daten/jahre/`“); Zoomen mit dem
+Mausrad (Nachtrag „Desktop-Mausrad“ in `DESIGN.md`); nach dem Einschalten zur letzten Frage springen; neue
+Kodierungen für Geheimhaltung und Gleichstand; die Ebene `zellen-3d` löschen (Prüfskripte lesen sie). Die Startseite
+behält ihre Säulen, bis Andre entscheidet. Einzelheiten, Zählungen und Prüfungen: `belege/3D_haeuser_20261107.md`.
 
 ## Nicht geprüft sind
 

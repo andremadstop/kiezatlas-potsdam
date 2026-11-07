@@ -11,7 +11,9 @@ var rundEw = T.rundEw, proz = T.proz, name = T.name, kachel = T.kachel, esc = T.
 // ---------- Farben und Themen: gemeinsamer Kern in themen.js (wie auf der Startseite)
 var FARBE = T.FARBE, BEZIRKFARBE = T.BEZIRKFARBE, TEIL = T.TEIL, STUFEN = T.STUFEN;
 var THEMEN = T.THEMEN, THEMA = T.THEMA, HASHTHEMA = T.HASH, KLASSEN = T.KLASSEN;
-var hoehe = T.hoehe, farbe = T.farbe, umriss = T.umriss, GANZ = T.GANZ;
+var farbe = T.farbe, umriss = T.umriss, GANZ = T.GANZ;
+// „3D-Häuser“ ohne gewählten Stadtteil und ohne Stadtteil unter der Kartenmitte: Innenstadt
+var HAUS_ERSATZ = "41";
 
 // ---------- Zustand aus dem Hash
 var S = { thema: "stadtteile", nr: "", d3: false, luft: false, geb: false, kam: null };
@@ -20,7 +22,7 @@ var S = { thema: "stadtteile", nr: "", d3: false, luft: false, geb: false, kam: 
   var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[dek(kv[0])] = dek(kv[1] || ""); });
   if (HASHTHEMA[h.thema]) S.thema = HASHTHEMA[h.thema];
   if (h.st && K.stadtteile[h.st]) S.nr = h.st;
-  S.d3 = h["3d"] === "1"; S.luft = h.luft === "1"; S.geb = h.geb === "1";
+  S.d3 = h["3d"] === "1"; S.luft = h.luft === "1"; S.geb = h.geb === "1" || S.d3;   // 3D heißt Häuser (auch in alten Links)
   if (h.k) { var k = h.k.split("/").map(Number); if (k.length >= 3 && k.every(function (x) { return !isNaN(x); })) S.kam = { zoom: k[0], center: [k[2], k[1]], pitch: k[3] || 0, bearing: k[4] || 0 }; }
 })();
 function hashSchreiben() {
@@ -50,7 +52,8 @@ var map = new maplibregl.Map(Object.assign({
       { id: "basemap", type: "raster", source: "basemap", paint: { "raster-opacity": 0.6, "raster-saturation": -1 } },
       { id: "dop", type: "raster", source: "dop", layout: { visibility: "none" } },
       { id: "teile-flaeche", type: "fill", source: "teile", paint: { "fill-color": ["get", "farbe"], "fill-opacity": 0.72 } },
-      { id: "zellen-2d", type: "fill", source: "zellen", layout: { visibility: "none" }, paint: { "fill-color": STUFEN[2], "fill-opacity": 0.85, "fill-outline-color": "rgba(255,255,255,0.35)" } },
+      { id: "zellen-2d", type: "fill", source: "zellen", layout: { visibility: "none" }, paint: { "fill-color": STUFEN[2], "fill-opacity": 0.85 } },
+      // zellen-3d: bleibt als Ebene bestehen, ist aber immer aus; 3D zeigt nur Häuser (Andre 07.11.)
       { id: "zellen-3d", type: "fill-extrusion", source: "zellen", layout: { visibility: "none" }, paint: { "fill-extrusion-color": STUFEN[2], "fill-extrusion-height": 0, "fill-extrusion-opacity": 0.94, "fill-extrusion-vertical-gradient": true } },
       { id: "gebaeude2d", type: "fill", source: "gebaeude", layout: { visibility: "none" }, paint: { "fill-color": "#24363b", "fill-opacity": 0.45 } },
       { id: "gebaeude3d", type: "fill-extrusion", source: "gebaeude", layout: { visibility: "none" }, paint: { "fill-extrusion-color": "#aebfbf", "fill-extrusion-height": ["get", "h"], "fill-extrusion-opacity": 0.95, "fill-extrusion-vertical-gradient": true } },
@@ -69,14 +72,14 @@ var nummern = ST.features.map(function (f) { var e = el("div", "teilnr", f.prope
 function anwenden() {
   if (!bereit) return;
   var t = THEMA[S.thema], gitter = t.id !== "stadtteile";
-  map.setPaintProperty("teile-flaeche", "fill-opacity", gitter ? 0 : 0.72);
+  // Stadtteilfläche tritt zurück, solange Gebäude stehen (sonst viel Farbe unter den Häusern)
+  map.setPaintProperty("teile-flaeche", "fill-opacity", gitter ? 0 : S.geb ? 0.2 : 0.72);
   nummern.forEach(function (m) { if (!gitter) m.addTo(map); else m.remove(); });
-  var z3 = gitter && S.d3 && !S.geb, z2 = gitter && !z3;
-  map.setLayoutProperty("zellen-3d", "visibility", z3 ? "visible" : "none");
-  map.setLayoutProperty("zellen-2d", "visibility", z2 ? "visible" : "none");
+  // keine Zellsäulen mehr: Zellen liegen immer flach, 3D gilt den Gebäuden
+  map.setLayoutProperty("zellen-3d", "visibility", "none");
+  map.setLayoutProperty("zellen-2d", "visibility", gitter ? "visible" : "none");
   if (gitter) {
-    map.setFilter("zellen-3d", ["!=", ["get", t.id], null]); map.setFilter("zellen-2d", ["!=", ["get", t.id], null]);
-    map.setPaintProperty("zellen-3d", "fill-extrusion-color", farbe(t)); map.setPaintProperty("zellen-3d", "fill-extrusion-height", hoehe(t));
+    map.setFilter("zellen-2d", ["!=", ["get", t.id], null]);
     map.setPaintProperty("zellen-2d", "fill-color", farbe(t)); map.setPaintProperty("zellen-2d", "fill-opacity", S.geb ? 0.55 : 0.85);
   }
   map.setLayoutProperty("dop", "visibility", S.luft ? "visible" : "none");
@@ -99,10 +102,12 @@ function waehle(nr) {
   if (S.geb) gebaeudeLaden(); else if (bereit) map.getSource("gebaeude").setData(LEER);
   anwenden();
 }
+var HINWEIS_TEIL = "Gebäude gibt es je Stadtteil: bitte zuerst einen Stadtteil wählen.";
 function gebaeudeLaden() {
   if (!bereit) return;
   var nr = S.nr, hin = document.getElementById("teilen-hinweis");
-  if (!nr) { map.getSource("gebaeude").setData(LEER); hin.textContent = "Gebäude gibt es je Stadtteil: bitte zuerst einen Stadtteil wählen."; return; }
+  if (!nr) { map.getSource("gebaeude").setData(LEER); hin.textContent = HINWEIS_TEIL; return; }
+  if (hin.textContent === HINWEIS_TEIL) hin.textContent = "";   // Stadtteil gewählt: Hinweis erledigt
   var v = "KIEZ_GEB_" + nr;
   if (window[v]) { map.getSource("gebaeude").setData(window[v]); return; }
   var s = document.createElement("script"); s.src = KIEZ_THEMEN.v("daten/gebaeude/" + nr + ".js");
@@ -123,26 +128,50 @@ function legende(t) {
     return;
   }
   var s = KLASSEN[t.id], st = el("div", "stufen"); st.setAttribute("aria-hidden", "true");
-  STUFEN.slice(0, s.grenzen.length + 1).forEach(function (f, i, a) { var x = el("span"); x.style.background = f; x.style.height = (S.d3 ? 30 + 70 * (i + 1) / a.length : 100) + "%"; st.appendChild(x); });
+  STUFEN.slice(0, s.grenzen.length + 1).forEach(function (f) { var x = el("span"); x.style.background = f; x.style.height = "100%"; st.appendChild(x); });
   L.appendChild(st);
   var m = el("div", "marken"), r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
   m.appendChild(el("span", null, r(s.min))); s.grenzen.forEach(function (g) { m.appendChild(el("span", null, r(g))); }); m.appendChild(el("span", null, r(s.max))); L.appendChild(m);
   if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode("Weniger als 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen") + ", Wert zu unscharf")); L.appendChild(g); }
-  L.appendChild(el("p", "legende__q", (S.d3 ? "Farbe und Höhe zeigen denselben Wert. " : "") + (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
+  L.appendChild(el("p", "legende__q", (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
 }
 
 // ---------- Bedienung
 var themaBox = document.getElementById("thema");
 THEMEN.forEach(function (t) { var l = el("label", "chip"), r = document.createElement("input"); r.type = "radio"; r.name = "thema"; r.value = t.id; l.appendChild(r); l.appendChild(el("span", null, t.kurz)); l.title = t.name; themaBox.appendChild(l); });
 themaBox.addEventListener("change", function (e) { S.thema = e.target.value; anwenden(); });
+// Stadtteil an einem Punkt (Strahlverfahren, Löcher beachtet). Nicht über queryRenderedFeatures: bei den
+// Zensus-Themen ist die Stadtteilfläche unsichtbar (Deckkraft 0) und wird dort nicht getroffen.
+function inRing(r, x, y) { var c = false; for (var i = 0, j = r.length - 1; i < r.length; j = i++) { var a = r[i], b = r[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
+function teilAn(x, y) {
+  for (var i = 0; i < ST.features.length; i++) {
+    var f = ST.features[i], u = umriss(f);
+    if (x < u[0][0] || x > u[1][0] || y < u[0][1] || y > u[1][1]) continue;
+    if (T.polys(f).some(function (p) { return inRing(p[0], x, y) && !p.slice(1).some(function (h) { return inRing(h, x, y); }); })) return f.properties.nr;
+  }
+  return "";
+}
+// „3D-Häuser“: ein Klick zeigt Gebäude als Körper. Ohne gewählten Stadtteil nimmt die Seite den unter der
+// Kartenmitte (aus der Nähe), sonst die Innenstadt; aus der Ferne fliegt sie auf den Stadtteil. Nur auf Klick, nie beim Laden.
+var gebDurch3D = false;   // Gebäude hat erst „3D-Häuser“ eingeschaltet: beim Ausschalten wieder aus
 document.getElementById("dreid").addEventListener("change", function (e) {
-  S.d3 = e.target.checked; anwenden();
-  // Säulen sind nur im Schrägblick sichtbar: einmalig neigen, weil der Nutzer 3D eingeschaltet hat; nichts dreht sich
-  if (S.d3 && map.getPitch() < 20) map.jumpTo({ pitch: 50 });
-  if (!S.d3 && map.getPitch() > 0) map.jumpTo({ pitch: 0 });
+  S.d3 = e.target.checked;
+  if (!S.d3) { if (gebDurch3D) S.geb = false; gebDurch3D = false; anwenden(); if (map.getPitch() > 0) map.jumpTo({ pitch: 0 }); return; }
+  gebDurch3D = !S.geb; S.geb = true;
+  // Kartenmitte nur, wenn schon nah (ab Zoom 13, wie auf der Bauzeiten-Seite); im Überblick läge sie in Bornim
+  if (!S.nr) { var c = map.getCenter(); waehle((map.getZoom() >= 13 && teilAn(c.lng, c.lat)) || HAUS_ERSATZ); } else anwenden();
+  if (map.getZoom() < 14) {
+    var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5, pitch: 50, bearing: map.getBearing() };
+    if (RUHIG) map.fitBounds(umriss(TEIL[S.nr]), Object.assign(opt, { animate: false })); else map.fitBounds(umriss(TEIL[S.nr]), Object.assign(opt, { duration: 900 }));
+  } else if (map.getPitch() < 20) map.jumpTo({ pitch: 50 });
 });
 document.getElementById("luftbild").addEventListener("change", function (e) { S.luft = e.target.checked; anwenden(); });
-document.getElementById("gebaeude").addEventListener("change", function (e) { S.geb = e.target.checked; anwenden(); });
+// ohne Gebäude keine 3D-Häuser: Gebäude aus schaltet auch 3D aus
+document.getElementById("gebaeude").addEventListener("change", function (e) {
+  S.geb = e.target.checked; gebDurch3D = false;
+  if (!S.geb && S.d3) { S.d3 = false; if (map.getPitch() > 0) map.jumpTo({ pitch: 0 }); }
+  anwenden();
+});
 document.getElementById("zoom-teil").addEventListener("click", function () {
   var opt = { padding: SCHMAL ? { top: 70, bottom: 30, left: 16, right: 16 } : 40, maxZoom: 15.5, pitch: map.getPitch(), bearing: map.getBearing() };
   var b = S.nr ? umriss(TEIL[S.nr]) : GANZ;

@@ -200,7 +200,7 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(await page.evaluate(() => document.getAnimations().length === 0), "reduzierte Bewegung: keine laufende Animation nach dem Laden");
       pruef(await page.evaluate(() => { const t = window.KIEZ_KARTE.getStyle().transition; return t && t.duration === 0; }), "reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)");
       pruef(await page.$eval("#j-abspielen", (b) => b.hidden), "reduzierte Bewegung: „Nacheinander“ ausgeblendet");
-      const erwartet = { 1: ["spanne", 0, 0, false], 2: ["spanne", 2, 3, false], 3: ["spanne", 4, 7, true], 4: ["spanne", 6, 7, false], 5: ["ueberblick"], 6: ["ueberblick"], 7: ["ueberblick"] };
+      const erwartet = { 1: ["spanne", 0, 0, false], 2: ["spanne", 2, 3, false], 3: ["spanne", 4, 7, false], 4: ["spanne", 6, 7, false], 5: ["ueberblick"], 6: ["ueberblick"], 7: ["ueberblick"] };
       for (const n of Object.keys(erwartet)) {
         await page.$eval("#frage-" + n, (e) => e.scrollIntoView({ block: "center" }));
         await page.waitForFunction((n) => document.getElementById("frage-" + n).classList.contains("ist-aktiv"), n, { timeout: 5000 }).catch(() => {});
@@ -261,9 +261,17 @@ for (const [art, basis] of [["file", FILE], ["http", HTTP]]) {
       pruef(jahreAnfragen() === vor12 && await page.evaluate(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe", "geb-nd", "geb-rest"] }).length === 0), "unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen");
       const leg0 = await page.$eval("#j-legende", (e) => e.textContent);
       pruef(/ab Zoom 14/.test(leg0), "unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin");
-      // Frage 7 führt zu den Gebäuden am Stern
+      // Frage 7 führt zu den Gebäuden am Stern, als 3D-Häuser (seit 07.11.); danach 3D aus für die flachen Prüfungen
       await page.$eval("#frage-7", (e) => e.scrollIntoView({ block: "center" }));
-      await page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 15000 }).catch(() => {});
+      const gebDa = () => page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 15000 }).catch(() => {});
+      await gebDa();
+      await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(300);
+      const g7 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { z: m.getZoom(), p: m.getPitch(), d: window.KIEZ_JAHRE.S.d3, sicht: m.getLayoutProperty("geb-3d", "visibility"), n: m.queryRenderedFeatures({ layers: ["geb-3d"] }).length, ...window.KIEZ_JAHRE.geb() }; });
+      pruef(g7.d && g7.z >= 14 && g7.p >= 45 && g7.sicht === "visible" && g7.n > 50 && g7.geladen.length <= 4 && jahreAnfragen() === g7.geladen.length,
+        `Frage 7: 3D-Häuser am Stern (Zoom ${g7.z.toFixed(1)}, Neigung ${Math.round(g7.p)}, ${g7.n} Körper, Dateien ${g7.geladen.join(", ")}, ${jahreAnfragen()} Anfragen)`);
+      await page.evaluate(() => { document.getElementById("j-dreid").click(); });
+      await page.waitForTimeout(300); await gebDa();
       await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
       await page.waitForTimeout(300);
       let g = await page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), ...window.KIEZ_JAHRE.geb(), n: window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["geb-farbe"] }).length, anim: document.getAnimations().length }));
@@ -525,6 +533,93 @@ console.log("\nHash und Bewegung");
     pruef(quer[0] <= quer[1] && quer[2] > 0 && va.length === 0, `375 px Gebäudeansicht: kein waagrechtes Scrollen (${quer[0]} ≤ ${quer[1]}), axe ${va.length} ${va.join(", ")}`);
     await bild(h.page, "B5_375_gebaeude.png");
     await h.ctx.close();
+  }
+  // 3D = Häuser (Andre 07.11.): Schalter „3D-Häuser“ und Knopf „Häuser in 3D ansehen“ führen mit einem Klick zu
+  // Häusern als Körper; nie Zellsäulen; Mausrad und Weiterlesen nehmen 3D nicht weg; Doppelklick ohne Fenster
+  {
+    const haeuser = async (page, geladen) => {
+      await page.waitForFunction(() => { const g = window.KIEZ_JAHRE.geb(); return window.KIEZ_KARTE.getZoom() >= 14 && g.im_bild.length && g.im_bild.every((n) => g.geladen.includes(n)); }, null, { timeout: 20000 }).catch(() => {});
+      await page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(400);
+      const z = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { z: m.getZoom(), p: m.getPitch(), d: window.KIEZ_JAHRE.S.d3, selbst: window.KIEZ_JAHRE.S.selbst, sicht: m.getLayoutProperty("geb-3d", "visibility"), n: m.queryRenderedFeatures({ layers: ["geb-3d"] }).length, s3: m.getLayoutProperty("zellen-3d", "visibility"), ...window.KIEZ_JAHRE.geb() }; });
+      z.anfragen = geladen.filter((u) => /daten\/jahre\/\d{2}\.js/.test(u)).length;
+      return z;
+    };
+    for (const [breite, hoehe] of [[1440, 900], [375, 812]]) {
+      for (const [wie, sel] of [["Schalter", "label:has(#j-dreid)"], ["Knopf", "#j-haeuser"]]) {
+        const v = await oeffnen(FILE, "jahre.html", { breite, hoehe });
+        const vor = v.geladen.filter((u) => /daten\/jahre\//.test(u)).length;
+        await v.page.click(sel);
+        const z = await haeuser(v.page, v.geladen);
+        pruef(vor === 0 && z.d && z.selbst && z.z >= 14 && z.p >= 45 && z.sicht === "visible" && z.n >= 200 && z.s3 === "none" && z.geladen.length <= 4 && z.anfragen === z.geladen.length && v.fehler.length === 0,
+          `(a) ${breite} px, ${wie}: ein Klick zu den 3D-Häusern (Zoom ${z.z.toFixed(1)}, Neigung ${Math.round(z.p)}, ${z.n} Körper, Dateien ${z.geladen.join(", ")}, beim Start ${vor}, Konsolenfehler ${v.fehler.length})`);
+        if (breite === 1440 && wie === "Schalter") {
+          // (b) Mausrad über der Karte scrollt die Seite (DESIGN.md, Desktop-Mausrad); die Geschichte blättert weiter,
+          // nimmt 3D und Kamera aber nicht weg
+          const r = await v.page.locator("#karte").boundingBox();
+          await v.page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+          const a0 = await v.page.evaluate(() => (document.querySelector("[data-schritt].ist-aktiv") || {}).getAttribute?.("data-schritt") ?? null);
+          for (let i = 0; i < 3; i++) { await v.page.mouse.wheel(0, 300); await v.page.waitForTimeout(250); }
+          await v.page.waitForTimeout(600);
+          const a1 = await v.page.evaluate(() => (document.querySelector("[data-schritt].ist-aktiv") || {}).getAttribute?.("data-schritt") ?? null);
+          for (let i = 0; i < 3; i++) { await v.page.mouse.wheel(0, -300); await v.page.waitForTimeout(250); }
+          await v.page.waitForTimeout(600);
+          const zb = await v.page.evaluate(() => { const m = window.KIEZ_KARTE; return { z: m.getZoom(), p: m.getPitch(), d: window.KIEZ_JAHRE.S.d3, y: scrollY }; });
+          pruef(a1 !== a0 && zb.d && zb.p >= 45 && zb.z >= 14, `(b) Mausrad 3 Rasten runter und 3 hoch: Frage ${a0} → ${a1}, 3D bleibt (d3 ${zb.d}, Neigung ${Math.round(zb.p)}, Zoom ${zb.z.toFixed(1)})`);
+          // 3D aus: Hinweis, dass die Karte wieder der Geschichte folgt
+          await v.page.evaluate(() => { document.getElementById("j-dreid").click(); });
+          await v.page.waitForTimeout(200);
+          const st = await v.page.$eval("#j-status", (e) => e.textContent);
+          pruef(/Karte folgt wieder der Geschichte/.test(st) && await v.page.evaluate(() => !window.KIEZ_JAHRE.S.selbst && window.KIEZ_KARTE.getPitch() === 0), `3D aus: Statuszeile „${st.slice(-40)}“, Neigung 0`);
+        }
+        await v.ctx.close();
+      }
+    }
+    // (c) Doppelklick zoomt, öffnet aber kein Fenster (auch nicht vom ersten Klick)
+    {
+      const v = await oeffnen(FILE, "jahre.html");
+      await v.page.evaluate(() => window.KIEZ_KARTE.jumpTo({ center: [13.105, 52.392], zoom: 12.6, pitch: 0 }));
+      await v.page.waitForFunction(() => window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+      await v.page.waitForTimeout(300);
+      const pt = await v.page.evaluate(() => {
+        const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect(), lw = m.getCanvas();
+        for (const f of m.queryRenderedFeatures({ layers: ["zellen-2d"] }).filter((x) => x.properties.j_s === 3)) {
+          const c = f.geometry.coordinates[0], p = m.project([(c[0][0] + c[2][0]) / 2, (c[0][1] + c[2][1]) / 2]);
+          if (document.elementFromPoint(r.left + p.x, r.top + p.y) === lw && m.queryRenderedFeatures([p.x, p.y], { layers: ["zellen-2d"] }).length) return { x: r.left + p.x, y: r.top + p.y };
+        }
+        return null;
+      });
+      let n = -1, z0 = 0, z1 = 0;
+      if (pt) {
+        z0 = await v.page.evaluate(() => window.KIEZ_KARTE.getZoom());
+        await v.page.mouse.dblclick(pt.x, pt.y);
+        await v.page.waitForTimeout(400);
+        await v.page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {});
+        z1 = await v.page.evaluate(() => window.KIEZ_KARTE.getZoom());
+        n = await v.page.locator(".maplibregl-popup").count();
+      }
+      pruef(pt && z1 > z0 + 0.5 && n === 0, `(c) Doppelklick auf eine Zelle: Zoom ${z0.toFixed(1)} → ${z1.toFixed(1)}, ${n} Fenster offen`);
+      await v.ctx.close();
+    }
+    // Link mit 3D-Häusern (3d=1 und blick=) hält die Geschichte an; alter Link aus Frage 3 (3d=1 ohne blick=) nicht
+    for (const [hash, halten] of [["#ansicht=ueberblick&3d=1&blick=13.06000,52.39950,16.20", true], ["#ansicht=spanne&von=4&bis=7&3d=1", false]]) {
+      const v = await oeffnen(FILE, "jahre.html", { hash });
+      const z0 = await v.page.evaluate(() => window.KIEZ_KARTE.getZoom());
+      await v.page.$eval("#frage-5", (e) => e.scrollIntoView({ block: "center" }));
+      await v.page.waitForFunction(() => document.getElementById("frage-5").classList.contains("ist-aktiv"), null, { timeout: 5000 }).catch(() => {});
+      await v.page.waitForTimeout(300);
+      const z = await v.page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), d: window.KIEZ_JAHRE.S.d3, a: window.KIEZ_JAHRE.S.ansicht }));
+      const ok = halten ? z.d && Math.abs(z.z - z0) < 0.01 && z.a === "ueberblick" : !z.d && Math.abs(z.z - z0) > 0.01 && z.a === "ueberblick";
+      pruef(ok && v.fehler.length === 0, `Link ${hash.slice(0, 40)}…: nach Frage 5 ${halten ? "3D und Kamera unverändert" : "führt die Geschichte (3D aus)"} (d3 ${z.d}, Zoom ${z0.toFixed(1)} → ${z.z.toFixed(1)})`);
+      await v.ctx.close();
+    }
+    // (d) 3D über die Adresse, Überblick (Zoom um 10): keine Zellsäulen
+    {
+      const v = await oeffnen(FILE, "jahre.html", { hash: "#ansicht=ueberblick&3d=1" });
+      const z = await v.page.evaluate(() => { const m = window.KIEZ_KARTE; return { z: m.getZoom(), d: window.KIEZ_JAHRE.S.d3, s3: m.getLayoutProperty("zellen-3d", "visibility"), s2: m.getLayoutProperty("zellen-2d", "visibility"), n2: m.queryRenderedFeatures({ layers: ["zellen-2d"] }).length }; });
+      pruef(z.d && z.z < 12 && z.s3 === "none" && z.s2 === "visible" && z.n2 > 1000 && v.fehler.length === 0, `(d) 3D bei Zoom ${z.z.toFixed(1)}: zellen-3d ${z.s3}, Zellen flach (${z.n2} gezeichnet), d3 ${z.d}, Konsolenfehler ${v.fehler.length} ${v.fehler.slice(0, 2).join(" | ")}`);
+      await v.ctx.close();
+    }
   }
   // K32: Zwei-Finger-Schutz bei Touch (wie atlas.js), Maus/Feinzeiger ohne
   {

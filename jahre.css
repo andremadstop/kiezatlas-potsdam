@@ -166,7 +166,11 @@
   .j-klasse{font-size:.6875rem;min-height:40px}
   .j-klasse__balken{height:18px}
   .j-legende__quelle{font-size:.6875rem;line-height:1.3}
-  .jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 48px)}
+  /* Bühne klebt unter der Kopfleiste (sonst lägen Chipzeile und Knöpfe beim Hereinscrollen mitten über den Häusern):
+     gleiche sichtbare Kartenhöhe wie vorher, Chipzeile am oberen Kartenrand, Zoomknöpfe darunter */
+  .j-erzaehlung .j-buehne{top:var(--kopf);height:calc(68svh - var(--kopf))}
+  .j-buehne .werkzeug{top:8px}
+  .jahreseite .maplibregl-ctrl-top-right{top:52px}
   .j-register__koerper{grid-template-columns:minmax(0,1fr)}
   .j-steckbrief{position:static}
   .j-zeile{grid-template-columns:2.2em minmax(0,1fr) 4.2em;row-gap:6px}
