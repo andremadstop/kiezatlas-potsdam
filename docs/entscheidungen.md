@@ -29,7 +29,7 @@ Entschieden hat jeweils André Stiebitz; Vorschläge, Prüfberichte und Umsetzun
 | A15 | Schulen mit Primarstufe zählen als Grundschulstandort | 06.11.2026 | Audit K4 |
 | A16 | Schaugrafik unter CC BY 4.0 | 06.11.2026 | Audit K19 |
 | A17 | Zitierfähige Stände: Version, Tag, Änderungsprotokoll, Meldeweg | 06.11.2026 | Audit K13 |
-| A18 | 3D heißt Häuser: keine Zellsäulen auf Karte und Bauzeiten, ein Klick zu den Häusern | 07.11.2026 | Beleg H1 bis H9 |
+| A18 | 3D heißt Häuser: keine Zellsäulen mehr auf allen Seiten, ein Klick zu den Häusern | 07.11.2026 | Beleg H1 bis H10 |
 
 ## A1: OpenStreetMap nur in eigenen `_odbl`-Dateien
 
@@ -167,7 +167,7 @@ kommt der Knopf „Häuser in 3D ansehen“ dazu. Hat der Nutzer 3D selbst einge
 Weiterlesen nicht wieder weg. Die Zellen bleiben flach und etwas leiser (ohne Rand, geringere Deckkraft, Muster mit
 halbtransparenter Tinte); Schraffur, Punkte und die acht Farben bleiben.
 
-Begründung: „3D“ bedeutete je nach Zoom zwei Dinge (unter Zoom 14 Säulen, darüber Häuser), und zu den Häusern
+Begründung: „3D“ bedeutete je nach Zoom zwei Dinge (unter Zoom 14 Säulen, darüber Häuser; Säulen gibt es seither keine mehr), und zu den Häusern
 führten am Desktop acht Gesten. Die Zoomschwelle selbst bleibt, weil die Gebäude nach A10 als Datei je Stadtteil
 geladen werden: Bei Zoom 13 lägen 8 bis 15 Stadtteile im Bild. Statt die Schwelle zu senken, fliegt die Karte zu
 den Häusern.
@@ -175,8 +175,17 @@ den Häusern.
 Verworfen: die Schwelle auf Zoom 13 senken (Flickenteppich aus geladenen und nicht geladenen Stadtteilen); 3D schon
 beim Laden (1 bis 3 MB vor der ersten Geste, verstößt gegen „nichts beim Start aus `daten/jahre/`“); Zoomen mit dem
 Mausrad (Nachtrag „Desktop-Mausrad“ in `DESIGN.md`); nach dem Einschalten zur letzten Frage springen; neue
-Kodierungen für Geheimhaltung und Gleichstand; die Ebene `zellen-3d` löschen (Prüfskripte lesen sie). Die Startseite
-behält ihre Säulen, bis Andre entscheidet. Einzelheiten, Zählungen und Prüfungen: `belege/3D_haeuser_20261107.md`.
+Kodierungen für Geheimhaltung und Gleichstand; die Ebene `zellen-3d` löschen (Prüfskripte lesen sie).
+
+Nachtrag Startseite (07.11.2026): Auf die Frage, ob die Säulen auch von der Startseite sollen, antwortete Andre
+„1 weg“. Damit gibt es auf keiner Seite mehr Säulen. Auf der Startseite liegen die Zellen flach (Ebene `zellen-2d`,
+Farbe trägt den Wert, Deckkraft 0,85 wie auf der freien Karte), `zellen-3d` bleibt als Ebene und ist immer aus, der
+GSAP-Höhenfaktor ist entfernt, die Legende zeigt keine Höhenbalken. Die Fragen zeigen die Karte von oben (Neigung 0
+wie die flachen Fragen der Bauzeiten), schräg steht sie nur mit Gebäuden in 3D; der Schalter heißt auch hier
+„3D-Häuser“ und führte schon vorher mit einem Klick zu den Häusern, ebenso der Knopf in Frage 4. Verworfen: ein
+Link auf die Bauzeiten statt des Schalters (nicht nötig, der Weg ist schon kurz); den Schrägblick über flachen
+Zellen behalten (verzerrt das Gitter, ohne etwas zu zeigen). Einzelheiten, Zählungen und Prüfungen:
+`belege/3D_haeuser_20261107.md`.
 
 ## Nicht geprüft sind
 

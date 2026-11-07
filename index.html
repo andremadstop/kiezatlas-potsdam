@@ -69,7 +69,7 @@
       <fieldset class="themen" id="thema"><legend class="nur-sr">Thema der Karte</legend></fieldset>
       <div class="schalter">
         <label class="chip chip--schalter"><input type="checkbox" id="luftbild"><span>Luftbild</span></label>
-        <label class="chip chip--schalter"><input type="checkbox" id="dreid"><span>Gebäude 3D</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="dreid"><span>3D-Häuser</span></label>
       </div>
     </div>
     <div class="legende" id="legende"></div>
@@ -81,15 +81,15 @@
     <li class="frage" id="frage-1" data-schritt="1">
       <p class="frage__nr">Frage 1</p>
       <h2 class="frage__titel">Wie viele Menschen wohnen in meiner Nachbarschaft?</h2>
-      <p>Jetzt richtet sich die Stadt auf. Jede Säule ist eine Zelle des Zensus-Gitters, 100 mal 100 Meter; je höher und dunkler, desto mehr Menschen wohnen darin. Beim Zensus im Mai 2022 lag die vollste Zelle im Stadtteil <b data-q="ew-max-teil"></b> mit rund <b data-q="ew-max"></b> Einwohnern; in der Hälfte aller Zellen waren es höchstens <span data-q="ew-median"></span>.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Eine Säule anklicken oder antippen zeigt ihre Werte mit Quelle. Verschieben durch Ziehen, zoomen per Doppelklick oder mit den Knöpfen rechts; am Handy mit zwei Fingern.</p>
+      <p>Jetzt zeigt die Karte das Zensus-Gitter. Jede Zelle misst 100 mal 100 Meter; je dunkler sie ist, desto mehr Menschen wohnen darin. Beim Zensus im Mai 2022 lag die vollste Zelle im Stadtteil <b data-q="ew-max-teil"></b> mit rund <b data-q="ew-max"></b> Einwohnern; in der Hälfte aller Zellen waren es höchstens <span data-q="ew-median"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Eine Zelle anklicken oder antippen zeigt ihre Werte mit Quelle. Verschieben durch Ziehen, zoomen per Doppelklick oder mit den Knöpfen rechts; am Handy mit zwei Fingern.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
     </li>
     <li class="frage" id="frage-2" data-schritt="2">
       <p class="frage__nr">Frage 2</p>
       <h2 class="frage__titel">Wie alt ist meine Nachbarschaft?</h2>
       <p>Das Gitter zeigt nun das Durchschnittsalter je Zelle. Unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern ist der Anteil der Menschen ab 65 im Stadtteil <b data-q="alt-hoch"></b> am höchsten (<span data-q="alt-hoch-wert"></span>) und im Stadtteil <b data-q="alt-tief"></b> am niedrigsten (<span data-q="alt-tief-wert"></span>); für ganz Potsdam sind es <span data-q="alt-stadt"></span> (Zensus, Mai 2022).</p>
-      <p class="frage__kann"><b>So geht’s:</b> Das Thema wechselt in der Leiste über der Karte. Die Legende erklärt Farben und Höhen; grau und flach sind Zellen, deren Wert zu unscharf ist.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Thema wechselt in der Leiste über der Karte. Die Legende erklärt die Farben; grau sind Zellen, deren Wert zu unscharf ist.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="2"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
     </li>
     <li class="frage" id="frage-3" data-schritt="3">
@@ -103,14 +103,14 @@
       <p class="frage__nr">Frage 4</p>
       <h2 class="frage__titel">Wie alt sind die Häuser in meinem Stadtteil?</h2>
       <p>Gefärbt ist jetzt der Anteil der Wohnungen in Gebäuden von vor 1949. Im Stadtteil <b data-q="altbau-teil"></b> sind es <span data-q="altbau-wert"></span>, in ganz Potsdam <span data-q="altbau-stadt"></span>.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen, Umrisse aus ALKIS, Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m).</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen (Knopf unten oder „3D-Häuser“ in der Leiste), Umrisse aus ALKIS, Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m).</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="4" data-gebaeude="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Gebäude in 3D zeigen</span></button>
     </li>
     <li class="frage" id="frage-5" data-schritt="5">
       <p class="frage__nr">Frage 5</p>
       <h2 class="frage__titel">Womit wird bei uns geheizt?</h2>
       <p>Im Mai 2022 hingen in Potsdam <span data-q="fern-stadt"></span> der Wohnungen an der Fernwärme. Am höchsten ist der Anteil im Stadtteil <b data-q="fern-hoch"></b> (<span data-q="fern-hoch-wert"></span>), am niedrigsten im Stadtteil <b data-q="fern-tief"></b> (<span data-q="fern-tief-wert"></span>), jeweils unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern.</p>
-      <p class="frage__kann"><b>So geht’s:</b> Das Luftbild der Landesvermessung ersetzt auf Wunsch die graue Hintergrundkarte; so wird sichtbar, welche Bebauung hinter den Säulen steht.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Luftbild der Landesvermessung ersetzt auf Wunsch die graue Hintergrundkarte; so wird sichtbar, welche Bebauung zu den Zellen gehört.</p>
       <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="5" data-luftbild="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Luftbild einblenden</span></button>
     </li>
     <li class="frage frage--grenze" id="frage-6" data-schritt="6">
@@ -278,8 +278,8 @@
       <p>Alle Zahlen zu Menschen und Wohnungen sind ein Bild vom 15. Mai 2022 (Zensus). Wer danach zugezogen ist oder in einem später bezogenen Neubaugebiet wohnt, etwa in Krampnitz oder im Bornstedter Feld, fehlt. Die Stadt zählt ihre Einwohner nach dem Melderegister und kommt deshalb auf andere Zahlen; der Steckbrief zeigt diesen Vergleich als Gegenprobe. Einzelne Zellen sind durch die Geheimhaltung leicht verändert und sagen nichts Sicheres über ein einzelnes Haus. Die Summe der Zellen weicht vom amtlichen Gemeindeergebnis um 0,07 % ab (182.673 gegen 182.806 Einwohner, Beleg <code>belege/A1_gemeindeabgleich_20261105.md</code>).</p>
     </div>
     <div>
-      <h3>Säulen, Farben, Gebäude</h3>
-      <p>Farbe und Höhe einer Säule zeigen denselben Wert: Einwohner über die Wurzel, damit wenige dichte Zellen nicht alles überragen; Anteile bis 100 %. Zellen mit weniger als zehn Personen bzw. Wohnungen liegen flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist die Objekthöhe aus dem Kataster (ALKIS, über dem Gelände, bei 50.356 von 52.309 Gebäuden), sonst die Geschosszahl mal 3 m (73 Gebäude) oder ein Ersatzwert von 3 m (1.880, meist Nebengebäude); das Popup nennt die Herkunft je Gebäude. Dächer sind flach dargestellt.</p>
+      <h3>Farben, Zellen, Gebäude</h3>
+      <p>Die Farbe einer Zelle zeigt ihren Wert in bis zu fünf Stufen: Anteile in Stufen zu 20 Prozentpunkten, Einwohner und Durchschnittsalter in Fünfteln aller Zellen. Zellen mit weniger als zehn Personen bzw. Wohnungen sind grau. In 3D stehen nur die Gebäude, die Zellen bleiben flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist die Objekthöhe aus dem Kataster (ALKIS, über dem Gelände, bei 50.356 von 52.309 Gebäuden), sonst die Geschosszahl mal 3 m (73 Gebäude) oder ein Ersatzwert von 3 m (1.880, meist Nebengebäude); das Popup nennt die Herkunft je Gebäude. Dächer sind flach dargestellt.</p>
     </div>
   </div>
 </section>

@@ -131,14 +131,43 @@ async function startseite(basis, art) {
   const fragen = await page.$$eval(".erzaehlung .frage", (l) => l.map((f) => +f.dataset.schritt));
   pruef(fragen.filter((s) => s >= 1 && s <= 7).length === 7, `sieben Fragen vorhanden (Schritte ${fragen.join(",")})`);
   let scrollOk = true;
+  // keine Zellsäulen (07.11.): je Frage zellen-3d aus und 0 gerendert, Zellen flach (zellen-2d) und von oben
+  const flach = [];
+  const zellen = () => page.evaluate(() => { const m = window.KIEZ_KARTE, n = (l) => m.queryRenderedFeatures({ layers: [l] }).length;
+    return { s3: m.getLayoutProperty("zellen-3d", "visibility"), n3: n("zellen-3d"), s2: m.getLayoutProperty("zellen-2d", "visibility"), n2: n("zellen-2d"), p: Math.round(m.getPitch()) }; });
+  const ruhe = () => page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {}).then(() => page.waitForTimeout(300));
   for (const s of [1, 3, 5, 7]) {
     await page.locator(`.frage[data-schritt="${s}"]`).scrollIntoViewIfNeeded();
     await page.evaluate((s) => document.querySelector(`.frage[data-schritt="${s}"]`).scrollIntoView({ block: "center" }), s);
     const ok = await page.waitForFunction((s) => document.querySelector(`.frage[data-schritt="${s}"]`).classList.contains("ist-aktiv"), s, { timeout: 8000 }).then(() => true, () => false);
     scrollOk = scrollOk && ok;
     if (!ok) console.log(`     Schritt ${s} wurde beim Scrollen nicht aktiv`);
+    await ruhe();
+    flach.push([s, await zellen()]);
   }
   pruef(scrollOk, "Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv");
+  pruef(flach.every(([, z]) => z.s3 === "none" && z.n3 === 0 && z.s2 === "visible" && z.n2 > 0 && z.p === 0),
+    `keine Zellsäulen: ${flach.map(([s, z]) => `Frage ${s} zellen-3d ${z.s3}/${z.n3}, flach ${z.n2}, Neigung ${z.p}`).join("; ")}`);
+  // eine flache Zelle anklicken öffnet ihr Fenster
+  const punkt = await page.evaluate(() => { const m = window.KIEZ_KARTE, r = m.getContainer().getBoundingClientRect();
+    for (let y = 120; y < r.height - 80; y += 17) for (let x = 80; x < r.width - 120; x += 19) {
+      if (m.queryRenderedFeatures([x, y], { layers: ["zellen-2d"] }).length && document.elementFromPoint(r.left + x, r.top + y) === m.getCanvas()) return { x: r.left + x, y: r.top + y };
+    }
+    return null; });
+  if (punkt) { await page.mouse.click(punkt.x, punkt.y); await page.waitForTimeout(400); }
+  const fenster = await page.$eval(".maplibregl-popup", (e) => e.textContent).catch(() => "");
+  pruef(punkt && /Gitterzelle/.test(fenster), `Klick auf eine flache Zelle öffnet ihr Fenster (${fenster.slice(0, 40)}…)`);
+  await page.evaluate(() => document.querySelectorAll(".maplibregl-popup").forEach((e) => e.remove()));
+  // „3D-Häuser“: Gebäude als Körper, keine Zellen darunter, keine Säulen; aus: wieder von oben
+  await page.check("#dreid", { force: true });
+  await page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 20000 }).catch(() => {});
+  await ruhe();
+  const h3 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, p: Math.round(m.getPitch()) }; });
+  const z3 = await zellen();
+  await page.uncheck("#dreid", { force: true }); await ruhe();
+  const z0 = await zellen();
+  pruef(h3.n > 0 && h3.p >= 45 && z3.s3 === "none" && z3.n3 === 0 && z0.p === 0 && z0.n3 === 0,
+    `„3D-Häuser“: ${h3.n} Häuser, Neigung ${h3.p}, zellen-3d ${z3.s3}/${z3.n3}; aus: Neigung ${z0.p}`);
   // Register-Sortierung
   const sorten = await page.$$eval('#sortierung input[name="sort"]', (l) => l.map((i) => i.value));
   const ersteJe = {};

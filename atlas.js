@@ -40,11 +40,9 @@ setze("zellen-stadt", fmt.format(K.stadt.zellen));
   });
 })();
 
-// ---------- Themen der Karte (Themen, Klassen, Farben, Höhen aus themen.js)
+// ---------- Themen der Karte (Themen, Klassen, Farben aus themen.js)
 var STUFEN = T.STUFEN, THEMEN = T.THEMEN, THEMA = T.THEMA, KLASSEN = T.KLASSEN;
 function werte(feld) { return Z.features.map(function (f) { return f.properties[feld]; }).filter(function (v) { return v != null && !isNaN(v); }).sort(function (a, b) { return a - b; }); }
-var hk = { k: 0 };                                 // Höhenfaktor, wird animiert
-function grund(t) { return T.hoehe(t, { faktor: hk.k }); }
 var farbe = T.farbe;
 
 // ---------- Kennzahlen für die Fragen (alles live)
@@ -147,6 +145,8 @@ var map = new maplibregl.Map({
       { id: "dop", type: "raster", source: "dop", layout: { visibility: "none" } },
       { id: "teile-flaeche", type: "fill", source: "teile", paint: { "fill-color": ["get", "farbe"], "fill-opacity": 0.72, "fill-opacity-transition": { duration: 700 } } },
       { id: "zellen-flach", type: "fill", source: "zellen", layout: { visibility: "none" }, paint: { "fill-color": "rgba(255,255,255,0.35)", "fill-outline-color": "rgba(19,33,42,0.55)" } },
+      { id: "zellen-2d", type: "fill", source: "zellen", layout: { visibility: "none" }, paint: { "fill-color": STUFEN[2], "fill-opacity": 0.85 } },
+      // zellen-3d: bleibt als Ebene bestehen, ist aber immer aus; keine Zellsäulen, 3D zeigt nur Häuser (Andre 07.11.)
       { id: "zellen-3d", type: "fill-extrusion", source: "zellen", layout: { visibility: "none" },
         paint: { "fill-extrusion-color": STUFEN[2], "fill-extrusion-height": 0, "fill-extrusion-opacity": 0.94, "fill-extrusion-vertical-gradient": true } },
       { id: "gebaeude2d", type: "fill", source: "gebaeude", minzoom: 14, paint: { "fill-color": "#24363b", "fill-opacity": 0.4 } },
@@ -184,25 +184,17 @@ var S = { nr: "", thema: "stadtteile", luftbild: false, geb3d: false, grenze: fa
 var bereit = false, wartend = null;
 function geladen() { return bereit; }
 
-function setzeHoehe() { var t = THEMA[S.thema]; if (t && t.id !== "stadtteile") map.setPaintProperty("zellen-3d", "fill-extrusion-height", grund(t)); }
-var hoeheTween = null;
-function hoeheAuf(ziel, dauer) {
-  if (hoeheTween) hoeheTween.kill();
-  if (RUHIG || SCHMAL || !window.gsap) { hk.k = ziel; setzeHoehe(); return; }   // Handy: ohne Höhen-Tween, spart Rechenlast
-  hoeheTween = gsap.to(hk, { k: ziel, duration: dauer, ease: "expo.out", onUpdate: setzeHoehe });
-}
-
-function themaAnwenden(id, alt) {
+function themaAnwenden(id) {
   var t = THEMA[id], gitter = id !== "stadtteile";
   map.setPaintProperty("teile-flaeche", "fill-opacity", gitter || S.grenze ? 0 : 0.72);
   zeigeNummern(!gitter && !S.grenze);
-  var dreiZellen = gitter && !S.geb3d && !S.grenze;
-  map.setLayoutProperty("zellen-3d", "visibility", dreiZellen ? "visible" : "none");
+  // keine Zellsäulen mehr: Zellen liegen flach, die Farbe trägt den Wert; 3D gilt nur den Gebäuden
+  map.setLayoutProperty("zellen-3d", "visibility", "none");
+  map.setLayoutProperty("zellen-2d", "visibility", gitter && !S.geb3d && !S.grenze ? "visible" : "none");
   map.setLayoutProperty("zellen-flach", "visibility", S.grenze ? "visible" : "none");
   if (gitter) {
-    map.setFilter("zellen-3d", ["!=", ["get", id], null]);
-    map.setPaintProperty("zellen-3d", "fill-extrusion-color", farbe(t));
-    if (id !== alt || hk.k < 0.99) { hk.k = 0; setzeHoehe(); hoeheAuf(1, 1.1); }
+    map.setFilter("zellen-2d", ["!=", ["get", id], null]);
+    map.setPaintProperty("zellen-2d", "fill-color", farbe(t));
   }
   legende(t);
   document.querySelectorAll('#thema input').forEach(function (r) { r.checked = r.value === id; });
@@ -253,7 +245,7 @@ function setzeGebaeude3d(an) {
   map.setLayoutProperty("gebaeude3d", "visibility", an ? "visible" : "none");
   map.setLayoutProperty("gebaeude2d", "visibility", an ? "none" : "visible");
   if (an) gebaeudeLaden(S.nr);
-  themaAnwenden(S.thema, S.thema);
+  themaAnwenden(S.thema);
 }
 function setzeGrenze(an) {
   S.grenze = an;
@@ -263,12 +255,11 @@ function setzeGrenze(an) {
 // zustand({nr, thema, luftbild, geb3d, grenze, kamera, pitch, bearing})
 function zustand(z) {
   if (!bereit) { wartend = z; return; }
-  var alt = S.thema;
   if ("grenze" in z) setzeGrenze(!!z.grenze);
   if ("luftbild" in z) setzeLuftbild(!!z.luftbild);
   if ("nr" in z) waehle(z.nr);
   if ("geb3d" in z && z.geb3d !== S.geb3d) { S.thema = z.thema || S.thema; setzeGebaeude3d(!!z.geb3d); }
-  if (z.thema) { S.thema = z.thema; themaAnwenden(z.thema, alt); }
+  if (z.thema) { S.thema = z.thema; themaAnwenden(z.thema); }
   if (z.kamera) kamera(z.kamera, z);
   status();
 }
@@ -301,13 +292,13 @@ function legende(t) {
   }
   var s = KLASSEN[t.id], st = el("div", "stufen");
   st.setAttribute("aria-hidden", "true");
-  STUFEN.slice(0, s.grenzen.length + 1).forEach(function (f, i, arr) { var x = el("span"); x.style.background = f; x.style.height = (30 + 70 * (i + 1) / arr.length) + "%"; st.appendChild(x); });
+  STUFEN.slice(0, s.grenzen.length + 1).forEach(function (f) { var x = el("span"); x.style.background = f; x.style.height = "100%"; st.appendChild(x); });
   L.appendChild(st);
   var m = el("div", "marken"), r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
   m.appendChild(el("span", null, r(s.min))); s.grenzen.forEach(function (g) { m.appendChild(el("span", null, r(g))); }); m.appendChild(el("span", null, r(s.max)));
   L.appendChild(m);
   if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode("Weniger als 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen") + ", Wert zu unscharf")); L.appendChild(g); }
-  L.appendChild(el("p", "legende__q", "Farbe und Höhe zeigen denselben Wert. " + (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
+  L.appendChild(el("p", "legende__q", (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
 }
 
 // ---------- Werkzeugleiste
@@ -319,7 +310,6 @@ THEMEN.forEach(function (t) {
 });
 themaBox.addEventListener("change", function (e) {
   var id = e.target.value, z = { thema: id, grenze: false };
-  if (id !== "stadtteile" && map.getPitch() < 20 && !S.geb3d) { z.kamera = S.nr ? "teil" : "stadt"; z.pitch = 50; z.bearing = -14; }
   zustand(z);
 });
 document.getElementById("luftbild").addEventListener("change", function (e) { zustand({ luftbild: e.target.checked }); });
@@ -328,6 +318,8 @@ document.getElementById("dreid").addEventListener("change", function (e) {
   if (an && !S.nr) z.nr = A.FRAGE.altbau;
   if (an) { z.kamera = "teil"; z.pitch = 58; z.bearing = -20; z.zoomPlus = 0.6; z.maxZoom = 16; }
   zustand(z);
+  // 3D aus: wieder von oben, die Zellen liegen flach (wie auf Karte und Bauzeiten)
+  if (!an && map.getPitch() > 0) map.jumpTo({ pitch: 0, bearing: 0 });
 });
 
 // ---------- Klicks in der Karte
@@ -345,7 +337,7 @@ map.on("click", function (e) {
       "<div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
     return;
   }
-  var zl = ["zellen-3d", "zellen-flach"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
+  var zl = ["zellen-2d", "zellen-flach"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var c = zl.length ? map.queryRenderedFeatures(e.point, { layers: zl }) : [];
   if (c.length) {
     var p = c[0].properties, n = function (k) { var v = p[k]; return (v === undefined || v === "null" || v === null) ? null : Number(v); };
@@ -388,18 +380,19 @@ map.on("load", function () {
 // =====================================================================
 // Fragen: Schritte steuern die Karte
 // =====================================================================
+// Zellen liegen flach (keine Säulen, Andre 07.11.): die Fragen zeigen die Karte von oben, schräg nur mit 3D-Häusern
 var SCHRITTE = {
   0: { nr: "", thema: "stadtteile", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 0, bearing: 0 },
-  1: { nr: "", thema: "ew", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 52, bearing: -16 },
-  2: { nr: A.FRAGE.alt, thema: "d_alter", grenze: false, geb3d: false, kamera: "stadt", pitch: 48, bearing: 12 },
-  3: { nr: A.FRAGE.kind, thema: "q_u18", grenze: false, geb3d: false, kamera: "teil", pitch: 50, bearing: -24, maxZoom: 14 },
-  4: { nr: A.FRAGE.altbau, thema: "q_v1949", grenze: false, geb3d: false, luftbild: false, kamera: "teil", pitch: 50, bearing: 18, maxZoom: 14.5 },
-  5: { nr: A.FRAGE.fern, thema: "q_fern", grenze: false, geb3d: false, kamera: "teil", pitch: 50, bearing: -10, maxZoom: 14 },
+  1: { nr: "", thema: "ew", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 0, bearing: 0 },
+  2: { nr: A.FRAGE.alt, thema: "d_alter", grenze: false, geb3d: false, kamera: "stadt", pitch: 0, bearing: 0 },
+  3: { nr: A.FRAGE.kind, thema: "q_u18", grenze: false, geb3d: false, kamera: "teil", pitch: 0, bearing: 0, maxZoom: 14 },
+  4: { nr: A.FRAGE.altbau, thema: "q_v1949", grenze: false, geb3d: false, luftbild: false, kamera: "teil", pitch: 0, bearing: 0, maxZoom: 14.5 },
+  5: { nr: A.FRAGE.fern, thema: "q_fern", grenze: false, geb3d: false, kamera: "teil", pitch: 0, bearing: 0, maxZoom: 14 },
   6: { nr: GZ ? GZ.p.st : "", thema: "stadtteile", grenze: true, geb3d: false, luftbild: false, kamera: "zelle", pitch: 0, bearing: 0 },
-  7: { nr: "", thema: "ew", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 45, bearing: -8 },
-  8: { nr: "", thema: "q_u18", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 48, bearing: -12 },
-  9: { nr: "", thema: "q_v1949", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 48, bearing: 14 },
-  10: { nr: "", thema: "ew", grenze: false, geb3d: false, kamera: "stadt", pitch: 52, bearing: -16 }
+  7: { nr: "", thema: "ew", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 0, bearing: 0 },
+  8: { nr: "", thema: "q_u18", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 0, bearing: 0 },
+  9: { nr: "", thema: "q_v1949", grenze: false, geb3d: false, luftbild: false, kamera: "stadt", pitch: 0, bearing: 0 },
+  10: { nr: "", thema: "ew", grenze: false, geb3d: false, kamera: "stadt", pitch: 0, bearing: 0 }
 };
 var aktiv = -1;
 function schritt(i, zwingen) {
@@ -442,7 +435,7 @@ function scrollSteuerung() {
   });
 }
 
-// ---------- Ruhezustand: die schräge Stadt dreht sich langsam, wenn niemand etwas tut
+// ---------- Ruhezustand: die schräge Stadt (seit 07.11. nur mit 3D-Häusern) dreht sich langsam, wenn niemand etwas tut
 (function () {
   if (RUHIG || !FEIN || !window.gsap) return;
   var letzte = performance.now(), basis = null, sichtbar = true, t0 = 0;
@@ -561,7 +554,7 @@ sortBox.addEventListener("change", function (e) { register(e.target.value); });
 register("nr");
 zeigeZahlen("");
 document.getElementById("sb-karte").addEventListener("click", function () {
-  aktiv = 10; zustand({ nr: S.nr, thema: S.thema === "stadtteile" ? "ew" : S.thema, grenze: false, kamera: S.nr ? "teil" : "stadt", pitch: 50, bearing: -14, maxZoom: 15 });
+  aktiv = 10; zustand({ nr: S.nr, thema: S.thema === "stadtteile" ? "ew" : S.thema, grenze: false, kamera: S.nr ? "teil" : "stadt", pitch: 0, bearing: 0, maxZoom: 15 });
   document.getElementById("buehne").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth" });
   document.getElementById("frage-10").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "center" });
 });

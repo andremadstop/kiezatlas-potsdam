@@ -3,6 +3,13 @@
 Jeder veröffentlichte Stand bekommt einen Tag `stand-JJJJ-MM-TT` (bei mehreren am Tag mit Buchstabe) und steht hier.
 Die Seiten nennen den Stand im Fuß. Entscheidungen: `docs/entscheidungen.md`; Prüfstände: `belege/pruefstand-*`.
 
+## 2026-11-07 (kommender Stand, noch ohne Tag)
+
+- 3D heißt Häuser: keine Zellsäulen mehr auf Startseite, freier Karte und Bauzeiten; die Zellen liegen flach, die
+  Farbe trägt den Wert. Der Schalter „3D-Häuser“ führt mit einem Klick zu Gebäuden als Körper, auf den Bauzeiten
+  dazu der Knopf „Häuser in 3D ansehen“. Zellmosaik leiser, Fragen der Startseite von oben (Entscheidung A18,
+  Beleg `belege/3D_haeuser_20261107.md`).
+
 ## stand-2026-11-06
 
 - Gebäudehöhe in 3D aus der ALKIS-Objekthöhe statt Geschosse × 3 m, Herkunft je Gebäude im Fenster; 3D-Gebäude in
