@@ -180,7 +180,9 @@ var nummern = ST.features.map(function (f) {
 function zeigeNummern(an) { nummern.forEach(function (m) { if (an) m.addTo(map); else m.remove(); }); }
 
 // ---------- Zustand: eine Funktion für Fragen und freie Bedienung
-var S = { nr: "", thema: "stadtteile", luftbild: false, geb3d: false, grenze: false };
+// selbst: 3D-Häuser hat der Nutzer selbst eingeschaltet (Schalter oder Knopf in Frage 4); dann stellen die Fragen
+// beim Weiterlesen nur noch das Thema ein, nicht Stadtteil, Kamera und 3D (wie auf den Bauzeiten, H3)
+var S = { nr: "", thema: "stadtteile", luftbild: false, geb3d: false, grenze: false, selbst: false };
 var bereit = false, wartend = null;
 function geladen() { return bereit; }
 
@@ -242,6 +244,7 @@ function setzeLuftbild(an) {
 }
 function setzeGebaeude3d(an) {
   S.geb3d = an; document.getElementById("dreid").checked = an;
+  if (!an) S.selbst = false;
   map.setLayoutProperty("gebaeude3d", "visibility", an ? "visible" : "none");
   map.setLayoutProperty("gebaeude2d", "visibility", an ? "none" : "visible");
   if (an) gebaeudeLaden(S.nr);
@@ -318,6 +321,7 @@ document.getElementById("dreid").addEventListener("change", function (e) {
   if (an && !S.nr) z.nr = A.FRAGE.altbau;
   if (an) { z.kamera = "teil"; z.pitch = 58; z.bearing = -20; z.zoomPlus = 0.6; z.maxZoom = 16; }
   zustand(z);
+  S.selbst = an;
   // 3D aus: wieder von oben, die Zellen liegen flach (wie auf Karte und Bauzeiten)
   if (!an && map.getPitch() > 0) map.jumpTo({ pitch: 0, bearing: 0 });
 });
@@ -325,12 +329,13 @@ document.getElementById("dreid").addEventListener("change", function (e) {
 // ---------- Klicks in der Karte
 function zeile(t, a) { return "<tr><td>" + t + "</td><td>" + a + "</td></tr>"; }
 function zz(v) { return v == null ? "k. A." : fmt.format(v); }
+// focusAfterOpen aus (wie auf den Bauzeiten): der Fokus auf den Schließknopf scrollte die Seite, die Geschichte sprang
 map.on("click", function (e) {
   var lay = ["gebaeude3d", "gebaeude2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var g = map.queryRenderedFeatures(e.point, { layers: lay });
   if (g.length) {
     var gp = g[0].properties;
-    new maplibregl.Popup({ maxWidth: "270px" }).setLngLat(e.lngLat).setHTML(
+    new maplibregl.Popup({ maxWidth: "270px", focusAfterOpen: false }).setLngLat(e.lngLat).setHTML(
       "<b>" + esc(gp.f || "Gebäude") + "</b><table class='pop-tab'>" +
       zeile("Geschosse", gp.gs == null || gp.gs === "null" ? "k. A." : esc(gp.gs)) +
       zeile("Höhe", fmt1.format(gp.h) + " m") + "</table>" +
@@ -341,7 +346,7 @@ map.on("click", function (e) {
   var c = zl.length ? map.queryRenderedFeatures(e.point, { layers: zl }) : [];
   if (c.length) {
     var p = c[0].properties, n = function (k) { var v = p[k]; return (v === undefined || v === "null" || v === null) ? null : Number(v); };
-    new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(e.lngLat).setHTML(
+    new maplibregl.Popup({ maxWidth: "290px", focusAfterOpen: false }).setLngLat(e.lngLat).setHTML(
       "<b>Gitterzelle 100 × 100 m</b><br>" + esc(p.st + " " + name(p.st)) + "<table class='pop-tab'>" +
       zeile("Einwohner", zz(n("ew"))) + zeile("Durchschnittsalter", n("d_alter") == null ? "k. A." : fmt1.format(n("d_alter"))) +
       zeile("unter 18", proz(n("q_u18"))) + zeile("65 und älter", proz(n("q_65p"))) + zeile("Wohnungen", zz(n("w_ges"))) +
@@ -399,7 +404,10 @@ function schritt(i, zwingen) {
   if (i === aktiv && !zwingen) return;
   aktiv = i;
   document.querySelectorAll(".erzaehlung .frage").forEach(function (f) { f.classList.toggle("ist-aktiv", +f.dataset.schritt === i); });
-  if (SCHRITTE[i]) zustand(Object.assign({}, SCHRITTE[i]));
+  if (!SCHRITTE[i]) return;
+  // 3D-Häuser selbst eingeschaltet: Häuser, Stadtteil und Kamera bleiben, die Frage färbt nur die Zellen
+  if (S.selbst) { zustand({ thema: SCHRITTE[i].thema, grenze: false }); return; }
+  zustand(Object.assign({}, SCHRITTE[i]));
 }
 A.schritt = schritt;
 document.querySelectorAll("[data-zeige]").forEach(function (b) {
@@ -408,6 +416,7 @@ document.querySelectorAll("[data-zeige]").forEach(function (b) {
     if (b.dataset.gebaeude) { z.geb3d = true; z.pitch = 58; z.bearing = -20; z.zoomPlus = 0.8; z.maxZoom = 15.5; }
     if (b.dataset.luftbild) { z.luftbild = !S.luftbild; delete z.kamera; }
     aktiv = i; zustand(z);
+    S.selbst = !!b.dataset.gebaeude;
     if (SCHMAL) document.getElementById("buehne").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "start" });
   });
 });

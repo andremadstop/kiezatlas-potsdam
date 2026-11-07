@@ -110,6 +110,9 @@ html.kopf-weg .werkzeug{top:12px}
 .schalter{display:flex;gap:4px}
 .chip{position:relative;display:inline-flex;align-items:center;min-height:34px;padding:0 11px;font:500 .875rem/1 var(--f-text);background:rgba(250,251,248,.95);border:1px solid var(--line);cursor:pointer;white-space:nowrap;overflow:hidden;isolation:isolate;transition:color .3s var(--ease),border-color .3s}
 .chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+/* Leiste in der klebenden Bühne: der Fokus beim Klick scrollt die Seite nicht. Oben liegt sie sonst in scroll-padding-top,
+   der Browser schob die Seite um rund 470 px und die Geschichte sprang eine Frage zurück (Gegenprobe 2, 07.11.) */
+.buehne .werkzeug .chip input{scroll-margin-top:calc(-8px - var(--kopf))}
 .chip span{position:relative}
 .chip::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ink);transform-origin:50% 100%;scale:1 0;transition:scale .4s var(--ease)}
 .chip:has(input:checked){color:#fff;border-color:var(--ink)}
