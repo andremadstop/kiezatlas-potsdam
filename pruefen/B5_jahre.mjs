@@ -662,9 +662,10 @@ if (!NUR_RESPONSIV) {
       await zeile("72"); await v.page.click("#j-sb-karte");
       const b = await haeuser(v.page, v.geladen);
       const t = await v.page.evaluate(() => { const r = document.querySelector("#frage-8 .frage__titel").getBoundingClientRect(), u = document.getElementById("buehne").getBoundingClientRect(); return { oben: r.top, unten: u.bottom, h: innerHeight }; });
-      const titelOk = breite > 860 || (t.oben >= t.unten && t.oben < t.h);
+      // Lücke unter der Bühne: main 38 px, vor der Gegenprobe 126 px (scroll-padding-top doppelt), jetzt 30 px
+      const titelOk = breite > 860 || (t.oben >= t.unten && t.oben - t.unten < 40 && t.oben < t.h);
       pruef(a.im_bild[0] === "13" && a.im_bild.length <= 2 && a.n > 0 && b.z >= 14 && b.p >= 45 && b.im_bild.includes("72") && b.n > 0 && titelOk && v.fehler.length === 0,
-        `${breite} px: Knopf nach Wahl von 13 fliegt hin (${a.n} Körper aus ${a.im_bild.join(", ")}); „Auf der Karte zeigen“ 72 bei 3D: Zoom ${b.z.toFixed(1)}, Neigung ${Math.round(b.p)}, ${b.n} Körper${breite > 860 ? "" : `, Titel „Selbst erkunden“ bei ${Math.round(t.oben)} unter der Bühne (${Math.round(t.unten)})`}`);
+        `${breite} px: Knopf nach Wahl von 13 fliegt hin (${a.n} Körper aus ${a.im_bild.join(", ")}); „Auf der Karte zeigen“ 72 bei 3D: Zoom ${b.z.toFixed(1)}, Neigung ${Math.round(b.p)}, ${b.n} Körper${breite > 860 ? "" : `, Titel „Selbst erkunden“ bei ${Math.round(t.oben)} unter der Bühne (${Math.round(t.unten)}, Lücke ${Math.round(t.oben - t.unten)} px, höchstens 40)`}`);
       await v.ctx.close();
     }
     // (d) 3D über die Adresse, Überblick (Zoom um 10): keine Zellsäulen

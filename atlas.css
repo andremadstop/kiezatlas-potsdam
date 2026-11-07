@@ -335,6 +335,12 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .buehne .werkzeug{left:0;right:0;top:calc(var(--kopf) + 6px);padding:0 calc(10px + var(--sa-rechts)) 4px 10px}
   html.kopf-weg .buehne .werkzeug{top:6px}
 }
+/* Nebeneinander, schmal oder niedrig: die Bühne beginnt schon beim Laden an der Oberkante, unter der Kopfleiste (wie danach
+   beim Kleben). Sonst lagen die Chips bis zum ersten Scrollen eine Kopfleistenhöhe zu tief und die Knöpfe unten
+   abgeschnitten (Gegenprobe 07.11.). Gestapelt setzt es unten zurück. */
+@media (max-width:860px),(max-height:500px){
+  .buehne{margin-top:calc(-1 * var(--kopf))}
+}
 /* Legende kompakt: schmal und bei niedriger Höhe (Handy quer) */
 @media (max-width:860px),(max-height:500px){
   .legende{left:8px;bottom:34px;width:auto;max-width:min(190px,calc(100% - 92px));padding:8px 10px 6px}
@@ -349,7 +355,7 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .erzaehlung{display:block}
   .auftakt.frage{min-height:auto;padding:32px var(--gut) 36px}
   .lede{max-width:none}
-  .buehne{position:sticky;top:0;height:60svh;border-left:0;border-top:1px solid var(--line);border-bottom:1px solid var(--ink);z-index:5}
+  .buehne{position:sticky;top:0;height:60svh;margin-top:0;border-left:0;border-top:1px solid var(--line);border-bottom:1px solid var(--ink);z-index:5}
   .fragen{padding:0 var(--gut) 20svh}
   .frage{min-height:auto;padding:9svh 0 26svh 18px}
   .frage::before{top:9svh}

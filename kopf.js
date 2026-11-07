@@ -20,8 +20,10 @@ window.KIEZ_GESTAPELT = "(max-width:599px),(max-width:699px) and (orientation:po
     else if (y < merk - SCHWELLE) { setze(false); merk = y; }
   }
   if (kartenseite) {
+    // Nur das Blatt selbst (nebeneinander) bzw. sein Inhalt (gestapelt) zählt; verschachtelte Listen (#treffer, #raeume)
+    // haben eigene Scrollstände und schalteten sonst die Kopfleiste mitten im Abwärtsscrollen zurück (Gegenprobe 07.11.)
     document.addEventListener("scroll", function (e) {
-      var t = e.target; if (t && t.nodeType === 1 && t.closest("#seite")) lage(t.scrollTop);
+      var t = e.target; if (t && (t.id === "seite" || t.id === "seite-inhalt")) lage(t.scrollTop);
     }, { capture: true, passive: true });
     // Blatt zu (Handy): die Kopfleiste ist wieder da
     var griff = document.getElementById("seite-griff");

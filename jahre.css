@@ -151,6 +151,9 @@
 .kopf-weg .jahreseite .maplibregl-ctrl-top-right{top:58px}
 .jahreseite .maplibregl-ctrl-top-right{transition:top .5s var(--ease)}
 .j-leiste{padding-bottom:calc(10px + var(--sa-unten))}
+/* Nebeneinander: die Bühne beginnt schon beim Laden an der Oberkante, unter der Kopfleiste (wie danach beim Kleben).
+   Sonst lagen Chips und Knöpfe bis zum ersten Scrollen eine Kopfleistenhöhe zu tief, quer mitten im Bild (Gegenprobe 07.11.) */
+.j-erzaehlung .j-buehne{margin-top:calc(-1 * var(--kopf))}
 
 /* ---------- Breiten ---------- */
 @media (max-width:1100px){
@@ -179,12 +182,18 @@
 /* Gestapelt (Handy hoch, gleiche Abfrage wie window.KIEZ_GESTAPELT): Bühne klebt oben, die Kopfleiste liegt
    darüber und klappt beim Lesen ein; die Bühne behält ihre Höhe (kein Neuzeichnen beim Ein- und Ausklappen) */
 @media (max-width:599px),(max-width:699px) and (orientation:portrait){
-  .j-erzaehlung .j-buehne{top:0;height:68svh}
-  .jahreseite .maplibregl-ctrl-top-right{top:calc(var(--kopf) + 54px)}
-  .kopf-weg .jahreseite .maplibregl-ctrl-top-right{top:54px}
+  .j-erzaehlung .j-buehne{top:0;height:68svh;margin-top:0}
   .j-leiste{padding-bottom:6px}
   /* „Auf der Karte zeigen“ scrollt zu „Selbst erkunden“: Titel unter der klebenden Bühne, nicht dahinter */
-  .j-erzaehlung #frage-8{scroll-margin-top:calc(68svh - 9svh)}   /* 9svh: Innenabstand der Frage oben */
+  /* 9svh: Innenabstand der Frage oben; scroll-padding-top (Kopfleiste + 8 px) zieht der Browser selbst dazu */
+  .j-erzaehlung #frage-8{scroll-margin-top:calc(68svh - 9svh - var(--kopf) - 8px)}
+}
+/* Handy hoch und niedrig: Kartenknöpfe unten an der Karte und in einer Zeile, immer über dem Quellen-„i“. Oben an der
+   Kopfleiste rutschten sie mit ihr nach unten und lagen dann unter dem „i“, der Leiste oder der offenen Legende (Gegenprobe 07.11.) */
+@media (max-width:599px),(max-width:699px) and (orientation:portrait),(max-height:500px){
+  .jahreseite .maplibregl-ctrl-top-right,.kopf-weg .jahreseite .maplibregl-ctrl-top-right{top:auto;bottom:62px;display:flex;flex-direction:row-reverse;align-items:flex-end}
+  .jahreseite .maplibregl-ctrl-top-right .maplibregl-ctrl-group{display:flex}
+  .jahreseite .maplibregl-ctrl-top-right .maplibregl-ctrl-group button+button{border-top:0;border-left:1px solid #ddd}
 }
 /* Niedrig (Handy quer): Leiste so knapp wie am Handy hoch */
 @media (max-height:500px){
@@ -194,6 +203,11 @@
   .j-klasse{font-size:.6875rem;min-height:40px}
   .j-klasse__balken{height:16px}
   .j-regler{height:22px;margin:0 0 2px}
+  /* Offene Legende als Ebene über der Karte, links neben den Knöpfen; in der Leiste drückte sie die Karte auf 180 von 390 px
+     (Gegenprobe 07.11.). Höhe bis unter die Chips (100 % = Höhe der Leiste), Rest scrollt; die Quelle steht im „i“ */
+  .j-leiste__fuss{position:absolute;z-index:3;left:calc(8px + var(--sa-links));bottom:calc(100% + 34px);max-width:calc(100% - 240px - var(--sa-links) - var(--sa-rechts));max-height:calc(100svh - 100% - 96px - var(--kopf));overflow:auto;overscroll-behavior:contain;padding:6px 10px;background:rgba(250,251,248,.95);border:1px solid var(--line)}
+  html.kopf-weg .j-leiste__fuss{max-height:calc(100svh - 100% - 96px)}
+  .j-leiste__fuss .j-legende__quelle{display:none}
 }
 /* Legende der Leiste einklappbar (Handy: eingeklappt, sonst nahm die Leiste so viel Höhe wie die Karte) */
 .j-legende-knopf{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border:1px solid var(--line);background:none;font:500 .8125rem/1 var(--f-text);color:var(--ink);cursor:pointer;border-radius:0;white-space:nowrap}
