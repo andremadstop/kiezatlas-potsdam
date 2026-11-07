@@ -557,7 +557,8 @@ console.log("\nHash und Bewegung");
           // Gegenprobe 07.11.: Fragen, die beim Scrollen zur Bühne vorbeiziehen, bekommen die Markierung, die Karte bleibt
           await v.page.waitForTimeout(1000);
           const m = await v.page.evaluate(() => ({ a: (document.querySelector("[data-schritt].ist-aktiv") || {}).getAttribute?.("data-schritt") ?? null, s: window.KIEZ_JAHRE.S.ansicht }));
-          pruef(m.a !== null && m.s === "ueberblick", `375 px, Knopf: Markierung bei Frage ${m.a}, Karte bleibt beim Überblick (${m.s})`);
+          // nur eine Frage mit Spanne (1 bis 4) zeigt, dass die Karte stillhält: bei 0, 5, 6, 7 ist „ueberblick“ ohnehin ihr Sollwert
+          pruef(["1", "2", "3", "4"].includes(m.a) && m.s === "ueberblick", `375 px, Knopf: Markierung bei Frage ${m.a} (Spanne), Karte bleibt beim Überblick (${m.s})`);
         }
         if (breite === 1440 && wie === "Schalter") {
           // (b) Mausrad über der Karte scrollt die Seite (DESIGN.md, Desktop-Mausrad); die Geschichte blättert weiter,

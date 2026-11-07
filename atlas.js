@@ -190,9 +190,11 @@ function themaAnwenden(id) {
   var t = THEMA[id], gitter = id !== "stadtteile";
   map.setPaintProperty("teile-flaeche", "fill-opacity", gitter || S.grenze ? 0 : 0.72);
   zeigeNummern(!gitter && !S.grenze);
-  // keine Zellsäulen mehr: Zellen liegen flach, die Farbe trägt den Wert; 3D gilt nur den Gebäuden
+  // keine Zellsäulen mehr: Zellen liegen flach, die Farbe trägt den Wert; 3D gilt nur den Gebäuden. Mit 3D-Häusern
+  // bleiben die Zellen darunter sichtbar, heller (0,55 wie auf der freien Karte), damit Legende und Fragen stimmen
   map.setLayoutProperty("zellen-3d", "visibility", "none");
-  map.setLayoutProperty("zellen-2d", "visibility", gitter && !S.geb3d && !S.grenze ? "visible" : "none");
+  map.setLayoutProperty("zellen-2d", "visibility", gitter && !S.grenze ? "visible" : "none");
+  map.setPaintProperty("zellen-2d", "fill-opacity", S.geb3d ? 0.55 : 0.85);
   map.setLayoutProperty("zellen-flach", "visibility", S.grenze ? "visible" : "none");
   if (gitter) {
     map.setFilter("zellen-2d", ["!=", ["get", id], null]);
@@ -206,13 +208,30 @@ function kamera(art, opt) {
   opt = opt || {};
   var pad = SCHMAL ? { top: 70, bottom: 70, left: 16, right: 16 } : { top: 90, bottom: 60, left: 40, right: 60 };
   var pitch = opt.pitch != null ? opt.pitch : 0, bearing = opt.bearing || 0, ziel;
-  if (art === "stadt") { ziel = map.cameraForBounds(GANZ, { padding: pad, bearing: bearing }); if (pitch > 20) ziel.zoom += SCHMAL ? 0.35 : 0.55; }
+  if (art === "stadt") ziel = map.cameraForBounds(GANZ, { padding: pad, bearing: bearing });
+  else if (art === "haus" && S.nr) ziel = { center: opt.mitte || dichteMitte(S.nr) || [TEIL[S.nr].properties.lx, TEIL[S.nr].properties.ly], zoom: SCHMAL ? HAUS_ZOOM_SCHMAL : HAUS_ZOOM };
   else if (art === "teil" && S.nr) { ziel = map.cameraForBounds(umriss(TEIL[S.nr]), { padding: pad, maxZoom: opt.maxZoom || 15, bearing: bearing }); }
   else if (art === "zelle" && GZ) ziel = { center: GZ.c, zoom: SCHMAL ? 15.6 : 16.4 };
   if (!ziel) return;
   if (opt.zoomPlus) ziel.zoom += opt.zoomPlus;
   var cam = { center: ziel.center, zoom: ziel.zoom, pitch: pitch, bearing: bearing };
   if (RUHIG) map.jumpTo(cam); else map.easeTo(Object.assign(cam, { duration: opt.dauer || 1500, easing: function (x) { return 1 - Math.pow(1 - x, 4); } }));
+}
+
+// 3D-Häuser wie auf Karte und Bauzeiten: nah heran (Zoom 16,2, Handy 15,6) in die dichtesten Zellen des Stadtteils
+// (Summe der Einwohner im Umkreis von rund 170 m), nicht auf seinen Namenspunkt; ohne Wahl die Innenstadt
+var HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6, HAUS_ERSATZ = "41";
+function dichteMitte(nr) {
+  var m = [];
+  Z.features.forEach(function (f) { var p = f.properties, v = +p.ew; if (p.st === nr && v > 0) { var c = f.geometry.coordinates[0]; m.push([(c[0][0] + c[2][0]) / 2, (c[0][1] + c[2][1]) / 2, v]); } });
+  var best = null, max = 0;
+  m.forEach(function (a) { var s = 0; m.forEach(function (b) { if (Math.abs(a[0] - b[0]) < 0.0025 && Math.abs(a[1] - b[1]) < 0.0016) s += b[2]; }); if (s > max) { max = s; best = a; } });
+  return best ? [best[0], best[1]] : null;
+}
+// Stadtteil unter der Kartenmitte (die Fläche liegt immer in der Karte, auch bei Deckkraft 0)
+function teilInDerMitte() {
+  var c = map.project(map.getCenter()), t = map.queryRenderedFeatures(c, { layers: ["teile-flaeche"] });
+  return t.length ? t[0].properties.nr : "";
 }
 
 var gewaehlt = "";
@@ -318,8 +337,14 @@ themaBox.addEventListener("change", function (e) {
 document.getElementById("luftbild").addEventListener("change", function (e) { zustand({ luftbild: e.target.checked }); });
 document.getElementById("dreid").addEventListener("change", function (e) {
   var an = e.target.checked, z = { geb3d: an, grenze: false };
-  if (an && !S.nr) z.nr = A.FRAGE.altbau;
-  if (an) { z.kamera = "teil"; z.pitch = 58; z.bearing = -20; z.zoomPlus = 0.6; z.maxZoom = 16; }
+  if (an) {
+    // ohne Wahl der Stadtteil unter der Kartenmitte (aus der Nähe, ab Zoom 13), sonst die Innenstadt (wie auf der Karte);
+    // schon nah und mittendrin nur neigen, sonst zu den dichtesten Zellen fliegen
+    var hier = map.getZoom() >= 13 ? teilInDerMitte() : "", nr = S.nr || hier || HAUS_ERSATZ;
+    if (!S.nr) z.nr = nr;
+    z.kamera = "haus"; z.pitch = 58; z.bearing = -20;
+    if (hier === nr) { var c = map.getCenter(); z.mitte = [c.lng, c.lat]; if (map.getZoom() >= 14) { delete z.kamera; if (map.getPitch() < 20) map.easeTo({ pitch: 58, duration: RUHIG ? 0 : 600 }); } }
+  }
   zustand(z);
   S.selbst = an;
   // 3D aus: wieder von oben, die Zellen liegen flach (wie auf Karte und Bauzeiten)
@@ -329,29 +354,38 @@ document.getElementById("dreid").addEventListener("change", function (e) {
 // ---------- Klicks in der Karte
 function zeile(t, a) { return "<tr><td>" + t + "</td><td>" + a + "</td></tr>"; }
 function zz(v) { return v == null ? "k. A." : fmt.format(v); }
-// focusAfterOpen aus (wie auf den Bauzeiten): der Fokus auf den Schließknopf scrollte die Seite, die Geschichte sprang
+var fenster = null;
+function oeffne(lngLat, breite, html) {
+  if (fenster) fenster.remove();
+  // focusAfterOpen aus (wie auf den Bauzeiten): der Fokus auf den Schließknopf scrollte die Seite, und die Geschichte sprang
+  // zur Frage darüber (Klick auf eine Zelle bei Frage 7 landete in Frage 6, Zoom 16,4)
+  fenster = new maplibregl.Popup({ maxWidth: breite, focusAfterOpen: false }).setLngLat(lngLat).setHTML(html).addTo(map);
+}
+// Doppelklick zoomt (So geht’s): das Fenster des ersten Klicks schließt beim Zoomen, der zweite Klick tut nichts
+map.on("zoomstart", function () { if (fenster) { fenster.remove(); fenster = null; } });
 map.on("click", function (e) {
+  if (e.originalEvent && e.originalEvent.detail > 1) return;
   var lay = ["gebaeude3d", "gebaeude2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var g = map.queryRenderedFeatures(e.point, { layers: lay });
   if (g.length) {
     var gp = g[0].properties;
-    new maplibregl.Popup({ maxWidth: "270px", focusAfterOpen: false }).setLngLat(e.lngLat).setHTML(
+    oeffne(e.lngLat, "270px",
       "<b>" + esc(gp.f || "Gebäude") + "</b><table class='pop-tab'>" +
       zeile("Geschosse", gp.gs == null || gp.gs === "null" ? "k. A." : esc(gp.gs)) +
       zeile("Höhe", fmt1.format(gp.h) + " m") + "</table>" +
-      "<div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
+      "<div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>");
     return;
   }
   var zl = ["zellen-2d", "zellen-flach"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var c = zl.length ? map.queryRenderedFeatures(e.point, { layers: zl }) : [];
   if (c.length) {
     var p = c[0].properties, n = function (k) { var v = p[k]; return (v === undefined || v === "null" || v === null) ? null : Number(v); };
-    new maplibregl.Popup({ maxWidth: "290px", focusAfterOpen: false }).setLngLat(e.lngLat).setHTML(
+    oeffne(e.lngLat, "290px",
       "<b>Gitterzelle 100 × 100 m</b><br>" + esc(p.st + " " + name(p.st)) + "<table class='pop-tab'>" +
       zeile("Einwohner", zz(n("ew"))) + zeile("Durchschnittsalter", n("d_alter") == null ? "k. A." : fmt1.format(n("d_alter"))) +
       zeile("unter 18", proz(n("q_u18"))) + zeile("65 und älter", proz(n("q_65p"))) + zeile("Wohnungen", zz(n("w_ges"))) +
       zeile("davon vor 1949", proz(n("q_v1949"))) + zeile("mit Fernwärme", proz(n("q_fern"))) + "</table>" +
-      "<div class='pop-q'>Zensus 2022, 15.05.2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0. Kleine Werte sind durch die Geheimhaltung unscharf, Anteile können darum über 100 % liegen.</div>").addTo(map);
+      "<div class='pop-q'>Zensus 2022, 15.05.2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0. Kleine Werte sind durch die Geheimhaltung unscharf, Anteile können darum über 100 % liegen.</div>");
     return;
   }
   var t = map.queryRenderedFeatures(e.point, { layers: ["teile-flaeche"] });
@@ -413,7 +447,7 @@ A.schritt = schritt;
 document.querySelectorAll("[data-zeige]").forEach(function (b) {
   b.addEventListener("click", function () {
     var i = +b.dataset.zeige, z = Object.assign({}, SCHRITTE[i]);
-    if (b.dataset.gebaeude) { z.geb3d = true; z.pitch = 58; z.bearing = -20; z.zoomPlus = 0.8; z.maxZoom = 15.5; }
+    if (b.dataset.gebaeude) { z.geb3d = true; z.kamera = "haus"; z.pitch = 58; z.bearing = -20; }
     if (b.dataset.luftbild) { z.luftbild = !S.luftbild; delete z.kamera; }
     aktiv = i; zustand(z);
     S.selbst = !!b.dataset.gebaeude;

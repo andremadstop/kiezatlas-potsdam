@@ -187,6 +187,13 @@ Link auf die Bauzeiten statt des Schalters (nicht nötig, der Weg ist schon kurz
 Zellen behalten (verzerrt das Gitter, ohne etwas zu zeigen). Einzelheiten, Zählungen und Prüfungen:
 `belege/3D_haeuser_20261107.md`.
 
+Nachtrag Gegenprobe 2 (07.11.2026): Auf der Startseite bleiben die Zellen auch mit 3D-Häusern sichtbar, flach und
+heller (Deckkraft 0,55 wie auf der freien Karte); vorher war das Gitter dann ganz aus, Legende und Texte sprachen aber
+von gefärbten Zellen. Der Schalter steht vorn in der Leiste und fliegt wie auf den anderen Seiten zu den dichtesten
+Zellen (Zoom 16,2, Handy 15,6), ohne Wahl in die Innenstadt. Die Regel „selbst eingeschaltet, nimmt die Geschichte es
+nicht weg“ gilt jetzt auch auf der Startseite. Verworfen: das Gitter in 3D aus lassen und Legende und Chips dafür
+umbauen (offen bei Andre, umkehrbar). Beleg G11 bis G23.
+
 ## Nicht geprüft sind
 
 - Ob ein neuer Nahverkehrsplan die Gebietsklassen ändert (gerechnet mit dem Nahverkehrsplan 2019, `config/richtwerte.yaml`).

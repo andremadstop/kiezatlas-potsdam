@@ -9,6 +9,10 @@ Die Seiten nennen den Stand im Fuß. Entscheidungen: `docs/entscheidungen.md`; P
   Farbe trägt den Wert. Der Schalter „3D-Häuser“ führt mit einem Klick zu Gebäuden als Körper, auf den Bauzeiten
   dazu der Knopf „Häuser in 3D ansehen“. Zellmosaik leiser, Fragen der Startseite von oben (Entscheidung A18,
   Beleg `belege/3D_haeuser_20261107.md`).
+- Gegenprobe 2 (Beleg G11 bis G23): Startseite mit 3D-Häusern zeigt die Zellen flach darunter, „3D-Häuser“ steht vorn
+  in der Leiste und fliegt wie auf Karte und Bauzeiten nah heran (Zoom 16,2, Handy 15,6); selbst eingeschaltet bleibt
+  3D beim Weiterlesen; Doppelklick ohne Zellfenster; Chip-Klick scrollt die Seite nicht mehr; Links der freien Karte
+  behalten die Kopplung von 3D und Gebäuden; zwei Texte berichtigt.
 
 ## stand-2026-11-06
 

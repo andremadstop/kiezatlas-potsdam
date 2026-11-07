@@ -134,7 +134,7 @@ async function startseite(basis, art) {
   // keine Zellsäulen (07.11.): je Frage zellen-3d aus und 0 gerendert, Zellen flach (zellen-2d) und von oben
   const flach = [];
   const zellen = () => page.evaluate(() => { const m = window.KIEZ_KARTE, n = (l) => m.queryRenderedFeatures({ layers: [l] }).length;
-    return { s3: m.getLayoutProperty("zellen-3d", "visibility"), n3: n("zellen-3d"), s2: m.getLayoutProperty("zellen-2d", "visibility"), n2: n("zellen-2d"), p: Math.round(m.getPitch()) }; });
+    return { s3: m.getLayoutProperty("zellen-3d", "visibility"), n3: n("zellen-3d"), s2: m.getLayoutProperty("zellen-2d", "visibility"), n2: n("zellen-2d"), p: Math.round(m.getPitch()), t: (document.querySelector("#thema input:checked") || {}).value, y: Math.round(scrollY) }; });
   const ruhe = () => page.waitForFunction(() => !window.KIEZ_KARTE.isMoving() && window.KIEZ_KARTE.loaded(), null, { timeout: 15000 }).catch(() => {}).then(() => page.waitForTimeout(300));
   for (const s of [1, 3, 5, 7]) {
     await page.locator(`.frage[data-schritt="${s}"]`).scrollIntoViewIfNeeded();
@@ -158,16 +158,36 @@ async function startseite(basis, art) {
   const fenster = await page.$eval(".maplibregl-popup", (e) => e.textContent).catch(() => "");
   pruef(punkt && /Gitterzelle/.test(fenster), `Klick auf eine flache Zelle öffnet ihr Fenster (${fenster.slice(0, 40)}…)`);
   await page.evaluate(() => document.querySelectorAll(".maplibregl-popup").forEach((e) => e.remove()));
-  // „3D-Häuser“: Gebäude als Körper, keine Zellen darunter, keine Säulen; aus: wieder von oben
-  await page.check("#dreid", { force: true });
+  // Gegenprobe 2 (07.11.): Doppelklick auf eine Zelle zoomt und lässt kein Fenster offen
+  if (punkt) {
+    const z0 = await page.evaluate(() => window.KIEZ_KARTE.getZoom());
+    await page.mouse.dblclick(punkt.x, punkt.y); await page.waitForTimeout(400); await ruhe();
+    const d = await page.evaluate(() => ({ z: window.KIEZ_KARTE.getZoom(), f: document.querySelectorAll(".maplibregl-popup").length }));
+    pruef(d.z > z0 + 0.5 && d.f === 0, `Doppelklick auf eine Zelle: Zoom ${z0.toFixed(2)} → ${d.z.toFixed(2)}, ${d.f} Fenster offen`);
+  }
+  // „3D-Häuser“: Gebäude als Körper, nah heran, Zellen flach darunter, keine Säulen; aus: wieder von oben.
+  // Klick auf die sichtbare Stelle des Chips: page.check scrollt die Seite erst (y 5624 → 4682) und schaltet so Frage 6 dazwischen
+  const chip3d = async () => { const r = await page.evaluate(() => { const b = document.querySelector("label:has(#dreid)").getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+    await page.mouse.click(r.x, r.y); };
+  await chip3d();
   await page.waitForFunction(() => window.KIEZ_KARTE.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length > 0, null, { timeout: 20000 }).catch(() => {});
   await ruhe();
-  const h3 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, p: Math.round(m.getPitch()) }; });
+  const h3 = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length, p: Math.round(m.getPitch()), z: m.getZoom() }; });
   const z3 = await zellen();
-  await page.uncheck("#dreid", { force: true }); await ruhe();
+  // Gegenprobe 2: selbst eingeschaltet, nimmt die nächste Frage die Häuser nicht weg; sie färbt nur die Zellen
+  await page.evaluate(() => document.querySelector('.frage[data-schritt="8"]').scrollIntoView({ block: "center" }));
+  await page.waitForFunction(() => document.querySelector('.frage[data-schritt="8"]').classList.contains("ist-aktiv"), null, { timeout: 8000 }).catch(() => {});
+  await ruhe();
+  const w = await page.evaluate(() => { const m = window.KIEZ_KARTE; return { d3: document.getElementById("dreid").checked, n: m.queryRenderedFeatures({ layers: ["gebaeude3d"] }).length,
+    p: Math.round(m.getPitch()), t: (document.querySelector("#thema input:checked") || {}).value }; });
+  pruef(w.d3 && w.n > 0 && w.p >= 45 && w.t === "q_u18", `Weiterlesen bei 3D-Häusern (Frage 8): 3D ${w.d3}, ${w.n} Häuser, Neigung ${w.p}, Thema ${w.t}`);
+  await chip3d(); await ruhe();
   const z0 = await zellen();
-  pruef(h3.n > 0 && h3.p >= 45 && z3.s3 === "none" && z3.n3 === 0 && z0.p === 0 && z0.n3 === 0,
-    `„3D-Häuser“: ${h3.n} Häuser, Neigung ${h3.p}, zellen-3d ${z3.s3}/${z3.n3}; aus: Neigung ${z0.p}`);
+  pruef(h3.n > 0 && h3.p >= 45 && h3.z >= 15.5 && z3.s3 === "none" && z3.n3 === 0 && z3.s2 === "visible" && z3.n2 > 0 && z0.p === 0 && z0.n3 === 0,
+    `„3D-Häuser“: ${h3.n} Häuser, Zoom ${h3.z.toFixed(1)}, Neigung ${h3.p}, zellen-3d ${z3.s3}/${z3.n3}, flache Zellen darunter ${z3.s2}/${z3.n2} (Thema ${z3.t}, y ${z3.y}); aus: Neigung ${z0.p}`);
+  // Gegenprobe 2: „3D-Häuser“ steht vor den Themen (auf dem Handy im ersten Bild)
+  const erster = await page.$eval(".werkzeug .chip", (e) => e.innerText.trim());
+  pruef(erster === "3D-Häuser", `erster Chip der Leiste: ${erster}`);
   // Register-Sortierung
   const sorten = await page.$$eval('#sortierung input[name="sort"]', (l) => l.map((i) => i.value));
   const ersteJe = {};

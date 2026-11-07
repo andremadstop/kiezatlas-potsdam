@@ -17,19 +17,23 @@ var HAUS_ERSATZ = "41";
 
 // ---------- Zustand aus dem Hash
 var S = { thema: "stadtteile", nr: "", d3: false, luft: false, geb: false, kam: null };
+// Gebäude hat erst „3D-Häuser“ eingeschaltet: beim Ausschalten wieder aus. Steht im Link als 3d=1 ohne geb=1
+// (hashSchreiben schreibt geb=1 nur für Gebäude, die unabhängig von 3D an sind), damit die Kopplung die Rundreise übersteht
+var gebDurch3D = false;
 (function () {
   function dek(x) { try { return decodeURIComponent(x); } catch (e) { return ""; } }   // verstümmelte Links nicht tödlich
   var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (p) { var kv = p.split("="); if (kv[0]) h[dek(kv[0])] = dek(kv[1] || ""); });
   if (HASHTHEMA[h.thema]) S.thema = HASHTHEMA[h.thema];
   if (h.st && K.stadtteile[h.st]) S.nr = h.st;
   S.d3 = h["3d"] === "1"; S.luft = h.luft === "1"; S.geb = h.geb === "1" || S.d3;   // 3D heißt Häuser (auch in alten Links)
+  gebDurch3D = S.d3 && h.geb !== "1";
   if (h.k) { var k = h.k.split("/").map(Number); if (k.length >= 3 && k.every(function (x) { return !isNaN(x); })) S.kam = { zoom: k[0], center: [k[2], k[1]], pitch: k[3] || 0, bearing: k[4] || 0 }; }
 })();
 function hashSchreiben() {
   if (!bereit) return;
   var c = map.getCenter(), teile = ["thema=" + THEMA[S.thema].h];
   if (S.nr) teile.push("st=" + S.nr);
-  if (S.d3) teile.push("3d=1"); if (S.luft) teile.push("luft=1"); if (S.geb) teile.push("geb=1");
+  if (S.d3) teile.push("3d=1"); if (S.luft) teile.push("luft=1"); if (S.geb && !(S.d3 && gebDurch3D)) teile.push("geb=1");
   teile.push("k=" + [map.getZoom().toFixed(2), c.lat.toFixed(5), c.lng.toFixed(5), Math.round(map.getPitch()), Math.round(map.getBearing())].join("/"));
   try { history.replaceState(null, "", "#" + teile.join("&")); } catch (e) { /* file:// in manchen Browsern */ }
 }
@@ -153,7 +157,6 @@ function teilAn(x, y) {
 }
 // „3D-Häuser“: ein Klick zeigt Gebäude als Körper. Ohne gewählten Stadtteil nimmt die Seite den unter der
 // Kartenmitte (aus der Nähe), sonst die Innenstadt, und fliegt zu seinen Häusern. Nur auf Klick, nie beim Laden.
-var gebDurch3D = false;   // Gebäude hat erst „3D-Häuser“ eingeschaltet: beim Ausschalten wieder aus
 // Häuser stehen nur für den gewählten Stadtteil: nah heran wie auf der Bauzeiten-Seite (Zoom 16,2, Handy 15,6),
 // in seine dichtesten Zellen oder, wenn die Kartenmitte schon in ihm liegt, dorthin; schon nah und mittendrin nur neigen
 var HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6;
