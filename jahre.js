@@ -333,11 +333,20 @@ function karte() {
     if (an && map.getPitch() < 20) map.jumpTo({ pitch: 50 });
     if (!an && map.getPitch() > 0) map.jumpTo({ pitch: 0, bearing: 0 });
   }
-  // Ein Klick zu den Häusern: gewählter Stadtteil (sein Namenspunkt), sonst die Kartenmitte, wenn sie schon nah
-  // (ab Zoom 13) in einem Stadtteil liegt, sonst die Innenstadt
+  // Ziel für die Häuser eines Stadtteils: Mitte seiner dichtesten Zellen (Summe von j_g im Umkreis von rund 170 m), nicht
+  // sein Namenspunkt; der liegt bei manchen Stadtteilen über Feld, Park oder Wasser (Gegenprobe 07.11.: 32, 83 ohne ein Haus im Bild)
+  function dichteMitte(nr) {
+    var m = [];
+    Z.features.forEach(function (f) { var p = f.properties, v = +p.j_g; if (p.st === nr && v > 0) { var c = f.geometry.coordinates[0]; m.push([(c[0][0] + c[2][0]) / 2, (c[0][1] + c[2][1]) / 2, v]); } });
+    var best = null, max = 0;
+    m.forEach(function (a) { var s = 0; m.forEach(function (b) { if (Math.abs(a[0] - b[0]) < 0.0025 && Math.abs(a[1] - b[1]) < 0.0016) s += b[2]; }); if (s > max) { max = s; best = a; } });
+    return best ? [best[0], best[1]] : null;
+  }
+  // Ein Klick zu den Häusern: gewählter Stadtteil (seine dichtesten Zellen, ersatzweise sein Namenspunkt), sonst die
+  // Kartenmitte, wenn sie schon nah (ab Zoom 13) in einem Stadtteil liegt, sonst die Innenstadt
   function hausBlick() {
     var ziel = null, c = map.getCenter();
-    if (S.nr && T.TEIL[S.nr]) { var p = T.TEIL[S.nr].properties; if (isFinite(p.lx) && isFinite(p.ly)) ziel = [p.lx, p.ly]; }
+    if (S.nr && T.TEIL[S.nr]) { var p = T.TEIL[S.nr].properties; ziel = dichteMitte(S.nr) || (isFinite(p.lx) && isFinite(p.ly) ? [p.lx, p.ly] : null); }
     if (!ziel && map.getZoom() >= 13 && teilAn(c.lng, c.lat)) ziel = [c.lng, c.lat];
     var o = { center: ziel || HAUS_ZIEL, zoom: matchMedia("(max-width:860px)").matches ? HAUS_ZOOM_SCHMAL : HAUS_ZOOM, pitch: HAUS_NEIGUNG, bearing: 0 };
     if (RUHIG) map.jumpTo(o); else { o.duration = 1400; o.easing = function (t) { return 1 - Math.pow(1 - t, 4); }; map.flyTo(o); }

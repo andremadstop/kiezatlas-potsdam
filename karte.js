@@ -155,13 +155,22 @@ function teilAn(x, y) {
 // Kartenmitte (aus der Nähe), sonst die Innenstadt, und fliegt zu seinen Häusern. Nur auf Klick, nie beim Laden.
 var gebDurch3D = false;   // Gebäude hat erst „3D-Häuser“ eingeschaltet: beim Ausschalten wieder aus
 // Häuser stehen nur für den gewählten Stadtteil: nah heran wie auf der Bauzeiten-Seite (Zoom 16,2, Handy 15,6),
-// an seinen Namenspunkt oder, wenn die Kartenmitte schon in ihm liegt, dorthin; schon nah und mittendrin nur neigen
+// in seine dichtesten Zellen oder, wenn die Kartenmitte schon in ihm liegt, dorthin; schon nah und mittendrin nur neigen
 var HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6;
+// Ziel für die Häuser eines Stadtteils: Mitte seiner dichtesten Zellen (Summe von ew im Umkreis von rund 170 m), nicht
+// sein Namenspunkt; der liegt bei manchen Stadtteilen über Feld, Park oder Wasser (Gegenprobe 07.11.: 32, 83 ohne ein Haus im Bild)
+function dichteMitte(nr) {
+  var m = [];
+  Z.features.forEach(function (f) { var p = f.properties, v = +p.ew; if (p.st === nr && v > 0) { var c = f.geometry.coordinates[0]; m.push([(c[0][0] + c[2][0]) / 2, (c[0][1] + c[2][1]) / 2, v]); } });
+  var best = null, max = 0;
+  m.forEach(function (a) { var s = 0; m.forEach(function (b) { if (Math.abs(a[0] - b[0]) < 0.0025 && Math.abs(a[1] - b[1]) < 0.0016) s += b[2]; }); if (s > max) { max = s; best = a; } });
+  return best ? [best[0], best[1]] : null;
+}
 function zuDenHaeusern() {
   if (!S.nr || !TEIL[S.nr]) return;
   var c = map.getCenter(), hier = map.getZoom() >= 13 ? teilAn(c.lng, c.lat) : "";
   if (map.getZoom() >= 14 && hier === S.nr) { if (S.d3 && map.getPitch() < 20) map.jumpTo({ pitch: 50 }); return; }
-  var p = TEIL[S.nr].properties, o = { center: hier === S.nr || !isFinite(p.lx) ? [c.lng, c.lat] : [p.lx, p.ly],
+  var ziel = hier === S.nr ? [c.lng, c.lat] : dichteMitte(S.nr) || [TEIL[S.nr].properties.lx, TEIL[S.nr].properties.ly], o = { center: ziel,
     zoom: matchMedia("(max-width:860px)").matches ? HAUS_ZOOM_SCHMAL : HAUS_ZOOM, pitch: S.d3 ? 50 : map.getPitch(), bearing: map.getBearing() };
   if (RUHIG) map.jumpTo(o); else map.flyTo(Object.assign(o, { duration: 1400, easing: function (t) { return 1 - Math.pow(1 - t, 4); } }));
 }
