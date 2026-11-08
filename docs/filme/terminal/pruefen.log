@@ -1,0 +1,1081 @@
+07:28:15.720 +   0.000s | # Wrapper: jede Zeile mit Ortszeit (ms) und Sekunden seit Start; pruefen.sh unverändert, Aufruf ./pruefen.sh im Worktree ausbau/filme
+07:28:15.720 +   0.000s | Kiezatlas Potsdam, Prüflauf 08.11.2026 07:28:15 CET
+07:28:15.720 +   0.000s | Commit: a057522dd41e80c69e26aa1a1c4f1c74d1a73a10
+07:28:15.720 +   0.000s | Arbeitsstand: sauber (keine offenen Änderungen)
+07:28:16.066 +   0.346s | Werkzeuge: uv 0.11.3 (x86_64-unknown-linux-gnu), node v22.23.4, Python 3.13.12
+07:28:16.066 +   0.346s | 
+07:28:16.066 +   0.346s | == Syntax JavaScript (node --check)
+07:28:17.462 +   1.743s |   13 Dateien, 0 mit Fehler
+07:28:17.463 +   1.743s | -- Syntax JavaScript (node --check): grün, 1 s
+07:28:17.463 +   1.743s | 
+07:28:17.463 +   1.743s | == Syntax Shell (sh -n)
+07:28:17.469 +   1.749s |   4 Dateien, 0 mit Fehler
+07:28:17.469 +   1.749s | -- Syntax Shell (sh -n): grün, 0 s
+07:28:17.469 +   1.749s | 
+07:28:17.469 +   1.749s | == Syntax Python (ast)
+07:28:18.018 +   2.298s |   50 Dateien, 0 mit Fehler
+07:28:18.052 +   2.332s | -- Syntax Python (ast): grün, 1 s
+07:28:18.052 +   2.332s | 
+07:28:18.052 +   2.332s | == Datenverträge und Summen (pruefen/daten.py)
+07:28:21.942 +   6.222s | Summen und Kontrollen gegen kennzahlen.json
+07:28:21.942 +   6.222s |   ok    kennzahlen.js und kennzahlen.json gleich
+07:28:21.942 +   6.222s |   ok    zellen.js nach gitter_id sortiert (Grundlage der Zellreihenfolge)
+07:28:21.942 +   6.222s |   ok    zellen.js ohne doppelte gitter_id (3443)
+07:28:21.942 +   6.222s |   ok    Σ ew über zellen.js = Kachel Einwohner Stadt (182673 = 182673)
+07:28:21.942 +   6.222s |   ok    Zahl der Zellen = stadt.zellen (3443 = 3443)
+07:28:21.942 +   6.222s |   ok    Einwohner und Zellen je Stadtteil aus zellen.js = kennzahlen (32 Stadtteile, Abweichungen: [])
+07:28:21.942 +   6.222s |   ok    Stadtteile in stadtteile.js = kennzahlen (32)
+07:28:21.942 +   6.222s |   ok    Anteile der Kacheln = zaehler/nenner (Abweichungen: [])
+07:28:21.942 +   6.222s |   ok    Σ Stadtteile einwohner = Stadt (182673)
+07:28:21.942 +   6.222s |   ok    Gebäude je Stadtteil in gebaeude/<nr>.js = kennzahlen (Abweichungen: [])
+07:28:21.942 +   6.222s |   ok    Σ Gebäude = kontrolle.gebaeude_in_potsdam = stadt.gebaeude.anzahl (52309)
+07:28:21.942 +   6.222s |   ok    kontrolle: Gebäude im Rechteck (85046) ≥ in Potsdam
+07:28:21.942 +   6.222s |   ok    grenzfall.stadt.mittelpunkt = Einwohner Stadt (182673)
+07:28:21.942 +   6.222s | Datenverträge (15 Schemas)
+07:28:21.942 +   6.222s |   ok    einrichtungen.js: Vertrag einrichtungen.json
+07:28:21.942 +   6.222s |   ok    einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+07:28:21.942 +   6.222s |   ok    erreichbar.js: Vertrag erreichbar.json
+07:28:21.942 +   6.222s |   ok    erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+07:28:21.942 +   6.222s |   ok    gebaeude/11.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/12.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/13.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/14.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/15.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/16.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/17.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/21.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/22.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/23.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/31.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/32.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/41.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/43.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/44.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/51.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/52.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/53.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/61.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/62.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/63.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/64.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/65.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/71.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/72.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/73.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/81.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/82.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/83.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/84.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/85.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    gebaeude/86.js: Vertrag gebaeude.json
+07:28:21.942 +   6.222s |   ok    grundkarte.js: Vertrag grundkarte.json
+07:28:21.942 +   6.222s |   ok    jahre/11.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/12.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/13.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/14.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/15.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/16.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/17.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/21.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/22.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/23.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/31.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/32.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/41.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/43.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/44.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/51.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/52.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/53.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/61.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/62.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/63.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/64.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/65.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/71.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/72.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/73.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/81.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/82.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/83.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/84.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/85.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre/86.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    jahre_methode.js: Vertrag jahre_methode.json
+07:28:21.942 +   6.222s |   ok    jahre_zellen.js: Vertrag jahre_zellen.json
+07:28:21.942 +   6.222s |   ok    kennzahlen.js: Vertrag kennzahlen.json
+07:28:21.942 +   6.222s |   ok    planer.js: Vertrag planer.json
+07:28:21.942 +   6.222s |   ok    planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+07:28:21.942 +   6.222s |   ok    planungsraeume.js: Vertrag planungsraeume.json
+07:28:21.942 +   6.222s |   ok    stadtteile.js: Vertrag stadtteile.json
+07:28:21.942 +   6.222s |   ok    zellen.js: Vertrag zellen.json
+07:28:21.942 +   6.222s | Fixtures
+07:28:21.942 +   6.222s |   ok    Fixture einrichtungen.js: Vertrag einrichtungen.json
+07:28:21.942 +   6.222s |   ok    Fixture einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+07:28:21.942 +   6.222s |   ok    Fixture erreichbar.js: Vertrag erreichbar.json
+07:28:21.942 +   6.222s |   ok    Fixture erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+07:28:21.942 +   6.222s |   ok    Fixture jahre/52.js: Vertrag jahre_gebaeude.json
+07:28:21.942 +   6.222s |   ok    Fixture jahre_zellen.js: Vertrag jahre_zellen.json
+07:28:21.942 +   6.222s |   ok    Fixture planer.js: Vertrag planer.json
+07:28:21.942 +   6.222s |   ok    Fixture planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+07:28:21.942 +   6.222s | 
+07:28:21.942 +   6.222s | 0 Abweichungen
+07:28:21.951 +   6.231s | -- Datenverträge und Summen (pruefen/daten.py): grün, 3 s
+07:28:21.951 +   6.231s | 
+07:28:21.951 +   6.231s | == Vertrag Bauzeiten-Methode (pruefen/B5_methode.py)
+07:28:22.058 +   6.338s |   ok    jahre_methode.js: Vertrag jahre_methode.json
+07:28:22.087 +   6.367s | -- Vertrag Bauzeiten-Methode (pruefen/B5_methode.py): grün, 1 s
+07:28:22.087 +   6.367s | 
+07:28:22.087 +   6.367s | == jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen)
+07:28:22.843 +   7.123s | aktuell
+07:28:22.851 +   7.131s | -- jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen): grün, 0 s
+07:28:22.851 +   7.131s | 
+07:28:22.851 +   7.131s | == planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen)
+07:28:22.986 +   7.266s | aktuell
+07:28:22.995 +   7.275s | -- planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen): grün, 0 s
+07:28:22.995 +   7.275s | 
+07:28:22.995 +   7.275s | == GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet)
+07:28:25.153 +   9.433s |   ok    kiezatlas_potsdam.gpkg vorhanden
+07:28:25.153 +   9.433s | 
+07:28:25.153 +   9.433s | [1] GeoPackage kiezatlas_potsdam.gpkg
+07:28:25.153 +   9.433s |   ok    application_id = GPKG
+07:28:25.153 +   9.433s |   ok    user_version 1.2 bis 1.4
+07:28:25.153 +   9.433s |   ok    integrity_check ok
+07:28:25.153 +   9.433s |   ok    foreign_key_check leer
+07:28:25.153 +   9.433s |   ok    Pflichttabelle gpkg_spatial_ref_sys
+07:28:25.153 +   9.433s |   ok    Pflichttabelle gpkg_contents
+07:28:25.153 +   9.433s |   ok    Pflichttabelle gpkg_geometry_columns
+07:28:25.153 +   9.433s |   ok    SRS -1, 0, 4326, 25833 eingetragen
+07:28:25.153 +   9.433s |   ok    jede Zeile in gpkg_contents hat eine Tabelle
+07:28:25.153 +   9.433s |   ok    einrichtung: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    einrichtung: 679 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+07:28:25.153 +   9.433s |   ok    einrichtung: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    einrichtung: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    einrichtung: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s |   ok    gruenflaeche: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    gruenflaeche: 4892 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+07:28:25.153 +   9.433s |   ok    gruenflaeche: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    gruenflaeche: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    gruenflaeche: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s |   ok    haltestelle: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    haltestelle: 315 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+07:28:25.153 +   9.433s |   ok    haltestelle: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    haltestelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    haltestelle: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s |   ok    raumeinheit: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    raumeinheit: 19 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+07:28:25.153 +   9.433s |   ok    raumeinheit: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    raumeinheit: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    raumeinheit: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s |   ok    stadtteil: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    stadtteil: 32 Geometrien mit GP-Kopf, SRS 25833, WKB MULTIPOLYGON
+07:28:25.153 +   9.433s |   ok    stadtteil: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    stadtteil: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    stadtteil: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s |   ok    zelle: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.153 +   9.433s |   ok    zelle: 3443 Geometrien mit GP-Kopf, SRS 25833, WKB POLYGON
+07:28:25.153 +   9.433s |   ok    zelle: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.153 +   9.433s |   ok    zelle: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.153 +   9.433s |   ok    zelle: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.153 +   9.433s | 
+07:28:25.153 +   9.433s | [2] Inhalt gegen die Quelldateien
+07:28:25.153 +   9.433s |   ok    raumeinheit: 19 Zeilen, Quelle 19
+07:28:25.153 +   9.433s |   ok    versorgung: 323 Zeilen, Quelle 323
+07:28:25.153 +   9.433s |   ok    einrichtung: 679 Zeilen, Quelle 679
+07:28:25.153 +   9.433s |   ok    zelle: 3443 Zeilen, Quelle 3443
+07:28:25.153 +   9.433s |   ok    versorgung: alle 323 Werte mit Status, vorläufig, Maßstab, Unsicherheit, Zähler und Nenner wie planer.js
+07:28:25.153 +   9.433s |   ok    versorgung: Status nur amtlich/orientierung
+07:28:25.153 +   9.433s |   ok    versorgung: 76 Grundschulwerte alle vorläufig (ohne H2)
+07:28:25.153 +   9.433s |   ok    versorgung: jeder Wert mit Unsicherheitshinweis
+07:28:25.153 +   9.433s |   ok    raumeinheit: Name, Einwohner, Kinder je Zielgruppe und jede Kennzahlspalte wie versorgung bzw. planer.js
+07:28:25.153 +   9.433s |   ok    raumeinheit: Einwohner auf 10 gerundet
+07:28:25.153 +   9.433s |   ok    einrichtung: alle Felder wie einrichtungen.js
+07:28:25.153 +   9.433s |   ok    einrichtung: ALKIS-Lagen ohne Namen
+07:28:25.153 +   9.433s |   ok    zelle: gitter_id, Einwohner, Stadtteil und 13 Entfernungen je Zelle wie zellen.js/erreichbar.js
+07:28:25.153 +   9.433s |   ok    csv/einrichtung.csv vorhanden
+07:28:25.153 +   9.433s |   ok    csv/einrichtung.csv: Spalten wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/einrichtung.csv: 679 Zeilen wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/einrichtung.csv: Werte wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/gruenflaeche.csv vorhanden
+07:28:25.153 +   9.433s |   ok    csv/gruenflaeche.csv: Spalten wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/gruenflaeche.csv: 4892 Zeilen wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/gruenflaeche.csv: Werte wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/haltestelle.csv vorhanden
+07:28:25.153 +   9.433s |   ok    csv/haltestelle.csv: Spalten wie GPKG
+07:28:25.153 +   9.433s |   ok    csv/haltestelle.csv: 315 Zeilen wie GPKG
+07:28:25.153 +   9.434s |   ok    csv/haltestelle.csv: Werte wie GPKG
+07:28:25.153 +   9.434s |   ok    csv/lizenz.csv vorhanden
+07:28:25.153 +   9.434s |   ok    csv/lizenz.csv: Spalten wie GPKG
+07:28:25.153 +   9.434s |   ok    csv/lizenz.csv: 7 Zeilen wie GPKG
+07:28:25.153 +   9.434s |   ok    csv/lizenz.csv: Werte wie GPKG
+07:28:25.153 +   9.434s |   ok    csv/raumeinheit.csv vorhanden
+07:28:25.154 +   9.434s |   ok    csv/raumeinheit.csv: Spalten wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/raumeinheit.csv: 19 Zeilen wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/raumeinheit.csv: Werte wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/stadtteil.csv vorhanden
+07:28:25.154 +   9.434s |   ok    csv/stadtteil.csv: Spalten wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/stadtteil.csv: 32 Zeilen wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/stadtteil.csv: Werte wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/versorgung.csv vorhanden
+07:28:25.154 +   9.434s |   ok    csv/versorgung.csv: Spalten wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/versorgung.csv: 323 Zeilen wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/versorgung.csv: Werte wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/zelle.csv vorhanden
+07:28:25.154 +   9.434s |   ok    csv/zelle.csv: Spalten wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/zelle.csv: 3443 Zeilen wie GPKG
+07:28:25.154 +   9.434s |   ok    csv/zelle.csv: Werte wie GPKG
+07:28:25.154 +   9.434s |   --    Datenbankvergleich ausgelassen (keine PG-Umgebung oder Beispieldaten)
+07:28:25.154 +   9.434s | 
+07:28:25.154 +   9.434s | [3] Keine Adresse, keine Kontakte, kein Personenbezug
+07:28:25.154 +   9.434s |   ok    keine Adress- oder Kontaktspalte ([])
+07:28:25.154 +   9.434s |   ok    Ausnahmen amtlicher Einrichtungsnamen stimmen (2 Stück)
+07:28:25.154 +   9.434s |   ok    kein Wert mit Hausnummer, PLZ, Telefon oder E-Mail ([]); Ausnahme nur die 2 amtlichen Namen ['Hort"Am Schulplatz 1"', 'KinderGarten Schulplatz 1']
+07:28:25.154 +   9.434s |   ok    keine Einrichtungsnamen mit Personenbezug ([])
+07:28:25.154 +   9.434s | 
+07:28:25.154 +   9.434s | [4] Keine feinere Altersklasse je Zelle
+07:28:25.154 +   9.434s |   ok    zelle: Spalten exakt 21 nach Positivliste (fremd: [])
+07:28:25.154 +   9.434s |   ok    csv/zelle.csv: nur erlaubte Spalten
+07:28:25.154 +   9.434s |   ok    kein Feldname einer feinen Zensusklasse in GPKG oder CSV ([])
+07:28:25.154 +   9.434s |   ok    zelle: auch keine der fünf Altersklassen je Zelle
+07:28:25.154 +   9.434s | 
+07:28:25.154 +   9.434s | [5] Kein OSM in den Dateien ohne _odbl
+07:28:25.154 +   9.434s |   ok    kiezatlas_potsdam.gpkg: kein OpenStreetMap, ODbL, fussweg, osm_id
+07:28:25.154 +   9.434s |   ok    einrichtung: Quellen nur mbjs und lgb (Fixtures: nicht osm)
+07:28:25.154 +   9.434s |   ok    versorgung: Methode luftlinie, Quoten je Raumeinheit raumeinheit
+07:28:25.154 +   9.434s |   ok    versorgung: jeder Zeilenvermerk nennt den Zensus 2022
+07:28:25.154 +   9.434s |   ok    csv/: kein OSM-Wert, auch nicht in csv_de/ ([])
+07:28:25.154 +   9.434s |   ok    csv_de/ ohne _odbl-Datei
+07:28:25.154 +   9.434s |   ok    steckbriefe/: kein OSM-Wert ([])
+07:28:25.154 +   9.434s |   ok    csv/ ohne _odbl-Datei
+07:28:25.154 +   9.434s |   ok    kiezatlas_potsdam_odbl.gpkg vorhanden
+07:28:25.154 +   9.434s | 
+07:28:25.154 +   9.434s | [1] GeoPackage kiezatlas_potsdam_odbl.gpkg
+07:28:25.154 +   9.434s |   ok    application_id = GPKG
+07:28:25.154 +   9.434s |   ok    user_version 1.2 bis 1.4
+07:28:25.154 +   9.434s |   ok    integrity_check ok
+07:28:25.154 +   9.434s |   ok    foreign_key_check leer
+07:28:25.154 +   9.434s |   ok    Pflichttabelle gpkg_spatial_ref_sys
+07:28:25.154 +   9.434s |   ok    Pflichttabelle gpkg_contents
+07:28:25.154 +   9.434s |   ok    Pflichttabelle gpkg_geometry_columns
+07:28:25.154 +   9.434s |   ok    SRS -1, 0, 4326, 25833 eingetragen
+07:28:25.154 +   9.434s |   ok    jede Zeile in gpkg_contents hat eine Tabelle
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: 941 Geometrien mit GP-Kopf, SRS 25833, WKB POINT
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.154 +   9.434s |   ok    zelle_fuss_odbl: SRS 25833 in gpkg_contents und geometry_columns
+07:28:25.154 +   9.434s |   ok    zelle_fuss_odbl: 3443 Geometrien mit GP-Kopf, SRS 25833, WKB POLYGON
+07:28:25.154 +   9.434s |   ok    zelle_fuss_odbl: Hülle im Kopf = Hülle der Koordinaten
+07:28:25.154 +   9.434s |   ok    zelle_fuss_odbl: alle Objekte im Raum Potsdam (x 340-400 km, y 5770-5850 km)
+07:28:25.154 +   9.434s |   ok    zelle_fuss_odbl: Hülle in gpkg_contents umfasst alle Objekte
+07:28:25.154 +   9.434s |   ok    _odbl.gpkg: Lizenztabelle mit ODbL-Vermerk und Link
+07:28:25.154 +   9.434s |   ok    _odbl.gpkg: jede Ebene mit ODbL-Vermerk in der Beschreibung
+07:28:25.154 +   9.434s |   ok    _odbl.gpkg: Ebenennamen enden auf _odbl
+07:28:25.154 +   9.434s |   ok    csv_odbl/: nur _odbl-Dateien
+07:28:25.154 +   9.434s |   ok    csv_odbl_de/: nur _odbl-Dateien
+07:28:25.154 +   9.434s |   ok    einrichtung_odbl: ohne Namen
+07:28:25.154 +   9.434s |   ok    versorgung_fuss_odbl: kein Titel einer Fußweg-Zeile nennt Luftlinie (190 Zeilen)
+07:28:25.154 +   9.434s |   ok    versorgung_fuss_odbl: amtliche Ziele mit MBJS- bzw. LGB-Vermerk ([])
+07:28:25.154 +   9.434s |   ok    versorgung_fuss_odbl: jede Fußweg-Zeile nennt das OSM-Wegenetz im Vermerk
+07:28:25.154 +   9.434s |   ok    _odbl.gpkg lizenz versorgung_fuss_odbl: MBJS- und LGB-Vermerk
+07:28:25.154 +   9.434s | 
+07:28:25.154 +   9.434s | [6] Vermerke
+07:28:25.154 +   9.434s |   ok    lizenz raumeinheit (Grenzen): jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+07:28:25.154 +   9.434s |   ok    lizenz raumeinheit, versorgung (Werte): jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+07:28:25.154 +   9.434s |   ok    lizenz raumeinheit, versorgung (Werte): CC-BY-Vermerk mit Link
+07:28:25.154 +   9.434s |   ok    lizenz einrichtung: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+07:28:25.791 +  10.072s |   ok    lizenz zelle: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+07:28:25.792 +  10.072s |   ok    lizenz gruenflaeche: jeder dl-de-Vermerk mit „Daten verändert (eigene Berechnung)“ und Link
+07:28:25.792 +  10.072s |   ok    lizenz haltestelle: CC-BY-Vermerk mit Link
+07:28:25.792 +  10.072s |   ok    README nennt „Statistische Ämter des Bundes und der Länder“
+07:28:25.792 +  10.072s |   ok    README nennt „Ministerium für Bildung, Jugend und Sport“
+07:28:25.792 +  10.072s |   ok    README nennt „GeoBasis-DE/LGB“
+07:28:25.792 +  10.072s |   ok    README nennt „VBB Verkehrsverbund“
+07:28:25.792 +  10.072s |   ok    README nennt „OpenStreetMap-Mitwirkende“
+07:28:25.792 +  10.072s |   ok    README nennt „Daten verändert (eigene Berechnung)“
+07:28:25.792 +  10.072s |   ok    README nennt „https://www.govdata.de/dl-de/by-2-0“
+07:28:25.792 +  10.072s |   ok    README nennt „EPSG:25833“
+07:28:25.792 +  10.072s |   ok    README nennt „Cell-Key“
+07:28:25.792 +  10.072s |   ok    README nennt „15.05.2022“
+07:28:25.792 +  10.072s |   ok    README nennt „orientierung“
+07:28:25.792 +  10.072s |   ok    README nennt „vorlaeufig“
+07:28:25.792 +  10.072s |   ok    README nennt „Keine Adressen“
+07:28:25.792 +  10.072s |   ok    Lizenzkürzel je Zeile nur dl-de/by-2-0 und CC BY 4.0 (['CC BY 4.0', 'dl-de/by-2-0'])
+07:28:25.792 +  10.072s | 
+07:28:25.792 +  10.072s | [7] QGIS-Projekt und Stile
+07:28:25.792 +  10.072s |   ok    .qgz enthält genau ein .qgs (['kiezatlas_potsdam.qgs'])
+07:28:25.792 +  10.072s |   ok    .qgs wohlgeformt
+07:28:25.792 +  10.072s |   ok    Projekt-KBS EPSG:25833
+07:28:25.792 +  10.072s |   ok    relative Pfade
+07:28:25.792 +  10.072s |   ok    11 Ebenen im Baum und in projectlayers
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung: Klassenfeld art vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung: jede vorkommende Kategorie hat ein Symbol ([])
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung: eigene Farbe je Kategorie
+07:28:25.792 +  10.072s |   ok    Ebene Einrichtungen: ./kiezatlas_potsdam.gpkg|layername=einrichtung vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene haltestelle: Klassenfeld klasse vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene haltestelle: jede vorkommende Kategorie hat ein Symbol ([])
+07:28:25.792 +  10.072s |   ok    Ebene haltestelle: eigene Farbe je Kategorie
+07:28:25.792 +  10.072s |   ok    Ebene Haltestellen (NVP-Klasse): ./kiezatlas_potsdam.gpkg|layername=haltestelle vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Raumeinheiten: ./kiezatlas_potsdam.gpkg|layername=raumeinheit vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene zelle: Klassenfeld ew vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Zensus-Zellen (Einwohner): ./kiezatlas_potsdam.gpkg|layername=zelle vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene gruenflaeche: Klassenfeld art vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene gruenflaeche: jede vorkommende Kategorie hat ein Symbol ([])
+07:28:25.792 +  10.072s |   ok    Ebene gruenflaeche: eigene Farbe je Kategorie
+07:28:25.792 +  10.072s |   ok    Ebene Grünflächen: ./kiezatlas_potsdam.gpkg|layername=gruenflaeche vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Stadtteile: ./kiezatlas_potsdam.gpkg|layername=stadtteil vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Versorgung (Tabelle): ./kiezatlas_potsdam.gpkg|layername=versorgung vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Lizenzen (Tabelle): ./kiezatlas_potsdam.gpkg|layername=lizenz vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung_odbl: Klassenfeld art vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung_odbl: jede vorkommende Kategorie hat ein Symbol ([])
+07:28:25.792 +  10.072s |   ok    Ebene einrichtung_odbl: eigene Farbe je Kategorie
+07:28:25.792 +  10.072s |   ok    Ebene Einrichtungen aus OpenStreetMap (ohne Namen) (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=einrichtung_odbl vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Zellen: Fußweg zum nächsten Standort (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=zelle_fuss_odbl vorhanden
+07:28:25.792 +  10.072s |   ok    Ebene Versorgung je Raumeinheit, Fußweg (ODbL): ./kiezatlas_potsdam_odbl.gpkg|layername=versorgung_fuss_odbl vorhanden
+07:28:25.792 +  10.072s |   ok    stile/einrichtung.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/einrichtung_odbl.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/gruenflaeche.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/haltestelle.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/raumeinheit.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/stadtteil.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    stile/zelle.qml wohlgeformt
+07:28:25.792 +  10.072s |   ok    GPKG: Tabelle layer_styles
+07:28:25.792 +  10.072s |   ok    layer_styles raumeinheit: Standardstil = stile/raumeinheit.qml
+07:28:25.792 +  10.072s |   ok    layer_styles stadtteil: Standardstil = stile/stadtteil.qml
+07:28:25.792 +  10.072s |   ok    layer_styles zelle: Standardstil = stile/zelle.qml
+07:28:25.792 +  10.072s |   ok    layer_styles gruenflaeche: Standardstil = stile/gruenflaeche.qml
+07:28:25.792 +  10.072s |   ok    layer_styles einrichtung: Standardstil = stile/einrichtung.qml
+07:28:25.792 +  10.072s |   ok    layer_styles haltestelle: Standardstil = stile/haltestelle.qml
+07:28:25.792 +  10.072s |   ok    keine Orange- oder Gelbtöne in Stilen (Dateien, layer_styles), Projekt und Steckbriefen ([])
+07:28:25.792 +  10.072s | 
+07:28:25.792 +  10.072s | [8] Steckbriefe
+07:28:25.792 +  10.072s |   ok    19 Steckbriefe, einer je Raumeinheit
+07:28:25.792 +  10.072s |   ok    keine Platzhalter, Karte und @page vorhanden ([])
+07:28:25.792 +  10.072s |   ok    keine Gedankenstriche oder Strich-Ketten ([])
+07:28:25.792 +  10.072s |   ok    jede Zahl aus planer.js steht im Steckbrief ([])
+07:28:25.792 +  10.072s |   ok    Spalte Potsdam: jeder Wert aus planer.js gesamt in jedem Steckbrief ([])
+07:28:25.792 +  10.072s | 
+07:28:25.792 +  10.072s | [9] CSV mit Dezimalkomma (csv_de/, csv_odbl_de/)
+07:28:25.792 +  10.072s |   ok    csv_de/: dieselben 8 Dateien wie csv/
+07:28:25.792 +  10.072s |   ok    csv_de/: Spalten, Zeilen und Texte wie csv/, 7433 Dezimalzahlen mit Komma, ohne Tausendertrenner (0 Abweichungen, 0 Zahlen mit Punkt)
+07:28:25.792 +  10.072s |   ok    csv_odbl_de/: dieselben 4 Dateien wie csv_odbl/
+07:28:25.792 +  10.072s |   ok    csv_odbl_de/: Spalten, Zeilen und Texte wie csv_odbl/, 1901 Dezimalzahlen mit Komma, ohne Tausendertrenner (0 Abweichungen, 0 Zahlen mit Punkt)
+07:28:25.792 +  10.072s |   ok    README nennt, welche CSV-Fassung man in Excel oder LibreOffice öffnet
+07:28:25.792 +  10.072s | 
+07:28:25.792 +  10.072s | 0 Befunde
+07:28:25.803 +  10.083s | -- GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet): grün, 3 s
+07:28:25.803 +  10.083s | 
+07:28:25.803 +  10.083s | == Codepfade Planer (pruefen/A6_test_pfade.py)
+07:28:26.154 +  10.435s |   ok    Prognose gelesen, Zeile anderer Raumebene nicht addiert
+07:28:26.154 +  10.435s |   ok    Tausenderpunkt gelesen, zwei Zeilen addiert (1.200 + 34)
+07:28:26.155 +  10.435s |   ok    unbekannte Altersgruppe gemeldet (Zeile ohne quelle)
+07:28:26.155 +  10.435s |   ok    Zeile mit anderer Raumebene gemeldet
+07:28:26.155 +  10.435s |   ok    Randhinweis an der Luftlinie
+07:28:26.155 +  10.435s |   ok    kein Luftlinien-Randhinweis am Fußweg, sondern der eigene Fußweg-Hinweis
+07:28:26.155 +  10.435s |   ok    Fußweg- und OSM-Dateien entstehen, wenn Daten da sind
+07:28:26.155 +  10.435s |   ok    Raum B (50 EW): 7 Altersklassen-Werte null
+07:28:26.155 +  10.435s |   ok    Grund der Leerstelle im Hinweis
+07:28:26.155 +  10.435s |   ok    Einwohner-Anteile bleiben auch in kleinen Raumeinheiten
+07:28:26.155 +  10.435s |   ok    Kita ohne Hortanteil: 30 Plätze / 30 Kinder unter 6
+07:28:26.155 +  10.435s |   ok    kombinierte Einrichtung benannt
+07:28:26.155 +  10.435s |   ok    kein reiner Hort, nur kombinierte: Hortrelation null
+07:28:26.155 +  10.435s |   ok    Bedarf nach Baulandmodell: 70 Plätze / 47.95
+07:28:26.155 +  10.435s |   ok    Grundschule vorläufig
+07:28:26.155 +  10.435s |   ok    ÖPNV Klasse II: beide Zellen im 400-m-Radius
+07:28:26.155 +  10.435s |   ok    gemischte Gebietsklasse: wert null mit Spanne
+07:28:26.155 +  10.435s |   ok    Prognose 2030/2035 an Kinder-unter-6-Werten
+07:28:26.155 +  10.435s |   ok    Prognose 6 bis unter 12 an der Grundschul-Relation
+07:28:26.155 +  10.435s |   ok    Fußweg: Arzt nur als Entfernung (Korrektur 13)
+07:28:26.155 +  10.435s |   ok    Fußweg-Datei nur methode fussweg
+07:28:26.155 +  10.435s |   ok    OSM-Quelle nur in der Fußweg-Datei
+07:28:26.155 +  10.435s |   ok    strittige Lage: nur Zellen mit dem strittigen Ziel neu, andere Arten und Zellen unverändert
+07:28:26.155 +  10.435s |   ok    strittige Lage: Zahl der Zellen gemeldet
+07:28:26.155 +  10.435s |   ok    strittige Lage: Fußweg unter der Luftlinie bricht ab
+07:28:26.155 +  10.435s |   ok    einrichtungen.js: Hinweis nur am strittigen Punkt
+07:28:26.155 +  10.435s |   ok    erreichbar.js nennt den Punkt
+07:28:26.155 +  10.435s |   ok    Grundschulwerte in beiden betroffenen Raumeinheiten gesperrt, mit Hinweis
+07:28:26.155 +  10.435s |   ok    Vermerk statistische Bezirke nur, wenn eine Klasse daraus stammt
+07:28:26.155 +  10.435s |   ok    Fußweg mit Haltestellen nennt die VBB-Quelle (N1)
+07:28:26.155 +  10.435s |   ok    K4: Schule mit Primarstufe als Grundschulziel, je Zelle das nähere Ziel, andere Arten unverändert
+07:28:26.155 +  10.435s |   ok    K4: Grundschüler je Kind ohne Wert mit Grund im ersten Satz, ohne Kita-Bausteine, Status Orientierung
+07:28:26.155 +  10.435s |   ok    K4: Einwohner je Grundschulstandort zählt die Schule mit Primarstufe mit
+07:28:26.155 +  10.435s |   ok    K7: Plätze je Bedarfsplatz Orientierung mit Satz zu Nr. 3.4.4
+07:28:26.155 +  10.435s |   ok    K8: Wortlaut genehmigte Plätze
+07:28:26.155 +  10.435s |   ok    K14: Zähler, Nenner und Differenz (Plätze genau, Personen und Bedarf auf 10)
+07:28:26.155 +  10.435s |   ok    K14: ohne Wert keine Zähler und Nenner, Kinder je Raum nur ab der Mindestgröße
+07:28:26.155 +  10.435s |   ok    K24: gesamt aus veröffentlichten Zählern und Nennern, Raumeinheiten ohne Wert genannt
+07:28:26.155 +  10.435s |   ok    K27: Kita mit Häusern in zwei Raumeinheiten in beiden genannt
+07:28:26.155 +  10.435s |   ok    K28: Prüfwerte aus den Belegen gelesen
+07:28:26.155 +  10.435s |   ok    K32: Fahrplantext aus config/richtwerte.yaml
+07:28:26.155 +  10.435s |   ok    planer.js: Vertrag planer.json
+07:28:26.155 +  10.435s |   ok    planer_fuss_odbl.js: Vertrag planer_fuss_odbl.json
+07:28:26.155 +  10.435s |   ok    erreichbar_fuss_odbl.js: Vertrag erreichbar_fuss_odbl.json
+07:28:26.155 +  10.435s |   ok    einrichtungen_odbl.js: Vertrag einrichtungen_odbl.json
+07:28:26.155 +  10.435s |   ok    erreichbar.js: Vertrag erreichbar.json
+07:28:26.155 +  10.435s |   ok    einrichtungen.js: Vertrag einrichtungen.json
+07:28:26.155 +  10.435s |   ok    alle Testdateien bestehen Vertrag und Lizenzgrenze aus daten.py
+07:28:26.155 +  10.435s |   ok    leere OSM-Quelle: keine Fußweg- und OSM-Dateien
+07:28:26.155 +  10.435s |   ok    Raumebene planungsraum wird übernommen
+07:28:26.155 +  10.435s |   ok    Planungsraum: Klasse je Zelle aus dem Stadtteil, gemischte Zellen (50 %) zählen nicht
+07:28:26.155 +  10.435s |   ok    Planungsraum nur mit gemischter Klasse: kein Wert, Spanne über die möglichen Klassen
+07:28:26.155 +  10.435s |   ok    ohne H1, Tabelle und CSV: Stadtteile
+07:28:26.155 +  10.435s |   ok    H1 im Eingang, aber weder Tabelle noch CSV: Abbruch mit Aufruf statt stiller Stadtteile
+07:28:26.155 +  10.435s |   ok    leere Tabelle, CSV vorhanden: Planungsräume per SELECT über unnest
+07:28:26.155 +  10.435s |   ok    CSV mit anderen Nummern als H1: Abbruch statt alter Grenzen
+07:28:26.155 +  10.435s | 
+07:28:26.155 +  10.435s | alle Tests bestanden
+07:28:26.166 +  10.446s | -- Codepfade Planer (pruefen/A6_test_pfade.py): grün, 1 s
+07:28:26.166 +  10.446s | 
+07:28:26.166 +  10.446s | == OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test)
+07:28:26.918 +  11.198s | .....................s                                                   [100%]
+07:28:26.918 +  11.198s | 21 passed, 1 skipped in 0.52s
+07:28:27.002 +  11.283s | -- OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test): grün, 1 s
+07:28:27.003 +  11.283s | 
+07:28:27.003 +  11.283s | == Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test)
+07:28:28.191 +  12.471s | ..............sss                                                        [100%]
+07:28:28.191 +  12.471s | 14 passed, 3 skipped in 0.61s
+07:28:28.234 +  12.515s | -- Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test): grün, 1 s
+07:28:28.235 +  12.515s | 
+07:28:28.235 +  12.515s | == Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe)
+07:28:29.876 +  14.156s | GTFS: $KIEZ_DATEN/vbb_gtfs/2026-11-05/GTFS.zip
+07:28:29.876 +  14.156s | Haltepunkte im Rechteck: 1800 (Berlin 473, Brandenburg 1327)
+07:28:29.876 +  14.156s | falsch zugeordnet: 15 (0.8 %): Berlin als Brandenburg 6, Brandenburg als Berlin 9
+07:28:29.876 +  14.156s | Fehltreffer: Abstand zum nächsten Haltepunkt des anderen Landes 200 bis 988 m (Median 355 m)
+07:28:29.910 +  14.190s | -- Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe): grün, 1 s
+07:28:29.910 +  14.190s | 
+07:28:29.910 +  14.190s | == Prüfsummen Kerndaten (belege/rohdaten.sha256)
+07:28:30.901 +  15.181s |   7 Dateien stimmen
+07:28:30.901 +  15.181s | -- Prüfsummen Kerndaten (belege/rohdaten.sha256): grün, 1 s
+07:28:30.901 +  15.181s | 
+07:28:30.901 +  15.181s | == Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256)
+07:28:32.371 +  16.651s |   78 Dateien stimmen
+07:28:32.372 +  16.652s | -- Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256): grün, 2 s
+07:28:32.372 +  16.652s | 
+07:28:32.372 +  16.652s | == Browser: pruefen/seiten.mjs
+07:28:34.167 +  18.447s | Textstellen (Audit)
+07:28:34.177 +  18.457s |   ok   K1: Gebäudehöhe als Geschosse × 3 m beschrieben (seit 06.11. Katasterhöhe mit Herkunft je Gebäude)
+07:28:34.188 +  18.468s |   ok   K2: Denkmallisten-Nummer als Zuordnungsweg genannt (nur Prüfung)
+07:28:34.188 +  18.468s | Abfrage „Gestapelt“ (kopf.js und CSS)
+07:28:34.189 +  18.469s |   ok   atlas.css: @media (max-width:599px),(max-width:699px) and (orientation:portrait)
+07:28:34.190 +  18.470s |   ok   karte.css: @media (max-width:599px),(max-width:699px) and (orientation:portrait)
+07:28:34.191 +  18.472s |   ok   jahre.css: @media (max-width:599px),(max-width:699px) and (orientation:portrait)
+07:28:34.581 +  18.861s | Kopfzeile (K31)
+07:28:34.583 +  18.863s |   ok   index.html: erste Kopfzeile index* · karte · planer · jahre
+07:28:34.583 +  18.863s |   ok   karte.html: erste Kopfzeile index · karte* · planer · jahre
+07:28:34.584 +  18.864s |   ok   planer.html: erste Kopfzeile index · karte · planer* · jahre
+07:28:34.584 +  18.864s |   ok   planer-methode.html: erste Kopfzeile index · karte · planer* · jahre
+07:28:34.585 +  18.865s |   ok   planer-daten.html: erste Kopfzeile index · karte · planer* · jahre
+07:28:34.585 +  18.865s |   ok   jahre.html: erste Kopfzeile index · karte · planer · jahre*
+07:28:34.585 +  18.865s |   ok   jahre-methode.html: erste Kopfzeile index · karte · planer · jahre*
+07:28:34.586 +  18.866s |   ok   jahre-daten.html: erste Kopfzeile index · karte · planer · jahre*
+07:28:34.586 +  18.866s |   ok   404.html: erste Kopfzeile index · karte · planer · jahre
+07:28:34.589 +  18.869s | index.html über file://
+07:28:41.762 +  26.042s |   ok   alle Themen geschaltet (7: stadtteile, ew, d_alter, q_u18, q_65p, q_v1949, q_fern)
+07:28:41.775 +  26.055s |   ok   Kopfzahlen: 5 Werte (rund 182.700 | 17,9% | 20,2% | 25,7% | 60,7%)
+07:28:41.786 +  26.066s |   ok   sieben Fragen vorhanden (Schritte 0,1,2,3,4,5,6,7,8,9,10)
+07:28:45.687 +  29.967s |   ok   Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv
+07:28:45.687 +  29.967s |   ok   keine Zellsäulen: Frage 1 zellen-3d none/0, flach 3461, Neigung 0; Frage 3 zellen-3d none/0, flach 530, Neigung 0; Frage 5 zellen-3d none/0, flach 402, Neigung 0; Frage 7 zellen-3d none/0, flach 3461, Neigung 0
+07:28:46.225 +  30.505s |   ok   Klick auf eine flache Zelle öffnet ihr Fenster (Gitterzelle 100 × 100 m84 FahrlandEinwoh…)
+07:28:47.041 +  31.321s |   ok   Doppelklick auf eine Zelle: Zoom 10.85 → 11.85, 0 Fenster offen
+07:28:48.905 +  33.186s |   ok   Weiterlesen bei 3D-Häusern (Frage 8): 3D true, 1968 Häuser, Neigung 58, Thema q_u18
+07:28:49.568 +  33.848s |   ok   „3D-Häuser“: 1968 Häuser, Zoom 16.2, Neigung 58, zellen-3d none/0, flache Zellen darunter visible/190 (Thema ew, y 5624); aus: Neigung 0
+07:28:51.845 +  36.125s |   ok   „3D-Häuser“ aus Frage 5 (Zoom 14.0): Zoom 16.2, 247 Häuser
+07:28:51.861 +  36.142s |   ok   erster Chip der Leiste: 3D-Häuser
+07:28:52.360 +  36.640s |   ok   Register-Sortierung: 6 Sortierungen, je 32 Zeilen, 6 verschiedene Spitzenreiter
+07:28:52.611 +  36.891s |   ok   Schaugrafik SVG: kiezatlas-potsdam-a4h.svg, 524 KB, Schriften eingebettet
+07:28:53.488 +  37.768s |   ok   Schaugrafik PNG: kiezatlas-potsdam-a4h.png, 840 KB
+07:28:54.108 +  38.388s |   ok   Schaugrafik Druck/PDF: Druckblatt gesetzt, PDF 232 KB
+07:28:56.187 +  40.467s |   ok   axe: 0 Verstöße 
+07:28:56.187 +  40.467s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 32)
+07:28:56.187 +  40.467s |   Gewicht beim Start: 490 KB gz JS, 627 KB gz gesamt (eigene Dateien)
+07:28:56.238 +  40.518s | index.html über HTTP
+07:29:01.607 +  45.887s |   ok   alle Themen geschaltet (7: stadtteile, ew, d_alter, q_u18, q_65p, q_v1949, q_fern)
+07:29:01.624 +  45.904s |   ok   Kopfzahlen: 5 Werte (rund 182.700 | 17,9% | 20,2% | 25,7% | 60,7%)
+07:29:01.627 +  45.907s |   ok   sieben Fragen vorhanden (Schritte 0,1,2,3,4,5,6,7,8,9,10)
+07:29:05.807 +  50.087s |   ok   Scroll-Steuerung: Fragen 1, 3, 5, 7 werden beim Scrollen aktiv
+07:29:05.807 +  50.087s |   ok   keine Zellsäulen: Frage 1 zellen-3d none/0, flach 3461, Neigung 0; Frage 3 zellen-3d none/0, flach 530, Neigung 0; Frage 5 zellen-3d none/0, flach 402, Neigung 0; Frage 7 zellen-3d none/0, flach 3461, Neigung 0
+07:29:06.293 +  50.573s |   ok   Klick auf eine flache Zelle öffnet ihr Fenster (Gitterzelle 100 × 100 m84 FahrlandEinwoh…)
+07:29:07.040 +  51.320s |   ok   Doppelklick auf eine Zelle: Zoom 10.85 → 11.85, 0 Fenster offen
+07:29:09.076 +  53.356s |   ok   Weiterlesen bei 3D-Häusern (Frage 8): 3D true, 1968 Häuser, Neigung 58, Thema q_u18
+07:29:09.771 +  54.051s |   ok   „3D-Häuser“: 1968 Häuser, Zoom 16.2, Neigung 58, zellen-3d none/0, flache Zellen darunter visible/190 (Thema ew, y 5624); aus: Neigung 0
+07:29:11.924 +  56.204s |   ok   „3D-Häuser“ aus Frage 5 (Zoom 14.0): Zoom 16.2, 247 Häuser
+07:29:11.938 +  56.219s |   ok   erster Chip der Leiste: 3D-Häuser
+07:29:12.288 +  56.568s |   ok   Register-Sortierung: 6 Sortierungen, je 32 Zeilen, 6 verschiedene Spitzenreiter
+07:29:12.591 +  56.871s |   ok   Schaugrafik SVG: kiezatlas-potsdam-a4h.svg, 524 KB, Schriften eingebettet
+07:29:13.404 +  57.685s |   ok   Schaugrafik PNG: kiezatlas-potsdam-a4h.png, 840 KB
+07:29:14.266 +  58.546s |   ok   Schaugrafik Druck/PDF: Druckblatt gesetzt, PDF 232 KB
+07:29:16.144 +  60.424s |   ok   axe: 0 Verstöße 
+07:29:16.144 +  60.424s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 32)
+07:29:16.144 +  60.424s |   Gewicht beim Start: 490 KB gz JS, 627 KB gz gesamt (eigene Dateien)
+07:29:16.164 +  60.444s | karte.html über file://
+07:29:20.625 +  64.905s |   ok   alle Themen geschaltet (7)
+07:29:23.072 +  67.352s |   ok   axe: 0 Verstöße 
+07:29:23.072 +  67.352s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 32)
+07:29:23.072 +  67.352s |   Gewicht beim Start: 429 KB gz JS, 561 KB gz gesamt (eigene Dateien)
+07:29:31.604 +  75.884s |   ok   Hash-Rundreise: #thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12 -> neu geladen gleich (#thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12)
+07:29:35.633 +  79.913s |   ok   1440 px: „3D-Häuser“ ohne Stadtteil wählt 41 Historische Innenstadt, 2049 Häuser, Zoom 16.2, Neigung 50, Hinweis danach leer (vorher „Gebäude gibt es je Stadtteil: …“), Schalter rechts bei 102 px
+07:29:35.641 +  79.921s |   ok   1440 px: Zoom nach „3D-Häuser“ 16.2; Chips ganz im Bild: 3D-Häuser, Stadtteile, Einwohner, Alter, unter 18, 65 und älter, vor 1949, Fernwärme, Luftbild, Gebäude
+07:29:46.847 +  91.127s |   ok   Doppelklick auf einen Nachbarn von 41 Historische Innenstadt: 22 Jägervorstadt gewählt; Klick in ihn: weiter 22 Jägervorstadt; Liste „72“: 72 Drewitz, 193 Häuser im Bild
+07:29:49.956 +  94.236s |   ok   390 px: „3D-Häuser“ ohne Stadtteil wählt 41 Historische Innenstadt, 1301 Häuser, Zoom 15.6, Neigung 50, Hinweis danach leer (vorher „Gebäude gibt es je Stadtteil: …“), Schalter rechts bei 100 px
+07:29:49.980 +  94.260s |   ok   390 px: Zoom nach „3D-Häuser“ 15.6; Chips ganz im Bild: 3D-Häuser, Stadtteile, Einwohner, Alter
+07:29:49.983 +  94.263s | karte.html über HTTP
+07:29:54.493 +  98.773s |   ok   alle Themen geschaltet (7)
+07:29:56.471 + 100.751s |   ok   axe: 0 Verstöße 
+07:29:56.471 + 100.751s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 32)
+07:29:56.471 + 100.751s |   Gewicht beim Start: 429 KB gz JS, 561 KB gz gesamt (eigene Dateien)
+07:30:04.603 + 108.883s |   ok   Hash-Rundreise: #thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12 -> neu geladen gleich (#thema=fern&st=52&3d=1&luft=1&geb=1&k=14.20/52.39350/13.07000/45/-12)
+07:30:08.810 + 113.090s |   ok   1440 px: „3D-Häuser“ ohne Stadtteil wählt 41 Historische Innenstadt, 2049 Häuser, Zoom 16.2, Neigung 50, Hinweis danach leer (vorher „Gebäude gibt es je Stadtteil: …“), Schalter rechts bei 102 px
+07:30:08.821 + 113.101s |   ok   1440 px: Zoom nach „3D-Häuser“ 16.2; Chips ganz im Bild: 3D-Häuser, Stadtteile, Einwohner, Alter, unter 18, 65 und älter, vor 1949, Fernwärme, Luftbild, Gebäude
+07:30:20.054 + 124.335s |   ok   Doppelklick auf einen Nachbarn von 41 Historische Innenstadt: 22 Jägervorstadt gewählt; Klick in ihn: weiter 22 Jägervorstadt; Liste „72“: 72 Drewitz, 193 Häuser im Bild
+07:30:23.155 + 127.435s |   ok   390 px: „3D-Häuser“ ohne Stadtteil wählt 41 Historische Innenstadt, 1301 Häuser, Zoom 15.6, Neigung 50, Hinweis danach leer (vorher „Gebäude gibt es je Stadtteil: …“), Schalter rechts bei 100 px
+07:30:23.162 + 127.442s |   ok   390 px: Zoom nach „3D-Häuser“ 15.6; Chips ganz im Bild: 3D-Häuser, Stadtteile, Einwohner, Alter
+07:30:23.165 + 127.445s | index.html über HTTP ohne reduzierte Bewegung
+07:30:27.767 + 132.047s |   ok   Bewegung an: Konsole ohne Fehler (0)
+07:30:30.757 + 135.037s |   ok   reduzierte Bewegung wird von der Seite erkannt
+07:30:30.763 + 135.043s | index.html über HTTP: 3D-Häuser mit Liste, Register und Luftbild
+07:30:33.366 + 137.646s |   ok   B1 Liste: 3D an bei 41, Wahl „72“: Kartenmitte in 72, Zoom 16.2, 189 Häuser, Neigung 58
+07:30:34.079 + 138.359s |   ok   B1 Register: Zeile „15“: Kartenmitte in 15, Zoom 16.2, 532 Häuser
+07:30:35.650 + 139.930s |   ok   B2 Klick in den gewählten Stadtteil bei 3D-Häusern: Stelle gefunden, danach 15 gewählt, 3D true
+07:30:38.152 + 142.432s |   ok   B3 „Luftbild einblenden“ bei 3D-Häusern: Luftbild true, 3D true, 1446 Häuser, Stadtteil 15, Neigung 58
+07:30:38.152 + 142.432s |   ok   Konsole ohne Fehler (0)
+07:30:38.169 + 142.449s | Responsiv index.html (8 Breiten)
+07:30:43.905 + 148.185s |   ok   360x740: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:30:43.905 + 148.185s |   ok   360x740: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:30:43.905 + 148.185s |   ok   360x740: Karte beim Lesen 442 px = 60 % (mindestens 55 %), Legende 17 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:30:50.039 + 154.319s |   ok   390x844: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:30:50.039 + 154.319s |   ok   390x844: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:30:50.039 + 154.319s |   ok   390x844: Karte beim Lesen 506 px = 60 % (mindestens 56 %), Legende 15 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:30:55.725 + 160.005s |   ok   844x390: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:30:55.725 + 160.005s |   ok   844x390: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:30:55.725 + 160.005s |   ok   844x390: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:30:55.725 + 160.005s |   ok   844x390: Karte beim Lesen 390 px = 100 % (mindestens 85 %), Legende 32 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:02.217 + 166.497s |   ok   768x1024: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:02.217 + 166.498s |   ok   768x1024: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:31:02.218 + 166.498s |   ok   768x1024: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:31:02.218 + 166.498s |   ok   768x1024: Karte beim Lesen 1024 px = 100 % (mindestens 85 %), Legende 12 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:08.707 + 172.987s |   ok   1024x768: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:08.707 + 172.987s |   ok   1024x768: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:31:08.707 + 172.987s |   ok   1024x768: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:31:08.707 + 172.987s |   ok   1024x768: Karte beim Lesen 768 px = 100 % (mindestens 85 %), Legende 27 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:14.872 + 179.152s |   ok   1280x800: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:14.872 + 179.152s |   ok   1280x800: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:31:14.872 + 179.152s |   ok   1280x800: Karte beim Lesen 800 px = 100 % (mindestens 85 %), Legende 26 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:20.290 + 184.570s |   ok   1440x900: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:20.291 + 184.571s |   ok   1440x900: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:31:20.291 + 184.571s |   ok   1440x900: Karte beim Lesen 900 px = 100 % (mindestens 85 %), Legende 23 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:25.721 + 190.001s |   ok   1920x1080: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:25.721 + 190.001s |   ok   1920x1080: Kopfzahlen der Startseite über zwei Zeilen: 0
+07:31:25.721 + 190.001s |   ok   1920x1080: Karte beim Lesen 1080 px = 100 % (mindestens 85 %), Legende 19 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:25.723 + 190.003s | Responsiv karte.html (8 Breiten)
+07:31:29.223 + 193.503s |   ok   360x740: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:33.377 + 197.657s |   ok   360x740: erst #treffer bis 982, dann #seite-inhalt bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3478 → 3478
+07:31:33.377 + 197.657s |   ok   360x740: Karte beim Lesen 206 px = 28 % (mindestens 24 %), Legende 5 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:36.950 + 201.230s |   ok   390x844: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:40.768 + 205.048s |   ok   390x844: erst #treffer bis 982, dann #seite-inhalt bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3382 → 3382
+07:31:40.768 + 205.048s |   ok   390x844: Karte beim Lesen 236 px = 28 % (mindestens 24 %), Legende 4 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:45.040 + 209.320s |   ok   844x390: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:48.631 + 212.911s |   ok   844x390: erst #treffer bis 1019, dann #seite bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3802 → 3802
+07:31:48.631 + 212.911s |   ok   844x390: Karte beim Lesen 390 px = 100 % (mindestens 80 %), Legende 8 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:31:54.031 + 218.311s |   ok   768x1024: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:31:57.293 + 221.573s |   ok   768x1024: erst #treffer bis 1019, dann #seite bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3796 → 3796
+07:31:57.293 + 221.573s |   ok   768x1024: Karte beim Lesen 1024 px = 100 % (mindestens 85 %), Legende 3 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:32:02.242 + 226.523s |   ok   1024x768: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:32:02.243 + 226.523s |   ok   1024x768: Karte beim Lesen 712 px = 93 % (mindestens 85 %), Legende 18 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:32:06.824 + 231.105s |   ok   1280x800: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:32:06.825 + 231.105s |   ok   1280x800: Karte beim Lesen 744 px = 93 % (mindestens 85 %), Legende 17 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:32:12.491 + 236.771s |   ok   1440x900: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:32:12.492 + 236.772s |   ok   1440x900: Karte beim Lesen 844 px = 94 % (mindestens 85 %), Legende 15 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:32:18.496 + 242.776s |   ok   1920x1080: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:32:18.496 + 242.777s |   ok   1920x1080: Karte beim Lesen 1024 px = 95 % (mindestens 85 %), Legende 13 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:32:18.564 + 242.845s | 
+07:32:18.565 + 242.845s | KB gz je Seite (eigene Dateien bis KIEZ_BEREIT):
+07:32:18.565 + 242.845s |   index.html  file://  JS 490 KB gz, gesamt 627 KB gz
+07:32:18.565 + 242.845s |   index.html  HTTP     JS 490 KB gz, gesamt 627 KB gz
+07:32:18.565 + 242.845s |   karte.html  file://  JS 429 KB gz, gesamt 561 KB gz
+07:32:18.565 + 242.845s |   karte.html  HTTP     JS 429 KB gz, gesamt 561 KB gz
+07:32:18.565 + 242.845s | 
+07:32:18.565 + 242.845s | grün
+07:32:18.605 + 242.885s | -- Browser: pruefen/seiten.mjs: grün, 226 s
+07:32:18.606 + 242.886s | 
+07:32:18.606 + 242.886s | == Browser: pruefen/A7_planer.mjs
+07:32:19.546 + 243.827s | planer.html über file://, echte Daten
+07:32:20.712 + 244.992s |   ok   Startgewicht 320 KB gz JS mit echten Daten (Grenze 320)
+07:32:20.712 + 244.992s |   ok   keine Datei aus daten/fixtures/ geladen
+07:32:20.715 + 244.995s |   ok   kein Hinweis „Beispieldaten“
+07:32:20.717 + 244.998s |   ok   data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js" passt zu daten/ (true); Fußweg gesperrt false (erwartet false), OSM-Arten gesperrt false (erwartet false)
+07:32:20.728 + 245.008s |   ok   Einrichtungs-Chips aus den echten Daten: kita, hort, grundschule, sek1, gymnasium, foerderschule, osz, sonstige_schule, feuerwehr, bibliothek, sport, sonstiger_gemeinbedarf, arzt, apotheke, supermarkt, pflege, spielplatz
+07:32:21.667 + 245.947s |   ok   Kita (Luftlinie) mit echten Daten: 7027 Zellen gezeichnet, 679 Einrichtungen
+07:32:21.703 + 245.983s |   ok   Raumebene Planungsräume voreingestellt: pr, 19 in der Liste, 19 Flächen in der Karte
+07:32:22.057 + 246.337s |   ok   Versorgungstabelle mit echten Daten: 17 Zeilen, ohne Quelle 0, Messart falsch 0, „amtlicher Maßstab“ ohne Richtwert 0, Orientierung 9/9
+07:32:23.492 + 247.772s |   ok   Ebene Stadtteile: Hinweis statt Tabelle (0 Zeilen, 32 Flächen), zurück auf Planungsräume 17 Zeilen (#ein=kita,gs&zu=kita&weg=luft&raum=pr&r=403)
+07:32:23.546 + 247.826s |   ok   Klick auf Einrichtung mit echten Daten: Kinderhaus Wölkchen 2Kindertagesstätte, krippe kindergartenPlätze60Genehmigte Plätze laut …
+07:32:23.552 + 247.832s |   ok   Zähler und Nenner an 16 von 16 Zeilen („a von b“ wie planer.js true), ganz Potsdam an 16 Zeilen (gesamt 16)
+07:32:23.792 + 248.072s |   ok   Vergleich „Alle Planungsräume“: 19 Zeilen (Räume 19), Zeile ganz Potsdam true, 17 Kennzahlen, nach Wechsel 19 Zeilen, Tabellenzeilen der Versorgung unverändert 17
+07:32:25.097 + 249.377s |   ok   axe mit echten Daten: 0 Verstöße 
+07:32:25.097 + 249.377s |   ok   Konsole ohne Fehler mit echten Daten (0)
+07:32:25.116 + 249.397s | planer.html über file://, Beispieldaten
+07:32:27.237 + 251.517s |   ok   Startgewicht 305 KB gz JS (Grenze 320); geladen: kiezatlas-wt-FILME/kopf.js, daten/stadtteile.js, daten/planungsraeume.js, vendor/maplibre-gl.js, daten/grundkarte.js, kiezatlas-wt-FILME/themen.js, kiezatlas-wt-FILME/planer.js, fixtures/einrichtungen.js
+07:32:27.237 + 251.517s |   ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+07:32:27.237 + 251.517s |   ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+07:32:27.239 + 251.519s |   ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+07:32:27.244 + 251.524s |   ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+07:32:27.970 + 252.250s |   ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+07:32:28.243 + 252.523s |   ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+07:32:28.244 + 252.524s |   ok   Orientierungswerte gekennzeichnet: 1 von 1
+07:32:28.244 + 252.524s |   ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+07:32:28.629 + 252.909s |   ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+07:32:28.661 + 252.941s |   ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+07:32:29.231 + 253.511s |   ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+07:32:29.682 + 253.962s |   ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+07:32:29.687 + 253.967s |   ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+07:32:30.526 + 254.806s |   ok   axe: 0 Verstöße 
+07:32:30.526 + 254.806s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 4)
+07:32:36.256 + 260.536s |   ok   Hash-Rundreise über file://: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+07:32:38.961 + 263.242s |   ok   planer.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:32:40.246 + 264.526s |   ok   axe bei 375 px mit offener Leiste: 0 
+07:32:40.246 + 264.526s |   ok   planer.html bei 375 px ohne Konsolenfehler (0)
+07:32:40.703 + 264.983s |   ok   planer-methode.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:32:40.703 + 264.983s |   ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+07:32:41.065 + 265.345s |   ok   planer-daten.html bei 375 px über file://: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:32:41.065 + 265.345s |   ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+07:32:41.692 + 265.972s |   ok   planer-methode.html über file://: 2 Prüfwerte aus planer.js gefüllt (2 mit Beleg), abweichend keiner, Beleg falsch 0
+07:32:42.837 + 267.117s |   ok   planer-methode.html über file://: 17 Maßstäbe aus der Datei, 9 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+07:32:43.309 + 267.589s |   ok   planer-daten.html über file://: 63 Links in daten/, ins Leere 0
+07:32:43.897 + 268.177s |   ok   planer-daten.html über file://: axe 0, Fehler 0
+07:32:43.905 + 268.185s |   ok   index.html: Kita-Frage verlinkt den Planer im Fußweg (planer.html#ein=kita&amp;zu=kita&amp;weg=fuss)
+07:32:46.798 + 271.078s |   ok   Kita-Link über file://: Planer zeigt Fußweg zur Kita, ODbL-Vermerk sichtbar (fuss, kita, true)
+07:32:46.798 + 271.078s |   ok   Versorgung 403 über file://: Knopf „Steckbrief (A4)“ auf daten/export/steckbriefe/403.html, Datei vorhanden, Hinweis Luftlinie
+07:32:48.757 + 273.037s |   ok   Beispieldaten über file://: Versorgung ohne Steckbrief-Knopf (3 Zeilen, 0 Knöpfe)
+07:32:48.944 + 273.224s |   ok   planer-daten.html über file://: 19 Steckbriefe verlinkt, 19 Dateien in daten/export/steckbriefe/
+07:32:48.944 + 273.224s | planer.html über HTTP, echte Daten
+07:32:51.395 + 275.675s |   ok   Startgewicht 320 KB gz JS mit echten Daten (Grenze 320)
+07:32:51.395 + 275.675s |   ok   keine Datei aus daten/fixtures/ geladen
+07:32:51.398 + 275.678s |   ok   kein Hinweis „Beispieldaten“
+07:32:51.400 + 275.680s |   ok   data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js" passt zu daten/ (true); Fußweg gesperrt false (erwartet false), OSM-Arten gesperrt false (erwartet false)
+07:32:51.408 + 275.688s |   ok   Einrichtungs-Chips aus den echten Daten: kita, hort, grundschule, sek1, gymnasium, foerderschule, osz, sonstige_schule, feuerwehr, bibliothek, sport, sonstiger_gemeinbedarf, arzt, apotheke, supermarkt, pflege, spielplatz
+07:32:52.436 + 276.717s |   ok   Kita (Luftlinie) mit echten Daten: 7027 Zellen gezeichnet, 679 Einrichtungen
+07:32:52.465 + 276.745s |   ok   Raumebene Planungsräume voreingestellt: pr, 19 in der Liste, 19 Flächen in der Karte
+07:32:52.785 + 277.065s |   ok   Versorgungstabelle mit echten Daten: 17 Zeilen, ohne Quelle 0, Messart falsch 0, „amtlicher Maßstab“ ohne Richtwert 0, Orientierung 9/9
+07:32:54.031 + 278.311s |   ok   Ebene Stadtteile: Hinweis statt Tabelle (0 Zeilen, 32 Flächen), zurück auf Planungsräume 17 Zeilen (#ein=kita,gs&zu=kita&weg=luft&raum=pr&r=403)
+07:32:54.080 + 278.360s |   ok   Klick auf Einrichtung mit echten Daten: Kinderhaus Wölkchen 2Kindertagesstätte, krippe kindergartenPlätze60Genehmigte Plätze laut …
+07:32:54.085 + 278.365s |   ok   Zähler und Nenner an 16 von 16 Zeilen („a von b“ wie planer.js true), ganz Potsdam an 16 Zeilen (gesamt 16)
+07:32:54.321 + 278.601s |   ok   Vergleich „Alle Planungsräume“: 19 Zeilen (Räume 19), Zeile ganz Potsdam true, 17 Kennzahlen, nach Wechsel 19 Zeilen, Tabellenzeilen der Versorgung unverändert 17
+07:32:55.725 + 280.005s |   ok   axe mit echten Daten: 0 Verstöße 
+07:32:55.725 + 280.005s |   ok   Konsole ohne Fehler mit echten Daten (0)
+07:32:55.729 + 280.009s | planer.html über HTTP, Beispieldaten
+07:32:58.269 + 282.549s |   ok   Startgewicht 305 KB gz JS (Grenze 320); geladen: 127.0.0.1:45715/kopf.js, daten/stadtteile.js, daten/planungsraeume.js, vendor/maplibre-gl.js, daten/grundkarte.js, 127.0.0.1:45715/themen.js, 127.0.0.1:45715/planer.js, fixtures/einrichtungen.js
+07:32:58.269 + 282.549s |   ok   zellen.js lädt nicht beim Start, erst bei einer Entfernung
+07:32:58.269 + 282.549s |   ok   Versorgungsdatei lädt nicht beim Start, erst bei der Wahl einer Raumeinheit
+07:32:58.274 + 282.555s |   ok   Hinweis „Beispieldaten“ sichtbar, solange Fixtures geladen sind
+07:32:58.289 + 282.569s |   ok   Einrichtungs-Chips: kita, hort, grundschule, gymnasium, arzt, apotheke, supermarkt, pflege, spielplatz
+07:32:59.353 + 283.633s |   ok   Erreichbarkeit Kita (Luftlinie) als Zellthema: 7027 Zellen gezeichnet
+07:32:59.610 + 283.890s |   ok   Versorgungstabelle Luftlinie: 3 Zeilen, ohne Quelle 0, ohne Methode 0, Einwohner mit Vermerk true, 1 Vermerke mit Lizenz
+07:32:59.610 + 283.890s |   ok   Orientierungswerte gekennzeichnet: 1 von 1
+07:32:59.610 + 283.890s |   ok   Legende der Entfernung mit Methode und sichtbarem Vermerk
+07:33:00.035 + 284.315s |   ok   Klick auf Zelle: Entfernung mit Methode und dl-de-Vermerk samt Bearbeitungshinweis und Lizenzlink (gefunden)
+07:33:00.053 + 284.333s |   ok   Klick auf eine Zelle im gewählten Stadtteil hebt die Wahl nicht auf (gewählt: 13)
+07:33:00.516 + 284.796s |   ok   Fußweg: 2 Zeilen mit „Fußweg“, ODbL-Vermerk sichtbar true
+07:33:00.948 + 285.228s |   ok   OSM-Einrichtungen (ODbL) laden erst bei Auswahl und werden gezeigt
+07:33:00.951 + 285.231s |   ok   Klick auf Einrichtung zeigt Art, Plätze und Quelle: Beispiel-Einrichtung 22 (unecht)GrundschuleSchüler222 (Stand Beispiel)© Beispielanbieter, …
+07:33:01.226 + 285.506s |   ok   axe: 0 Verstöße 
+07:33:01.226 + 285.506s |   ok   Konsole ohne Fehler (0; lokal ersetzte Fremdabrufe: 4)
+07:33:06.264 + 290.544s |   ok   Hash-Rundreise über HTTP: #ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0 -> neu geladen gleich (#ein=kita,gs,arzt&zu=gs&weg=fuss&raum=st&r=14&k=13.10/52.39000/13.06000/0/0)
+07:33:08.661 + 292.941s |   ok   planer.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:33:08.904 + 293.184s |   ok   axe bei 375 px mit offener Leiste: 0 
+07:33:08.904 + 293.184s |   ok   planer.html bei 375 px ohne Konsolenfehler (0)
+07:33:09.315 + 293.595s |   ok   planer-methode.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:33:09.315 + 293.595s |   ok   planer-methode.html bei 375 px ohne Konsolenfehler (0)
+07:33:09.572 + 293.852s |   ok   planer-daten.html bei 375 px über HTTP: kein seitliches Scrollen (scrollWidth 375, Breite 375)
+07:33:09.572 + 293.852s |   ok   planer-daten.html bei 375 px ohne Konsolenfehler (0)
+07:33:10.114 + 294.394s |   ok   planer-methode.html über HTTP: 2 Prüfwerte aus planer.js gefüllt (2 mit Beleg), abweichend keiner, Beleg falsch 0
+07:33:11.452 + 295.732s |   ok   planer-methode.html über HTTP: 17 Maßstäbe aus der Datei, 9 als Orientierung, Vermerk je Zeile true, axe 0, Fehler 0
+07:33:11.869 + 296.149s |   ok   planer-daten.html über HTTP: 63 Links in daten/, ins Leere 0
+07:33:13.254 + 297.534s |   ok   planer-daten.html über HTTP: axe 0, Fehler 0
+07:33:13.265 + 297.545s |   ok   index.html: Kita-Frage verlinkt den Planer im Fußweg (planer.html#ein=kita&amp;zu=kita&amp;weg=fuss)
+07:33:16.091 + 300.371s |   ok   Kita-Link über HTTP: Planer zeigt Fußweg zur Kita, ODbL-Vermerk sichtbar (fuss, kita, true)
+07:33:16.091 + 300.371s |   ok   Versorgung 403 über HTTP: Knopf „Steckbrief (A4)“ auf daten/export/steckbriefe/403.html, Datei vorhanden, Hinweis Luftlinie
+07:33:18.186 + 302.466s |   ok   Beispieldaten über HTTP: Versorgung ohne Steckbrief-Knopf (3 Zeilen, 0 Knöpfe)
+07:33:18.405 + 302.685s |   ok   planer-daten.html über HTTP: 19 Steckbriefe verlinkt, 19 Dateien in daten/export/steckbriefe/
+07:33:18.407 + 302.687s |   ok   Download-Liste deckt alle 15 Verträge ab
+07:33:18.407 + 302.687s |   ok   Download-Liste: Lizenzgrenze, Stand und Links stimmen mit daten/ überein
+07:33:20.877 + 305.157s |   ok   Datei auf Planungsräumen, Stadtteil gewählt, ohne Grenzen der Planungsräume: Hinweis statt Tabelle (0 Zeilen, Ebenen st, Fehler 0)
+07:33:23.366 + 307.646s |   ok   Datei auf Planungsräumen, Stadtteil gewählt, mit Grenzen der Planungsräume: Hinweis statt Tabelle (0 Zeilen, Ebenen pr,st, Fehler 0)
+07:33:26.297 + 310.577s |   ok   Fußweg-Tabelle scheitert einmal: Rückfall auf Luftlinie mit Meldung (luft, 3 Zeilen), zweiter Versuch lädt (fuss, 2 Zeilen, 2 Abrufe)
+07:33:30.987 + 315.267s |   ok   reduzierte Bewegung: Klicks bewegen die Kamera nicht (0), Zoom springt (1 Bewegung)
+07:33:35.652 + 319.932s |   ok   ohne reduzierte Bewegung fehlerfrei (0)
+07:33:35.655 + 319.935s | Responsiv planer.html (8 Breiten)
+07:33:39.079 + 323.359s |   ok   360x740: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:33:42.948 + 327.228s |   ok   360x740: erst #raeume bis 552, dann #seite-inhalt bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 2812 → 2812
+07:33:42.948 + 327.228s |   ok   360x740: Karte beim Lesen 206 px = 28 % (mindestens 24 %), Legende 6 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:33:48.112 + 332.392s |   ok   390x844: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:33:51.909 + 336.189s |   ok   390x844: erst #raeume bis 552, dann #seite-inhalt bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 2711 → 2711
+07:33:51.909 + 336.189s |   ok   390x844: Karte beim Lesen 236 px = 28 % (mindestens 24 %), Legende 5 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:33:56.898 + 341.178s |   ok   844x390: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:00.248 + 344.528s |   ok   844x390: erst #raeume bis 617, dann #seite bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3264 → 3264
+07:34:00.248 + 344.528s |   ok   844x390: Karte beim Lesen 390 px = 100 % (mindestens 80 %), Legende 11 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:34:05.659 + 349.939s |   ok   768x1024: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:09.456 + 353.736s |   ok   768x1024: erst #raeume bis 617, dann #seite bis 300: Kopfleiste W60 (bleibt eingeklappt), Höhe des Blatts 3257 → 3257
+07:34:09.456 + 353.736s |   ok   768x1024: Karte beim Lesen 1024 px = 100 % (mindestens 85 %), Legende 4 % (höchstens 35 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:34:14.826 + 359.106s |   ok   1024x768: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:14.827 + 359.107s |   ok   1024x768: Karte beim Lesen 676 px = 88 % (mindestens 85 %), Legende 7 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:34:19.621 + 363.901s |   ok   1280x800: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:19.621 + 363.901s |   ok   1280x800: Karte beim Lesen 708 px = 89 % (mindestens 85 %), Legende 7 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:34:24.811 + 369.091s |   ok   1440x900: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:24.811 + 369.091s |   ok   1440x900: Karte beim Lesen 808 px = 90 % (mindestens 85 %), Legende 6 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:34:30.486 + 374.766s |   ok   1920x1080: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:34:30.486 + 374.766s |   ok   1920x1080: Karte beim Lesen 988 px = 92 % (mindestens 85 %), Legende 5 % (höchstens 35 %), Kopfleiste beim Lesen da, nach Hochscrollen da (bleibt hier stehen)
+07:34:30.573 + 374.853s | 
+07:34:30.573 + 374.853s | A7 grün.
+07:34:30.609 + 374.889s | -- Browser: pruefen/A7_planer.mjs: grün, 132 s
+07:34:30.609 + 374.889s | 
+07:34:30.609 + 374.889s | == Browser: pruefen/B5_jahre.mjs
+07:34:31.589 + 375.869s | Statisch (jahre.html, jahre.js, jahre.css, jahre-methode.html, jahre-daten.html)
+07:34:31.589 + 375.870s |   ok   jahre.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+07:34:31.589 + 375.870s |   ok   jahre.html: „visinage“ 0-mal (erlaubt: nie)
+07:34:31.590 + 375.870s |   ok   jahre.html: kein fetch/XHR (file://)
+07:34:31.590 + 375.870s |   ok   jahre.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+07:34:31.590 + 375.870s |   ok   jahre.js: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+07:34:31.590 + 375.870s |   ok   jahre.js: „visinage“ 0-mal (erlaubt: nie)
+07:34:31.590 + 375.870s |   ok   jahre.js: kein fetch/XHR (file://)
+07:34:31.590 + 375.871s |   ok   jahre.js: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+07:34:31.591 + 375.871s |   ok   jahre.css: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+07:34:31.591 + 375.871s |   ok   jahre.css: „visinage“ 0-mal (erlaubt: nie)
+07:34:31.591 + 375.871s |   ok   jahre.css: kein fetch/XHR (file://)
+07:34:31.591 + 375.871s |   ok   jahre.css: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+07:34:31.591 + 375.871s |   ok   jahre-methode.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+07:34:31.591 + 375.871s |   ok   jahre-methode.html: „visinage“ 1-mal (erlaubt: genau einmal als Methodenvorbild)
+07:34:31.591 + 375.871s |   ok   jahre-methode.html: kein fetch/XHR (file://)
+07:34:31.591 + 375.871s |   ok   jahre-methode.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+07:34:31.591 + 375.871s |   ok   jahre-daten.html: keine verbotenen Tokens, Namen, Schriften, Geviertstriche 
+07:34:31.591 + 375.871s |   ok   jahre-daten.html: „visinage“ 0-mal (erlaubt: nie)
+07:34:31.591 + 375.871s |   ok   jahre-daten.html: kein fetch/XHR (file://)
+07:34:31.591 + 375.871s |   ok   jahre-daten.html: keine ALKIS-Gebäudedateien daten/gebaeude/ (Bauzeit je Gebäude nur aus daten/jahre/)
+07:34:31.591 + 375.871s | 
+07:34:31.591 + 375.871s | Gebäudedateien daten/jahre/*.js
+07:34:31.773 + 376.053s |   ok   32 Dateien, 52309 Gebäude: nur j/k/g/q/s/h/hq, Höhe 1–200 m mit Herkunft, jede Angabe mit Status und Quelle samt Vermerk, Jahr nur bei „belegt“ 
+07:34:32.333 + 376.613s |   ok   daten/jahre_methode.js gegen pruefen/B5_schema/jahre_methode.json (Prüfmaschine aus daten.py): ok jahre_methode.js: Vertrag jahre_methode.json
+07:34:32.334 + 376.614s |   ok   daten/jahre_methode.js aktuell (aktuell), 52309 Gebäude, Rücktest je Bauzeit und Stufe mit n
+07:34:32.337 + 376.617s |   ok   Farben in jahre.css/jahre.js: 23 geprüft, keine zwischen 20° und 70° 
+07:34:32.338 + 376.619s |   ok   Palette: 8 Stufen, alle mit Farbton außerhalb 20°–70°: #42194d 287°, #613878 278°, #756092 265°, #8c87a9 249°, #74a1aa 190°, #428293 193°, #226174 194°, #1c4a5b 196°
+07:34:32.343 + 376.624s | (node:2508047) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+07:34:32.344 + 376.624s | (Use `node --trace-warnings ...` to show where the warning was created)
+07:34:32.563 + 376.843s | 
+07:34:32.563 + 376.844s | jahre.html per file
+07:34:36.059 + 380.339s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:34:36.144 + 380.424s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:34:37.105 + 381.385s |   ok   axe: 0 Verstöße 
+07:34:37.589 + 381.869s |   ok   gerenderte Farben (87 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:34:37.589 + 381.869s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:34:37.589 + 381.869s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:34:37.594 + 381.874s |   ok   reduzierte Bewegung: keine laufende Animation nach dem Laden
+07:34:37.601 + 381.882s |   ok   reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)
+07:34:37.617 + 381.898s |   ok   reduzierte Bewegung: „Nacheinander“ ausgeblendet
+07:34:38.066 + 382.347s |   ok   Frage 1: Karte eingestellt (spanne 0–0), Kamera steht, keine Animation
+07:34:38.345 + 382.625s |   ok   Frage 2: Karte eingestellt (spanne 2–3), Kamera steht, keine Animation
+07:34:38.556 + 382.836s |   ok   Frage 3: Karte eingestellt (spanne 4–7), Kamera steht, keine Animation
+07:34:38.740 + 383.020s |   ok   Frage 4: Karte eingestellt (spanne 6–7), Kamera steht, keine Animation
+07:34:38.968 + 383.249s |   ok   Frage 5: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+07:34:39.215 + 383.495s |   ok   Frage 6: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+07:34:39.581 + 383.861s |   ok   Frage 7: Karte eingestellt (ueberblick 6–7 3D), Kamera steht, keine Animation
+07:34:39.967 + 384.247s |   ok   Leiste: Klick auf die vierte Klasse zeigt nur diese (1979–1990)
+07:34:40.299 + 384.579s |   ok   Leiste: Regler „bis“ per Pfeiltaste, Status „Anteil 1979 bis 2010 je Zelle“
+07:34:40.301 + 384.581s |   ok   Kartenfarbe rechnet genau die gewählten Klassen (ohne neues Laden)
+07:34:40.336 + 384.616s |   ok   Legende nennt Quelle, Stichtag und „nicht einzelne Gebäude“
+07:34:40.371 + 384.651s |   ok   Kopfzahlen mit dl-de-Vermerk „Daten verändert (eigene Berechnung)“
+07:34:40.380 + 384.660s |   ok   Gebäudezahlen in den Fragen als „hochgerechnet“ gekennzeichnet, Unsicherheitshinweis 
+07:34:50.222 + 394.502s |   ok   Zell-Popup: Werte mit Quelle, Stichtag, Vermerk, „nicht einzelne Gebäude“
+07:34:50.322 + 394.602s |   ok   Vergleich: Auswahl „52 Babelsberg Nord“, Steckbrief mit 8 Klassen, Hinweis auf Näherung und Rundung
+07:34:50.351 + 394.631s |   ok   Vergleich: Sortierung nach Anteil absteigend
+07:34:58.536 + 402.816s |   ok   unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen
+07:34:58.539 + 402.819s |   ok   unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin
+07:34:59.303 + 403.583s |   ok   Frage 7: 3D-Häuser am Stern (Zoom 15.4, Neigung 50, 1943 Körper, Dateien 53, 71, 2 Anfragen)
+07:35:00.154 + 404.435s |   ok   Frage 7: Zoom 15.4, Gebäude aus 53, 71 (452 farbig im Bild), keine Animation
+07:35:00.155 + 404.435s |   ok   höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (2 Anfragen, 2 Dateien)
+07:35:00.180 + 404.460s |   ok   ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „Karte zeigt: Gebäude nach geschätzter Bauzeit, ausgewählt 52 Babelsberg Nord, Gebäude aus 53 Babelsberg Süd, 71 Stern.“
+07:35:00.184 + 404.464s |   ok   Adresse merkt sich den Blick auf die Gebäude (blick=…)
+07:35:00.455 + 404.735s |   ok   Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (Bauzeit 1991–2000geschätztSchätzweg: Zensuszahlen der Zelle nach Gebäu…)
+07:35:00.509 + 404.789s |   ok   Gebäude-Popup: Schätzweg und Rücktest der Stufe mit n aus daten/jahre_methode.js, kein „Stufe X von 6“ (Im Rücktest traf dieser Schätzweg die bekannte Bauzeit so oft: Sichtprüfung Luftbilder Bor…)
+07:35:00.780 + 405.060s |   ok   Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses
+07:35:01.417 + 405.697s |   ok   Zeitfilter 1949–1990: nur Klassen 2,3 farbig, übrige blass, 0 neue Anfragen
+07:35:01.430 + 405.710s |   ok   Zeitfilter: Legende nennt „andere Bauzeit“, keine Prozentskala der Zellen
+07:35:01.448 + 405.728s |   ok   Legende ab Zoom 14: Muster für „geschätzt“/„belegt“ ohne Klassenfarbe (rgb(19, 33, 42) rgb(19, 33, 42))
+07:35:01.906 + 406.186s |   ok   3D ab Zoom 14: keine Säulen über den Gebäuden (zellen-3d none, zellen-2d visible, Zoom 15.4)
+07:35:02.622 + 406.902s |   ok   Gebäudeansicht: axe 0 Verstöße 
+07:35:02.916 + 407.196s |   ok   Gebäudeansicht: Farben ohne Farbton 20°–70° 
+07:35:02.917 + 407.197s |   ok   Gebäudeansicht: reduzierte Bewegung ohne Animation
+07:35:10.189 + 414.469s |   ok   breiter Blick Zoom 14: Gebäude aus 31, 41, 44, 61, Zellen abgeblendet nur dort (31, 41, 44, 61), Zellen voll in 22, 23, 43, 62; Hinweis „adt; weitere Stadtteile beim Heranzoomen“
+07:35:10.189 + 414.469s |   ok   keine Konsolenfehler 
+07:35:10.189 + 414.469s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 25)
+07:35:13.508 + 417.788s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:35:14.567 + 418.847s |   ok   375 px: axe 0 Verstöße 
+07:35:16.513 + 420.793s |   ok   375 px: Frage 1 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:35:17.938 + 422.219s |   ok   375 px: Frage 2 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:35:19.382 + 423.662s |   ok   375 px: Frage 3 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:35:19.828 + 424.108s | 
+07:35:19.828 + 424.108s | jahre-methode.html per file
+07:35:20.525 + 424.806s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:35:20.622 + 424.902s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:35:22.153 + 426.434s |   ok   axe: 0 Verstöße 
+07:35:22.385 + 426.665s |   ok   gerenderte Farben (23 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:35:22.385 + 426.665s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:35:22.385 + 426.665s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:35:22.428 + 426.708s |   ok   Methode: Stufentabelle, 6 Rücktest-Tabellen je Bauzeit und Stufe (19 Quoten mit n und 95-%-Bereich nach Wilson, gleich daten/jahre_methode.js; 5 mit n < 10 nur als Zählung), Vergleich mit dem Zensus
+07:35:22.429 + 426.709s |   ok   Methode: 95-%-Bereich je Quote nach Wilson nachgerechnet, Quote liegt im Bereich, als Darstellung gekennzeichnet
+07:35:22.434 + 426.714s |   ok   Methode: Höhe aus der Datei (Kataster 50.356, Geschosse 73, Ersatz 1.880, Summe = 52309 Gebäude, 96,3 %), keine feste Zählung im HTML, Kopfsatz eingeschränkt
+07:35:22.438 + 426.718s |   ok   Methode: „Nicht datiert“ nennt alle 25.593, davon 22.531 Nebengebäude
+07:35:22.439 + 426.719s |   ok   Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl
+07:35:22.439 + 426.719s |   ok   Methode: Vorbild genau einmal genannt, als Methodenvorbild
+07:35:22.443 + 426.723s |   ok   Methode: Baualter-Statistik der Stadt (H4), 4 Zeilen, Gruppen = Gesamt, Gebäudekarte = Summe der Zensus-Tabelle, Vermerk mit Lizenz
+07:35:22.443 + 426.723s |   ok   Methode: genaue Jahre aus Wikidata genannt, im Rücktest zurückgehalten
+07:35:22.443 + 426.723s |   ok   keine Konsolenfehler 
+07:35:22.443 + 426.723s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+07:35:23.163 + 427.443s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:35:24.184 + 428.465s |   ok   375 px: axe 0 Verstöße 
+07:35:24.186 + 428.467s | 
+07:35:24.187 + 428.467s | jahre-daten.html per file
+07:35:24.318 + 428.598s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:35:24.335 + 428.615s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:35:25.190 + 429.470s |   ok   axe: 0 Verstöße 
+07:35:25.339 + 429.619s |   ok   gerenderte Farben (11 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:35:25.339 + 429.619s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:35:25.339 + 429.619s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:35:25.447 + 429.727s |   ok   CSV Zellen kiezatlas-bauzeiten-zellen-2026-11-05.csv: 2869 Zeilen (erwartet 2869), Kopf gitter_id,stadtteil,gebaeude,anteil_vor_1919,anteil_1919_194…
+07:35:25.656 + 429.936s |   ok   GeoJSON kiezatlas-bauzeiten-zellen-2026-11-05.geojson: 2869 Zellen, Vermerk und Lizenzlink
+07:35:25.705 + 429.985s |   ok   CSV je Stadtteil kiezatlas-bauzeiten-stadtteile-2026-11-05.csv: 32 Gebiete, Gebäudezahlen auf 10 gerundet
+07:35:25.770 + 430.050s |   ok   Liesmich LIESMICH-kiezatlas-bauzeiten.txt: Vermerk, Lizenzlink, kein OSM
+07:35:25.821 + 430.101s |   ok   GeoPackage daten/download/bauzeiten.gpkg: Pflichttabellen, application_id GPKG, Geometriekopf GP, EPSG:25833, Ausdehnung Potsdam
+07:35:26.269 + 430.549s |   ok   GeoPackage zellen: 2869 Zeilen, Gebäude und Anteile gleich der Zell-CSV
+07:35:26.270 + 430.550s |   ok   GeoPackage stadtteile: 32 Gebiete, alle Spalten gleich der Stadtteil-CSV (gerundet)
+07:35:26.270 + 430.550s |   ok   GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten
+07:35:26.271 + 430.551s |   ok   GeoPackage-Stand 2026-11-05 = Stand von jahre_zellen.js 2026-11-05 (sonst skripte/25_jahre_gpkg.py neu laufen lassen)
+07:35:26.274 + 430.554s |   ok   Downloads ohne Adress- oder Eigentümerfelder
+07:35:26.274 + 430.554s |   ok   keine Konsolenfehler 
+07:35:26.274 + 430.554s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+07:35:26.537 + 430.818s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:35:27.436 + 431.716s |   ok   375 px: axe 0 Verstöße 
+07:35:27.445 + 431.725s | 
+07:35:27.445 + 431.725s | jahre.html per http
+07:35:30.457 + 434.737s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:35:30.539 + 434.819s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:35:32.225 + 436.505s |   ok   axe: 0 Verstöße 
+07:35:32.849 + 437.129s |   ok   gerenderte Farben (87 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:35:32.850 + 437.130s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:35:32.850 + 437.130s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:35:32.855 + 437.135s |   ok   reduzierte Bewegung: keine laufende Animation nach dem Laden
+07:35:32.867 + 437.147s |   ok   reduzierte Bewegung: Kartenstil ohne Überblendung (transition 0)
+07:35:32.893 + 437.174s |   ok   reduzierte Bewegung: „Nacheinander“ ausgeblendet
+07:35:33.309 + 437.590s |   ok   Frage 1: Karte eingestellt (spanne 0–0), Kamera steht, keine Animation
+07:35:33.624 + 437.904s |   ok   Frage 2: Karte eingestellt (spanne 2–3), Kamera steht, keine Animation
+07:35:34.005 + 438.285s |   ok   Frage 3: Karte eingestellt (spanne 4–7), Kamera steht, keine Animation
+07:35:34.195 + 438.475s |   ok   Frage 4: Karte eingestellt (spanne 6–7), Kamera steht, keine Animation
+07:35:34.379 + 438.659s |   ok   Frage 5: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+07:35:34.558 + 438.839s |   ok   Frage 6: Karte eingestellt (ueberblick 6–7), Kamera steht, keine Animation
+07:35:35.023 + 439.303s |   ok   Frage 7: Karte eingestellt (ueberblick 6–7 3D), Kamera steht, keine Animation
+07:35:35.178 + 439.458s |   ok   Leiste: Klick auf die vierte Klasse zeigt nur diese (1979–1990)
+07:35:35.234 + 439.514s |   ok   Leiste: Regler „bis“ per Pfeiltaste, Status „Anteil 1979 bis 2010 je Zelle“
+07:35:35.235 + 439.515s |   ok   Kartenfarbe rechnet genau die gewählten Klassen (ohne neues Laden)
+07:35:35.238 + 439.518s |   ok   Legende nennt Quelle, Stichtag und „nicht einzelne Gebäude“
+07:35:35.241 + 439.521s |   ok   Kopfzahlen mit dl-de-Vermerk „Daten verändert (eigene Berechnung)“
+07:35:35.246 + 439.526s |   ok   Gebäudezahlen in den Fragen als „hochgerechnet“ gekennzeichnet, Unsicherheitshinweis 
+07:35:48.886 + 453.166s |   ok   Zell-Popup: Werte mit Quelle, Stichtag, Vermerk, „nicht einzelne Gebäude“
+07:35:49.058 + 453.338s |   ok   Vergleich: Auswahl „52 Babelsberg Nord“, Steckbrief mit 8 Klassen, Hinweis auf Näherung und Rundung
+07:35:49.169 + 453.449s |   ok   Vergleich: Sortierung nach Anteil absteigend
+07:36:03.286 + 467.566s |   ok   unter Zoom 14: keine Gebäude gezeichnet, keine Gebäudedatei geladen
+07:36:03.298 + 467.578s |   ok   unter Zoom 14: Legende weist auf die Gebäude ab Zoom 14 hin
+07:36:04.241 + 468.521s |   ok   Frage 7: 3D-Häuser am Stern (Zoom 15.4, Neigung 50, 1943 Körper, Dateien 53, 71, 2 Anfragen)
+07:36:05.156 + 469.436s |   ok   Frage 7: Zoom 15.4, Gebäude aus 53, 71 (452 farbig im Bild), keine Animation
+07:36:05.156 + 469.436s |   ok   höchstens 4 Stadtteile im Bild geladen, je Datei genau eine Anfrage (2 Anfragen, 2 Dateien)
+07:36:05.171 + 469.451s |   ok   ab Zoom 14: Legende mit „geschätzt“, „nicht datiert“, Vermerk; Kartenstatus „Karte zeigt: Gebäude nach geschätzter Bauzeit, ausgewählt 52 Babelsberg Nord, Gebäude aus 53 Babelsberg Süd, 71 Stern.“
+07:36:05.174 + 469.454s |   ok   Adresse merkt sich den Blick auf die Gebäude (blick=…)
+07:36:05.448 + 469.728s |   ok   Gebäude-Popup: Bauzeit, „geschätzt“, Weg, Quelle mit Vermerk, Grundstückshinweis (Bauzeit 1991–2000geschätztSchätzweg: Zensuszahlen der Zelle nach Gebäu…)
+07:36:05.491 + 469.771s |   ok   Gebäude-Popup: Schätzweg und Rücktest der Stufe mit n aus daten/jahre_methode.js, kein „Stufe X von 6“ (Im Rücktest traf dieser Schätzweg die bekannte Bauzeit so oft: Sichtprüfung Luftbilder Bor…)
+07:36:05.751 + 470.031s |   ok   Gebäude-Popup „nicht datiert“ mit Quelle des Umrisses
+07:36:06.663 + 470.944s |   ok   Zeitfilter 1949–1990: nur Klassen 2,3 farbig, übrige blass, 0 neue Anfragen
+07:36:06.713 + 470.993s |   ok   Zeitfilter: Legende nennt „andere Bauzeit“, keine Prozentskala der Zellen
+07:36:06.720 + 471.000s |   ok   Legende ab Zoom 14: Muster für „geschätzt“/„belegt“ ohne Klassenfarbe (rgb(19, 33, 42) rgb(19, 33, 42))
+07:36:07.134 + 471.414s |   ok   3D ab Zoom 14: keine Säulen über den Gebäuden (zellen-3d none, zellen-2d visible, Zoom 15.4)
+07:36:09.188 + 473.468s |   ok   Gebäudeansicht: axe 0 Verstöße 
+07:36:09.970 + 474.250s |   ok   Gebäudeansicht: Farben ohne Farbton 20°–70° 
+07:36:09.974 + 474.254s |   ok   Gebäudeansicht: reduzierte Bewegung ohne Animation
+07:36:16.490 + 480.770s |   ok   breiter Blick Zoom 14: Gebäude aus 31, 41, 44, 61, Zellen abgeblendet nur dort (31, 41, 44, 61), Zellen voll in 22, 23, 43, 62; Hinweis „adt; weitere Stadtteile beim Heranzoomen“
+07:36:16.490 + 480.770s |   ok   keine Konsolenfehler 
+07:36:16.490 + 480.770s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 25)
+07:36:19.705 + 483.985s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:36:21.432 + 485.712s |   ok   375 px: axe 0 Verstöße 
+07:36:23.458 + 487.738s |   ok   375 px: Frage 1 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:36:24.952 + 489.233s |   ok   375 px: Frage 2 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:36:26.310 + 490.590s |   ok   375 px: Frage 3 wird erst aktiv, wenn ihr Titel unter der Bühne lesbar ist
+07:36:26.320 + 490.601s | 
+07:36:26.321 + 490.601s | jahre-methode.html per http
+07:36:26.827 + 491.108s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:36:26.845 + 491.125s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:36:27.565 + 491.845s |   ok   axe: 0 Verstöße 
+07:36:27.721 + 492.001s |   ok   gerenderte Farben (23 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:36:27.721 + 492.001s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:36:27.721 + 492.001s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:36:27.765 + 492.045s |   ok   Methode: Stufentabelle, 6 Rücktest-Tabellen je Bauzeit und Stufe (19 Quoten mit n und 95-%-Bereich nach Wilson, gleich daten/jahre_methode.js; 5 mit n < 10 nur als Zählung), Vergleich mit dem Zensus
+07:36:27.765 + 492.045s |   ok   Methode: 95-%-Bereich je Quote nach Wilson nachgerechnet, Quote liegt im Bereich, als Darstellung gekennzeichnet
+07:36:27.770 + 492.050s |   ok   Methode: Höhe aus der Datei (Kataster 50.356, Geschosse 73, Ersatz 1.880, Summe = 52309 Gebäude, 96,3 %), keine feste Zählung im HTML, Kopfsatz eingeschränkt
+07:36:27.774 + 492.054s |   ok   Methode: „Nicht datiert“ nennt alle 25.593, davon 22.531 Nebengebäude
+07:36:27.775 + 492.055s |   ok   Methode: Schieflage (vor 1919 +41 %, 1979–1990 −35 %), Vorbehalte zum Rücktest, kein Vergleich mit Berlin als Zahl
+07:36:27.775 + 492.055s |   ok   Methode: Vorbild genau einmal genannt, als Methodenvorbild
+07:36:27.779 + 492.059s |   ok   Methode: Baualter-Statistik der Stadt (H4), 4 Zeilen, Gruppen = Gesamt, Gebäudekarte = Summe der Zensus-Tabelle, Vermerk mit Lizenz
+07:36:27.779 + 492.059s |   ok   Methode: genaue Jahre aus Wikidata genannt, im Rücktest zurückgehalten
+07:36:27.779 + 492.059s |   ok   keine Konsolenfehler 
+07:36:27.779 + 492.059s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+07:36:28.439 + 492.719s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:36:30.483 + 494.763s |   ok   375 px: axe 0 Verstöße 
+07:36:30.496 + 494.776s | 
+07:36:30.496 + 494.776s | jahre-daten.html per http
+07:36:31.145 + 495.425s |   ok   alle Zahlenfelder aus den Daten gefüllt 
+07:36:31.225 + 495.505s |   ok   keine Meldung (Daten echt, passend zu den Zellen)
+07:36:31.769 + 496.049s |   ok   axe: 0 Verstöße 
+07:36:31.803 + 496.083s |   ok   gerenderte Farben (11 verschiedene, DOM + Kartenstil) ohne Farbton 20°–70° 
+07:36:31.803 + 496.083s |   ok   keine ALKIS-Gebäudedatei daten/gebaeude/ geladen
+07:36:31.803 + 496.083s |   ok   beim Start keine Gebäudedatei daten/jahre/ geladen
+07:36:31.908 + 496.188s |   ok   CSV Zellen kiezatlas-bauzeiten-zellen-2026-11-05.csv: 2869 Zeilen (erwartet 2869), Kopf gitter_id,stadtteil,gebaeude,anteil_vor_1919,anteil_1919_194…
+07:36:32.088 + 496.368s |   ok   GeoJSON kiezatlas-bauzeiten-zellen-2026-11-05.geojson: 2869 Zellen, Vermerk und Lizenzlink
+07:36:32.156 + 496.436s |   ok   CSV je Stadtteil kiezatlas-bauzeiten-stadtteile-2026-11-05.csv: 32 Gebiete, Gebäudezahlen auf 10 gerundet
+07:36:32.202 + 496.482s |   ok   Liesmich LIESMICH-kiezatlas-bauzeiten.txt: Vermerk, Lizenzlink, kein OSM
+07:36:32.218 + 496.498s |   ok   GeoPackage daten/download/bauzeiten.gpkg: Pflichttabellen, application_id GPKG, Geometriekopf GP, EPSG:25833, Ausdehnung Potsdam
+07:36:32.829 + 497.109s |   ok   GeoPackage zellen: 2869 Zeilen, Gebäude und Anteile gleich der Zell-CSV
+07:36:32.830 + 497.110s |   ok   GeoPackage stadtteile: 32 Gebiete, alle Spalten gleich der Stadtteil-CSV (gerundet)
+07:36:32.831 + 497.111s |   ok   GeoPackage hinweis: Vermerk mit „Daten verändert“, Link zum Lizenztext; keine Adress- oder Eigentümerspalten
+07:36:32.833 + 497.114s |   ok   GeoPackage-Stand 2026-11-05 = Stand von jahre_zellen.js 2026-11-05 (sonst skripte/25_jahre_gpkg.py neu laufen lassen)
+07:36:32.841 + 497.121s |   ok   Downloads ohne Adress- oder Eigentümerfelder
+07:36:32.841 + 497.121s |   ok   keine Konsolenfehler 
+07:36:32.841 + 497.121s |   ok   Fremdabrufe nur Kacheln (abgewiesen: 0)
+07:36:33.445 + 497.725s |   ok   375 px: kein waagrechtes Scrollen (375 ≤ 375)
+07:36:34.455 + 498.735s |   ok   375 px: axe 0 Verstöße 
+07:36:34.465 + 498.745s | 
+07:36:34.465 + 498.745s | Hash und Bewegung
+07:36:37.183 + 501.463s |   ok   Hash wird gelesen und bleibt (#ansicht=spanne&von=2&bis=3&3d=1&st=52)
+07:36:40.189 + 504.469s |   ok   verstümmelter Hash (#st=%E0) bricht die Seite nicht ab 
+07:36:44.098 + 508.378s |   ok   file: Adresse mit blick= öffnet die Gebäude (41), Filter ab 1991 aktiv (Klassen 4,5,6,7)
+07:36:44.098 + 508.379s |   ok   file: Gebäudeansicht ohne Konsolenfehler 
+07:36:48.163 + 512.443s |   ok   http: Adresse mit blick= öffnet die Gebäude (41), Filter ab 1991 aktiv (Klassen 4,5,6,7)
+07:36:48.163 + 512.443s |   ok   http: Gebäudeansicht ohne Konsolenfehler 
+07:36:52.618 + 516.898s |   ok   Fixture: „belegt“ kräftig mit Rand (14 Ränder), Popup mit Baujahr und Quelle, Legende, Beispieldaten-Hinweis (Bauzeit 1919–1948belegt, Baujahr 1941Weg: genaues …)
+07:36:57.862 + 522.142s |   ok   375 px Gebäudeansicht: kein waagrechtes Scrollen (375 ≤ 375), axe 0 
+07:37:01.780 + 526.060s |   ok   (a) 1440 px, Schalter: ein Klick zu den 3D-Häusern (Zoom 16.2, Neigung 50, 1078 Körper, Dateien 41, beim Start 0, Konsolenfehler 0)
+07:37:04.621 + 528.901s |   ok   (b) Mausrad 3 Rasten runter und 3 hoch: Frage 0 → 1, 3D bleibt (d3 true, Neigung 50, Zoom 16.2)
+07:37:05.059 + 529.339s |   ok   3D aus: Statuszeile „uzeit. Karte folgt wieder der Geschichte“, Neigung 0
+07:37:05.090 + 529.370s |   ok   3D aus: Live-Region „…1 Historische Innenstadt. Karte folgt wieder der Geschichte.“
+07:37:09.089 + 533.369s |   ok   (a) 1440 px, Knopf: ein Klick zu den 3D-Häusern (Zoom 16.2, Neigung 50, 1078 Körper, Dateien 41, beim Start 0, Konsolenfehler 0)
+07:37:12.940 + 537.220s |   ok   (a) 375 px, Schalter: ein Klick zu den 3D-Häusern (Zoom 15.6, Neigung 50, 669 Körper, Dateien 41, beim Start 0, Konsolenfehler 0)
+07:37:16.742 + 541.023s |   ok   (a) 375 px, Knopf: ein Klick zu den 3D-Häusern (Zoom 15.6, Neigung 50, 669 Körper, Dateien 41, beim Start 0, Konsolenfehler 0)
+07:37:17.753 + 542.034s |   ok   375 px, Knopf: Markierung bei Frage 1 (Spanne), Karte bleibt beim Überblick (ueberblick)
+07:37:28.529 + 552.809s |   ok   (c) Doppelklick auf eine Zelle: Zoom 12.6 → 13.6, 0 Fenster offen
+07:37:32.573 + 556.853s |   ok   Link #ansicht=ueberblick&3d=1&selbst=1&blick=…: nach Frage 5 3D und Kamera unverändert (d3 true, Zoom 16.2 → 16.2)
+07:37:36.587 + 560.867s |   ok   Link #ansicht=ueberblick&3d=1&blick=13.12800,…: nach Frage 5 führt die Geschichte (3D aus) (d3 false, Zoom 15.4 → 10.3)
+07:37:40.548 + 564.828s |   ok   Link #ansicht=spanne&von=4&bis=7&3d=1…: nach Frage 5 führt die Geschichte (3D aus) (d3 false, Zoom 10.6 → 10.3)
+07:37:49.304 + 573.584s |   ok   Adresse aus Frage 7 (#ansicht=ueberblick&3d=1&blick=13.12800,52.37900…) neu geladen, Frage 2: 3D aus (d3 false, Zoom 12.2); nach dem Knopf steht selbst=1 in der Adresse
+07:37:56.265 + 580.545s |   ok   1440 px: Knopf nach Wahl von 13 fliegt hin (1183 Körper aus 13); „Auf der Karte zeigen“ 72 bei 3D: Zoom 16.2, Neigung 50, 181 Körper
+07:38:02.518 + 586.798s |   ok   375 px: Knopf nach Wahl von 13 fliegt hin (819 Körper aus 13); „Auf der Karte zeigen“ 72 bei 3D: Zoom 15.6, Neigung 50, 119 Körper, Titel „Selbst erkunden“ bei 582 unter der Bühne (552, Lücke 30 px, höchstens 40)
+07:38:05.751 + 590.031s |   ok   (d) 3D bei Zoom 10.6: zellen-3d none, Zellen flach (2141 gezeichnet), d3 true, Konsolenfehler 0 
+07:38:10.742 + 595.022s |   ok   Touch 375 px: Zwei-Finger-Schutz an, deutscher Hinweis („Strg + Mausrad zum ZoomenMit zwei Finger“), axe 0 , Konsolenfehler 0
+07:38:13.931 + 598.211s |   ok   Feinzeiger 1440 px: Zwei-Finger-Schutz aus
+07:38:16.903 + 601.183s |   ok   ohne reduzierte Bewegung: „Nacheinander“ sichtbar
+07:38:16.940 + 601.220s |   ok   ohne reduzierte Bewegung: Kartenstil blendet über
+07:38:18.155 + 602.435s | Responsiv jahre.html (8 Breiten)
+07:38:24.555 + 608.835s |   ok   360x740: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Legende offen, Tippziele unter 44 px 0
+07:38:24.555 + 608.835s |   ok   360x740: Karte beim Lesen 352 px = 48 % (mindestens 42 %), Leiste 20 % (höchstens 25 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:30.555 + 614.835s |   ok   390x844: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Legende offen, Tippziele unter 44 px 0
+07:38:30.555 + 614.836s |   ok   390x844: Karte beim Lesen 424 px = 50 % (mindestens 44 %), Leiste 18 % (höchstens 25 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:34.355 + 618.635s |   ok   844x390: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Legende offen, Tippziele unter 44 px 0
+07:38:34.355 + 618.635s |   ok   844x390: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:38:34.355 + 618.635s |   ok   844x390: Karte beim Lesen 262 px = 67 % (mindestens 60 %), Leiste 33 % (höchstens 36 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:40.351 + 624.631s |   ok   768x1024: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:38:40.351 + 624.631s |   ok   768x1024: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:38:40.351 + 624.631s |   ok   768x1024: Karte beim Lesen 790 px = 77 % (mindestens 70 %), Leiste 23 % (höchstens 32 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:46.445 + 630.725s |   ok   1024x768: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:38:46.445 + 630.725s |   ok   1024x768: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:38:46.445 + 630.725s |   ok   1024x768: Karte beim Lesen 546 px = 71 % (mindestens 66 %), Leiste 29 % (höchstens 32 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:52.563 + 636.843s |   ok   1280x800: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:38:52.563 + 636.843s |   ok   1280x800: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:38:52.563 + 636.843s |   ok   1280x800: Karte beim Lesen 590 px = 74 % (mindestens 68 %), Leiste 26 % (höchstens 32 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:38:59.002 + 643.282s |   ok   1440x900: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:38:59.002 + 643.282s |   ok   1440x900: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:38:59.002 + 643.282s |   ok   1440x900: Karte beim Lesen 690 px = 77 % (mindestens 72 %), Leiste 23 % (höchstens 32 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:39:05.401 + 649.681s |   ok   1920x1080: geladen, Konsole 0 Fehler, Überstand 0/0 px, Überlappungen 0, Kartenknöpfe verdeckt 0 über Start, Lesen, Hoch, Tippziele unter 44 px 0
+07:39:05.401 + 649.681s |   ok   1920x1080: Bühne beim Laden bei y 0 (nebeneinander: 0, die Kopfleiste liegt darüber)
+07:39:05.401 + 649.681s |   ok   1920x1080: Karte beim Lesen 890 px = 82 % (mindestens 78 %), Leiste 18 % (höchstens 32 %), Kopfleiste beim Lesen eingeklappt, nach Hochscrollen da
+07:39:05.492 + 649.772s | 
+07:39:05.492 + 649.772s | grün (251 Punkte)
+07:39:05.549 + 649.829s | -- Browser: pruefen/B5_jahre.mjs: grün, 275 s
+07:39:05.549 + 649.829s | 
+07:39:05.549 + 649.829s | == Browser: pruefen/p1_themen.mjs
+07:39:06.188 + 650.468s |   ok   themen.js 4.37 KB gz (Vertrag: höchstens 6 KB)
+07:39:06.461 + 650.741s | karte.html über file://
+07:39:07.762 + 652.043s |   ok   Objekt KIEZ_THEMEN hat genau die 32 Namen des Vertrags
+07:39:07.763 + 652.043s |   ok   Themen-Schlüssel id/h wie im Vertrag (stadtteile/stadtteile, ew/ew, d_alter/alter, q_u18/u18, q_65p/65p, q_v1949/vor1949, q_fern/fern)
+07:39:07.763 + 652.043s |   ok   laden: zwei gleichzeitige Aufrufe, 1 Script-Tag, beide erhalten dasselbe Objekt
+07:39:07.763 + 652.043s |   ok   laden: liegt das Global schon vor, kommt fertig() sofort
+07:39:07.763 + 652.043s |   ok   ebenen.registrieren: {"liste":["erreichbar"],"themenNeu":1,"ebene":"erreichbar","hash":"m_kita","zurueck":"erreichbar","keinDoppel":true}
+07:39:07.763 + 652.043s |   ok   ebenen.zellwerte: 3443 Werte für 3443 Zellen, erster 50
+07:39:07.763 + 652.043s |   ok   ebenen.zellwerte bei falscher erste_id, anzahl, Art oder Ebene: null und Meldung („Die Werte der Ebene erreichbar passen nicht zu den Zellen der Karte.“)
+07:39:07.763 + 652.043s |   ok   laden bei fehlender Datei: fertig(null), aria-live-Meldung („Daten aus daten/fixtures/gibt-es-nicht.js ließen sich nicht laden.“)
+07:39:07.763 + 652.043s |   ok   farbe mit eigenen Klassen: ["step",["get","m_kita"],"#dce6e2",300,"#a8c7c2",500,"#6fa1a3",1000,"#3b7684",2000,"#1c4a5b"]
+07:39:07.763 + 652.043s |   ok   klasse mit eigenen Klassen: 0,1,2,3,4
+07:39:07.763 + 652.043s |   ok   klassen über übergebene Features: {"grenzen":[2,3,5,8],"min":1,"max":10}
+07:39:07.763 + 652.043s |   ok   klassen für Prozent: fest 20/40/60/80
+07:39:07.763 + 652.043s |   ok   hoehe: faktor wirkt, faktor 1 = Standard
+07:39:07.763 + 652.043s |   ok   Texthelfer: 182.673 | 17,9 | 182.700 | 460 | k. A. | 20,2 % | Potsdam | Bornstedt | &lt;a &quot;b&quot;&gt;&amp;
+07:39:07.763 + 652.043s |   ok   Geometrie und Farben: {"ganz":true,"teile":32,"umriss":2,"polys":true,"farbe":32,"bezirk":8,"stufen":5,"grau":"#cdc8be"}
+07:39:07.763 + 652.043s |   ok   Ebenen-Thema ohne Werte: einfarbig "#dce6e2", nicht gemerkt, MapLibre nimmt es an
+07:39:07.763 + 652.043s |   ok   nach dem Einmischen (erreichbar_fuss_odbl.js, hort): {"grenzen":[7,12,19,24],"min":1,"max":30}, MapLibre nimmt es an
+07:39:07.763 + 652.043s |   ok   ebenen.zellwerte nimmt nur Listen (anzahl → null)
+07:39:07.763 + 652.043s |   ok   registrieren mit vergebener id oder h: {"neu":0,"ew":true,"alter":true,"neu2":true}
+07:39:07.763 + 652.043s |   ok   laden: gleiche Datei, verschiedene Globals getrennt ([null,"luftlinie"])
+07:39:07.763 + 652.043s |   ok   ebenen.zellwerte auf jahre_zellen.js (gebaeude, vorherrschend, anteile): 3443, 3443, 3443
+07:39:07.763 + 652.043s |   ok   keine Seitenfehler (0)
+07:39:07.763 + 652.043s |   ok   Konsole: 1 Fehler, davon 1 nur von der absichtlich fehlenden Datei (Failed to load resource: net::ERR_FILE_NOT_FOUND)
+07:39:07.777 + 652.057s | karte.html über HTTP
+07:39:10.469 + 654.749s |   ok   Objekt KIEZ_THEMEN hat genau die 32 Namen des Vertrags
+07:39:10.469 + 654.749s |   ok   Themen-Schlüssel id/h wie im Vertrag (stadtteile/stadtteile, ew/ew, d_alter/alter, q_u18/u18, q_65p/65p, q_v1949/vor1949, q_fern/fern)
+07:39:10.469 + 654.750s |   ok   laden: zwei gleichzeitige Aufrufe, 1 Script-Tag, beide erhalten dasselbe Objekt
+07:39:10.469 + 654.750s |   ok   laden: liegt das Global schon vor, kommt fertig() sofort
+07:39:10.469 + 654.750s |   ok   ebenen.registrieren: {"liste":["erreichbar"],"themenNeu":1,"ebene":"erreichbar","hash":"m_kita","zurueck":"erreichbar","keinDoppel":true}
+07:39:10.470 + 654.750s |   ok   ebenen.zellwerte: 3443 Werte für 3443 Zellen, erster 50
+07:39:10.470 + 654.750s |   ok   ebenen.zellwerte bei falscher erste_id, anzahl, Art oder Ebene: null und Meldung („Die Werte der Ebene erreichbar passen nicht zu den Zellen der Karte.“)
+07:39:10.470 + 654.750s |   ok   laden bei fehlender Datei: fertig(null), aria-live-Meldung („Daten aus daten/fixtures/gibt-es-nicht.js ließen sich nicht laden.“)
+07:39:10.470 + 654.750s |   ok   farbe mit eigenen Klassen: ["step",["get","m_kita"],"#dce6e2",300,"#a8c7c2",500,"#6fa1a3",1000,"#3b7684",2000,"#1c4a5b"]
+07:39:10.470 + 654.750s |   ok   klasse mit eigenen Klassen: 0,1,2,3,4
+07:39:10.470 + 654.750s |   ok   klassen über übergebene Features: {"grenzen":[2,3,5,8],"min":1,"max":10}
+07:39:10.470 + 654.750s |   ok   klassen für Prozent: fest 20/40/60/80
+07:39:10.470 + 654.750s |   ok   hoehe: faktor wirkt, faktor 1 = Standard
+07:39:10.470 + 654.750s |   ok   Texthelfer: 182.673 | 17,9 | 182.700 | 460 | k. A. | 20,2 % | Potsdam | Bornstedt | &lt;a &quot;b&quot;&gt;&amp;
+07:39:10.470 + 654.750s |   ok   Geometrie und Farben: {"ganz":true,"teile":32,"umriss":2,"polys":true,"farbe":32,"bezirk":8,"stufen":5,"grau":"#cdc8be"}
+07:39:10.470 + 654.750s |   ok   Ebenen-Thema ohne Werte: einfarbig "#dce6e2", nicht gemerkt, MapLibre nimmt es an
+07:39:10.470 + 654.750s |   ok   nach dem Einmischen (erreichbar_fuss_odbl.js, hort): {"grenzen":[7,12,19,24],"min":1,"max":30}, MapLibre nimmt es an
+07:39:10.470 + 654.750s |   ok   ebenen.zellwerte nimmt nur Listen (anzahl → null)
+07:39:10.470 + 654.750s |   ok   registrieren mit vergebener id oder h: {"neu":0,"ew":true,"alter":true,"neu2":true}
+07:39:10.470 + 654.750s |   ok   laden: gleiche Datei, verschiedene Globals getrennt ([null,"luftlinie"])
+07:39:10.470 + 654.750s |   ok   ebenen.zellwerte auf jahre_zellen.js (gebaeude, vorherrschend, anteile): 3443, 3443, 3443
+07:39:10.470 + 654.750s |   ok   keine Seitenfehler (0)
+07:39:10.470 + 654.750s |   ok   Konsole: 1 Fehler, davon 1 nur von der absichtlich fehlenden Datei (Failed to load resource: the server responded with a status of 404 (Not Found))
+07:39:10.558 + 654.838s | 
+07:39:10.558 + 654.838s | grün
+07:39:10.586 + 654.866s | -- Browser: pruefen/p1_themen.mjs: grün, 5 s
+07:39:10.586 + 654.866s | 
+07:39:10.586 + 654.866s | == Zählung: 18 Prüfungen, 18 grün, 0 mit Befund, 0 übersprungen
+07:39:10.586 + 654.866s |   grün  Syntax JavaScript (node --check)
+07:39:10.586 + 654.866s |   grün  Syntax Shell (sh -n)
+07:39:10.586 + 654.866s |   grün  Syntax Python (ast)
+07:39:10.586 + 654.866s |   grün  Datenverträge und Summen (pruefen/daten.py)
+07:39:10.586 + 654.866s |   grün  Vertrag Bauzeiten-Methode (pruefen/B5_methode.py)
+07:39:10.586 + 654.866s |   grün  jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen)
+07:39:10.586 + 654.866s |   grün  planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen)
+07:39:10.586 + 654.866s |   grün  GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet)
+07:39:10.586 + 654.866s |   grün  Codepfade Planer (pruefen/A6_test_pfade.py)
+07:39:10.586 + 654.866s |   grün  OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test)
+07:39:10.586 + 654.866s |   grün  Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test)
+07:39:10.586 + 654.866s |   grün  Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe)
+07:39:10.586 + 654.866s |   grün  Prüfsummen Kerndaten (belege/rohdaten.sha256)
+07:39:10.586 + 654.866s |   grün  Prüfsummen $KIEZ_DATEN (belege/rohdaten.kiez_daten.sha256)
+07:39:10.586 + 654.866s |   grün  Browser: pruefen/seiten.mjs
+07:39:10.586 + 654.866s |   grün  Browser: pruefen/A7_planer.mjs
+07:39:10.586 + 654.866s |   grün  Browser: pruefen/B5_jahre.mjs
+07:39:10.586 + 654.866s |   grün  Browser: pruefen/p1_themen.mjs
+07:39:10.587 + 654.867s | # Rückgabe pruefen.sh: 0
