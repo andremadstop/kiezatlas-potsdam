@@ -1,5 +1,10 @@
 # Kiezatlas Potsdam
 
+[![Standbild aus dem Belegfilm: Wohnungen in Häusern von vor 1949, Teltower Vorstadt 63,7 % gegen Waldstadt II 0,0 %](docs/filme/karte/standbild.png)](docs/filme/README.md)
+
+*Drei Belegfilme zeigen Läufe, Prüfung und Befunde; jede Zahl im Bild ist beim Rendern aus den Dateien dieses
+Repositorys gelesen ([`docs/filme/`](docs/filme/README.md)).*
+
 Alle 32 Stadtteile der Landeshauptstadt Potsdam in Zahlen und Karte, nur aus offenen amtlichen Daten:
 Zensus 2022 im 100-Meter-Gitter, die amtlichen Stadtteile und die Gebäudeumrisse der Landesvermessung.
 Wer wo wohnt, wie alt die Häuser sind, womit geheizt wird, für die ganze Stadt und jeden Stadtteil, und
@@ -12,7 +17,7 @@ Prototyp der Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam, Stand
 Jede Kernzahl mit dem Beleg, der sie trägt, und dem Skript, das sie erzeugt. Stand des Codes `6cb7efa` mit den
 Ergänzungen dieses Kastens; der Weg aller Skripte steht in [`docs/rundgang.md`](docs/rundgang.md), alle Belege in
 [`belege/README.md`](belege/README.md). Warum etwas so gerechnet ist, steht im Entscheidungsprotokoll
-[`docs/entscheidungen.md`](docs/entscheidungen.md) (A1 bis A17, mit „Nicht geprüft sind …“); was sich je Stand
+[`docs/entscheidungen.md`](docs/entscheidungen.md) (A1 bis A20, mit „Nicht geprüft sind …“); was sich je Stand
 geändert hat, in [`CHANGELOG.md`](CHANGELOG.md); wie man zitiert, in [`CITATION.cff`](CITATION.cff); was das Audit
 vom 06.11.2026 gefunden hat und was daraus wurde, in [`berichte/audit_20261106.md`](berichte/audit_20261106.md).
 Fehler in Daten oder Texten bitte an kontakt@souverain-systems.de.
@@ -86,6 +91,11 @@ Seiten (`pruefen/*.mjs`, je mit eigenem Port, Fremdabrufe beantwortet der Prüfb
 rote und übersprungene Prüfungen und gibt bei einem Befund 1 zurück; `--ohne-browser` lässt die Seitenprüfungen
 weg. Das Log je geprüftem Stand liegt unter `belege/pruefstand-<datum>-<commit>/`. Die Abnahmen gegen die
 Datenbank nennt der Rundgang.
+
+![Belegfilm „Der Lauf im Terminal“: sieben Importläufe, der Kita-Lauf mit Warnung, pruefen.sh mit 18 von 18 grün](docs/filme/terminal/film.gif)
+
+Der Film [„Der Lauf im Terminal“](docs/filme/terminal/README.md) zeigt die sieben Importläufe mit ihren echten
+Berichtszeilen und `./pruefen.sh` am Stand `a057522` (Protokoll `docs/filme/terminal/pruefen.log`).
 
 ## Umgebung
 

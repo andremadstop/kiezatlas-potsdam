@@ -98,3 +98,10 @@ vom 04.11. Die neuen Quellen stehen in `QUELLEN.md`.
 
 `3D_grundkarte_20261106.md`: Entscheidungen G1 bis G8, Herkunft der Gebäudehöhen (50.356 von 52.309 aus der
 ALKIS-Objekthöhe), Nachweis, dass die Bauzeit-Schätzung unverändert blieb, Prüfungen, Netzabrufe und Grenzen.
+
+## Belegfilme (08.11.2026)
+
+| Datei | belegt | erzeugt von |
+|---|---|---|
+| `filme_20261108.md` | Wie die drei Filme unter `docs/filme/` gebaut sind, Zählung der Prüfstellen (168), Prüfbefunde und was daraus wurde, Grenzen (Entscheidung A20) | Filmskripte in `docs/filme/*/`, Prüfung je Film durch einen eigenen Agenten |
+| `../docs/filme/terminal/pruefen.log` | `./pruefen.sh` am Commit `a057522` (sauberer Arbeitsstand), 08.11.2026: 18 Prüfungen, 18 grün, 0 mit Befund; Zeile 441 mit `$KIEZ_DATEN` statt des lokalen Pfads | `./pruefen.sh`, Zeitstempel je Zeile |

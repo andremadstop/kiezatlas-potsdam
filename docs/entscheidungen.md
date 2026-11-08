@@ -30,6 +30,8 @@ Entschieden hat jeweils André Stiebitz; Vorschläge, Prüfberichte und Umsetzun
 | A16 | Schaugrafik unter CC BY 4.0 | 06.11.2026 | Audit K19 |
 | A17 | Zitierfähige Stände: Version, Tag, Änderungsprotokoll, Meldeweg | 06.11.2026 | Audit K13 |
 | A18 | 3D heißt Häuser: keine Zellsäulen mehr auf allen Seiten, ein Klick zu den Häusern | 07.11.2026 | Beleg H1 bis H10 |
+| A19 | Voll responsive: Kopfleiste klappt beim Lesen ein, Karte und Text ab Handy quer nebeneinander | 07.11.2026 | Beleg `responsive_20261107.md` (Zeile am 08.11.2026 nachgetragen) |
+| A20 | Belegfilme: jede Zahl im Bild beim Rendern aus einer Datei im Repository gelesen und abgeglichen | 08.11.2026 | Beleg `filme_20261108.md` |
 
 ## A1: OpenStreetMap nur in eigenen `_odbl`-Dateien
 
@@ -215,6 +217,34 @@ Verworfen: Bühne mit der Kopfleiste wachsen lassen (Karte zeichnet bei jedem Ei
 springt); nur die Leiste der Bauzeiten einklappen (half einer Seite, quer blieb 0 % Karte); `dvh` statt `svh` (Karte
 springt beim Ein- und Ausfahren der Adressleiste); Kopfleiste am Desktop von Karte und Planer einklappen (dort ist
 Platz, die Seitenleiste müsste mitrutschen). Beleg `belege/responsive_20261107.md`.
+
+## A20: Belegfilme, Zahlen zur Renderzeit aus Dateien
+
+Anlass: André am 08.11.2026, die drei Belegfilme der Geodaten-Import-Pipeline auf den Kiezatlas zu übertragen. Maßstab:
+„oldschool aber doch top modern“, „inhaltlich weiterhin exakt und alles korrekt“, die Präsentation „darf nicht zu
+trocken und langweilig werden“. Am Ende soll ein Befund über Potsdam stehen, nicht nur der Nachweis, dass die Technik
+läuft.
+
+Entscheidung: Drei Filme unter `docs/filme/` (Karte mit Blender als Python-Modul, Terminal mit pycairo, Erklärfilm mit
+Manim), je mit Skripten, README, `film.mp4`, `film.gif` und `standbild.png`. Jede sichtbare Zahl und jede
+Berichtszeile liest das Skript beim Rendern aus einer Datei im Repository (`belege/`, `daten/`, `config/`,
+`docs/entscheidungen.md`, Tabelle „Zur Prüfung“ im README) und gleicht sie per `assert` ab; weicht eine Datei ab,
+bricht der Neubau ab, statt einen veralteten Film zu erzeugen. Was schematisch ist (Zeitraffer, Zeitleiste nach
+`laufzeit_s`, Bauzeit-Klasse geschätzt), steht klein im Bild. Die Namensnennung je Szene passt zu den gezeigten Daten,
+im Wortlaut von `daten/LIZENZ.md`. Datenschutz wie A3: kein Einzeljahr bei Wohnraum, keine Adresse, keine
+Gebäudekennung; die Bauzeit nur als Klasse und als Schätzung benannt. Ein Ergebnis erscheint erst, wenn der Lauf oder
+die Färbung, die es trägt, abgeschlossen ist. Geodaten kommen nicht aus dem Netz, sondern aus `daten/`, `belege/` und
+nur lesend aus der lokalen Datenbank.
+
+Begründung: Abgetippte Zahlen veralten still und lassen sich am Bild nicht nachprüfen. Werden sie beim Rendern gelesen,
+zeigt der Film den Stand der Dateien oder gar nichts. Das gilt auch für diese Entscheidung selbst: Der Erklärfilm
+zählt die Überschriften hier und bricht ab, wenn sie nicht lückenlos sind.
+
+Verworfen: eine Bildschirmaufnahme der Seiten (Grundkarte und Luftbild kämen von fremden Servern, nicht nachbaubar);
+Zahlen als Konstanten in den Skripten; die Filmskripte in `pruefen.sh` aufnehmen (Einmal-Werkzeuge mit eigenen
+Paketen wie `bpy`, `manim` und `pycairo`, die nicht in `requirements.txt` stehen; geprüft wird beim Rendern). Offen bei
+André: das Prüfprotokoll vom 08.11.2026 als `belege/pruefstand-20261108-a057522/` ablegen; bis dahin liegt es neben dem
+Terminalfilm. Beleg `belege/filme_20261108.md`.
 
 ## Nicht geprüft sind
 

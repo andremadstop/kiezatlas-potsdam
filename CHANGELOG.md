@@ -3,6 +3,17 @@
 Jeder veröffentlichte Stand bekommt einen Tag `stand-JJJJ-MM-TT` (bei mehreren am Tag mit Buchstabe) und steht hier.
 Die Seiten nennen den Stand im Fuß. Entscheidungen: `docs/entscheidungen.md`; Prüfstände: `belege/pruefstand-*`.
 
+## 2026-11-08 (kommender Stand, noch ohne Tag)
+
+- Drei Belegfilme unter `docs/filme/` (Übersicht `docs/filme/README.md`): „Potsdam wächst aus den Daten“ (Karte,
+  Blender, 47,0 s), „Der Lauf im Terminal“ (pycairo, 44,8 s) und „Was der Kiezatlas beantwortet“ (Manim, 74,2 s). Jede Zahl
+  im Bild liest das Skript beim Rendern aus einer Datei im Repository und gleicht sie ab (168 Prüfstellen); jeder Film
+  endet mit einem Befund über Potsdam (Altbau, Fernwärme). Entscheidung A20, Beleg `belege/filme_20261108.md`.
+- README: Standbild der Karte als Aufmacher, GIF des Terminalfilms bei „Prüfen“.
+- Prüfprotokoll von `./pruefen.sh` am Stand `a057522` (18 von 18 grün) als `docs/filme/terminal/pruefen.log`.
+- Pre-existing: Die Übersicht in `docs/entscheidungen.md` endete bei A18 (Zeile A19 nachgetragen), das README nannte
+  „A1 bis A17“.
+
 ## 2026-11-07 (kommender Stand, noch ohne Tag)
 
 - 3D heißt Häuser: keine Zellsäulen mehr auf Startseite, freier Karte und Bauzeiten; die Zellen liegen flach, die
