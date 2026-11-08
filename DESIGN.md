@@ -7,7 +7,7 @@
 - **Aufgabe der Seite:** In einem Durchgang zeigen, was das Werkzeug kann (Fragen als Einstieg), dann frei erkunden, vergleichen, die Methode nachvollziehen. Sorgfalt sichtbar machen (Grenzfall, Quellen bei jeder Zahl).
 - **Wünsche des Besitzers:** Einstieg über Alltagsfragen, die die Karte an die richtige Stelle führen und nebenbei je eine Funktion erklären. Zensus-Gitter als echte 3D-Säulen mit Tiefenwirkung, Höhe nach Wert, schräger Blick (so bis 07.11.2026; seither auf Andres Wunsch keine Säulen mehr, 3D heißt Häuser, siehe Nachträge).
 - **Grenzen:** Statisch, ohne Build, läuft per Doppelklick und über einen statischen Server. Daten nur aus `daten/*.js` (nie von Hand eingesetzte Zahlen). Kein Orange, keine Gedankenstrich-Ketten, keine Buzzwords.
-- **Annahmen:** Keine Bilder außer Karte und Luftbild. Kein Loader. One-Pager plus `404.html`.
+- **Annahmen:** Keine Bilder außer Karte und Luftbild. Kein Loader. One-Pager plus `404.html`. Ausnahme seit 08.11.2026 (Andre: „punkt 5 auch machen“): zwei Belegfilme im Abschnitt „Im Film“ unter der Methode, als `<video>` ohne fremden Player, `preload="none"`, ohne Ton, Vorschaubild als JPG.
 
 ## Drei Konzepte
 

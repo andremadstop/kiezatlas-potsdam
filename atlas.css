@@ -287,6 +287,15 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
 .methode__absaetze{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px clamp(24px,5vw,80px);max-width:1200px}
 .methode__absaetze h3{font:600 1.25rem/1.2 var(--f-display);color:#fff;margin:0 0 6px}
 .methode__absaetze p{margin:0;color:var(--tief-ink);font-size:1rem}
+.filme{margin-top:clamp(56px,7vw,96px);padding-top:28px;border-top:1px solid #3a4b55;max-width:1200px}
+.filme__titel{font:600 1.25rem/1.2 var(--f-display);color:#fff;margin:0 0 6px}
+.filme__einleitung,.filme__fuss{margin:0;color:var(--tief-ink);font-size:1rem;max-width:62ch}
+.filme__raster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px clamp(24px,5vw,80px);margin:28px 0}
+.film{margin:0;min-width:0}
+.film video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0e1a20;border:1px solid #3a4b55}
+.film figcaption{margin-top:10px;color:var(--tief-ink);font-size:.95rem}
+.film figcaption strong{color:#fff;font-weight:600}
+.film .vermerk{display:block;margin-top:6px;font-size:.8rem;font-weight:400;opacity:.85}
 
 /* ---------- Quellen, Fuß ---------- */
 .quellen-block{padding:clamp(64px,8vw,112px) var(--gut);background:var(--ground)}
@@ -332,6 +341,7 @@ select{font:500 1rem var(--f-text);padding:8px 10px;min-height:42px;border:1px s
   .grenz__tabelle{margin-top:36px;overflow-x:auto}
   .tabelle th:first-child{min-width:9.5em}
   .methode__absaetze{grid-template-columns:minmax(0,1fr)}
+  .filme__raster{grid-template-columns:minmax(0,1fr)}
   .methode__absaetze code{overflow-wrap:anywhere}   /* langer Belegpfad schob die Startseite bei 360 px um 29 px über */
 }
 /* Chipzeile in einer Zeile, seitlich wischbar: schmal und auf Touch (sonst brechen neun Chips am Tablet in drei Zeilen um) */

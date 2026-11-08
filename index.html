@@ -284,6 +284,25 @@
       <p>Die Farbe einer Zelle zeigt ihren Wert in bis zu fünf Stufen: Anteile in Stufen zu 20 Prozentpunkten, Einwohner und Durchschnittsalter in Fünfteln aller Zellen. Zellen mit weniger als zehn Personen bzw. Wohnungen sind grau. In 3D stehen nur die Gebäude, die Zellen bleiben flach. Gebäudeumrisse aus ALKIS vereinfacht, einem Stadtteil zugeordnet über einen Punkt im Umriss; die Höhe ist die Objekthöhe aus dem Kataster (ALKIS, über dem Gelände, bei 50.356 von 52.309 Gebäuden), sonst die Geschosszahl mal 3 m (73 Gebäude) oder ein Ersatzwert von 3 m (1.880, meist Nebengebäude); das Popup nennt die Herkunft je Gebäude. Dächer sind flach dargestellt.</p>
     </div>
   </div>
+  <div class="filme" id="filme">
+    <h3 class="filme__titel">Im Film</h3>
+    <p class="filme__einleitung">Zwei Belegfilme zeigen, wie die Daten hereinkommen und was die Prüfung meldet. Jede Zahl im Bild liest das Filmskript zur Renderzeit aus den Laufberichten im Repo. Die Filme laden erst beim Abspielen und haben keinen Ton.</p>
+    <div class="filme__raster">
+      <figure class="film">
+        <video controls preload="none" playsinline poster="docs/filme/karte/vorschau.jpg" width="1920" height="1080" aria-describedby="film-karte-text">
+          <source src="docs/filme/karte/film.mp4" type="video/mp4">
+        </video>
+        <figcaption id="film-karte-text"><strong>Potsdam wächst aus den Daten</strong> (47 s). Sieben Importläufe kommen nacheinander herein, die Gebäude wachsen in Kataster-Höhe aus dem Boden und färben sich nach geschätzter Bauzeit. <span class="vermerk">© Landeshauptstadt Potsdam, dl-de/zero-2-0; © Statistische Ämter des Bundes und der Länder, Zensus 2022; © GeoBasis-DE/LGB; © MBJS; jeweils dl-de/by-2-0, Daten verändert; belegte Bauzeiten Wikidata, CC0</span></figcaption>
+      </figure>
+      <figure class="film">
+        <video controls preload="none" playsinline poster="docs/filme/terminal/vorschau.jpg" width="1920" height="1080" aria-describedby="film-terminal-text">
+          <source src="docs/filme/terminal/film.mp4" type="video/mp4">
+        </video>
+        <figcaption id="film-terminal-text"><strong>Der Lauf im Terminal</strong> (45 s). Die echten Berichtszeilen der Importläufe, die Warnung des Kita-Laufs (220 von 240 gemeldeten Einträgen) mit ihrer Erklärung, danach die 18 Prüfungen von <code>pruefen.sh</code>.</figcaption>
+      </figure>
+    </div>
+    <p class="filme__fuss">Alle drei Filme mit Skripten, Herkunft jeder Zahl und Anleitung zum Neubauen: <a href="https://github.com/andremadstop/kiezatlas-potsdam/tree/main/docs/filme">docs/filme im Repo</a>.</p>
+  </div>
 </section>
 
 <!-- ============ QUELLEN ============ -->
