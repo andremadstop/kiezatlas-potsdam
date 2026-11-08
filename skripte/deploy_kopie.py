@@ -28,12 +28,15 @@ WURZEL = Path(__file__).resolve().parent.parent
 SEITEN = ["index.html", "karte.html", "404.html", "planer.html", "planer-methode.html", "planer-daten.html",
           "jahre.html", "jahre-methode.html", "jahre-daten.html"]
 DATEIEN = ["atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "karte.js", "planer.js", "jahre.js",
-           "themen.js", "kopf.js", "schaugrafik.js", "favicon.svg", "og.png"]
+           "themen.js", "kopf.js", "schaugrafik.js", "favicon.svg", "og.png",
+           # Belegfilme auf der Startseite (Abschnitt „Im Film“); Skripte und READMEs bleiben im Repo
+           "docs/filme/karte/film.mp4", "docs/filme/karte/vorschau.jpg",
+           "docs/filme/terminal/film.mp4", "docs/filme/terminal/vorschau.jpg"]
 ORDNER = ["vendor", "fonts", "daten"]
 AUSSER = ["daten/fixtures", "daten/schema"]
 
 # Seitenbestandteile und alle Dateien unter daten/ (auch Downloads wie .gpkg, .csv); Links auf Seiten bleiben ohne ?v
-VERWEIS = re.compile(r'((?:src|href)=")((?:daten/[^"#?:]+)|(?:[^"#?:]+\.(?:js|css|svg|png|woff2)))(")')
+VERWEIS = re.compile(r'((?:src|href|poster)=")((?:daten/[^"#?:]+)|(?:[^"#?:]+\.(?:js|css|svg|png|woff2|jpg|mp4)))(")')
 
 
 def dateiliste():
