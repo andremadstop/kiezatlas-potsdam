@@ -9,3 +9,8 @@ NICHT Teil dieses Repositorys: keine Open-Source-Lizenz, Weitergabe nicht geprü
 Einblendungen und Scroll-Auslöser; ohne GSAP schaltet atlas.js auf IntersectionObserver um. Bezug:
 sh skripte/vendor_holen.sh (npm-Paket gsap@3.15.1 nach vendor/). Ältere Commits (bis 7b6eb08) enthalten die
 beiden Dateien noch.
+
+MapLibre GL JS 4.7.1 (vendor/maplibre-gl.js, vendor/maplibre-gl.css), BSD-3-Clause, siehe
+vendor/MAPLIBRE-LICENSE.txt.
+Barlow und Barlow Semi Condensed (fonts/), Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow),
+SIL Open Font License 1.1 (fonts/OFL.txt).

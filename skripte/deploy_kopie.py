@@ -115,9 +115,11 @@ def main():
     (ziel / "MD5SUMS").write_text("\n".join(md5) + "\n", encoding="utf-8")
     groesse = sum((ziel / p).stat().st_size for p in liste)
     print(f"{len(liste)} Dateien, {groesse / 1e6:.1f} MB nach {ziel} (KIEZ_V={stempel}); MD5SUMS geschrieben")
-    print("Upload (Andre, additiv):")
-    print(f"  rsync -az -n --itemize-changes {ziel}/ relais:/opt/www/souverain-systems.de/kiezatlas/   # Probelauf")
-    print(f"  rsync -az --exclude MD5SUMS {ziel}/ relais:/opt/www/souverain-systems.de/kiezatlas/")
+    # Ziel des Uploads aus der Umgebung (Server und Webordner stehen nicht im öffentlichen Repo)
+    remote = os.environ.get("KIEZ_UPLOAD_ZIEL", "<server>:<webordner>/kiezatlas/")
+    print("Upload (Herausgeberin, additiv; Ziel aus $KIEZ_UPLOAD_ZIEL):")
+    print(f"  rsync -az -n --itemize-changes {ziel}/ {remote}   # Probelauf")
+    print(f"  rsync -az --exclude MD5SUMS {ziel}/ {remote}")
 
 
 if __name__ == "__main__":
