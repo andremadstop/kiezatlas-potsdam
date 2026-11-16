@@ -124,7 +124,8 @@ https://souverain-systems.de/kiezatlas/ (oder `index.html` per Doppelklick, ohne
   Quadrat), dann als SVG, PNG mit 300 dpi oder über die Druckansicht als PDF herunterladen. Quellen und Lizenzen
   stehen in jeder Grafik; die Karte darin ist aus den eigenen Daten gezeichnet, ohne fremde Kartenkacheln.
 - Bibliotheken (MapLibre GL JS, GSAP) und Schrift (Barlow, SIL Open Font License) liegen in `vendor/` und
-  `fonts/`; von fremden Servern kommen nur die Grundkarte (basemap.de, Kacheln und
+  `fonts/`. GSAP ist nicht im Repository (keine Open-Source-Lizenz, siehe NOTICE); `sh skripte/vendor_holen.sh`
+  legt es aus dem npm-Paket dazu, ohne GSAP fehlen nur die Einblendungen; von fremden Servern kommen nur die Grundkarte (basemap.de, Kacheln und
   Beschriftungsschrift) und das Luftbild (LGB).
 
 ## Grenzfall: Wem gehört eine Zelle auf der Grenze?

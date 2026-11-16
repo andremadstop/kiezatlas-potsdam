@@ -34,6 +34,8 @@ DATEIEN = ["atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "kar
            "docs/filme/terminal/film.mp4", "docs/filme/terminal/vorschau.jpg"]
 ORDNER = ["vendor", "fonts", "daten"]
 AUSSER = ["daten/fixtures", "daten/schema"]
+# Nicht im Repo (Lizenz ohne Open Source), aber auf der Website gebraucht: vorher skripte/vendor_holen.sh
+PFLICHT_UNVERFOLGT = ["vendor/gsap.min.js", "vendor/ScrollTrigger.min.js"]
 
 # Seitenbestandteile und alle Dateien unter daten/ (auch Downloads wie .gpkg, .csv); Links auf Seiten bleiben ohne ?v
 VERWEIS = re.compile(r'((?:src|href|poster)=")((?:daten/[^"#?:]+)|(?:[^"#?:]+\.(?:js|css|svg|png|woff2|jpg|mp4)))(")')
@@ -47,6 +49,7 @@ def dateiliste():
             if p.is_file() and not any(str(r).startswith(a + "/") for a in AUSSER):
                 out.append(r)
     fehlt = [str(p) for p in out if not (WURZEL / p).is_file()]
+    fehlt += [p for p in PFLICHT_UNVERFOLGT if not (WURZEL / p).is_file()]
     if fehlt:
         sys.exit("fehlt: " + ", ".join(fehlt))
     return out

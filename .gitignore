@@ -7,3 +7,7 @@ node_modules/
 .shots/
 __pycache__/
 *.pyc
+
+# GSAP: keine Open-Source-Lizenz, nicht im Repo; Bezug über skripte/vendor_holen.sh
+vendor/gsap.min.js
+vendor/ScrollTrigger.min.js

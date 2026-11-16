@@ -3,3 +3,9 @@ Copyright 2026 Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam
 
 Lizenziert unter der Apache License, Version 2.0 (siehe LICENSE).
 Die Daten in daten/ sind aus Quellen Dritter abgeleitet; Lizenzen und Quellenvermerke siehe README.md und index.html.
+
+GSAP 3.15.1 mit ScrollTrigger (GreenSock Standard „No Charge“ License, https://gsap.com/standard-license) ist
+NICHT Teil dieses Repositorys: keine Open-Source-Lizenz, Weitergabe nicht geprüft. Die Website nutzt es für
+Einblendungen und Scroll-Auslöser; ohne GSAP schaltet atlas.js auf IntersectionObserver um. Bezug:
+sh skripte/vendor_holen.sh (npm-Paket gsap@3.15.1 nach vendor/). Ältere Commits (bis 7b6eb08) enthalten die
+beiden Dateien noch.
