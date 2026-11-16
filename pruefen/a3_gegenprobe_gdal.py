@@ -5,8 +5,8 @@ prettymaps-potsdam. Vergleicht für jede Linie und jeden Punkt, die GDAL liefert
 eigenen Leser (gleiche Knotenzahl, größte Abweichung in Grad). Kein Netz.
 
 Aufruf (05.11.2026, Ergebnis in belege/A3_pbf_leser_gegenprobe.txt):
-    OSM_USE_CUSTOM_INDEXING=NO ~/localWorkspace/prettymaps-potsdam/.venv/bin/python -I \
-        pruefen/a3_gegenprobe_gdal.py ~/localWorkspace/prettymaps-potsdam/.venv/lib/python3.13/site-packages/pyogrio/tests/fixtures/sample.osm.pbf
+    OSM_USE_CUSTOM_INDEXING=NO <venv mit pyogrio>/bin/python -I \
+        pruefen/a3_gegenprobe_gdal.py <venv mit pyogrio>/lib/python3.13/site-packages/pyogrio/tests/fixtures/sample.osm.pbf
 """
 from __future__ import annotations
 

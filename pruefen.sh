@@ -91,6 +91,7 @@ pruef "GIS-Export ohne Datenbank (pruefen/A8_export.py --odbl-erwartet)" py prue
 pruef "Codepfade Planer (pruefen/A6_test_pfade.py)" py pruefen/A6_test_pfade.py
 pruef "OSM-Leser und Netz, ohne Datenbank (skripte/12_osm.sh test)" skripte/12_osm.sh test
 pruef "Fußweg, ohne Datenbank (skripte/14b_fussweg.sh test)" skripte/14b_fussweg.sh test
+pruef "Vor Veröffentlichung: Pfade, Adressen, Rechnernamen, Geheimnisse, Plankennungen, Lizenzregeln (skripte/oeffentlich_pruefen.py)" py skripte/oeffentlich_pruefen.py
 if ls "$KIEZ_DATEN"/vbb_gtfs/*/GTFS.zip >/dev/null 2>&1; then
   pruef "Landesfilter E7 (skripte/14b_fussweg.sh kreuzprobe)" skripte/14b_fussweg.sh kreuzprobe
 else

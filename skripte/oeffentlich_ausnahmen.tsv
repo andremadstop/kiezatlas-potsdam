@@ -1,0 +1,16 @@
+# Ausnahmen für skripte/oeffentlich_pruefen.py (übernommen aus dem Kiezatlas Kraków, 16.11.2026). Spalten durch Tabulator
+# getrennt: kategorie, pfadmuster (fnmatch, * passt auch auf /), wertmuster (regulärer Ausdruck, * = jeder), art, begründung.
+# art: ausnahme (begründet, bleibt), vor_veroeffentlichung (vor dem nächsten Release beheben) oder befund. Erste passende Zeile gilt.
+kategorie	pfadmuster	wertmuster	art	begruendung
+email	*	^kontakt@souverain-systems\.de$	ausnahme	Rollenadresse der Herausgeberin (Meldeweg, keine Person)
+email	*	@geobasis-bb\.de$	ausnahme	Behördenadresse der Landesvermessung (Quellenvermerk, keine Person)
+email	*	@mbjs\.brandenburg\.de$	ausnahme	Behördenadresse des Bildungsministeriums (Quellenvermerk, keine Person)
+email	skripte/*	^noreply@anthropic\.com$	ausnahme	Kennzeichnung der KI-Mitarbeit (Co-Authored-By), keine Person
+gross	docs/filme/*	*	ausnahme	Belegfilme der Startseite; Größe bewusst (Abschnitt „Im Film“)
+gross	daten/export/*.gpkg	*	ausnahme	GeoPackage-Download des Atlas; Größe gehört zum Datensatz
+lizenz	config/blocktypen.geojson	*	ausnahme	Text (GeoJSON) mit eigenem Lizenzvermerk im Kopf (ALKIS dl-de/by-2-0, eigene Abgrenzung)
+lizenz	docs/codekarte/*	*	ausnahme	Darstellung des eigenen Codes (CodeCharta), Apache-2.0 wie der Code
+lizenz	docs/filme/*	*	vor_veroeffentlichung	Filme und Bilder aus eigenen Seiten; Lizenz (in Kraków CC BY 4.0 mit den Vermerken der gezeigten Daten) für Potsdam noch nicht festgelegt
+lizenz	og.png	*	vor_veroeffentlichung	Vorschaubild aus eigener Seite; Lizenz wie die Filme festlegen
+plankennung	skripte/oeffentlich_pruefen.py	*	ausnahme	Beispiele der gesuchten Muster in der Beschreibung des Prüfwerkzeugs
+plankennung	*	*	vor_veroeffentlichung	Arbeitsvermerke des Baus (Pakete, Phasen) in Kommentaren, Belegen und Quellenlieferungen; seit 08.11.2026 öffentlich, vor dem ersten Release mit DOI erklären oder ersetzen

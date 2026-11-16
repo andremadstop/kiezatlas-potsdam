@@ -6,6 +6,10 @@ abstract: >-
   Kennzahlen je Stadtteil und Planungsraum der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter),
   Gemeinbedarf und Erreichbarkeit (Kita, Schule, Grün, ÖPNV) sowie geschätzte Bauzeiten der Gebäude, mit Methode,
   Rücktest, Prüfskripten und Quellenvermerk je Zahl. Prototyp.
+  Die Lizenz Apache-2.0 gilt für Code und eigene Texte. Die Daten in daten/ behalten die Lizenzen ihrer Quellen
+  (dl-de/by-2-0, dl-de/zero-2-0, CC0, CC BY 4.0, ODbL nur in *_odbl-Dateien), siehe daten/LIZENZ.md und QUELLEN.md.
+  Grafiken aus der Schaugrafik: CC BY 4.0 mit der Bildzeile auf der Grafik (docs/entscheidungen.md, A16).
+  GSAP ist nicht enthalten (keine Open-Source-Lizenz, siehe NOTICE). Code entstand mit KI-Unterstützung (Claude).
 authors:
   - given-names: André
     family-names: Stiebitz
@@ -19,6 +23,21 @@ license: Apache-2.0
 license-url: "https://github.com/andremadstop/kiezatlas-potsdam/blob/main/LICENSE"
 version: "stand-2026-11-06"
 date-released: "2026-11-06"
+references:
+  - type: software
+    title: "Geodaten-Import-Pipeline"
+    authors:
+      - name: "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+    doi: "10.5281/zenodo.24073612"
+    repository-code: "https://github.com/andremadstop/geodaten-import-pipeline"
+    license: Apache-2.0
+  - type: software
+    title: "Kiezatlas Kraków (aus diesem Code entstanden)"
+    authors:
+      - name: "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+    doi: "10.5281/zenodo.24254005"
+    repository-code: "https://github.com/andremadstop/kiezatlas-krakow"
+    license: Apache-2.0
 keywords:
   - Potsdam
   - Zensus 2022
@@ -26,8 +45,3 @@ keywords:
   - Gemeinbedarf
   - Baualter
   - Open Data
-notes: >-
-  Die Lizenz Apache-2.0 gilt für Code und eigene Texte. Die Daten in daten/ behalten die Lizenzen ihrer Quellen
-  (dl-de/by-2-0, dl-de/zero-2-0, CC0, CC BY 4.0, ODbL nur in *_odbl-Dateien), siehe daten/LIZENZ.md und QUELLEN.md.
-  Grafiken aus der Schaugrafik: CC BY 4.0 mit der Bildzeile auf der Grafik (docs/entscheidungen.md, A16).
-  Code entstand mit KI-Unterstützung (Claude).

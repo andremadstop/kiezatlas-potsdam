@@ -1,0 +1,44 @@
+{
+  "upload_type": "software",
+  "title": "Kiezatlas Potsdam: Stadtteile, Planungsräume und Bauzeiten aus offenen amtlichen Daten",
+  "description": "<p>Rezept (Code, Konfiguration, Prüfungen und Methode) für einen Atlas der 32 Stadtteile und der Planungsräume der Landeshauptstadt Potsdam aus offenen amtlichen Daten, mit Quellenvermerk bei jeder Zahl: Zensus 2022 im 100-Meter-Gitter, Gemeinbedarf und Erreichbarkeit (Kita, Schule, Grün, ÖPNV), geschätzte Bauzeiten der Gebäude mit Rücktest. Daten: Zensus 2022, ALKIS und Gebäude der Landesvermessung Brandenburg (LGB), Stadtteile und Planungsräume der Landeshauptstadt Potsdam, Schulen und Kitas (MBJS), VBB-GTFS, OpenStreetMap, Wikidata, basemap.de. Ein offenes Projekt, kein Produkt: Eine Hochschule oder Verwaltung kann es selbst betreiben und weiterentwickeln. Der Kiezatlas Kraków ist aus diesem Code entstanden.</p><p>Apache-2.0 gilt nur für den Code und die eigenen Texte. Die Daten in daten/ behalten die Lizenzen ihrer Quellen (daten/LIZENZ.md, QUELLEN.md); Teile aus OpenStreetMap stehen nur in *_odbl-Dateien (ODbL 1.0). GSAP (GreenSock Standard License, keine Open-Source-Lizenz) ist nicht enthalten (siehe NOTICE). Code und Texte entstanden mit KI-Unterstützung (Claude).</p>",
+  "creators": [
+    {
+      "name": "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+    },
+    {
+      "name": "Stiebitz, André",
+      "affiliation": "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+    }
+  ],
+  "license": "Apache-2.0",
+  "access_right": "open",
+  "language": "deu",
+  "keywords": [
+    "Potsdam",
+    "Stadtteile",
+    "Stadtatlas",
+    "Open Data",
+    "Zensus 2022",
+    "ALKIS",
+    "Gemeinbedarf",
+    "Baualter",
+    "OpenStreetMap",
+    "GeoPackage",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.24073612",
+      "relation": "requires",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.24254005",
+      "relation": "isSourceOf",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ]
+}

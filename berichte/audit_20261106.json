@@ -1153,9 +1153,9 @@
      "titel": "CITATION.cff, SECURITY.md (auch als Meldeweg für Datenfehler) und Änderungsprotokoll fehlen",
      "art": "zugang",
      "schwere": "niedrig",
-     "beleg": "Repo-Wurzel /home/andre/Workspace/Code/kiezatlas-potsdam: keine CITATION.cff, SECURITY.md, CHANGELOG (ls/git ls-files ohne Treffer); README.md:8 „Stand November 2026“ ohne Commit oder Tag, während live = 9864962; Vorbild: geodaten-import-pipeline/CITATION.cff, SECURITY.md, README-Kasten mit Tag",
+     "beleg": "Repo-Wurzel <Arbeitsordner>: keine CITATION.cff, SECURITY.md, CHANGELOG (ls/git ls-files ohne Treffer); README.md:8 „Stand November 2026“ ohne Commit oder Tag, während live = 9864962; Vorbild: geodaten-import-pipeline/CITATION.cff, SECURITY.md, README-Kasten mit Tag",
      "problem": "Wer den Atlas in einem Bericht, Antrag oder Heft nutzt, hat keine Zitierangabe mit Version. Wer einen Datenfehler findet (z. B. Standort Pestalozza, falsche Klasse), findet keinen Meldeweg. Welche Fassung live ist und was sich seit dem 04.11. geändert hat (Planer, Bauzeiten, Fußweg, Vektorkarte, Katasterhöhe), lässt sich nur aus Git-Commits erschließen.",
-     "vorschlag": "CITATION.cff nach dem Muster der Pipeline (type: dataset bzw. software, version = Tag, date-released, Lizenzen Code Apache-2.0, Daten je Datei). SECURITY.md mit Kontakt andre@souverain-systems.de (WKD), ausdrücklich auch für Daten- und Lizenzfehler. CHANGELOG.md je veröffentlichtem Stand mit Datum, Tag und den drei bis fünf sichtbaren Änderungen. Zusätzlich Tag und Commit im Seitenfuß neben „Import zuletzt“ anzeigen (data-feld aus kennzahlen.json).",
+     "vorschlag": "CITATION.cff nach dem Muster der Pipeline (type: dataset bzw. software, version = Tag, date-released, Lizenzen Code Apache-2.0, Daten je Datei). SECURITY.md mit Kontakt <Adresse entfernt> (WKD), ausdrücklich auch für Daten- und Lizenzfehler. CHANGELOG.md je veröffentlichtem Stand mit Datum, Tag und den drei bis fünf sichtbaren Änderungen. Zusätzlich Tag und Commit im Seitenfuß neben „Import zuletzt“ anzeigen (data-feld aus kennzahlen.json).",
      "aufwand": "klein"
     }
    ]

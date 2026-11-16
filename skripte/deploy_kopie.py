@@ -34,6 +34,8 @@ DATEIEN = ["atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "kar
            "docs/filme/terminal/film.mp4", "docs/filme/terminal/vorschau.jpg"]
 ORDNER = ["vendor", "fonts", "daten"]
 AUSSER = ["daten/fixtures", "daten/schema"]
+# Nicht im Repo (Lizenz ohne Open Source), aber auf der Website gebraucht: vorher skripte/vendor_holen.sh
+PFLICHT_UNVERFOLGT = ["vendor/gsap.min.js", "vendor/ScrollTrigger.min.js"]
 
 # Seitenbestandteile und alle Dateien unter daten/ (auch Downloads wie .gpkg, .csv); Links auf Seiten bleiben ohne ?v
 VERWEIS = re.compile(r'((?:src|href|poster)=")((?:daten/[^"#?:]+)|(?:[^"#?:]+\.(?:js|css|svg|png|woff2|jpg|mp4)))(")')
@@ -47,6 +49,7 @@ def dateiliste():
             if p.is_file() and not any(str(r).startswith(a + "/") for a in AUSSER):
                 out.append(r)
     fehlt = [str(p) for p in out if not (WURZEL / p).is_file()]
+    fehlt += [p for p in PFLICHT_UNVERFOLGT if not (WURZEL / p).is_file()]
     if fehlt:
         sys.exit("fehlt: " + ", ".join(fehlt))
     return out
@@ -112,9 +115,11 @@ def main():
     (ziel / "MD5SUMS").write_text("\n".join(md5) + "\n", encoding="utf-8")
     groesse = sum((ziel / p).stat().st_size for p in liste)
     print(f"{len(liste)} Dateien, {groesse / 1e6:.1f} MB nach {ziel} (KIEZ_V={stempel}); MD5SUMS geschrieben")
-    print("Upload (Andre, additiv):")
-    print(f"  rsync -az -n --itemize-changes {ziel}/ relais:/opt/www/souverain-systems.de/kiezatlas/   # Probelauf")
-    print(f"  rsync -az --exclude MD5SUMS {ziel}/ relais:/opt/www/souverain-systems.de/kiezatlas/")
+    # Ziel des Uploads aus der Umgebung (Server und Webordner stehen nicht im öffentlichen Repo)
+    remote = os.environ.get("KIEZ_UPLOAD_ZIEL", "<server>:<webordner>/kiezatlas/")
+    print("Upload (Herausgeberin, additiv; Ziel aus $KIEZ_UPLOAD_ZIEL):")
+    print(f"  rsync -az -n --itemize-changes {ziel}/ {remote}   # Probelauf")
+    print(f"  rsync -az --exclude MD5SUMS {ziel}/ {remote}")
 
 
 if __name__ == "__main__":
