@@ -73,7 +73,7 @@ with psycopg.connect() as con, con.cursor() as cur:
 
 # Repo: keine Gebäudekennungen oder Adressen in den B3-Dateien
 b3 = subprocess.run(["git", "-C", str(WURZEL), "ls-files", "skripte/23_*", "pruefen/B3_*", "berichte/B3_*",
-                     "quellen-b3.md"], capture_output=True, text=True, check=True).stdout.split()
+                     "docs/quellen/quellen-b3.md"], capture_output=True, text=True, check=True).stdout.split()
 treffer = [f for f in b3 if re.search(r"DEBBAL[0-9A-Za-z]{10}", (WURZEL / f).read_text(encoding="utf-8"))]
 pruefe(not treffer, f"keine ALKIS-oid in {len(b3)} B3-Dateien im Repo {treffer}")
 pruefe("aktualit" not in (WURZEL / "skripte" / "23_luftbild_pilot.py").read_text(encoding="utf-8"),
