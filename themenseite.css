@@ -1,0 +1,125 @@
+/* Kiezatlas: Themenseiten Luft, Wohnungsmarkt, Klima (themenseite.js, seite_*.js). Baut auf atlas.css und rahmen.css
+   auf (Farben, Schriften). Kein Orange; Akzent ist das Grenzviolett, Werte in den Stufen --k1 … --k5. */
+.ts-abzeichen{display:inline-block;margin:0 0 1.2em;padding:3px 10px;border:1px solid var(--accent);color:var(--accent);font:600 .875rem/1.4 var(--f-text);letter-spacing:.02em}
+.ts-abschnitt{margin:2.4em 0 0}
+.ts-abschnitt>h2{margin-top:0}
+.ts-merke{max-width:68ch;margin:1em 0;padding:10px 14px;border-left:4px solid var(--accent);background:var(--accent-soft)}
+.ts-merke p{margin:.3em 0}
+
+/* Beispieldaten im Inhalt: Kasten mit der fehlenden Quelle, Abbildungen schraffiert mit Marke */
+.ts-beispiel{max-width:72ch;margin:0 0 1.6em;padding:14px 16px;border:3px dashed var(--ink);background:repeating-linear-gradient(-45deg,#fff 0 10px,#f4f1ea 10px 20px)}
+.ts-beispiel p{margin:.35em 0}
+.ts-beispiel__titel{font:600 var(--t-m)/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.04em}
+.ts-beispiel[hidden]{display:none}
+.ts-mit-beispiel .ts-abbildung,.ts-mit-beispiel .ts-beispielzone{position:relative;background:repeating-linear-gradient(-45deg,transparent 0 12px,rgba(19,33,42,.045) 12px 24px)}
+.ts-mit-beispiel .ts-beispielzone{padding-top:34px}
+.ts-mit-beispiel .ts-abbildung::before,.ts-mit-beispiel .ts-beispielzone::before{content:var(--ts-marke,"");position:absolute;top:6px;left:6px;z-index:1;padding:2px 8px;background:var(--ink);color:#fff;font:600 .8125rem/1.4 var(--f-text);letter-spacing:.08em;pointer-events:none}
+.ts-mit-beispiel .ts-abbildung{padding-top:34px}
+
+/* Kennzahlen in einer Zeile */
+.ts-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:12px 24px;margin:1em 0 0;padding:0;list-style:none}
+.ts-zahlen li{border-top:1px solid var(--ink);padding-top:8px}
+.ts-zahlen b{display:block;font:600 var(--t-l)/1.05 var(--f-display)}
+.ts-zahlen span{color:var(--muted);font-size:.9375rem}
+
+/* Auswahl als Knopfgruppe */
+.ts-knoepfe{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:.8em 0}
+.ts-knoepfe__titel{margin-right:6px;color:var(--muted);font-size:.9375rem}
+.ts-knopf{min-height:44px;min-width:44px;padding:6px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 .9375rem/1.2 var(--f-text);cursor:pointer;border-radius:0}
+.ts-knopf[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.ts-knopf:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (hover:hover){.ts-knopf:not([aria-pressed="true"]):hover{border-color:var(--ink)}}
+
+/* Abbildungen */
+.ts-abbildung{margin:1em 0;max-width:900px}
+.ts-zeichnung{width:100%;overflow:hidden}
+.ts-abbildung figcaption{color:var(--muted);font-size:.9375rem;margin-top:.4em;max-width:68ch}
+.ts-linien{display:block;font-family:var(--f-text)}
+.ts-achsentext{font-size:12px;fill:var(--muted)}
+.ts-grenztext{font-size:12px;fill:var(--accent);font-weight:600}
+.ts-gitter{stroke:var(--line-soft);stroke-width:1}
+.ts-grenze{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:6 4}
+.ts-fenster{fill:var(--k1);opacity:.55}
+.ts-band{fill:#d8d4cc;opacity:.7}
+.ts-reihe path{fill:none;stroke:#9aa4a8;stroke-width:1.2}
+.ts-reihe circle{fill:#9aa4a8}
+.ts-reihe.ts-stadt path{stroke:var(--k4)}
+.ts-reihe.ts-stadt circle{fill:var(--k4)}
+.ts-reihe.ts-hervor path{stroke:var(--accent);stroke-width:2.6}
+.ts-reihe.ts-hervor circle{fill:var(--accent)}
+.ts-reihe.ts-m-ogolem path{stroke:var(--ink);stroke-width:2.6}
+.ts-reihe.ts-m-ogolem circle{fill:var(--ink)}
+.ts-reihe.ts-m-pierwotny path{stroke:var(--k4);stroke-width:1.8}
+.ts-reihe.ts-m-pierwotny circle{fill:var(--k4)}
+.ts-reihe.ts-m-wtorny path{stroke:var(--accent);stroke-width:1.8;stroke-dasharray:5 3}
+.ts-reihe.ts-m-wtorny circle{fill:var(--accent)}
+.ts-reihe circle.ts-offen{fill:var(--ground);stroke-width:1.5;stroke:currentColor}
+.ts-reihe.ts-hervor circle.ts-offen{stroke:var(--accent)}
+
+.ts-legende{display:flex;flex-wrap:wrap;gap:6px 18px;margin:.5em 0;padding:0;list-style:none;font-size:.9375rem}
+.ts-legende li{display:flex;align-items:center;gap:6px}
+.ts-muster{display:inline-block;width:22px;height:0;border-top:2px solid #9aa4a8}
+.ts-muster.ts-stadt{border-top-color:var(--k4)}
+.ts-muster.ts-hervor{border-top:3px solid var(--accent)}
+.ts-muster.ts-grenze{border-top:2px dashed var(--accent)}
+.ts-muster.ts-fenster{height:12px;border:0;background:var(--k1)}
+.ts-muster.ts-band{height:12px;border:0;background:#d8d4cc}
+.ts-muster.ts-offen{width:10px;height:10px;border:1.5px solid var(--ink);border-radius:50%}
+.ts-muster.ts-m-ogolem{border-top:3px solid var(--ink)}
+.ts-muster.ts-m-pierwotny{border-top-color:var(--k4)}
+.ts-muster.ts-m-wtorny{border-top:2px dashed var(--accent)}
+.ts-muster.ts-flaeche{width:16px;height:16px;border:1px solid var(--line)}
+.ts-muster.ts-grau{width:16px;height:16px;border:0;background:#cdc8be}
+
+/* Tabellen: scrollen in ihrem Rahmen, nie die Seite */
+.ts-tabellenrahmen{max-width:100%;overflow-x:auto;margin:1em 0;-webkit-overflow-scrolling:touch}
+.ts-tabellenrahmen:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ts-tabelle{border-collapse:collapse;min-width:100%;font-size:.9375rem}
+.ts-tabelle caption{text-align:left;font-weight:600;padding:0 0 .4em}
+.ts-tabelle th,.ts-tabelle td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ts-tabelle thead th{border-bottom:1px solid var(--ink);font-weight:600;white-space:nowrap}
+.ts-tabelle tbody th{font-weight:500;white-space:nowrap}
+.ts-tabelle thead th.ts-zahl{white-space:normal;min-width:7em}
+.ts-tabelle .ts-zahl{text-align:right;white-space:nowrap}
+.ts-tabelle tr.ts-summe th,.ts-tabelle tr.ts-summe td{font-weight:600;border-top:1px solid var(--ink)}
+.ts-tabelle tr.ts-gewaehlt th,.ts-tabelle tr.ts-gewaehlt td{background:var(--accent-soft)}
+.ts-leer{color:var(--muted);font-style:italic;white-space:normal}
+.ts-balkenzelle{display:inline-flex;align-items:center;justify-content:flex-end;gap:8px;min-width:9.5rem}
+.ts-balken{display:inline-block;width:5rem;height:8px;background:linear-gradient(90deg,var(--k4) calc(var(--w) * 100%),var(--line-soft) 0)}
+
+/* Karte (Klima) */
+.ts-kartenlegende{display:flex;flex-wrap:wrap;gap:4px 14px;margin:.5em 0;padding:0;list-style:none;font-size:.9375rem}
+.ts-kartenlegende li{display:flex;align-items:center;gap:6px}
+.ts-kartenwahl{margin:.4em 0 0;min-height:1.5em;color:var(--ink)}
+
+/* Quellen und Grenzen */
+.ts-quellen{margin:1em 0;max-width:80ch}
+.ts-quellen dt{font-weight:600;margin-top:1em}
+.ts-quellen dd{margin:0 0 0 0;padding-left:14px;border-left:1px solid var(--line)}
+.ts-quellen dd p{margin:.25em 0;overflow-wrap:anywhere}
+.ts-quellen q{quotes:"„" "”"}
+.ts-quelle-hinweis{font-weight:600}
+.ts-grenzen{max-width:72ch;padding-left:1.2em}
+.ts-grenzen li{margin:0 0 .5em}
+.ts-zitat{max-width:72ch;margin:1em 0;padding:0 0 0 14px;border-left:3px solid var(--line)}
+.ts-zitat p{margin:.3em 0}
+.ts-zitat footer{color:var(--muted);font-size:.9375rem}
+
+@media (max-width:599px){
+  .ts-tabelle{font-size:.875rem}
+  .ts-tabelle th,.ts-tabelle td{padding:6px 7px}
+  .ts-balken{width:3rem}
+  .ts-balkenzelle{min-width:6.5rem}
+}
+
+/* Platz für die Teile, die das Seitenskript erst nach dem ersten Zeichnen füllt (gegen Layoutsprünge beim Laden).
+   Werte = gemessene Höhe nach dem Füllen am 14.11.2026 (1440 px bzw. 390 px breit); sie gelten nur, solange der
+   Behälter leer ist, danach bestimmt der Inhalt die Höhe. Nur die Behälter bis etwa zum Ende des ersten Bildschirms. */
+#m-datenschutz:empty{min-height:56px}#m-rok:empty,#m-rynek:empty{min-height:44px}#m-stadt:empty{min-height:71px}#m-dzielnice:empty{min-height:794px}
+#p-stichtag:empty{min-height:83px}#p-zitat:empty{min-height:220px}#p-zmiany:empty{min-height:28px}#p-wahl:empty{min-height:94px}#p-stacja:empty{min-height:44px}#p-legende:empty{min-height:53px}#p-jahre:empty{min-height:680px}
+#k-zahlen:empty{min-height:98px}#k-klassen:empty{min-height:335px}#k-mapa-opis:empty{min-height:56px}#k-wahl:empty{min-height:44px}#k-legende:empty{min-height:51px}
+@media (max-width:599px){
+  #m-datenschutz:empty{min-height:50px}#m-rok:empty,#m-rynek:empty{min-height:94px}#m-stadt:empty{min-height:153px}#m-dzielnice:empty{min-height:1220px}
+  #p-stichtag:empty{min-height:124px}#p-zitat:empty{min-height:396px}#p-zmiany:empty{min-height:25px}#p-wahl:empty{min-height:200px}#p-legende:empty{min-height:170px}#p-jahre:empty{min-height:617px}
+  #k-zahlen:empty{min-height:294px}#k-klassen:empty{min-height:543px}#k-mapa-opis:empty{min-height:100px}#k-wahl:empty{min-height:129px}#k-legende:empty{min-height:152px}
+}

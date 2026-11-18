@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="{{lang}}"{{html_klasse}}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{titel}}</title>
+<meta name="description" content="{{beschreibung}}">
+{{robots}}{{sprachlinks}}
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{titel}}">
+<meta property="og:description" content="{{beschreibung}}">
+{{og_locale}}
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="{{wurzel}}favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{wurzel}}basis.css">
+{{stile}}<link rel="stylesheet" href="{{wurzel}}rahmen.css">
+{{css}}</head>
+<body class="{{body_klasse}}" data-seite="{{seite}}">
+<a class="sprung" href="#inhalt">{{t:kern.sprung}}</a>
+
+<header class="kopfleiste">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="{{wurzel_sprache}}index.html"><span class="marke__zeichen" aria-hidden="true"></span>{{ort:name}}</a>
+    <nav class="kopf-haupt" aria-label="{{t:kern.navigation}}">
+      <ul>
+{{navigation}}
+      </ul>
+    </nav>
+    <nav class="sprachen" aria-label="{{t:kern.sprachwahl}}">
+      <ul>
+{{sprachwahl}}
+      </ul>
+    </nav>
+  </div>
+{{unternavigation}}</header>
+
+<main id="inhalt">
+<div class="hinweise">
+  <p id="sprachhinweis" class="sprachhinweis" hidden>{{sprachhinweis}} <button type="button" aria-label="{{t:kern.schliessen}}" title="{{t:kern.schliessen}}"><span aria-hidden="true">×</span></button></p>
+  <p id="beispieldaten" class="beispieldaten" role="note" data-nachgeladen="{{t:kern.beispieldaten_nachgeladen}}" hidden>{{t:kern.beispieldaten}}</p>
+</div>
+{{inhalt}}
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__links"><a class="link" href="{{wurzel_sprache}}index.html">{{t:kern.zur_startseite}}</a> <a class="link" hreflang="{{lang}}" href="{{ort:impressum}}">{{t:kern.impressum}}</a> <a class="link" hreflang="{{lang}}" href="{{ort:datenschutz}}">{{t:kern.datenschutz}}</a></p>
+  <p class="fuss-seite__stand">{{t:kern.stand}} <span data-kiez-version>—</span>. {{t:kern.herausgeber}}: {{herausgeber}}. {{t:kern.lizenz}}{{odbl}} {{t:kern.meldeweg}} <a class="link" href="mailto:{{meldeweg}}">{{meldeweg}}</a></p>
+</footer>
+
+{{skripte}}</body>
+</html>

@@ -1,4 +1,4 @@
-/* Kiezatlas Potsdam: Bauzeiten (B5). Zensus 2022, Gebäude mit Wohnraum je 100-m-Zelle nach Bauzeit (Zweig 1),
+/* Kiezatlas: Bauzeiten (B5). Zensus 2022, Gebäude mit Wohnraum je 100-m-Zelle nach Bauzeit (Zweig 1),
    dazu ab Zoom 14 die Gebäude mit geschätzter Bauzeitklasse aus daten/jahre/<nr>.js (Zweig 2, Kaskade B4).
    Eine Datei für drei Seiten (body data-seite: karte | methode | daten). Daten nur per <script> (file://),
    alle Zahlen im Text werden hier aus daten/jahre_zellen.js und daten/jahre_methode.js gerechnet, keine ist von
@@ -29,7 +29,7 @@ var RAUM = { id: "stadtteile", einzahl: "Stadtteil", mehrzahl: "Stadtteile", fel
 // Gebäude: ab dieser Zoomstufe, Farben für „nicht datiert“ (E5) und „andere Bauzeit“ (ohne Farbton)
 var GEB_ZOOM = 14, GEB_ND = "#bcc0ba", GEB_REST = "#e5e7e2", GEB_LINIE = "#9da39b";
 // 3D-Häuser: Ziel ohne gewählten Stadtteil (Innenstadt), Zoom am Desktop und auf dem Handy, Neigung
-var HAUS_ZIEL = [13.0600, 52.3995], HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6, HAUS_NEIGUNG = 50;
+var HAUS_ZIEL = window.KIEZ_ORT.karte.haus_ziel, HAUS_ZOOM = 16.2, HAUS_ZOOM_SCHMAL = 15.6, HAUS_NEIGUNG = 50;
 var STATUS = { belegt: "belegt", geschaetzt: "geschätzt", nicht_datiert: "nicht datiert" };
 var WEG = { 1: "genaues Jahr aus einer Quelle", 2: "Luftbildklammer", 3: "Bauzeit der Großsiedlung", 4: "Zensuszahlen der Zelle nach Gebäudeform verteilt", 5: "Bauzeit der Nachbargebäude" };   // je Stufe s
 var M = window.KIEZ_JAHRE_METHODE || null;   // Kennzahlen der Gebäude-Schätzung (skripte/26_jahre_methode.py)
@@ -105,8 +105,8 @@ function aufzaehlung(l) {
 var QUELLE_KURZ = "";
 function zahlenFuellen() {
   var s = STAT, q = D.quellen[Object.keys(D.quellen)[0]];
-  QUELLE_KURZ = "Zensus 2022, Stichtag " + new Date(q.stand || "2022-05-15").toLocaleDateString("de-DE");
-  setze("stand", new Date(D.stand).toLocaleDateString("de-DE"));
+  QUELLE_KURZ = "Zensus 2022, Stichtag " + KIEZ_I18N.fmt.datum(q.stand || "2022-05-15");
+  setze("stand", KIEZ_I18N.fmt.datum(D.stand));
   setze("quelle", q.quelle); setze("vermerk", q.vermerk); setze("beschriftung", D.beschriftung);
   setze("zellen-alle", fmt.format(N)); setze("zellen", fmt.format(s.zellen)); setze("zellen-ohne", fmt.format(N - s.zellen));
   setze("gebaeude", rund(s.stadt.g)); setze("mitklassen", fmt.format(s.mitKlassen));
@@ -125,7 +125,7 @@ function zahlenFuellen() {
   if (M) gebaeudeZahlen();
   else if (document.querySelector('[data-j^="g-"]')) meldung("Die Kennzahlen der Gebäude-Schätzung (daten/jahre_methode.js) ließen sich nicht laden.");
   var v = document.getElementById("j-vermerk");
-  if (v) v.textContent = D.beschriftung + ". " + q.quelle + ". " + q.vermerk + ". Stand der Auswertung " + new Date(D.stand).toLocaleDateString("de-DE") + ".";
+  if (v) v.textContent = D.beschriftung + ". " + q.quelle + ". " + q.vermerk + ". Stand der Auswertung " + KIEZ_I18N.fmt.datum(D.stand) + ".";
 }
 
 // Gebäude-Schätzung: Zahlen aus daten/jahre_methode.js (gezählt aus daten/jahre/, Rücktest aus berichte/B4_holdout.md)
@@ -139,7 +139,7 @@ function gebaeudeZahlen() {
   setze("g-geschaetzt-p", pz(100 * M.je_g.geschaetzt / M.gebaeude)); setze("g-nd-p", pz(100 * M.je_g.nicht_datiert / M.gebaeude));
   setze("g-sf-alt", vz(sf(0).abweichung)); setze("g-sf-ddr", vz(sf(3).abweichung));
   setze("g-sf-alt-w", mehrWeniger(sf(0).abweichung)); setze("g-sf-ddr-w", mehrWeniger(sf(3).abweichung));
-  setze("g-sf-alt-k", KL[0]); setze("g-sf-ddr-k", KL[3]); setze("g-stand", new Date(M.stand).toLocaleDateString("de-DE"));
+  setze("g-sf-alt-k", KL[0]); setze("g-sf-ddr-k", KL[3]); setze("g-stand", KIEZ_I18N.fmt.datum(M.stand));
   var neben = M.stufen.filter(function (x) { return x.s === 6; })[0];
   setze("g-neben", fmt.format(neben ? neben.neben : 0));
   setze("g-sha", M.herkunft.sha256.slice(0, 12));
@@ -152,7 +152,7 @@ function gebaeudeZahlen() {
     setze("g-h-kataster-p", T.fmt1.format(100 * M.hoehe.kataster / M.gebaeude) + NB + "%");
     setze("g-h-ohne-p", pz(100 * (M.hoehe.geschosse + M.hoehe.ersatz) / M.gebaeude));
   }
-  if (M.umrisse_stand) setze("g-umrisse-stand", new Date(M.umrisse_stand).toLocaleDateString("de-DE"));
+  if (M.umrisse_stand) setze("g-umrisse-stand", KIEZ_I18N.fmt.datum(M.umrisse_stand));
   if (M.darstellung) setze("g-mindest-n", fmt.format(M.darstellung.mindest_n));
 }
 
@@ -220,12 +220,10 @@ function karte() {
   var map = new maplibregl.Map(Object.assign({
     container: "karte",
     style: T.grundkarte({ version: 8, transition: { duration: RUHIG ? 0 : 450, delay: 0 }, sources: {
-        basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-          attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
-        dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
-          attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
+        basemap: window.KIEZ_ORT.karte.grundkarte,
+        dop: window.KIEZ_ORT.karte.luftbild,
         zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung)' },
-        teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" },
+        teile: { type: "geojson", data: ST, promoteId: "nr", attribution: window.KIEZ_ORT.karte.teile_attribution },
         gebaeude: { type: "geojson", data: LEER, attribution: 'Gebäude © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung); Bauzeit je Gebäude geschätzt' } },
       layers: [
         { id: "papier", type: "background", paint: { "background-color": "#e6e9e4" } },
@@ -246,9 +244,7 @@ function karte() {
         { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
       ] }),
     maxZoom: 18, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: !FEIN,
-    locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden",
-      "CooperativeGesturesHandler.MobileHelpText": "Mit zwei Fingern die Karte bewegen",
-      "CooperativeGesturesHandler.WindowsHelpText": "Strg + Mausrad zum Zoomen", "CooperativeGesturesHandler.MacHelpText": "⌘ + Mausrad zum Zoomen" }
+    locale: KIEZ_I18N.karteLocale()
   }, start));
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
@@ -674,7 +670,7 @@ function karte() {
   }
   function steckbrief() {
     var r = S.nr ? STAT.raum[S.nr] : STAT.stadt, tb = document.querySelector("#j-sb-tabelle tbody");
-    document.getElementById("j-sb-name").textContent = S.nr ? S.nr + " " + T.name(S.nr) : "Potsdam";
+    document.getElementById("j-sb-name").textContent = S.nr ? S.nr + " " + T.name(S.nr) : KIEZ_I18N.ort("stadt");
     document.getElementById("j-sb-art").textContent = S.nr ? RAUM.einzahl + ", Bezirk " + T.TEIL[S.nr].properties.bezirk : "Ganze Stadt";
     document.getElementById("j-sb-g").textContent = "Rund " + rund(r.g) + " Gebäude mit Wohnraum in " + fmt.format(r.z) + " Zellen";
     tb.innerHTML = "";
@@ -689,7 +685,7 @@ function karte() {
       (ohne > 0 ? "Rund " + rund(ohne) + " Gebäude stehen in Zellen mit geheim gehaltenen Klassen und gehen nur in die Gesamtzahl ein. " : "") +
       (r.gk < MINDEST ? "Weniger als " + MINDEST + " Gebäude mit bekannter Bauzeit: Die Anteile sind sehr unsicher. " : "Die Geheimhaltung verändert kleine Werte; Summen über viele Zellen sind deshalb nur ungefähr. ") +
       QUELLE_KURZ + ", " + D.beschriftung.charAt(0).toLowerCase() + D.beschriftung.slice(1) + ".";
-    document.getElementById("j-sb-karte").querySelector(".knopf__text").textContent = S.nr ? "Auf der Karte zeigen" : "Ganz Potsdam auf der Karte";
+    document.getElementById("j-sb-karte").querySelector(".knopf__text").textContent = S.nr ? "Auf der Karte zeigen" : KIEZ_I18N.ort("ganze_stadt") + " auf der Karte";
   }
   var gewaehlt = "";
   function waehle(nr) {
@@ -818,7 +814,7 @@ function daten() {
       speichern("kiezatlas-bauzeiten-" + RAUM.id + "-" + tag + ".csv", "text/csv;charset=utf-8", z.join("\n") + "\n");
     },
     "j-d-liesmich": function () {
-      var t = ["Kiezatlas Potsdam: Bauzeiten, Stand " + D.stand, "",
+      var t = [KIEZ_I18N.ort("name") + ": Bauzeiten, Stand " + D.stand, "",
         D.beschriftung + ".", "", "Quelle: " + q.quelle, "Lizenz: " + q.lizenz + ", Lizenztext https://www.govdata.de/dl-de/by-2-0",
         "Namensnennung bei Weitergabe: " + q.vermerk, "", "Hinweise:", D.hinweis, "",
         "Spalten anteil_*: Prozent an der Summe der Klassen der Zelle, auf 0,1 gerundet; leer = alle Klassen geheim gehalten.",

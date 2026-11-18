@@ -1,25 +1,26 @@
-/* Kiezatlas Potsdam: gemeinsamer Themenkern aller Seiten (Vertrag: daten/schema/themen.md).
-   Zeichnet nichts. Nachladen nur per <script>, nie per fetch (file://). name() braucht KIEZ_KENNZAHLEN. */
+/* Kiezatlas: gemeinsamer Themenkern aller Seiten (Vertrag: daten/schema/themen.md).
+   Zeichnet nichts. Nachladen nur per <script>, nie per fetch (file://). name() braucht KIEZ_KENNZAHLEN.
+   Braucht vorher daten/ort.js (KIEZ_ORT: Themen, Farbtöne der Gruppen, Stadtname) und i18n.js (Zahlenformate). */
 (function () {
 "use strict";
 var ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN, NB = "\u00a0";
-var fmt = new Intl.NumberFormat("de-DE"), fmt1 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+var I18N = window.KIEZ_I18N, ORT = window.KIEZ_ORT, SW = I18N.sprachwert;
+var fmt = I18N.fmt.nf(), fmt1 = I18N.fmt.nf({ minimumFractionDigits: 1, maximumFractionDigits: 1 });
 function rundEw(v) { return fmt.format(v >= 1000 ? Math.round(v / 100) * 100 : Math.round(v / 10) * 10); }
-function proz(v) { return v == null ? "k. A." : fmt1.format(v) + NB + "%"; }
-function name(nr) { return nr ? window.KIEZ_KENNZAHLEN.stadtteile[nr].name : "Potsdam"; }
+function proz(v) { return v == null ? I18N.t("kern.k_a") : fmt1.format(v) + NB + "%"; }
+function name(nr) { return nr ? window.KIEZ_KENNZAHLEN.stadtteile[nr].name : I18N.ort("stadt"); }
 function kachel(G, id) { return (G.kacheln || []).filter(function (k) { return k.id === id; })[0]; }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
 // ---------- Themen in Chip-Reihenfolge; h = Hash-Schlüssel, bleibt stabil
-var THEMEN = [
-  { id: "stadtteile", h: "stadtteile", kurz: "Stadtteile", name: "Stadtteile" },
-  { id: "ew", h: "ew", kurz: "Einwohner", name: "Einwohner je Zelle", einheit: "Personen", quelle: "Zensus 2022, Bevölkerungszahl" },
-  { id: "d_alter", h: "alter", kurz: "Alter", name: "Durchschnittsalter", einheit: "Jahre", nenner: "a_ges", quelle: "Zensus 2022, Durchschnittsalter" },
-  { id: "q_u18", h: "u18", kurz: "unter 18", name: "Anteil unter 18 Jahre", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen" },
-  { id: "q_65p", h: "65p", kurz: "65 und älter", name: "Anteil 65 Jahre und älter", einheit: "%", nenner: "a_ges", quelle: "Zensus 2022, Alter in 5 Altersklassen" },
-  { id: "q_v1949", h: "vor1949", kurz: "vor 1949", name: "Wohnungen in Gebäuden vor 1949", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Baujahresklassen" },
-  { id: "q_fern", h: "fern", kurz: "Fernwärme", name: "Wohnungen mit Fernwärme", einheit: "%", nenner: "w_ges", quelle: "Zensus 2022, Energieträger der Heizung" }
-];
+// Liste aus der Ortskonfiguration (config/<ort>.yaml → daten/ort.js), Texte in der Seitensprache
+var THEMEN = ORT.themen.map(function (q) {
+  var o = { id: q.id, h: q.h, kurz: SW(q.kurz), name: SW(q.name) };
+  if (q.einheit != null) o.einheit = SW(q.einheit);
+  if (q.nenner) { o.nenner = q.nenner; o.mindest = q.mindestfallzahl || 10; }
+  if (q.quelle != null) o.quelle = SW(q.quelle);
+  return o;
+});
 var THEMA = {}, HASH = {};
 function aufnehmen(t) { THEMA[t.id] = t; if (t.h) HASH[t.h] = t.id; }
 THEMEN.forEach(aufnehmen);
@@ -42,12 +43,14 @@ if (Z) THEMEN.slice(1).forEach(function (t) { KLASSEN[t.id] = klassen(t); });
 // ohne Werte (Ebene noch nicht eingemischt): einfarbig, nicht gemerkt
 function kl(t, k) { if (k || KLASSEN[t.id]) return k || KLASSEN[t.id]; var s = klassen(t); if (!s.leer) KLASSEN[t.id] = s; return s; }
 function klasse(t, v, k) { var s = kl(t, k), i = 0; while (i < s.grenzen.length && v >= s.grenzen[i]) i++; return Math.min(i, 4); }
-function unscharf(t, p) { return t.nenner ? (p[t.nenner] == null || p[t.nenner] < 10) : false; }
+// unscharf: Nenner unter der Mindestfallzahl des Themas (ohne Angabe 10) oder Wert fehlt (null, in den Daten unterdrückt)
+function unscharf(t, p) { return t.nenner ? (p[t.nenner] == null || p[t.nenner] < (t.mindest || 10) || p[t.id] == null) : false; }
+function unscharfAusdruck(t) { return ["any", ["<", ["coalesce", ["get", t.nenner], 0], t.mindest || 10], ["==", ["get", t.id], null]]; }
 function farbe(t, k) {
   var s = kl(t, k), e = ["step", ["get", t.id], STUFEN[0]];
   s.grenzen.forEach(function (g, i) { e.push(g, STUFEN[Math.min(i + 1, 4)]); });
   if (!s.grenzen.length) e = STUFEN[0];
-  return t.nenner ? ["case", ["<", ["coalesce", ["get", t.nenner], 0], 10], GRAU, e] : e;
+  return t.nenner ? ["case", unscharfAusdruck(t), GRAU, e] : e;
 }
 // opt: faktor (Standard 1), hoch (1100 m), klassen
 function hoehe(t, opt) {
@@ -56,7 +59,7 @@ function hoehe(t, opt) {
   if (t.id === "ew") rel = ["sqrt", ["/", v, s.max || 1]];
   else if (t.einheit === "%") rel = ["/", ["min", 100, v], 100];
   else rel = ["max", 0, ["/", ["-", v, s.min], s.max - s.min || 1]];
-  var flach = t.nenner ? ["<", ["coalesce", ["get", t.nenner], 0], 10] : false;
+  var flach = t.nenner ? unscharfAusdruck(t) : false;
   function bei(H) { var h = ["*", f * H, rel]; return flach ? ["case", flach, 3, h] : h; }
   return ["interpolate", ["linear"], ["zoom"], 10, bei(H0 * 1.3), 12, bei(H0 * 0.45), 13, bei(H0 * 0.18), 14, bei(H0 * 0.075), 16, bei(H0 * 0.03)];
 }
@@ -65,8 +68,9 @@ function hoehe(t, opt) {
 function polys(f) { return f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates; }
 function umriss(f) { var a = [180, 90, -180, -90]; polys(f).forEach(function (p) { p[0].forEach(function (c) { a[0] = Math.min(a[0], c[0]); a[1] = Math.min(a[1], c[1]); a[2] = Math.max(a[2], c[0]); a[3] = Math.max(a[3], c[1]); }); }); return [[a[0], a[1]], [a[2], a[3]]]; }
 
-// ---------- Stadtteile: ein Farbton je Bezirk, heller und dunkler je Stadtteil
-var TOENE = { 1: 28, 2: 205, 3: 150, 4: 350, 5: 265, 6: 95, 7: 185, 8: 45 };
+// ---------- Stadtteile: ein Farbton je Gruppe (Feld bezirk = Gruppen-id aus der Ortskonfiguration), heller und dunkler je Stadtteil
+var TOENE = {};
+ORT.gliederung.gruppen.forEach(function (g) { TOENE[g.id] = g.ton; });
 var proBezirk = {}, FARBE = {}, BEZIRKFARBE = {}, TEIL = {}, GANZ = null;
 if (ST) {
   ST.features.forEach(function (f) { var b = f.properties.bezirk; (proBezirk[b] = proBezirk[b] || []).push(f.properties.nr); TEIL[f.properties.nr] = f; });
@@ -96,8 +100,8 @@ function laden(src, global, fertig) {
   var l = wartend[w] = [fertig], s = document.createElement("script");
   function ende(wert) { delete wartend[w]; l.forEach(function (f) { f(wert); }); }
   s.src = v(src); s.async = true;
-  s.onload = function () { var d = window[global]; if (d == null) melden("Daten aus " + src + " sind unvollständig."); ende(d == null ? null : d); };
-  s.onerror = function () { melden("Daten aus " + src + " ließen sich nicht laden."); ende(null); };
+  s.onload = function () { var d = window[global]; if (d == null) melden(I18N.t("kern.laden_unvollstaendig", { datei: src })); ende(d == null ? null : d); };
+  s.onerror = function () { melden(I18N.t("kern.laden_fehler", { datei: src })); ende(null); };
   document.head.appendChild(s);
 }
 
@@ -118,24 +122,50 @@ var ebenen = {
     var l = d && (d.werte && d.werte[art] || d[art]);
     var ok = Array.isArray(l) && d.anzahl === f.length && l.length === f.length &&
       f.length && d.erste_id === f[0].properties.id && d.letzte_id === f[f.length - 1].properties.id;
-    if (!ok) { melden("Die Werte der Ebene " + id + " passen nicht zu den Zellen der Karte."); return null; }
+    if (!ok) { melden(I18N.t("kern.ebene_passt_nicht", { ebene: id })); return null; }
     return l;
   }
 };
 
-// ---------- Grundkarte: Vektorkarte von basemap.de statt der grauen Rasterkarte (daten/grundkarte.js, CC BY 4.0).
+// ---------- Grundkarte: Vektorkarte aus daten/grundkarte.js (Quelle und Lizenz dort) statt der grauen Rasterkarte.
 // Ersetzt im Stil die Rasterebene "basemap" durch die Flächen und Linien (an ihrer Stelle) und hängt die
 // Beschriftungen oben an, bei o.vor vor dieser Ebene (z. B. Punkte, die über den Namen liegen sollen).
 // Fehlt daten/grundkarte.js, bleibt der Stil unverändert (Rasterkarte).
+// Relative Kachel- und Schriftpfade (eigene Kacheln, relativ zur Atlas-Wurzel) werden absolut, bezogen auf den
+// Ort, von dem die Seite daten/grundkarte.js geladen hat: MapLibre lädt Kacheln im Worker und löst relative URLs
+// nicht auf. Die Wurzel liegt eine Ebene über daten/, auch für Seiten in en/ und de/; ein ?v= stört nicht.
+// Absolute URLs (https:) bleiben. Unter file:// lädt der Worker nichts; dann entfällt eine Grundkarte mit
+// relativen Pfaden ohne Fehler (Ebene "basemap" als unsichtbarer Platzhalter), die übrige Karte bleibt. Der Stil hat
+// dann keine Schrift (glyphs): Beschriftungsebenen mit text-field funktionieren unter file:// nicht.
+// Eine Quelle null in der Ortskonfiguration (etwa ohne Luftbild) fällt weg; ihre Ebenen bleiben als unsichtbare
+// Platzhalter gleichen Namens, damit die Sichtbarkeitsschalter der Module keinen Fehler auslösen.
 var GK = window.KIEZ_GRUNDKARTE;
+var GK_WURZEL = (function () {
+  for (var s = document.scripts, k = 0; k < s.length; k++)
+    if (/\/daten\/grundkarte\.js$/.test((s[k].src || "").split(/[?#]/)[0])) return new URL("../", s[k].src).href;
+  return null;
+})();
+function gkRelativ(u) { return !/^[a-z][a-z0-9+.-]*:/i.test(u); }
+function gkAbsolut(u) { return gkRelativ(u) && GK_WURZEL ? GK_WURZEL + u.replace(/^\.\//, "") : u; }
+var GK_AUS = !!GK && (GK.quelle.tiles || []).concat(GK.glyphs || []).some(gkRelativ) && (location.protocol === "file:" || !GK_WURZEL);
+function ohneLeer(stil) {
+  Object.keys(stil.sources).forEach(function (q) {
+    if (stil.sources[q] != null) return;
+    delete stil.sources[q];
+    stil.layers = stil.layers.map(function (l) { return l.source === q ? { id: l.id, type: "background", layout: { visibility: "none" }, paint: { "background-opacity": 0 } } : l; });
+  });
+  return stil;
+}
 function grundkarte(stil, o) {
+  ohneLeer(stil);
   if (!GK) return stil;
   o = o || {};
   var i = stil.layers.map(function (l) { return l.id; }).indexOf("basemap");
   if (i < 0) return stil;
   delete stil.sources.basemap;
-  stil.sources.bm = GK.quelle;
-  stil.glyphs = GK.glyphs;
+  if (GK_AUS) { stil.layers[i] = { id: "basemap", type: "background", layout: { visibility: "none" }, paint: { "background-opacity": 0 } }; return stil; }
+  stil.sources.bm = GK.quelle.tiles ? Object.assign({}, GK.quelle, { tiles: GK.quelle.tiles.map(gkAbsolut) }) : GK.quelle;
+  stil.glyphs = GK.glyphs && gkAbsolut(GK.glyphs);
   var unten = GK.unten.map(function (l) { return Object.assign({}, l); }), oben = GK.oben.map(function (l) { return Object.assign({}, l); });
   stil.layers.splice.apply(stil.layers, [i, 1].concat(unten));
   var j = o.vor ? stil.layers.map(function (l) { return l.id; }).indexOf(o.vor) : -1;
@@ -143,18 +173,22 @@ function grundkarte(stil, o) {
   stil.layers.splice.apply(stil.layers, [j, 0].concat(oben));
   return stil;
 }
-// Luftbild an: Flächen und Linien der Grundkarte aus, Beschriftungen bleiben (mit Rand lesbar auf dem Foto)
+// Luftbild an: Flächen und Linien der Grundkarte aus, Beschriftungen bleiben (mit Rand lesbar auf dem Foto).
+// Ohne Luftbild (karte.luftbild null in der Ortskonfiguration) tut der Schalter nichts: sonst bliebe nur eine leere
+// Fläche mit Beschriftungen. Die Module blenden den Schalter mit KIEZ_THEMEN.LUFTBILD === false aus.
+var LUFTBILD = !!(ORT.karte && ORT.karte.luftbild);
 function grundLuft(map, an) {
+  if (!LUFTBILD) return;
   var v = an ? "none" : "visible";
   if (!GK) { if (map.getLayer("basemap")) map.setLayoutProperty("basemap", "visibility", v); return; }
   GK.unten.forEach(function (l) { if (l.layout && l.layout.visibility === "none") return; if (map.getLayer(l.id)) map.setLayoutProperty(l.id, "visibility", v); });
 }
 
 // Herkunft der Gebäudehöhe (Feld hq in daten/gebaeude/*.js und daten/jahre/*.js)
-var HQ = { kataster: "Objekthöhe aus dem Kataster (ALKIS)", geschosse: "geschätzt: Geschosse × 3 m", ersatz: "Ersatzwert 3 m, keine Höhe im Kataster" };
+var HQ = { kataster: I18N.t("kern.hq_kataster"), geschosse: I18N.t("kern.hq_geschosse"), ersatz: I18N.t("kern.hq_ersatz") };
 
 window.KIEZ_THEMEN = {
-  grundkarte: grundkarte, grundLuft: grundLuft, GRUNDKARTE: !!GK, HQ: HQ,
+  grundkarte: grundkarte, grundLuft: grundLuft, GRUNDKARTE: !!GK, LUFTBILD: LUFTBILD, HQ: HQ,
   THEMEN: THEMEN, THEMA: THEMA, HASH: HASH,
   STUFEN: STUFEN, GRAU: GRAU,
   KLASSEN: KLASSEN, klassen: klassen, klasse: klasse,

@@ -18,6 +18,7 @@
 <script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
 <link rel="stylesheet" href="vendor/maplibre-gl.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="vendor/maplibre-gl.css"></noscript>
+<link rel="stylesheet" href="basis.css">
 <link rel="stylesheet" href="atlas.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Kiezatlas Potsdam","description":"Kennzahlen je Stadtteil der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter), amtlichen Stadtteilen und ALKIS-Gebäuden.","inLanguage":"de","spatialCoverage":"Potsdam","creator":{"@type":"Organization","name":"Stiebitz Souverain Systems UG (haftungsbeschränkt)","address":"Potsdam"}}</script>
 </head>
@@ -331,7 +332,7 @@
 
 <div id="druck" aria-hidden="true"></div>
 
-<script defer src="daten/kennzahlen.js"></script>
+<script defer src="daten/ort.js"></script><script defer src="i18n.js"></script><script defer src="texte/de/kern.js"></script><script defer src="texte/de/karte.js"></script><script defer src="daten/kennzahlen.js"></script>
 <script defer src="kopf.js"></script>
 <script defer src="daten/stadtteile.js"></script>
 <script defer src="daten/zellen.js"></script>

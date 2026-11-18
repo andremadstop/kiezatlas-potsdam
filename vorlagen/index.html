@@ -1,0 +1,183 @@
+<!--seite
+rahmen: eigen
+-->
+<!doctype html>
+<html lang="de" class="kopf-zwei">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{t:seiten.index.titel}}</title>
+<meta name="description" content="{{t:seiten.index.beschreibung}}">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/">
+<meta name="theme-color" content="#f1f2ee">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kiezatlas Potsdam">
+<meta property="og:description" content="Potsdam im 100-Meter-Gitter des Zensus 2022: Stadtteile vergleichen, Grenzfälle nachrechnen, Schaugrafiken für den Druck.">
+<meta property="og:image" content="https://souverain-systems.de/kiezatlas/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="vendor/maplibre-gl.css"></noscript>
+<link rel="stylesheet" href="basis.css">
+<link rel="stylesheet" href="atlas.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Kiezatlas Potsdam","description":"Kennzahlen je Stadtteil der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter), amtlichen Stadtteilen und ALKIS-Gebäuden.","inLanguage":"de","spatialCoverage":"Potsdam","creator":{"@type":"Organization","name":"Stiebitz Souverain Systems UG (haftungsbeschränkt)","address":"Potsdam"}}</script>
+</head>
+<body>
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="#oben" aria-label="Kiezatlas Potsdam, zum Anfang"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html" aria-current="true"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Abschnitte der Startseite">
+    <ul>
+      <li><a class="nav" href="#fragen"><span>Fragen</span></a></li>
+      <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
+      <li><a class="nav" href="#schaugrafik"><span>Schaugrafik</span></a></li>
+      <li><a class="nav" href="#grenzfall"><span>Grenzfall</span></a></li>
+      <li><a class="nav" href="#methode"><span>Methode</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt" tabindex="-1">
+
+<!-- ============ ERZÄHLUNG: Titel, Fragen, Karte ============ -->
+<section class="erzaehlung" id="oben" aria-labelledby="titel">
+  <div class="auftakt frage" data-schritt="0">
+    <h1 id="titel" class="titel"><span class="titel__z"><span>Kiezatlas</span></span> <span class="titel__z"><span>Potsdam</span></span></h1>
+    <p class="lede">Wer wo wohnt, wie alt die Häuser sind und womit geheizt wird, für Potsdam und jeden seiner <span data-feld="anzahl-teile"></span> Stadtteile: aus dem Zensus 2022 im 100-Meter-Gitter, den amtlichen Stadtteilen und den Gebäuden der Landesvermessung. Jede Zahl nennt ihre Quelle.</p>
+    <div class="auftakt__aktion">
+      <a class="knopf knopf--voll" href="#frage-1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Mit der ersten Frage beginnen</span></a>
+      <span class="entwurf">Prototyp, Stand <span data-feld="stand"></span>.</span>
+    </div>
+    <dl class="stadtzahlen" id="stadtzahlen" aria-label="Ganz Potsdam in Zahlen"></dl>
+    <p class="stadtzahlen__quelle"><span data-feld="flaeche-stadt"></span> km² Stadtgebiet, <span data-feld="zellen-stadt"></span> Gitterzellen mit Zensuswerten. Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung.</p>
+
+  </div>
+
+  <div class="buehne" id="buehne">
+    <div id="karte" role="region" aria-label="Karte von Potsdam; Bedienung über die Werkzeugleiste darüber" tabindex="-1"></div>
+    <div class="werkzeug" role="toolbar" aria-label="Kartenwerkzeug">
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="dreid"><span>3D-Häuser</span></label>
+      </div>
+      <fieldset class="themen" id="thema"><legend class="nur-sr">Thema der Karte</legend></fieldset>
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="luftbild"><span>Luftbild</span></label>
+      </div>
+    </div>
+    <div class="legende" id="legende"></div>
+    <div class="schild" id="schild" aria-hidden="true"></div>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  {{block:index_fragen}}
+</section>
+
+<!-- ============ STADTTEILE: Register und Steckbrief ============ -->
+<section class="register" id="stadtteile" aria-labelledby="h-teile">
+  <div class="register__kopf">
+    <h2 id="h-teile" class="abschnitt">Die <span data-feld="anzahl-teile"></span> Stadtteile</h2>
+    <p class="abschnitt__unter">Nummeriert von <span data-feld="nr-erste"></span> bis <span data-feld="nr-letzte"></span>; die erste Ziffer nennt den Stadtbezirk, ein Farbton je Bezirk wie in der Karte. Sortieren zum Vergleichen, auswählen für den Steckbrief.</p>
+  </div>
+  <div class="register__liste">
+    <div class="sortierung" role="group" aria-label="Sortieren nach" id="sortierung"></div>
+    <div id="teile"></div>
+  </div>
+  <aside class="steckbrief" id="steckbrief" aria-labelledby="sb-name">
+    <label class="gebiet">Gebiet <select id="gebiet"></select></label>
+    <h3 class="steckbrief__name" id="sb-name" data-feld="name">Potsdam</h3>
+    <p class="steckbrief__art"><span data-feld="art"></span>, <span data-feld="flaeche"></span> km²</p>
+    <div class="kacheln" id="kacheln" aria-live="polite"></div>
+    <p class="fuss" id="sb-fuss">Grundlage: <span data-feld="zellen"></span> Gitterzellen zu 100 × 100 m, deren Mittelpunkt im Gebiet liegt; <span data-feld="gebaeude"></span>. Stichtag des Zensus: 15. Mai 2022.</p>
+    <p class="fuss" id="gegenprobe"></p>
+    <div class="steckbrief__aktion">
+      <button class="knopf knopf--rand" type="button" id="sb-karte"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+      <button class="knopf knopf--rand" type="button" id="sb-grafik"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Als Schaugrafik</span></button>
+    </div>
+  </aside>
+  <div class="verteilungen-block">
+    <h3 class="unterabschnitt">Verteilungen: <span data-feld="name">Potsdam</span></h3>
+    <p class="abschnitt__unter">Summen über alle Zellen im Gebiet. Heizung und Baujahr zählen Wohnungen, nicht Gebäude.</p>
+    <div class="verteilungen" id="verteilungen"></div>
+  </div>
+</section>
+
+<!-- ============ SCHAUGRAFIK ============ -->
+<section class="schaugrafik" id="schaugrafik" aria-labelledby="h-schau">
+  <div class="schau__kopf">
+    <h2 id="h-schau" class="abschnitt">Schaugrafik für den Druck</h2>
+    <p class="abschnitt__unter">Ein Gebiet oder bis zu vier zum Vergleich, die gewünschten Rubriken und ein Format wählen. Die Grafik entsteht im Browser aus denselben Daten wie die Seite, ohne Kartenkacheln, mit Quellenvermerk und Lizenz. Abdruck in Heft, Zeitung oder Vorlage ist erlaubt (CC BY 4.0), mit der Bildzeile unten auf der Grafik: Kiezatlas Potsdam, souverain-systems.de/kiezatlas, dazu die Datenquellen.</p>
+  </div>
+  <form class="schau__form" id="schau-form" aria-label="Schaugrafik einstellen">
+    <fieldset class="schau__gebiete">
+      <legend>Gebiet <span class="leise" id="schau-zaehler"></span></legend>
+      <div class="schau__gebietliste" id="schau-gebiete"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Rubriken</legend>
+      <div class="schau__haken" id="schau-rubriken"></div>
+      <label class="feld">Thema der Karte <select id="schau-kartenthema"></select></label>
+    </fieldset>
+    <fieldset>
+      <legend>Format</legend>
+      <div class="schau__haken" id="schau-format"></div>
+    </fieldset>
+    <div class="schau__aktion">
+      <button class="knopf knopf--voll" type="button" id="schau-svg"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">SVG laden</span></button>
+      <button class="knopf knopf--voll" type="button" id="schau-png"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">PNG laden, 300 dpi</span></button>
+      <button class="knopf knopf--rand" type="button" id="schau-druck"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Drucken oder als PDF</span></button>
+    </div>
+    <p class="fuss" id="schau-hinweis" aria-live="polite"></p>
+  </form>
+  <figure class="schau__vorschau" aria-labelledby="schau-cap">
+    <div class="schau__blatt" id="schau-blatt"></div>
+    <figcaption id="schau-cap" class="fuss">Vorschau. Format <span id="schau-mass"></span>.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ GRENZFALL ============ -->
+{{block:index_grenzfall}}
+
+<!-- ============ METHODE ============ -->
+{{block:index_methode}}
+
+<!-- ============ QUELLEN ============ -->
+{{block:index_quellen}}
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__marke" aria-hidden="true">Kiezatlas Potsdam</p>
+  <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
+  <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln und die Schrift der Kartenbeschriftung von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Planer</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
+</footer>
+
+<div id="druck" aria-hidden="true"></div>
+
+<script defer src="daten/ort.js"></script><script defer src="i18n.js"></script><script defer src="texte/de/kern.js"></script><script defer src="texte/de/karte.js"></script><script defer src="daten/kennzahlen.js"></script>
+<script defer src="kopf.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="vendor/gsap.min.js"></script>
+<script defer src="vendor/ScrollTrigger.min.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/grundkarte.js"></script>
+<script defer src="themen.js"></script>
+<script defer src="atlas.js"></script>
+<script defer src="schaugrafik.js"></script>
+</body>
+</html>

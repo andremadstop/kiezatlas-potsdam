@@ -1,0 +1,151 @@
+<!--seite
+rahmen: eigen
+-->
+<!doctype html>
+<html lang="de" class="kopf-zwei">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{t:seiten.jahre.titel}}</title>
+<meta name="description" content="{{t:seiten.jahre.beschreibung}}">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>if(location.protocol!=="file:"){["barlow-400-normal","barlow-semi-condensed-600-normal"].forEach(function(f){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="fonts/"+f+".woff2";document.head.appendChild(l);});}</script>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="basis.css">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="jahre.css">
+</head>
+<body class="jahreseite" data-seite="karte">
+<a class="sprung" href="#zeitleiste">Zur Bauzeit-Leiste springen</a>
+
+<header class="kopfleiste">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html" aria-current="true"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten der Bauzeiten">
+    <ul>
+      <li><a class="nav" href="jahre.html" aria-current="page"><span>Übersicht</span></a></li>
+      <li><a class="nav" href="#stadtteile"><span>Stadtteile</span></a></li>
+      <li><a class="nav" href="jahre-methode.html"><span>Methode</span></a></li>
+      <li><a class="nav" href="jahre-daten.html"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt">
+<section class="erzaehlung j-erzaehlung" id="oben" aria-labelledby="titel">
+  <div class="auftakt frage j-auftakt" data-schritt="0">
+    <p class="j-vorzeile">Kiezatlas Potsdam, Teil Gebäude</p>
+    <h1 class="titel" id="titel"><span class="titel__z"><span>Bauzeiten</span></span><span class="titel__z"><span>Potsdam</span></span></h1>
+    <p class="lede">Wann wurde gebaut, wo heute gewohnt wird? Acht Bauzeiten der Gebäude mit Wohnraum, Zelle für Zelle im 100-Meter-Gitter des Zensus 2022, und aus der Nähe Haus für Haus geschätzt.</p>
+    <div class="auftakt__aktion">
+      <button class="knopf knopf--voll" type="button" id="j-haeuser"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Häuser in 3D ansehen</span></button>
+    </div>
+    <div class="j-profil" aria-labelledby="j-profil-titel">
+      <p class="j-profil__titel" id="j-profil-titel">Ganz Potsdam nach Bauzeit, genähert</p>
+      <div class="j-schicht" id="j-stadtschicht" role="img" aria-label="Anteile der acht Bauzeiten an allen Gebäuden mit Wohnraum in Potsdam"></div>
+      <ol class="j-schicht__marken" id="j-stadtmarken" aria-hidden="true"></ol>
+    </div>
+    <dl class="stadtzahlen j-zahlen" id="j-zahlen" aria-label="Gebäude mit Wohnraum in Potsdam"></dl>
+    <p class="stadtzahlen__quelle" id="j-zahlen-quelle"></p>
+    <p class="j-fixture" id="j-fixture" hidden></p>
+  </div>
+
+  <div class="buehne j-buehne" id="buehne">
+    <div id="karte" role="region" aria-label="Karte der Bauzeiten. Mit Pfeiltasten verschieben, Plus und Minus zoomen."></div>
+    <div class="werkzeug" role="toolbar" aria-label="Ansicht der Karte">
+      <fieldset class="themen" id="j-ansicht"><legend class="nur-sr">Was die Farbe zeigt</legend>
+        <label class="chip"><input type="radio" name="ansicht" value="ueberblick"><span>Größte Klasse</span></label>
+        <label class="chip"><input type="radio" name="ansicht" value="spanne"><span>Gewählte Bauzeit</span></label>
+      </fieldset>
+      <div class="schalter">
+        <label class="chip chip--schalter"><input type="checkbox" id="j-dreid"><span>3D-Häuser</span></label>
+        <label class="chip chip--schalter"><input type="checkbox" id="j-luft"><span>Luftbild</span></label>
+      </div>
+    </div>
+    <div class="schild" id="schild" aria-hidden="true"></div>
+
+    <div class="j-leiste" id="zeitleiste" tabindex="-1" role="group" aria-labelledby="j-leiste-titel">
+      <div class="j-leiste__kopf">
+        <p class="j-leiste__titel" id="j-leiste-titel">Bauzeit</p>
+        <p class="j-leiste__status" id="j-status" aria-live="polite"></p>
+        <button class="j-abspielen" type="button" id="j-abspielen" hidden><span aria-hidden="true" class="j-abspielen__zeichen"></span><span class="j-abspielen__text">Nacheinander</span></button>
+        <button class="j-legende-knopf" type="button" id="legende-griff" aria-expanded="true" aria-controls="j-legende">Legende</button>
+      </div>
+      <div class="j-leiste__klassen" id="j-klassen"></div>
+      <div class="j-regler" id="j-regler">
+        <span class="j-regler__spanne" aria-hidden="true"></span>
+        <label class="nur-sr" for="j-von">Bauzeit von</label>
+        <input type="range" id="j-von" min="0" max="7" step="1" value="0">
+        <label class="nur-sr" for="j-bis">Bauzeit bis</label>
+        <input type="range" id="j-bis" min="0" max="7" step="1" value="0">
+      </div>
+      <div class="j-leiste__fuss" id="j-legende" role="group" aria-label="Legende" tabindex="0"></div>
+    </div>
+    <p class="nur-sr" id="kartenstatus" aria-live="polite"></p>
+  </div>
+
+  {{block:jahre_fragen}}
+</section>
+
+<section class="j-register" id="stadtteile" aria-labelledby="h-teile">
+  <div class="j-register__kopf">
+    <h2 id="h-teile" class="abschnitt">Bauzeiten je <span data-j="raum-name">Stadtteil</span></h2>
+    <p class="abschnitt__unter">Jede Zeile zeigt die genäherte Mischung der acht Bauzeiten. Die Zahl rechts ist der Anteil der oben gewählten Bauzeit: <b data-j="spanne-name">…</b>.</p>
+    <fieldset class="j-sortierung"><legend>Sortieren nach</legend>
+      <label class="chip"><input type="radio" name="sortierung" value="nr" checked><span>Nummer</span></label>
+      <label class="chip"><input type="radio" name="sortierung" value="anteil"><span>Anteil der Bauzeit</span></label>
+    </fieldset>
+  </div>
+  <div class="j-register__koerper">
+    <ul class="j-liste" id="j-liste" aria-label="Stadtteile"></ul>
+    <aside class="j-steckbrief" id="j-steckbrief" aria-labelledby="j-sb-name" aria-live="polite">
+      <p class="j-steckbrief__art" id="j-sb-art">Ganze Stadt</p>
+      <h3 class="j-steckbrief__name" id="j-sb-name">Potsdam</h3>
+      <p class="j-steckbrief__g" id="j-sb-g"></p>
+      <table class="j-tabelle" id="j-sb-tabelle">
+        <caption class="nur-sr">Gebäude mit Wohnraum nach Bauzeit, genähert</caption>
+        <thead><tr><th scope="col">Bauzeit</th><th scope="col">Gebäude, rund</th><th scope="col">Anteil</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="fuss" id="j-sb-hinweis"></p>
+      <div class="j-steckbrief__aktion">
+        <button class="knopf knopf--rand" type="button" id="j-sb-karte"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__marke" aria-hidden="true">Bauzeiten</p>
+  <p id="j-vermerk"></p>
+  <p>Gebäude: Umrisse © GeoBasis-DE/LGB, <a class="link" href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, Daten verändert (eigene Berechnung); Bauzeiten der Großsiedlungen nach Landeshauptstadt Potsdam, „Potsdamer Platte“ (2008). Bauzeit je Gebäude geschätzt, keine Aussage über einzelne Grundstücke.</p>
+  <p>Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0. Grundkarte © <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert; Luftbild © GeoBasis-DE/LGB, <a class="link" href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>.</p>
+  <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Alle Zahlen im Text rechnet die Seite beim Laden aus den Daten aus; keine ist von Hand eingesetzt.</p>
+  <p><b>Datenschutz:</b> Keine Cookies, keine Zählung. Die Karte lädt Kacheln von basemap.de und, wenn eingeschaltet, Luftbilder der LGB; diese Server sehen die IP-Adresse. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen.</p>
+  <p class="fuss-seite__links"><a class="link" href="index.html">Kiezatlas Potsdam</a> <a class="link" href="jahre-methode.html">Methode</a> <a class="link" href="jahre-daten.html">Daten</a> <a class="link" href="karte.html">Karte</a> <a class="link" href="planer.html">Planer</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
+</footer>
+
+<script defer src="daten/ort.js"></script><script defer src="i18n.js"></script><script defer src="texte/de/kern.js"></script><script defer src="daten/kennzahlen.js"></script>
+<script defer src="kopf.js"></script>
+<script defer src="daten/stadtteile.js"></script>
+<script defer src="daten/zellen.js"></script>
+<script defer src="vendor/maplibre-gl.js"></script>
+<script defer src="daten/jahre_methode.js"></script>
+<script defer src="daten/grundkarte.js"></script>
+<script defer src="themen.js"></script>
+<script defer src="jahre.js"></script>
+</body>
+</html>

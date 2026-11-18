@@ -1,0 +1,55 @@
+<!--seite
+rahmen: eigen
+-->
+<!doctype html>
+<html lang="de" class="kopf-zwei" data-daten="daten/" data-odbl="einrichtungen_odbl.js erreichbar_fuss_odbl.js planer_fuss_odbl.js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{t:seiten.planer_methode.titel}}</title>
+<meta name="description" content="{{t:seiten.planer_methode.beschreibung}}">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://souverain-systems.de/kiezatlas/planer-methode.html">
+<meta name="theme-color" content="#f1f2ee">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="basis.css">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="planer.css">
+</head>
+<body class="textseite" data-seite="methode">
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopfleiste">
+  <div class="kopfleiste__zeile">
+    <a class="marke" href="index.html" aria-label="Kiezatlas Potsdam, zur Startseite"><span class="marke__zeichen" aria-hidden="true"></span>Kiezatlas Potsdam</a>
+    <nav class="kopf-haupt" aria-label="Teile des Atlas">
+      <ul>
+        <li><a class="nav" href="index.html"><span>Start</span></a></li>
+        <li><a class="nav" href="karte.html"><span>Karte</span></a></li>
+        <li><a class="nav" href="planer.html" aria-current="true"><span>Planer</span></a></li>
+        <li><a class="nav" href="jahre.html"><span>Bauzeiten</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="kopf-unter" aria-label="Seiten des Planers">
+    <ul>
+      <li><a class="nav" href="planer.html"><span>Versorgung</span></a></li>
+      <li><a class="nav" href="planer-methode.html" aria-current="page"><span>Methode</span></a></li>
+      <li><a class="nav" href="planer-daten.html"><span>Daten</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inhalt">
+  {{block:planer_methode}}
+</main>
+
+<footer class="fuss-seite">
+  <p class="fuss-seite__links"><a class="link" href="planer.html">Zum Planer</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="index.html#quellen">Quellen und Lizenzen</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a></p>
+  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
+</footer>
+
+<script defer src="daten/ort.js"></script><script defer src="i18n.js"></script><script defer src="texte/de/kern.js"></script><script defer src="texte/de/planer.js"></script><script defer src="themen.js"></script>
+<script defer src="planer.js"></script>
+</body>
+</html>

@@ -1,9 +1,10 @@
-/* Kiezatlas Potsdam: freie Karte. Nichts bewegt sich von selbst; Kamera ändert sich nur auf ausdrücklichen Wunsch.
+/* Kiezatlas: freie Karte. Nichts bewegt sich von selbst; Kamera ändert sich nur auf ausdrücklichen Wunsch.
    Zustand steht im Hash (teilbar), z. B. karte.html#thema=fern&st=13&3d=1&k=13.2/52.40/13.05/50/-10 */
 (function () {
 "use strict";
 var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN;
 var T = window.KIEZ_THEMEN, fmt = T.fmt, fmt1 = T.fmt1, NB = "\u00a0";
+var tt = KIEZ_I18N.t;
 var RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches, SCHMAL = matchMedia("(max-width:860px)").matches, FEIN = matchMedia("(hover:hover) and (pointer:fine)").matches;
 // Blatt von unten nur gestapelt (Handy hoch); breiter oder quer steht es als Seitenleiste neben der Karte (kopf.js, 07.11.)
 var GESTAPELT = matchMedia(window.KIEZ_GESTAPELT || "(max-width:599px)");
@@ -48,12 +49,10 @@ var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
   style: T.grundkarte({ version: 8, sources: {
-      basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
-      dop: { type: "raster", tileSize: 256, maxzoom: 20, tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"],
-        attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>' },
+      basemap: window.KIEZ_ORT.karte.grundkarte,
+      dop: window.KIEZ_ORT.karte.luftbild,
       zellen: { type: "geojson", data: Z, attribution: 'Zensus 2022 © Statistische Ämter des Bundes und der Länder, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>, eigene Auswertung' },
-      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" },
+      teile: { type: "geojson", data: ST, promoteId: "nr", attribution: window.KIEZ_ORT.karte.teile_attribution },
       gebaeude: { type: "geojson", data: LEER, attribution: 'Gebäude © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> (Daten geändert)' } },
     layers: [
       { id: "papier", type: "background", paint: { "background-color": "#e6e9e4" } },
@@ -69,7 +68,7 @@ var map = new maplibregl.Map(Object.assign({
       { id: "teile-wahl", type: "line", source: "teile", paint: { "line-color": "#6a2c82", "line-width": ["case", ["boolean", ["feature-state", "gewaehlt"], false], 3.2, 0] } }
     ] }),
   maxZoom: 19, maxPitch: 70, attributionControl: false, fadeDuration: RUHIG ? 0 : 300, cooperativeGestures: false,
-  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+  locale: KIEZ_I18N.karteLocale()
 }, start));
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
@@ -105,12 +104,12 @@ function waehle(nr) {
   gewaehlt = S.nr = nr || "";
   if (bereit && gewaehlt) map.setFeatureState({ source: "teile", id: gewaehlt }, { gewaehlt: true });
   steckbrief(); trefferMarkieren();
-  document.getElementById("griff-name").textContent = S.nr ? S.nr + " " + name(S.nr) : "Ganz Potsdam";
-  document.getElementById("zoom-teil").querySelector(".knopf__text").textContent = S.nr ? "Auf Stadtteil zoomen" : "Ganz Potsdam zeigen";
+  document.getElementById("griff-name").textContent = S.nr ? S.nr + " " + name(S.nr) : KIEZ_I18N.ort("ganze_stadt");
+  document.getElementById("zoom-teil").querySelector(".knopf__text").textContent = S.nr ? tt("karte.zoom_teil") : tt("karte.zoom_ganz", { stadt: KIEZ_I18N.ort("ganze_stadt") });
   if (S.geb) gebaeudeLaden(); else if (bereit) map.getSource("gebaeude").setData(LEER);
   anwenden();
 }
-var HINWEIS_TEIL = "Gebäude gibt es je Stadtteil: bitte zuerst einen Stadtteil wählen.";
+var HINWEIS_TEIL = tt("karte.hinweis_teil");
 function gebaeudeLaden() {
   if (!bereit) return;
   var nr = S.nr, hin = document.getElementById("teilen-hinweis");
@@ -124,15 +123,15 @@ function gebaeudeLaden() {
 }
 function status() {
   var t = THEMA[S.thema];
-  document.getElementById("kartenstatus").textContent = "Karte zeigt: " + t.name + (S.nr ? ", ausgewählt " + S.nr + " " + name(S.nr) : ", ganz Potsdam") + (S.d3 ? ", 3D" : ", 2D") + (S.luft ? ", mit Luftbild" : "") + (S.geb ? ", mit Gebäuden" : "") + ".";
+  document.getElementById("kartenstatus").textContent = tt("karte.status", { thema: t.name }) + (S.nr ? tt("karte.status_wahl", { teil: S.nr + " " + name(S.nr) }) : tt("karte.status_ganz", { stadt: KIEZ_I18N.ort("stadt") })) + (S.d3 ? ", 3D" : ", 2D") + (S.luft ? tt("karte.status_luft") : "") + (S.geb ? tt("karte.status_geb") : "") + ".";
 }
 function legende(t) {
   var L = document.getElementById("legende"); L.innerHTML = "";
   L.appendChild(el("p", "legende__titel", t.name + (t.einheit ? " (" + t.einheit + ")" : "")));
   if (t.id === "stadtteile") {
     var bz = el("div", "bezirke");
-    Object.keys(BEZIRKFARBE).forEach(function (b) { var s = el("span"), i = el("i"); i.style.background = BEZIRKFARBE[b]; s.appendChild(i); s.appendChild(document.createTextNode("Bezirk " + b)); bz.appendChild(s); });
-    L.appendChild(bz); L.appendChild(el("p", "legende__q", "Ein Farbton je Stadtbezirk (erste Ziffer der Stadtteilnummer). Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0."));
+    Object.keys(BEZIRKFARBE).forEach(function (b) { var s = el("span"), i = el("i"); i.style.background = BEZIRKFARBE[b]; s.appendChild(i); s.appendChild(document.createTextNode(tt("karte.bezirk", { b: b }))); bz.appendChild(s); });
+    L.appendChild(bz); L.appendChild(el("p", "legende__q", tt("karte.farbton_bezirk") + " Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0."));
     return;
   }
   var s = KLASSEN[t.id], st = el("div", "stufen"); st.setAttribute("aria-hidden", "true");
@@ -140,8 +139,8 @@ function legende(t) {
   L.appendChild(st);
   var m = el("div", "marken"), r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
   m.appendChild(el("span", null, r(s.min))); s.grenzen.forEach(function (g) { m.appendChild(el("span", null, r(g))); }); m.appendChild(el("span", null, r(s.max))); L.appendChild(m);
-  if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode("Weniger als 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen") + ", Wert zu unscharf")); L.appendChild(g); }
-  L.appendChild(el("p", "legende__q", (s.fest ? "Stufen zu 20 Prozentpunkten. " : "Stufen: Fünftel aller Zellen. ") + t.quelle + ", 15.05.2022."));
+  if (t.nenner) { var g = el("p", "legende__grau"); g.appendChild(el("i")); g.appendChild(document.createTextNode(t.nenner === "a_ges" ? tt("karte.grau_personen") : tt("karte.grau_wohnungen"))); L.appendChild(g); }
+  L.appendChild(el("p", "legende__q", (s.fest ? tt("karte.stufen_fest") : tt("karte.stufen_fuenftel")) + t.quelle + ", 15.05.2022."));
 }
 
 // ---------- Bedienung
@@ -205,7 +204,7 @@ document.getElementById("zoom-teil").addEventListener("click", function () {
 document.getElementById("link-teilen").addEventListener("click", function () {
   hashSchreiben();
   var url = location.href, hin = document.getElementById("teilen-hinweis");
-  function ok() { hin.textContent = "Link kopiert. Er öffnet genau diese Ansicht."; }
+  function ok() { hin.textContent = tt("karte.link_kopiert"); }
   function zeigen() { hin.textContent = "Link: " + url; }
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(ok, zeigen); else zeigen();
 });
@@ -214,12 +213,12 @@ document.getElementById("link-teilen").addEventListener("click", function () {
 var trefferBox = document.getElementById("treffer"), suche = document.getElementById("suche");
 function trefferBauen() {
   var q = suche.value.trim().toLowerCase(); trefferBox.innerHTML = "";
-  var alle = [{ nr: "", name: "Ganz Potsdam" }].concat(ST.features.map(function (f) { return { nr: f.properties.nr, name: f.properties.name }; }));
+  var alle = [{ nr: "", name: KIEZ_I18N.ort("ganze_stadt") }].concat(ST.features.map(function (f) { return { nr: f.properties.nr, name: f.properties.name }; }));
   alle.filter(function (x) { return !q || (x.nr + " " + x.name).toLowerCase().indexOf(q) > -1; }).forEach(function (x) {
     var li = el("li"), b = el("button", "treffer"); b.type = "button"; b.dataset.nr = x.nr;
     var i = el("i"); i.style.background = x.nr ? FARBE[x.nr] : "#13212a"; b.appendChild(i);
     b.appendChild(el("b", null, x.nr || "")); b.appendChild(el("span", null, x.name));
-    if (x.nr) b.appendChild(el("span", "nur-sr", ", rund " + rundEw(kachel(K.stadtteile[x.nr], "einwohner").wert) + " Einwohner"));
+    if (x.nr) b.appendChild(el("span", "nur-sr", tt("karte.treffer_ew", { ew: rundEw(kachel(K.stadtteile[x.nr], "einwohner").wert) })));
     // Gebäude an: Wahl aus der Liste fliegt zu den Häusern (sie stehen nur für den gewählten Stadtteil)
     b.addEventListener("click", function () { waehle(x.nr); if (x.nr && S.geb && bereit) { zuDenHaeusern(); if (GESTAPELT.matches) seite(false); } });
     li.appendChild(b); trefferBox.appendChild(li);
@@ -231,32 +230,32 @@ suche.addEventListener("input", trefferBauen);
 suche.addEventListener("keydown", function (e) { if (e.key === "Enter") { var f = trefferBox.querySelector(".treffer"); if (f) { e.preventDefault(); f.click(); } } });
 
 // Steckbrief
-var TITEL = { alter: "Alter", baujahr: "Baujahr des Gebäudes", heizung: "Überwiegende Heizungsart", energie: "Energieträger der Heizung" };
+var TITEL = { alter: tt("karte.titel_alter"), baujahr: tt("karte.titel_baujahr"), heizung: tt("karte.titel_heizung"), energie: tt("karte.titel_energie") };
 function steckbrief() {
   var nr = S.nr, G = nr ? K.stadtteile[nr] : K.stadt;
-  document.getElementById("sb-name").textContent = nr ? G.name : "Potsdam";
-  document.getElementById("sb-art").textContent = (nr ? "Stadtteil " + nr + " der Landeshauptstadt Potsdam" : "Landeshauptstadt, " + ST.features.length + " Stadtteile") + ", " + fmt1.format(G.flaeche_km2) + " km²";
+  document.getElementById("sb-name").textContent = nr ? G.name : KIEZ_I18N.ort("stadt");
+  document.getElementById("sb-art").textContent = (nr ? tt("karte.art_teil", { nr: nr, amtlich: KIEZ_I18N.ort("stadt_amtlich") }) : tt("karte.art_stadt", { art: KIEZ_I18N.ort("stadt_art"), teile: tt("kern.dzielnice", { n: ST.features.length }) })) + ", " + fmt1.format(G.flaeche_km2) + " km²";
   var box = document.getElementById("kacheln"); box.innerHTML = "";
   G.kacheln.forEach(function (k) {
     var d = el("div", "kachel"), z = el("div", "zahl");
-    if (k.anzeige === "summe") { d.appendChild(el("div", "vorsatz", "rund")); z.textContent = rundEw(k.wert); }
-    else if (k.wert == null) z.textContent = "k. A.";
+    if (k.anzeige === "summe") { d.appendChild(el("div", "vorsatz", tt("karte.rund"))); z.textContent = rundEw(k.wert); }
+    else if (k.wert == null) z.textContent = tt("kern.k_a");
     else { z.textContent = fmt1.format(k.wert); z.appendChild(el("small", null, "%")); }
     d.appendChild(z); d.appendChild(el("div", "titel-k", k.titel));
     var m = k.quelle.match(/\(([^)]+)\)\s*$/), q = el("div", "quelle", "Zensus 2022, " + (m ? m[1] : "")); q.title = k.quelle; d.appendChild(q); box.appendChild(d);
   });
-  document.getElementById("sb-fuss").textContent = "Grundlage: " + fmt.format(G.zellen) + " Gitterzellen zu 100 × 100 m, deren Mittelpunkt im Gebiet liegt; " +
-    (G.gebaeude && G.gebaeude.anzahl ? fmt.format(G.gebaeude.anzahl) + " Gebäude laut ALKIS, davon " + fmt.format(G.gebaeude.wohngebaeude) + " Wohngebäude" : "keine Gebäude zugeordnet") + ". Stichtag des Zensus: 15. Mai 2022.";
+  document.getElementById("sb-fuss").textContent = tt("karte.grundlage", { zellen: fmt.format(G.zellen) }) +
+    (G.gebaeude && G.gebaeude.anzahl ? tt("karte.geb_alkis", { anzahl: fmt.format(G.gebaeude.anzahl), wohn: fmt.format(G.gebaeude.wohngebaeude) }) : tt("karte.geb_keine")) + tt("karte.stichtag_zensus");
   var gp = (K.gegenprobe || {})[nr || "stadt"], gpEl = document.getElementById("gegenprobe"); gpEl.innerHTML = "";
-  if (gp) { gpEl.appendChild(document.createTextNode("Gegenprobe: " + gp.art + " am " + gp.stichtag + ": " + fmt.format(gp.einwohner) + " (")); var a = el("a", "link", gp.quelle); a.href = gp.url; gpEl.appendChild(a); gpEl.appendChild(document.createTextNode(").")); }
+  if (gp) { gpEl.appendChild(document.createTextNode(tt("karte.gegenprobe", { art: gp.art, stichtag: gp.stichtag, ew: fmt.format(gp.einwohner) }))); var a = el("a", "link", gp.quelle); a.href = gp.url; gpEl.appendChild(a); gpEl.appendChild(document.createTextNode(").")); }
   var vb = document.getElementById("verteilungen"); vb.innerHTML = "";
   ["alter", "baujahr", "heizung", "energie"].forEach(function (key) {
     var v = G.verteilungen[key], max = Math.max.apply(null, v.werte.map(function (w) { return w[1]; })) || 1, d = el("div", "vert");
-    d.appendChild(el("h3", null, TITEL[key])); d.appendChild(el("p", "einheit", v.einheit + " insgesamt " + fmt.format(v.insgesamt) + ". Anteile am Insgesamt."));
+    d.appendChild(el("h3", null, TITEL[key])); d.appendChild(el("p", "einheit", tt("karte.vert_summe", { einheit: v.einheit, summe: fmt.format(v.insgesamt) }) + tt("karte.vert_anteile")));
     var ul = el("ul", "balken");
     v.werte.forEach(function (w) {
       if ((key === "energie" || key === "heizung") && w[1] === 0) return;
-      var li = el("li"), l = el("span", "l"); l.appendChild(el("span", null, w[0])); l.appendChild(el("span", null, v.insgesamt ? fmt1.format(100 * w[1] / v.insgesamt) + NB + "%" : "k. A."));
+      var li = el("li"), l = el("span", "l"); l.appendChild(el("span", null, w[0])); l.appendChild(el("span", null, v.insgesamt ? fmt1.format(100 * w[1] / v.insgesamt) + NB + "%" : tt("kern.k_a")));
       var b = el("span", "b"), i = el("i"); i.style.width = (100 * w[1] / max).toFixed(1) + "%"; b.appendChild(i); b.setAttribute("aria-hidden", "true");
       li.appendChild(l); li.appendChild(b); ul.appendChild(li);
     });
@@ -279,18 +278,18 @@ map.on("click", function (e) {
   var g = lay.length ? map.queryRenderedFeatures(e.point, { layers: lay }) : [];
   if (g.length) {
     var gp = g[0].properties;
-    new maplibregl.Popup({ maxWidth: "270px" }).setLngLat(e.lngLat).setHTML("<b>" + esc(gp.f || "Gebäude") + "</b><table class='pop-tab'>" + zeile("Geschosse", gp.gs == null || gp.gs === "null" ? "k. A." : esc(gp.gs)) +
-      zeile("Höhe", fmt1.format(gp.h) + " m") + "</table><div class='pop-q'>Höhe: " + (T.HQ[gp.hq] || "Herkunft unbekannt") + ". Umriss ALKIS vereinfacht. © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
+    new maplibregl.Popup({ maxWidth: "270px" }).setLngLat(e.lngLat).setHTML("<b>" + esc(gp.f || tt("karte.gebaeude")) + "</b><table class='pop-tab'>" + zeile(tt("karte.geschosse"), gp.gs == null || gp.gs === "null" ? tt("kern.k_a") : esc(gp.gs)) +
+      zeile(tt("karte.hoehe"), fmt1.format(gp.h) + " m") + "</table><div class='pop-q'>" + tt("karte.pop_hoehe", { herkunft: T.HQ[gp.hq] || tt("karte.herkunft_unbekannt") }) + " " + tt("karte.umriss") + " © GeoBasis-DE/LGB, dl-de/by-2-0</div>").addTo(map);
     return;
   }
   var zl = ["zellen-3d", "zellen-2d"].filter(function (l) { return map.getLayoutProperty(l, "visibility") !== "none"; });
   var c = zl.length ? map.queryRenderedFeatures(e.point, { layers: zl }) : [];
   if (c.length) {
-    var p = c[0].properties, n = function (k) { var v = p[k]; return (v === undefined || v === "null" || v === null) ? null : Number(v); }, zz = function (v) { return v == null ? "k. A." : fmt.format(v); };
-    new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(e.lngLat).setHTML("<b>Gitterzelle 100 × 100 m</b><br>" + esc(p.st + " " + name(p.st)) + "<table class='pop-tab'>" +
-      zeile("Einwohner", zz(n("ew"))) + zeile("Durchschnittsalter", n("d_alter") == null ? "k. A." : fmt1.format(n("d_alter"))) + zeile("unter 18", proz(n("q_u18"))) + zeile("65 und älter", proz(n("q_65p"))) +
-      zeile("Wohnungen", zz(n("w_ges"))) + zeile("davon vor 1949", proz(n("q_v1949"))) + zeile("mit Fernwärme", proz(n("q_fern"))) + "</table>" +
-      "<div class='pop-q'>Zensus 2022, 15.05.2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0. Kleine Werte sind durch die Geheimhaltung unscharf, Anteile können darum über 100 % liegen.</div>").addTo(map);
+    var p = c[0].properties, n = function (k) { var v = p[k]; return (v === undefined || v === "null" || v === null) ? null : Number(v); }, zz = function (v) { return v == null ? tt("kern.k_a") : fmt.format(v); };
+    new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(e.lngLat).setHTML("<b>" + tt("karte.zelle_titel") + "</b><br>" + esc(p.st + " " + name(p.st)) + "<table class='pop-tab'>" +
+      zeile(tt("karte.einwohner"), zz(n("ew"))) + zeile(tt("karte.d_alter"), n("d_alter") == null ? tt("kern.k_a") : fmt1.format(n("d_alter"))) + zeile(tt("karte.u18"), proz(n("q_u18"))) + zeile(tt("karte.p65"), proz(n("q_65p"))) +
+      zeile(tt("karte.wohnungen"), zz(n("w_ges"))) + zeile(tt("karte.davon_vor1949"), proz(n("q_v1949"))) + zeile(tt("karte.mit_fern"), proz(n("q_fern"))) + "</table>" +
+      "<div class='pop-q'>Zensus 2022, 15.05.2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0. " + tt("karte.pop_geheim") + "</div>").addTo(map);
   }
   var t = map.queryRenderedFeatures(e.point, { layers: ["teile-flaeche"] });
   // Gebäude an: ein Klick wählt den gewählten Stadtteil nicht ab (ohne Stadtteil stünden keine Gebäude mehr)
@@ -301,7 +300,7 @@ var schild = document.getElementById("schild");
 map.on("mousemove", function (e) {
   var t = map.queryRenderedFeatures(e.point, { layers: ["teile-flaeche"] });
   map.getCanvas().style.cursor = t.length ? "pointer" : "";
-  if (t.length && FEIN) { var nr = t[0].properties.nr; schild.textContent = nr + " " + name(nr) + ": rund " + rundEw(kachel(K.stadtteile[nr], "einwohner").wert) + " Einwohner"; schild.style.left = e.point.x + "px"; schild.style.top = e.point.y + "px"; schild.style.display = "block"; }
+  if (t.length && FEIN) { var nr = t[0].properties.nr; schild.textContent = tt("karte.schild", { teil: nr + " " + name(nr), ew: rundEw(kachel(K.stadtteile[nr], "einwohner").wert) }); schild.style.left = e.point.x + "px"; schild.style.top = e.point.y + "px"; schild.style.display = "block"; }
   else schild.style.display = "none";
 });
 map.on("mouseout", function () { schild.style.display = "none"; });
