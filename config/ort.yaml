@@ -1,0 +1,76 @@
+# Kiezatlas Potsdam: Ortskonfiguration für den gemeinsamen Code (Kiezatlas-Maschine).
+#
+# Leser (über skripte/ort_konfig.py der Maschine, das diese Datei am Schlüssel ort erkennt):
+#   skripte/31_ort.py     erzeugt daten/ort.js (window.KIEZ_ORT) für die Seiten
+#   skripte/30_seiten.py  Seitenliste, Sprachen, kanonische Adressen
+# Die Quellen der Import-Pipeline stehen weiter in config/potsdam.yaml; diese Datei berührt sie nicht.
+# Richtwerte: config/richtwerte.yaml daneben (Standard).
+#
+# Die Werte standen bis zum Umzug fest im Potsdamer JavaScript (Stand vor-umzug: atlas.js 133–141, karte.js 51–56,
+# planer.js 186–187, jahre.js 32 und 223–228, themen.js 9 und 69) und sind wörtlich übernommen.
+ort: potsdam
+sprache: de
+sprachen: [de]
+basis_url: "https://souverain-systems.de/kiezatlas/"
+rechen_srid: 25833
+
+name: {de: "Kiezatlas Potsdam"}
+stadt: {de: "Potsdam"}
+stadt_lokativ: {de: "in Potsdam"}
+ganze_stadt: {de: "Ganz Potsdam"}
+stadt_amtlich: {de: "Landeshauptstadt Potsdam"}
+stadt_art: {de: "Landeshauptstadt"}
+zitierzeile: {de: "Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), souverain-systems.de/kiezatlas"}
+herausgeber: "Stiebitz Souverain Systems UG (haftungsbeschränkt)"
+meldeweg: "kontakt@souverain-systems.de"
+
+karte:
+  mitte: [13.06, 52.4]
+  rahmen: [12.88, 52.33, 13.18, 52.52]
+  haus_ziel: [13.0600, 52.3995]
+  grundkarte:
+    type: raster
+    tileSize: 256
+    maxzoom: 18
+    tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"]
+    attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>'
+  luftbild:
+    type: raster
+    tileSize: 256
+    maxzoom: 20
+    tiles: ["https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=bebb_dop20c&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/jpeg"]
+    attribution: 'Luftbild © GeoBasis-DE/LGB, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>'
+  teile_attribution: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0"
+  teile_bildzeile: {de: "Stadtteile: © Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/zero-2-0."}
+
+# Potsdam: Bezirk = erste Ziffer der Stadtteilnummer (steht als Feld bezirk in daten/stadtteile.js);
+# die Namen der Stadtteile stehen in den Daten, daher keine Liste teile.
+gliederung:
+  einheit: {de: "Stadtteil"}
+  einheit_mehrzahl: {de: "Stadtteile"}
+  gruppe: {de: "Stadtbezirk"}
+  zuordnung_geprueft: true
+  anzeige_muster: {de: "Stadtteil {nr} {name}"}
+  lokativ_muster: {de: "im Stadtteil {nr} {name}"}
+  gruppen:
+    - {id: "1", ton: 28, name: "1"}
+    - {id: "2", ton: 205, name: "2"}
+    - {id: "3", ton: 150, name: "3"}
+    - {id: "4", ton: 350, name: "4"}
+    - {id: "5", ton: 265, name: "5"}
+    - {id: "6", ton: 95, name: "6"}
+    - {id: "7", ton: 185, name: "7"}
+    - {id: "8", ton: 45, name: "8"}
+  teile: []
+
+# Themen wörtlich aus themen.js (Potsdam, Stand 7b6eb08, Zeilen 14–22)
+themen:
+  - {id: stadtteile, h: stadtteile, kurz: {de: "Stadtteile"}, name: {de: "Stadtteile"}}
+  - {id: ew, h: ew, kurz: {de: "Einwohner"}, name: {de: "Einwohner je Zelle"}, einheit: {de: "Personen"}, quelle: {de: "Zensus 2022, Bevölkerungszahl"}}
+  - {id: d_alter, h: alter, kurz: {de: "Alter"}, name: {de: "Durchschnittsalter"}, einheit: {de: "Jahre"}, nenner: a_ges, quelle: {de: "Zensus 2022, Durchschnittsalter"}}
+  - {id: q_u18, h: u18, kurz: {de: "unter 18"}, name: {de: "Anteil unter 18 Jahre"}, einheit: "%", nenner: a_ges, quelle: {de: "Zensus 2022, Alter in 5 Altersklassen"}}
+  - {id: q_65p, h: 65p, kurz: {de: "65 und älter"}, name: {de: "Anteil 65 Jahre und älter"}, einheit: "%", nenner: a_ges, quelle: {de: "Zensus 2022, Alter in 5 Altersklassen"}}
+  - {id: q_v1949, h: vor1949, kurz: {de: "vor 1949"}, name: {de: "Wohnungen in Gebäuden vor 1949"}, einheit: "%", nenner: w_ges, quelle: {de: "Zensus 2022, Baujahresklassen"}}
+  - {id: q_fern, h: fern, kurz: {de: "Fernwärme"}, name: {de: "Wohnungen mit Fernwärme"}, einheit: "%", nenner: w_ges, quelle: {de: "Zensus 2022, Energieträger der Heizung"}}
+
+seiten: [index, karte, planer, planer-methode, planer-daten, jahre, jahre-methode, jahre-daten, "404"]

@@ -37,6 +37,7 @@ window.KIEZ_THEMEN = {
   fmt, fmt1, rundEw, proz, name, kachel, esc,   // Text
   ebenen,  laden,  v,             // Ebenen-Register, Nachladen, Cache-Busting
   grundkarte, grundLuft, GRUNDKARTE,  // Vektor-Grundkarte (daten/grundkarte.js) einsetzen, Luftbild-Umschaltung, ob geladen
+  LUFTBILD,                           // ob der Ort ein Luftbild anbietet (daten/ort.js, karte.luftbild); false blendet den Schalter aus
   HQ                                   // Klartext zur Herkunft der Gebäudehöhe (Feld hq), seit 06.11.2026
 };
 ```

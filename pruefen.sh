@@ -82,6 +82,9 @@ pruef "Syntax Python (ast)" py_syntax
 pruef "Datenverträge und Summen (pruefen/daten.py)" py pruefen/daten.py
 pruef "Vertrag Bauzeiten-Methode (pruefen/B5_methode.py)" py pruefen/B5_methode.py
 pruef "jahre_methode.js aktuell (skripte/26_jahre_methode.py --pruefen)" py skripte/26_jahre_methode.py --pruefen
+pruef "Gemeinsamer Code unverändert (skripte/maschine.py pruefen)" python3 -I skripte/maschine.py pruefen
+pruef "ort.js aktuell (skripte/31_ort.py --pruefen)" py skripte/31_ort.py --pruefen
+pruef "Seiten aus vorlagen/ und texte/ aktuell (skripte/30_seiten.py --pruefen)" py skripte/30_seiten.py --pruefen
 if [ -f "$KIEZ_DATEN/eingang/planungsraume-in-potsdam.geojson" ]; then
   pruef "planungsraeume.js aktuell (skripte/17_planungsraeume_js.py --pruefen)" py skripte/17_planungsraeume_js.py --pruefen
 else

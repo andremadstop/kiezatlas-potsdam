@@ -277,6 +277,8 @@ def main() -> int:
             rel = p.relative_to(DATEN).as_posix()
             if rel.startswith("fixtures/"):
                 continue
+            if rel == "ort.js":   # Ortskonfiguration, kein Datenvertrag: skripte/31_ort.py --pruefen (pruefen.sh)
+                continue
             datei_pruefen(p, rel, liste, kontext, fixture=False)
     print("Fixtures")
     for p in sorted(FIXTURES.rglob("*.js")) if FIXTURES.exists() else []:

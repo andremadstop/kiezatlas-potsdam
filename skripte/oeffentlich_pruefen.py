@@ -86,7 +86,7 @@ PLAN = [
 TEXT_ENDUNGEN = {".py", ".js", ".mjs", ".sh", ".md", ".html", ".css", ".yaml", ".yml", ".json", ".sql", ".txt",
                  ".tsv", ".csv", ".log", ".cff", ".svg", ".in", ".patch", ".sha256", ".beispiel", ".gitignore",
                  ".toml", ".cfg", ".ini", ".xml", ".vtt"}
-TEXT_NAMEN = {"LICENSE", "NOTICE", "Makefile", ".gitignore", ".gitattributes", ".env.beispiel", "atlas.sh"}
+TEXT_NAMEN = {"LICENSE", "NOTICE", "Makefile", ".gitignore", ".gitattributes", ".env.beispiel", "atlas.sh", "MASCHINE.lock"}
 
 
 def git(*args: str, eingabe: bytes | None = None) -> bytes:

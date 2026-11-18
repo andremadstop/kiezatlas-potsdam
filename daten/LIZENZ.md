@@ -19,6 +19,7 @@ sie nicht.** Sie sind aus offenen amtlichen Daten berechnet und stehen unter der
 | `export/steckbriefe/<nr>.html` (`export/steckbriefe/*`) | wie die Werte (dl-de/by-2-0, CC BY 4.0) | Abschnitt „Quellen und Lizenzen“ je Steckbrief |
 | `export/kiezatlas_potsdam.qgz`, `export/stile/*.qml`, `export/README.md` | Apache-2.0 (Projektdatei, Stile, Beschreibung; keine Daten) | – |
 | `*_odbl.js` (z. B. `einrichtungen_odbl.js`, `erreichbar_fuss_odbl.js`, `planer_fuss_odbl.js`), `export/*_odbl.gpkg`, `export/csv_odbl/` (`export/csv_odbl/*`, `export/csv_odbl_de/*`; seit 05.11.2026 aus dem OSM-Auszug Stand 31.10.2026: die `.js` mit N1, `export/kiezatlas_potsdam_odbl.gpkg` und `export/csv_odbl/` mit N4) | Open Database License 1.0 (ODbL), Inhalte Database Contents License 1.0 | © OpenStreetMap-Mitwirkende, https://opendatacommons.org/licenses/odbl/1-0/; dazu die amtlichen Vermerke aus `quellen` je Datei (Zensus, MBJS, LGB, VBB), in `export/csv_odbl/lizenz.csv` je Ebene |
+| `ort.js` | Apache-2.0 (eigene Angaben: Ortskonfiguration aus `config/ort.yaml`, erzeugt von `skripte/31_ort.py`; Bildzeilen als Text, keine Daten) | – |
 | `schema/*.json`, `schema/themen.md` | Apache-2.0 (Teil des Codes) | – |
 | `fixtures/*` | Apache-2.0; unechte Beispielwerte (`fixture: true`), keine Daten | – |
 

@@ -1,4 +1,4 @@
-/* Kiezatlas Potsdam: Planer-Seite (planer.html) und Methode (planer-methode.html).
+/* Kiezatlas: Planer-Seite (planer.html) und Methode (planer-methode.html).
    Daten nur per <script> (KIEZ_THEMEN.laden), nie per fetch (file://). Datenordner steht in <html data-daten>
    ("daten/"); mit planer.html?daten=fixtures zeigt die Seite die Beispieldateien aus daten/fixtures/ (Prüfung).
    <html data-odbl> nennt die veröffentlichten _odbl-Dateien; fehlt eine, sind Fußweg bzw. OSM-Arten gesperrt
@@ -12,8 +12,8 @@ var FIXTURE = /(?:^|&)daten=fixtures(?:&|$)/.test(location.search.replace(/^\?/,
 var WURZEL = FIXTURE ? "daten/fixtures/" : document.documentElement.getAttribute("data-daten") || "daten/";
 var ODBL = document.documentElement.getAttribute("data-odbl");   // null = keine Angabe: alle vorhanden
 var SEITE = document.body.getAttribute("data-seite");
-var fmt = T.fmt, fmt1 = T.fmt1, esc = T.esc, zahl2 = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 2 });
-var DLDE = "https://www.govdata.de/dl-de/by-2-0";
+var fmt = T.fmt, fmt1 = T.fmt1, esc = T.esc, zahl2 = KIEZ_I18N.fmt.nf({ maximumFractionDigits: 2 });
+var DLDE = "https://www.govdata.de/dl-de/by-2-0", tt = KIEZ_I18N.t;
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
 function $(id) { return document.getElementById(id); }
 
@@ -44,7 +44,7 @@ function holen(n, fertig) {
 function vermerkKnoten(text) {
   var span = el("span"), teile = String(text).split(/(https?:\/\/[^\s),]+)/);
   teile.forEach(function (t, i) {
-    if (i % 2) { var a = el("a", "link", t.indexOf("govdata.de/dl-de") > -1 || t.indexOf("opendatacommons") > -1 ? "Lizenztext" : t); a.href = t; span.appendChild(a); }
+    if (i % 2) { var a = el("a", "link", t.indexOf("govdata.de/dl-de") > -1 || t.indexOf("opendatacommons") > -1 ? tt("planer.lizenztext") : t); a.href = t; span.appendChild(a); }
     else if (t) span.appendChild(document.createTextNode(t));
   });
   return span;
@@ -55,32 +55,32 @@ function vermerke(quellen) { return Object.keys(quellen || {}).map(function (k) 
 // ---------- Arten: Kurzschlüssel im Hash bleiben stabil; Symbol = Kreis mit Form- und Graustufenunterschied
 // s: [Füllung, Rand, Radius, Randbreite]
 var GRUPPEN = [
-  { id: "bildung", titel: "Bildung und Betreuung", datei: "ein", hinweis: "Kitas und Schulen laut MBJS. Kreise außerhalb der Stadtgrenze sind blasser; sie zählen für die Entfernungen mit." },
-  { id: "gemeinbedarf", titel: "Gemeinbedarf, nur Lage", datei: "ein", hinweis: "Aus ALKIS-Gebäudefunktionen und Flächennutzung: Lage ohne Kapazität." },
-  { id: "versorgung", titel: "Nahversorgung und Gesundheit", datei: "ein_odbl", hinweis: "Aus OpenStreetMap (ODbL). Nur Lage und Entfernung, keine Aussage zur Versorgung: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, OSM nennt keine Kapazität." }
+  { id: "bildung", titel: tt("planer.gruppe.bildung"), datei: "ein", hinweis: tt("planer.gruppe.bildung_hinweis") },
+  { id: "gemeinbedarf", titel: tt("planer.gruppe.gemeinbedarf"), datei: "ein", hinweis: tt("planer.gruppe.gemeinbedarf_hinweis") },
+  { id: "versorgung", titel: tt("planer.gruppe.versorgung"), datei: "ein_odbl", hinweis: tt("planer.gruppe.versorgung_hinweis") }
 ];
 var ART = {
-  kita: { h: "kita", kurz: "Kita", name: "Kindertagesstätte", g: "bildung", s: ["#13212a", "#ffffff", 5, 1.5] },
-  hort: { h: "hort", kurz: "Hort", name: "Hort", g: "bildung", s: ["#5d6b72", "#ffffff", 4.5, 1.5] },
-  grundschule: { h: "gs", kurz: "Grundschule", name: "Grundschule", g: "bildung", s: ["#ffffff", "#13212a", 5.5, 2.5] },
-  sek1: { h: "sek1", kurz: "Sekundarstufe I", name: "Schule mit Sekundarstufe I (Oberschule, Gesamtschule)", g: "bildung", s: ["#ffffff", "#5d6b72", 5, 2] },
-  gymnasium: { h: "gym", kurz: "Gymnasium", name: "Gymnasium", g: "bildung", s: ["#9aa5a9", "#13212a", 5, 1.5] },
-  foerderschule: { h: "fs", kurz: "Förderschule", name: "Förderschule", g: "bildung", s: ["#cdd1cc", "#13212a", 4.5, 1.5] },
-  osz: { h: "osz", kurz: "Oberstufenzentrum", name: "Oberstufenzentrum, berufliche Schule", g: "bildung", s: ["#cdd1cc", "#5d6b72", 4.5, 1] },
-  sonstige_schule: { h: "ss", kurz: "andere Schule", name: "andere Schule", g: "bildung", s: ["#e6e9e4", "#5d6b72", 4, 1] },
-  feuerwehr: { h: "fw", kurz: "Feuerwehr", name: "Feuerwehr", g: "gemeinbedarf", s: ["#fafbf8", "#13212a", 5, 2] },
-  bibliothek: { h: "bib", kurz: "Bibliothek", name: "Bibliothek, Bücherei", g: "gemeinbedarf", s: ["#fafbf8", "#13212a", 4, 1] },
-  sport: { h: "sport", kurz: "Sport", name: "Sporthalle, Sportanlage, Bad", g: "gemeinbedarf", s: ["#fafbf8", "#5d6b72", 4.5, 1.5] },
-  jugendfreizeit: { h: "jug", kurz: "Jugend", name: "Jugendfreizeit", g: "gemeinbedarf", s: ["#fafbf8", "#5d6b72", 4, 2.5] },
-  seniorenfreizeit: { h: "sen", kurz: "Senioren", name: "Seniorenbegegnung", g: "gemeinbedarf", s: ["#fafbf8", "#808d92", 4, 2.5] },
-  buerger_vereinshaus: { h: "bh", kurz: "Bürgerhaus", name: "Bürger- und Vereinshaus", g: "gemeinbedarf", s: ["#fafbf8", "#808d92", 5, 1] },
-  sonstiger_gemeinbedarf: { h: "gb", kurz: "anderer Gemeinbedarf", name: "Gebäude für soziale, kulturelle oder öffentliche Zwecke", g: "gemeinbedarf", s: ["#fafbf8", "#9aa5a9", 3.5, 1] },
-  arzt: { h: "arzt", kurz: "Arzt", name: "Arztpraxis", g: "versorgung", s: ["#13212a", "#fafbf8", 3.5, 1] },
-  apotheke: { h: "apo", kurz: "Apotheke", name: "Apotheke", g: "versorgung", s: ["#5d6b72", "#fafbf8", 3.5, 1] },
-  supermarkt: { h: "markt", kurz: "Lebensmittel", name: "Lebensmittelmarkt", g: "versorgung", s: ["#9aa5a9", "#13212a", 4, 1] },
-  pflege: { h: "pflege", kurz: "Pflege", name: "Pflegeeinrichtung", g: "versorgung", s: ["#ffffff", "#5d6b72", 4, 1.5] },
-  spielplatz: { h: "spiel", kurz: "Spielplatz", name: "Spielplatz", g: "versorgung", s: ["#cdd1cc", "#5d6b72", 3.5, 1] },
-  gruen: { h: "gruen", kurz: "Grün", name: "öffentliche Grünfläche", g: "flaeche" }
+  kita: { h: "kita", kurz: tt("planer.art.kita"), name: tt("planer.art.kita_name"), g: "bildung", s: ["#13212a", "#ffffff", 5, 1.5] },
+  hort: { h: "hort", kurz: tt("planer.art.hort"), name: tt("planer.art.hort_name"), g: "bildung", s: ["#5d6b72", "#ffffff", 4.5, 1.5] },
+  grundschule: { h: "gs", kurz: tt("planer.art.grundschule"), name: tt("planer.art.grundschule_name"), g: "bildung", s: ["#ffffff", "#13212a", 5.5, 2.5] },
+  sek1: { h: "sek1", kurz: tt("planer.art.sek1"), name: tt("planer.art.sek1_name"), g: "bildung", s: ["#ffffff", "#5d6b72", 5, 2] },
+  gymnasium: { h: "gym", kurz: tt("planer.art.gymnasium"), name: tt("planer.art.gymnasium_name"), g: "bildung", s: ["#9aa5a9", "#13212a", 5, 1.5] },
+  foerderschule: { h: "fs", kurz: tt("planer.art.foerderschule"), name: tt("planer.art.foerderschule_name"), g: "bildung", s: ["#cdd1cc", "#13212a", 4.5, 1.5] },
+  osz: { h: "osz", kurz: tt("planer.art.osz"), name: tt("planer.art.osz_name"), g: "bildung", s: ["#cdd1cc", "#5d6b72", 4.5, 1] },
+  sonstige_schule: { h: "ss", kurz: tt("planer.art.sonstige_schule"), name: tt("planer.art.sonstige_schule_name"), g: "bildung", s: ["#e6e9e4", "#5d6b72", 4, 1] },
+  feuerwehr: { h: "fw", kurz: tt("planer.art.feuerwehr"), name: tt("planer.art.feuerwehr_name"), g: "gemeinbedarf", s: ["#fafbf8", "#13212a", 5, 2] },
+  bibliothek: { h: "bib", kurz: tt("planer.art.bibliothek"), name: tt("planer.art.bibliothek_name"), g: "gemeinbedarf", s: ["#fafbf8", "#13212a", 4, 1] },
+  sport: { h: "sport", kurz: tt("planer.art.sport"), name: tt("planer.art.sport_name"), g: "gemeinbedarf", s: ["#fafbf8", "#5d6b72", 4.5, 1.5] },
+  jugendfreizeit: { h: "jug", kurz: tt("planer.art.jugendfreizeit"), name: tt("planer.art.jugendfreizeit_name"), g: "gemeinbedarf", s: ["#fafbf8", "#5d6b72", 4, 2.5] },
+  seniorenfreizeit: { h: "sen", kurz: tt("planer.art.seniorenfreizeit"), name: tt("planer.art.seniorenfreizeit_name"), g: "gemeinbedarf", s: ["#fafbf8", "#808d92", 4, 2.5] },
+  buerger_vereinshaus: { h: "bh", kurz: tt("planer.art.buerger_vereinshaus"), name: tt("planer.art.buerger_vereinshaus_name"), g: "gemeinbedarf", s: ["#fafbf8", "#808d92", 5, 1] },
+  sonstiger_gemeinbedarf: { h: "gb", kurz: tt("planer.art.sonstiger_gemeinbedarf"), name: tt("planer.art.sonstiger_gemeinbedarf_name"), g: "gemeinbedarf", s: ["#fafbf8", "#9aa5a9", 3.5, 1] },
+  arzt: { h: "arzt", kurz: tt("planer.art.arzt"), name: tt("planer.art.arzt_name"), g: "versorgung", s: ["#13212a", "#fafbf8", 3.5, 1] },
+  apotheke: { h: "apo", kurz: tt("planer.art.apotheke"), name: tt("planer.art.apotheke_name"), g: "versorgung", s: ["#5d6b72", "#fafbf8", 3.5, 1] },
+  supermarkt: { h: "markt", kurz: tt("planer.art.supermarkt"), name: tt("planer.art.supermarkt_name"), g: "versorgung", s: ["#9aa5a9", "#13212a", 4, 1] },
+  pflege: { h: "pflege", kurz: tt("planer.art.pflege"), name: tt("planer.art.pflege_name"), g: "versorgung", s: ["#ffffff", "#5d6b72", 4, 1.5] },
+  spielplatz: { h: "spiel", kurz: tt("planer.art.spielplatz"), name: tt("planer.art.spielplatz_name"), g: "versorgung", s: ["#cdd1cc", "#5d6b72", 3.5, 1] },
+  gruen: { h: "gruen", kurz: tt("planer.art.gruen"), name: tt("planer.art.gruen_name"), g: "flaeche" }
 };
 var CODE = {};
 Object.keys(ART).forEach(function (a) { CODE[ART[a].h] = a; });
@@ -92,36 +92,36 @@ function wort(s) { return s == null ? "" : String(s).replace(/_/g, " "); }
 
 // ---------- Kennzahlen lesbar machen
 var KENNZAHL = {
-  anteil_in_radius: function (w) { return "Anteil " + (w.zielgruppe || "der Einwohner") + " mit " + art(w.art).kurz + (w.richtwert ? " in " + zahl(w.richtwert.wert) + NB + w.richtwert.einheit : " in der Nähe"); },
-  ew_je_einrichtung: function (w) { return "Einwohner je " + art(w.art).kurz; },
-  plaetze_je_kind: function (w) { return "Plätze je Kind, " + art(w.art).kurz + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
-  plaetze_je_bedarf: function () { return "Plätze je Bedarfsplatz (Krippe, Kindergarten, Hort)"; },
-  schueler_je_kind: function (w) { return "Grundschüler je Kind" + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
-  oepnv_erschliessung: function () { return "ÖPNV-Erschließung nach Nahverkehrsplan"; },
-  oepnv_takt: function () { return "ÖPNV-Erschließung mit Soll-Takt"; },
-  gruen_m2_je_ew: function () { return "Grünfläche je Einwohner"; }
+  anteil_in_radius: function (w) { return tt("planer.kz.anteil", { gruppe: w.zielgruppe || tt("planer.kz.der_einwohner"), art: art(w.art).kurz }) + (w.richtwert ? tt("planer.kz.in_radius", { radius: zahl(w.richtwert.wert) + NB + w.richtwert.einheit }) : tt("planer.kz.in_naehe")); },
+  ew_je_einrichtung: function (w) { return tt("planer.kz.ew_je", { art: art(w.art).kurz }); },
+  plaetze_je_kind: function (w) { return tt("planer.kz.plaetze_kind", { art: art(w.art).kurz }) + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
+  plaetze_je_bedarf: function () { return tt("planer.kz.plaetze_bedarf"); },
+  schueler_je_kind: function (w) { return tt("planer.kz.schueler_kind") + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
+  oepnv_erschliessung: function () { return tt("planer.kz.oepnv"); },
+  oepnv_takt: function () { return tt("planer.kz.oepnv_takt"); },
+  gruen_m2_je_ew: function () { return tt("planer.kz.gruen"); }
 };
 function kennzahlText(w) { return KENNZAHL[w.kennzahl] ? KENNZAHL[w.kennzahl](w) : wort(w.kennzahl) + ", " + art(w.art).kurz; }
 // Gleiche Kennzahl in Raumeinheit und gesamt (ganz Potsdam): Kennzahl, Art, Maßstab
 function wertSchluessel(w) { return [w.kennzahl, w.art, w.richtwert ? w.richtwert.wert : "-"].join("|"); }
 // „826 von 1.354“ mit Bedeutung von Zähler und Nenner (Audit K14); Personen und Bedarf sind laut Datei gerundet
-function znKurz(w) { return w.zaehler == null || w.nenner == null ? "" : fmt.format(w.zaehler) + " von " + fmt.format(w.nenner); }
+function znKurz(w) { return w.zaehler == null || w.nenner == null ? "" : tt("planer.zn_kurz", { zaehler: fmt.format(w.zaehler), nenner: fmt.format(w.nenner) }); }
 function znText(w) {
   if (!znKurz(w)) return "";
-  return znKurz(w) + " (Zähler: " + (w.zaehler_text || "") + "; Nenner: " + (w.nenner_text || "") + ")";
+  return znKurz(w) + tt("planer.zn_text", { zaehler: w.zaehler_text || "", nenner: w.nenner_text || "" });
 }
 function differenzText(w) {
   if (w.differenz == null) return "";
-  return w.differenz < 0 ? "Rechnerisch fehlen " + fmt.format(-w.differenz) + " Plätze zum Bedarf." :
-    "Rechnerisch " + fmt.format(w.differenz) + " Plätze mehr als der Bedarf.";
+  return w.differenz < 0 ? tt("planer.fehlen", { n: fmt.format(-w.differenz) }) :
+    tt("planer.mehr", { n: fmt.format(w.differenz) });
 }
-function zahl(v) { return v == null ? "k. A." : (Math.abs(v) < 10 && v % 1 ? zahl2 : fmt1).format(v).replace(/,0$/, ""); }
-var METHODE = { luftlinie: "Luftlinie", fussweg: "Fußweg" };
+function zahl(v) { return v == null ? tt("kern.k_a") : (Math.abs(v) < 10 && v % 1 ? zahl2 : fmt1).format(v).replace(/,0$/, ""); }
+var METHODE = { luftlinie: tt("planer.luftlinie"), fussweg: tt("planer.fussweg") };
 // Flächenquoten je Raumeinheit haben keinen Entfernungsbezug: dort kein Etikett zur Messart
 var OHNE_WEG = { plaetze_je_kind: 1, plaetze_je_bedarf: 1, schueler_je_kind: 1, ew_je_einrichtung: 1 };
 function wegText(w) { return OHNE_WEG[w.kennzahl] ? "" : (METHODE[w.methode] || w.methode); }
 // Status: amtlich mit Richtwert = amtlicher Maßstab; amtlich ohne Richtwert = nur amtliche Daten
-function statusText(w) { return w.status === "orientierung" ? "Orientierung, kein Richtwert" : w.richtwert ? "amtlicher Maßstab" : "amtliche Daten, kein Maßstab"; }
+function statusText(w) { return w.status === "orientierung" ? tt("planer.status.orientierung") : w.richtwert ? tt("planer.status.amtlich") : tt("planer.status.daten"); }
 function statusKlasse(w) { return w.status === "orientierung" ? "orientierung" : w.richtwert ? "amtlich" : "daten"; }
 var NUR_LAGE = { arzt: 1, apotheke: 1, pflege: 1, spielplatz: 1, supermarkt: 1 };
 
@@ -167,11 +167,11 @@ function hashSchreiben() {
 // ---------- Raumeinheiten: Planungsräume (H1, Ebene der Kita- und Schulentwicklungsplanung) und Stadtteile
 // datei = Wert von raumebene in planer.js; nur wenn er zur gewählten Ebene passt, zeigt die Seite die Tabelle
 var RAUMEBENE = {
-  pr: { name: "Planungsräume", einzahl: "Planungsraum", datei: "planungsraum", fc: PR,
+  pr: { name: tt("planer.ebene.pr"), einzahl: tt("planer.ebene.pr_eins"), datei: "planungsraum", fc: PR,
     att: 'Planungsräume © Landeshauptstadt Potsdam, <a href="' + DLDE + '">dl-de/by-2-0</a>, Daten verändert' },
-  st: { name: "Stadtteile", einzahl: "Stadtteil", datei: "stadtteil", fc: ST, att: "Stadtteile © Landeshauptstadt Potsdam, dl-de/zero-2-0" }
+  st: { name: tt("planer.ebene.st"), einzahl: tt("planer.ebene.st_eins"), datei: "stadtteil", fc: ST, att: window.KIEZ_ORT.karte.teile_attribution }
 };
-var RAUMEBENE_DATEI = { stadtteil: "Stadtteilen", planungsraum: "Planungsräumen" };
+var RAUMEBENE_DATEI = { stadtteil: tt("planer.ebene.st_datei"), planungsraum: tt("planer.ebene.pr_datei") };
 var RAUM = {};
 function raumIndex() { RAUM = {}; RAUMEBENE[S.raum].fc.features.forEach(function (f) { RAUM[f.properties.nr] = f; }); }
 raumIndex();
@@ -183,8 +183,7 @@ var start = S.kam ? { center: S.kam.center, zoom: S.kam.zoom, pitch: S.kam.pitch
 var map = new maplibregl.Map(Object.assign({
   container: "karte",
   style: T.grundkarte({ version: 8, sources: {
-      basemap: { type: "raster", tileSize: 256, maxzoom: 18, tiles: ["https://sgx.geodatenzentrum.de/wmts_basemapde/tile/1.0.0/de_basemapde_web_raster_grau/default/GLOBAL_WEBMERCATOR/{z}/{y}/{x}.png"],
-        attribution: 'Hintergrund © <a href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026) <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>' },
+      basemap: window.KIEZ_ORT.karte.grundkarte,
       zellen: { type: "geojson", data: LEER },
       raum: { type: "geojson", data: RAUMEBENE[S.raum].fc, promoteId: "nr", attribution: RAUMEBENE[S.raum].att },
       ein: { type: "geojson", data: LEER },
@@ -200,7 +199,7 @@ var map = new maplibregl.Map(Object.assign({
       { id: "ein", type: "circle", source: "ein", paint: {} }
     ] }, { vor: "ein_odbl" }),
   maxZoom: 19, maxPitch: 60, attributionControl: false, fadeDuration: RUHIG ? 0 : 300,
-  locale: { "GeolocateControl.FindMyLocation": "Meinen Standort zeigen", "GeolocateControl.LocationNotAvailable": "Standort nicht verfügbar", "NavigationControl.ZoomIn": "Vergrößern", "NavigationControl.ZoomOut": "Verkleinern", "NavigationControl.ResetBearing": "Nach Norden ausrichten", "AttributionControl.ToggleAttribution": "Quellen ein- oder ausblenden" }
+  locale: KIEZ_I18N.karteLocale()
 }, start));
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }), "top-right");
 map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false, timeout: 10000 }, trackUserLocation: false, showAccuracyCircle: false, fitBoundsOptions: { maxZoom: 15 } }), "top-right");   // „Wo bin ich?“ (Audit K30): Position bleibt im Browser
@@ -246,10 +245,10 @@ function einBauen() {
       var A = art(a), l = el("label", "chip chip--ein"), r = document.createElement("input");
       r.type = "checkbox"; r.value = a; r.name = "ein"; r.checked = S.ein.indexOf(a) > -1;
       var aus = !erlaubt(a); if (aus) { r.disabled = true; l.classList.add("chip--aus"); }
-      l.appendChild(r); l.appendChild(swatch(a)); l.appendChild(el("span", null, A.kurz)); l.title = A.name + (aus ? ": folgt mit dem OpenStreetMap-Auszug" : "");
+      l.appendChild(r); l.appendChild(swatch(a)); l.appendChild(el("span", null, A.kurz)); l.title = A.name + (aus ? tt("planer.folgt_osm") : "");
       reihe.appendChild(l);
     });
-    fs.appendChild(reihe); fs.appendChild(el("p", "fuss", g.hinweis + (g.id === "versorgung" && !OSM_DA ? " Folgt: Der OpenStreetMap-Auszug ist noch nicht eingebunden." : ""))); box.appendChild(fs);
+    fs.appendChild(reihe); fs.appendChild(el("p", "fuss", g.hinweis + (g.id === "versorgung" && !OSM_DA ? tt("planer.folgt_osm_lang") : ""))); box.appendChild(fs);
   });
   if (fokus != null) { var f = box.querySelector('input[value="' + fokus + '"]'); if (f) f.focus(); }
 }
@@ -272,7 +271,7 @@ function einAnwenden() {
       holen("ein_odbl", function (d) {
         laufend--; odblLaedt = false;
         if (d) { einMerken(d, "ein_odbl"); map.getSource("ein_odbl").setData(d); map.setLayoutProperty("ein_odbl", "visibility", "visible"); einBauen(); }
-        else meldung("Die Einrichtungen aus OpenStreetMap ließen sich nicht laden.");
+        else meldung(tt("planer.fehler_osm"));
         odblVermerk(); legende(); pruefeBereit();
       });
     }
@@ -296,7 +295,7 @@ function zuBauen() {
     box.querySelectorAll("label").forEach(function (l) { l.remove(); });
     liste.forEach(function (a) {
       var l = el("label", "chip"), r = document.createElement("input"); r.type = "radio"; r.name = "zu"; r.value = a;
-      l.appendChild(r); l.appendChild(el("span", null, a ? art(a).kurz : "keine Entfernung")); box.appendChild(l);
+      l.appendChild(r); l.appendChild(el("span", null, a ? art(a).kurz : tt("planer.keine_entfernung"))); box.appendChild(l);
     });
     box.dataset.liste = liste.join(",");
     if (fokus != null) { var f = box.querySelector('input[value="' + fokus + '"]'); if (f) f.focus(); }
@@ -304,13 +303,13 @@ function zuBauen() {
   box.querySelectorAll("input").forEach(function (r) {
     var a = r.value, l = r.parentNode, aus = !!(a && e && e.arten.indexOf(a) < 0);
     r.checked = S.zu === a; r.disabled = aus; l.classList.toggle("chip--aus", aus);
-    l.title = !a ? "Keine Entfernungen anzeigen" : aus ? art(a).name + ": nicht in den Daten (" + (S.weg === "fuss" ? "Fußweg" : "Luftlinie") + ")" : "Entfernung jeder bewohnten Zelle zur nächsten Einrichtung: " + art(a).name;
+    l.title = !a ? tt("planer.keine_entfernungen") : aus ? tt("planer.nicht_in_daten", { art: art(a).name, weg: S.weg === "fuss" ? METHODE.fussweg : METHODE.luftlinie }) : tt("planer.entf_jede", { art: art(a).name });
   });
   document.querySelectorAll('#weg input').forEach(function (r) {
     r.checked = r.value === S.weg;
     if (r.value === "fuss" && !FUSS_DA) {
-      r.disabled = true; r.parentNode.classList.add("chip--aus"); r.parentNode.title = "Fußweg folgt: Der OpenStreetMap-Auszug für das Wegenetz ist noch nicht eingebunden.";
-      var sp = r.parentNode.querySelector("span"); if (sp) sp.textContent = "Fußweg folgt";   // Sperre sichtbar, nicht nur im title (Touch)
+      r.disabled = true; r.parentNode.classList.add("chip--aus"); r.parentNode.title = tt("planer.fuss_folgt_lang");
+      var sp = r.parentNode.querySelector("span"); if (sp) sp.textContent = tt("planer.fuss_folgt");   // Sperre sichtbar, nicht nur im title (Touch)
     }
   });
 }
@@ -335,19 +334,19 @@ function zuAnwenden() {
   holen("zellen", function (z) {
     holen(E.datei, function (d) {
       laufend--;
-      if (!z) { meldung("Die Zellen der Karte ließen sich nicht laden; keine Entfernungen."); S.zu = ""; zuAnwenden(); pruefeBereit(); return; }
+      if (!z) { meldung(tt("planer.fehler_zellen")); S.zu = ""; zuAnwenden(); pruefeBereit(); return; }
       if (!d) {
-        meldung(w === "fuss" ? "Die Fußweg-Daten ließen sich nicht laden; die Karte zeigt Luftlinie." : "Die Entfernungen ließen sich nicht laden.");
+        meldung(w === "fuss" ? tt("planer.fehler_fuss") : tt("planer.fehler_entf"));
         if (w === "fuss") { S.weg = "luft"; odblVermerk(); zuAnwenden(); versorgung(); } else { S.zu = ""; zuAnwenden(); }
         pruefeBereit(); return;
       }
       var vermerk = vermerke(d.quellen).join(" ");
       T.ebenen.registrieren({ id: E.id, datei: WURZEL + DATEI[E.datei].src, global: DATEI[E.datei].global, art: "zellwert", odbl: !!DATEI[E.datei].odbl,
-        themen: d.arten.map(function (x) { return { id: E.p + x, h: E.p + art(x).h, kurz: art(x).kurz, name: "Entfernung zur nächsten Einrichtung: " + art(x).name, einheit: d.einheit, quelle: vermerk }; }) });
+        themen: d.arten.map(function (x) { return { id: E.p + x, h: E.p + art(x).h, kurz: art(x).kurz, name: tt("planer.entf_naechste", { art: art(x).name }), einheit: d.einheit, quelle: vermerk }; }) });
       zuBauen();
-      if (d.arten.indexOf(a) < 0 || S.zu !== a || S.weg !== w) { if (S.zu === a && S.weg === w) { meldung(art(a).name + " ist in den Daten (" + METHODE[d.methode] + ") nicht enthalten."); S.zu = ""; zuAnwenden(); } pruefeBereit(); return; }
+      if (d.arten.indexOf(a) < 0 || S.zu !== a || S.weg !== w) { if (S.zu === a && S.weg === w) { meldung(tt("planer.nicht_enthalten", { art: art(a).name, weg: METHODE[d.methode] })); S.zu = ""; zuAnwenden(); } pruefeBereit(); return; }
       var t = thema(w, a), l = zellwerte(d, a);
-      if (!l) { meldung("Die Entfernungen passen nicht zu den Zellen der Karte."); S.zu = ""; zuAnwenden(); pruefeBereit(); return; }
+      if (!l) { meldung(tt("planer.fehler_passt")); S.zu = ""; zuAnwenden(); pruefeBereit(); return; }
       if (!ZELLEN) { ZELLEN = { type: "FeatureCollection", features: z.features.map(function (f) { return { type: "Feature", geometry: f.geometry, properties: { id: f.properties.id, ew: f.properties.ew } }; }) }; }
       if (ZELLEN.features[0].properties[t.id] === undefined) ZELLEN.features.forEach(function (f, i) { f.properties[t.id] = l[i]; });
       var src = map.getSource("zellen");
@@ -368,14 +367,14 @@ function legende() {
   var d = window[S.weg === "fuss" ? "KIEZ_ERREICHBAR_FUSS" : "KIEZ_ERREICHBAR"];
   if (S.zu && d && map.getLayoutProperty("zellen", "visibility") === "visible") {
     var k = d.einheit === "min" ? KL_MIN : KL_M, ein = d.einheit === "min" ? "min" : "m";
-    L.appendChild(el("p", "legende__titel", "Entfernung zur nächsten " + art(S.zu).kurz + " · " + METHODE[d.methode]));
-    L.appendChild(el("p", "legende__weg", METHODE[d.methode] + ", " + ein + " je bewohnter 100-m-Zelle"));
+    L.appendChild(el("p", "legende__titel", tt("planer.leg_titel", { art: art(S.zu).kurz, weg: METHODE[d.methode] })));
+    L.appendChild(el("p", "legende__weg", tt("planer.leg_weg", { weg: METHODE[d.methode], einheit: ein })));
     var st = el("div", "stufen stufen--flach"); st.setAttribute("aria-hidden", "true");
     T.STUFEN.forEach(function (f) { var x = el("span"); x.style.background = f; st.appendChild(x); }); L.appendChild(st);
     var m = el("div", "marken"); m.appendChild(el("span", null, "0"));
-    k.grenzen.forEach(function (g) { m.appendChild(el("span", null, fmt.format(g))); }); m.appendChild(el("span", null, "mehr " + ein)); L.appendChild(m);
+    k.grenzen.forEach(function (g) { m.appendChild(el("span", null, fmt.format(g))); }); m.appendChild(el("span", null, tt("planer.leg_mehr", { einheit: ein }))); L.appendChild(m);
     var str = ((window.KIEZ_EINRICHTUNGEN || {}).features || []).filter(function (f) { return f.properties.hinweis && f.properties.art === S.zu; });
-    if (str.length) L.appendChild(el("p", "legende__q", str.map(function (f) { return f.properties.name; }).join(", ") + ": Lage strittig, zählt nicht für die Entfernungen."));
+    if (str.length) L.appendChild(el("p", "legende__q", str.map(function (f) { return f.properties.name; }).join(", ") + tt("planer.strittig")));
     var q = el("p", "legende__q legende__vermerk"); q.appendChild(vermerkKnoten(vermerke(d.quellen).join(" "))); L.appendChild(q);
   }
   var sichtbar = S.ein.filter(function (a) { return ARTEN_IN.ein.indexOf(a) > -1 || (window.KIEZ_EINRICHTUNGEN_ODBL && ARTEN_IN.ein_odbl.indexOf(a) > -1); });
@@ -410,12 +409,12 @@ function raumBauen() {
 function raumHinweis() {
   var P = planerDaten() || window.KIEZ_PLANER || window.KIEZ_PLANER_FUSS, E = RAUMEBENE[S.raum];
   $("raumebene-hinweis").textContent = P && P.raumebene !== E.datei
-    ? "Die Versorgungswerte liegen je " + (P.raumebene === "planungsraum" ? "Planungsraum" : "Stadtteil") + " vor. " + E.name + " dienen hier der Orientierung" +
-      (P.raumebene === "planungsraum" && !PR ? "; die Grenzen der Planungsräume fehlen der Karte noch." : "; für die Tabelle die andere Ebene wählen.")
+    ? tt("planer.werte_je", { ebene: P.raumebene === "planungsraum" ? RAUMEBENE.pr.einzahl : RAUMEBENE.st.einzahl, name: E.name }) +
+      (P.raumebene === "planungsraum" && !PR ? tt("planer.grenzen_fehlen") : tt("planer.andere_ebene"))
     : S.raum === "pr"
-      ? "Planungsräume sind die Ebene, auf der die Stadt Kita und Schule plant (19 Räume, Grenzen Stand 31.12.2025)."
-      : PR ? "Die 32 amtlichen Stadtteile der Landeshauptstadt."
-        : "Die Stadt plant Kita und Schule auf Planungsräumen. Bis deren Grenzen vorliegen, rechnet der Planer je Stadtteil.";
+      ? tt("planer.hinweis_pr")
+      : PR ? tt("planer.hinweis_st", { n: String(ST.features.length), art: KIEZ_I18N.ort("stadt_art") })
+        : tt("planer.hinweis_st_ohne_pr");
 }
 function markieren() { $("raeume").querySelectorAll(".treffer").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.nr === S.r)); }); }
 var gewaehlt = "";
@@ -424,79 +423,79 @@ function waehle(nr) {
   gewaehlt = S.r = RAUM[nr] ? nr : "";
   if (bereitKarte && gewaehlt) map.setFeatureState({ source: "raum", id: gewaehlt }, { gewaehlt: true });
   nochmal(); markieren(); versorgung(); status(); hashSchreiben();
-  $("griff-name").textContent = S.r ? S.r + " " + RAUM[S.r].properties.name : "Versorgung";
-  $("zoom-raum").querySelector(".knopf__text").textContent = S.r ? "Auf Raumeinheit zoomen" : "Ganz Potsdam zeigen";
+  $("griff-name").textContent = S.r ? S.r + " " + RAUM[S.r].properties.name : tt("planer.versorgung");
+  $("zoom-raum").querySelector(".knopf__text").textContent = S.r ? tt("planer.zoom_raum") : tt("planer.zoom_ganz", { stadt: KIEZ_I18N.ort("ganze_stadt") });
 }
 // planerLaedt[datei]: true = lädt oder geladen, false = fehlgeschlagen (nächste Handlung versucht es neu)
 var planerLaedt = {};
 function nochmal() { Object.keys(planerLaedt).forEach(function (k) { if (planerLaedt[k] === false) delete planerLaedt[k]; }); }
 function versorgung() {
   var box = $("vs-inhalt"); box.innerHTML = "";
-  if (!S.r) { $("vs-name").textContent = "Keine Raumeinheit gewählt"; $("vs-art").textContent = "Raumeinheit in der Liste oder in der Karte wählen. Die Tabelle zeigt je Zeile Wert, Methode, Status und Quelle."; return; }
+  if (!S.r) { $("vs-name").textContent = tt("planer.keine_wahl"); $("vs-art").textContent = tt("planer.wahl_hinweis"); return; }
   var p = RAUM[S.r].properties, P = planerDaten();
   $("vs-name").textContent = p.name;
-  $("vs-art").textContent = RAUMEBENE[S.raum].einzahl + " " + p.nr + " der Landeshauptstadt Potsdam, Werte " + (S.weg === "fuss" ? "als Fußweg" : "in Luftlinie");
+  $("vs-art").textContent = tt("planer.vs_art", { einheit: RAUMEBENE[S.raum].einzahl, nr: p.nr, amtlich: KIEZ_I18N.ort("stadt_amtlich"), weg: S.weg === "fuss" ? tt("planer.als_fussweg") : tt("planer.in_luftlinie") });
   if (!P) {
     var dn = S.weg === "fuss" ? "planer_fuss" : "planer";
     if (planerLaedt[dn] === undefined) {
       planerLaedt[dn] = true; beginn();
       holen(dn, function (d) {
         laufend--; planerLaedt[dn] = !!d;
-        if (!d && dn === "planer_fuss") { meldung("Die Fußweg-Tabelle ließ sich nicht laden; sie zeigt Luftlinie."); S.weg = "luft"; odblVermerk(); zuAnwenden(); }
+        if (!d && dn === "planer_fuss") { meldung(tt("planer.fehler_fuss_tab")); S.weg = "luft"; odblVermerk(); zuAnwenden(); }
         if (d) { zuBauen(); raumHinweis(); }
         versorgung(); vergleich(); pruefeBereit();
       });
     }
-    box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? "Die Versorgungsdatei ließ sich nicht laden." : "Daten werden geladen.")); return;
+    box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? tt("planer.fehler_datei") : tt("planer.laedt"))); return;
   }
   // Rechnet die Datei auf einer anderen Ebene als der gewählten, passen die Schlüssel nicht:
   // dann nichts zuordnen, sondern das sagen.
   raumHinweis();
   if (P.raumebene !== RAUMEBENE[S.raum].datei) {
     var andere = Object.keys(RAUMEBENE).filter(function (k) { return RAUMEBENE[k].datei === P.raumebene && RAUMEBENE[k].fc; })[0];
-    box.appendChild(el("p", "fuss", "Die Versorgungsdatei rechnet auf " + (RAUMEBENE_DATEI[P.raumebene] || P.raumebene) + ". " +
-      (andere ? "Für die Tabelle oben die Ebene „" + RAUMEBENE[andere].name + "“ wählen; " + RAUMEBENE[S.raum].name + " dienen nur der Orientierung."
-              : "Deren Grenzen fehlen der Karte noch; die Tabelle erscheint, sobald sie eingebunden sind. Bis dahin lassen sich die Werte nicht einem " + RAUMEBENE[S.raum].einzahl + " zuordnen.")));
+    box.appendChild(el("p", "fuss", tt("planer.datei_ebene", { ebene: RAUMEBENE_DATEI[P.raumebene] || P.raumebene }) +
+      (andere ? tt("planer.datei_andere", { andere: RAUMEBENE[andere].name, name: RAUMEBENE[S.raum].name })
+              : tt("planer.datei_grenzen", { einheit: RAUMEBENE[S.raum].einzahl }))));
     return;
   }
   var R = P.raeume[S.r];
-  if (!R) { box.appendChild(el("p", "fuss", "Für diese Raumeinheit stehen keine Versorgungswerte in der Datei (" + (S.weg === "fuss" ? "Fußweg" : "Luftlinie") + ").")); return; }
+  if (!R) { box.appendChild(el("p", "fuss", tt("planer.keine_werte", { weg: S.weg === "fuss" ? METHODE.fussweg : METHODE.luftlinie }))); return; }
   var QN = [], qnr = function (q) { var i = QN.indexOf(q); if (i < 0) { QN.push(q); i = QN.length - 1; } return i + 1; };
   // Einwohner: gerundet laut Datei, Quelle Zensus
   var ew = el("p", "vs-ew");
-  ew.appendChild(el("b", null, R.ew == null ? "Einwohner: k. A." : "rund " + fmt.format(R.ew) + " Einwohner"));
-  ew.appendChild(document.createTextNode(" (Zensus 2022, Stichtag 15.05.2022, gerundet auf " + fmt.format(P.rundung.ew) + "; © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, "));
-  var lz = el("a", "link", "Lizenztext"); lz.href = DLDE; ew.appendChild(lz); ew.appendChild(document.createTextNode(", Daten verändert (eigene Berechnung))"));
+  ew.appendChild(el("b", null, R.ew == null ? tt("planer.ew_ka", { ka: tt("kern.k_a") }) : tt("planer.ew_rund", { ew: fmt.format(R.ew) })));
+  ew.appendChild(document.createTextNode(tt("planer.ew_quelle", { rundung: fmt.format(P.rundung.ew) }) + "; © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, "));
+  var lz = el("a", "link", tt("planer.lizenztext")); lz.href = DLDE; ew.appendChild(lz); ew.appendChild(document.createTextNode(tt("planer.daten_veraendert") + ")"));
   box.appendChild(ew);
   if (P.hinweis) box.appendChild(el("p", "fuss vs-hinweis", P.hinweis));
   steckbriefLink(box, p, P);
-  var ul = el("ul", "vs-liste"); ul.setAttribute("aria-label", "Versorgung " + p.name);
+  var ul = el("ul", "vs-liste"); ul.setAttribute("aria-label", tt("planer.vs_aria", { name: p.name }));
   R.werte.forEach(function (w) {
     var li = el("li", "vs-zeile" + (w.status === "orientierung" ? " vs-zeile--orientierung" : ""));
     li.dataset.kennzahl = w.kennzahl;
     li.appendChild(el("h3", "vs-titel", kennzahlText(w)));
-    var z = el("p", "vs-wert"); z.appendChild(el("span", "vs-zahl", w.wert == null ? "k. A." : zahl(w.wert) + NB + w.einheit));
+    var z = el("p", "vs-wert"); z.appendChild(el("span", "vs-zahl", w.wert == null ? tt("kern.k_a") : zahl(w.wert) + NB + w.einheit));
     if (wegText(w)) z.appendChild(el("span", "marke-weg", wegText(w)));
     li.appendChild(z);
     if (znText(w)) li.appendChild(el("p", "vs-zn", znText(w) + (differenzText(w) ? ". " + differenzText(w) : "")));
     var G = P.gesamt && P.gesamt.werte.filter(function (g) { return wertSchluessel(g) === wertSchluessel(w); })[0];
-    if (G) li.appendChild(el("p", "vs-stadt", "Ganz Potsdam: " + (G.wert == null ? "kein Wert" : zahl(G.wert) + NB + G.einheit) + (znKurz(G) ? " (" + znKurz(G) + ")" : "")));
+    if (G) li.appendChild(el("p", "vs-stadt", KIEZ_I18N.ort("ganze_stadt") + ": " + (G.wert == null ? tt("planer.kein_wert") : zahl(G.wert) + NB + G.einheit) + (znKurz(G) ? " (" + znKurz(G) + ")" : "")));
     var st = el("p", "vs-status");
     st.appendChild(el("span", "abzeichen abzeichen--" + statusKlasse(w), statusText(w)));
-    if (w.vorlaeufig) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", "vorläufig, ohne Schulbezirk"));
-    if (NUR_LAGE[w.art]) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", "nur Lage, keine Versorgungsaussage"));
+    if (w.vorlaeufig) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", tt("planer.vorlaeufig")));
+    if (NUR_LAGE[w.art]) st.appendChild(el("span", "abzeichen abzeichen--vorlaeufig", tt("planer.nur_lage")));
     li.appendChild(st);
     if (w.richtwert) {
-      var rw = el("p", "vs-richt", (w.status === "orientierung" ? "Orientierungswert: " : "Richtwert: ") + zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : ""));
+      var rw = el("p", "vs-richt", (w.status === "orientierung" ? tt("planer.orientierungswert") : tt("planer.richtwert")) + zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : ""));
       rw.appendChild(el("sup", null, "[" + qnr(w.richtwert.q) + "]")); if (w.richtwert.seite) rw.appendChild(document.createTextNode(", " + w.richtwert.seite)); li.appendChild(rw);
     }
-    var q = el("p", "vs-q"); q.appendChild(document.createTextNode("Quelle [" + qnr(w.q) + "] " + ((P.quellen[w.q] || {}).quelle || w.q) + ". Stand: " + w.stand + ". " + w.unsicherheit));
+    var q = el("p", "vs-q"); q.appendChild(document.createTextNode(tt("planer.quelle_zeile", { nr: qnr(w.q), name: (P.quellen[w.q] || {}).quelle || w.q, stand: w.stand }) + w.unsicherheit));
     li.appendChild(q);
-    if (w.prognose) li.appendChild(el("p", "vs-q", "Prognose liegt vor (siehe Datei)."));
+    if (w.prognose) li.appendChild(el("p", "vs-q", tt("planer.prognose")));
     ul.appendChild(li);
   });
   box.appendChild(ul);
-  var ol = el("ol", "vs-quellen"); ol.setAttribute("aria-label", "Quellen der Tabelle");
+  var ol = el("ol", "vs-quellen"); ol.setAttribute("aria-label", tt("planer.quellen_aria"));
   QN.forEach(function (k) { var li = el("li"), Q = P.quellen[k] || { vermerk: k }; li.appendChild(vermerkKnoten(Q.vermerk)); ol.appendChild(li); });
   box.appendChild(ol);
 }
@@ -508,10 +507,10 @@ function steckbriefLink(box, p, P) {
   var z = el("div", "seite__aktion vs-steckbrief"), a = el("a", "knopf knopf--rand");
   a.href = WURZEL + "export/steckbriefe/" + encodeURIComponent(p.nr) + ".html";
   var f = el("span", "knopf__flut"); f.setAttribute("aria-hidden", "true"); a.appendChild(f);
-  a.appendChild(el("span", "knopf__text", "Steckbrief (A4)")); a.title = "Steckbrief " + p.nr + " " + p.name + " als Druckseite";
+  a.appendChild(el("span", "knopf__text", tt("planer.steckbrief"))); a.title = tt("planer.steckbrief_titel", { teil: p.nr + " " + p.name });
   z.appendChild(a); box.appendChild(z);
-  box.appendChild(el("p", "fuss", "Druckseite dieses Planungsraums mit der Versorgungstabelle. Der Steckbrief rechnet in Luftlinie" +
-    (S.weg === "fuss" ? ", die Tabelle hier zeigt den Fußweg." : ".")));
+  box.appendChild(el("p", "fuss", tt("planer.druck") +
+    (S.weg === "fuss" ? tt("planer.druck_fuss") : ".")));
 }
 
 // ---------- Vergleich aller Raumeinheiten (Audit K24): eine Kennzahl für jede Raumeinheit und ganz Potsdam.
@@ -522,7 +521,7 @@ function vergleich() {
   var P = planerDaten();
   if (!P) {
     var dn = S.weg === "fuss" ? "planer_fuss" : "planer";
-    box.innerHTML = ""; box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? "Die Versorgungsdatei ließ sich nicht laden." : "Daten werden geladen."));
+    box.innerHTML = ""; box.appendChild(el("p", "fuss", planerLaedt[dn] === false ? tt("planer.fehler_datei") : tt("planer.laedt")));
     if (planerLaedt[dn] === undefined) {
       planerLaedt[dn] = true; beginn();
       holen(dn, function (d) { laufend--; planerLaedt[dn] = !!d; if (d) { zuBauen(); raumHinweis(); } versorgung(); vergleich(); pruefeBereit(); });
@@ -542,13 +541,13 @@ function vergleich() {
   sel.disabled = false;
   var w0 = liste.filter(function (w) { return wertSchluessel(w) === sel.value; })[0];
   box.innerHTML = ""; if (!w0) return;
-  var tab = el("table", "tabelle vg-tabelle"), cap = el("caption", "nur-sr", kennzahlText(w0) + ", alle " + (P.raumebene === "planungsraum" ? "Planungsräume" : "Stadtteile") + " und ganz Potsdam");
+  var tab = el("table", "tabelle vg-tabelle"), cap = el("caption", "nur-sr", tt("planer.vg_caption", { kennzahl: kennzahlText(w0), ebene: P.raumebene === "planungsraum" ? RAUMEBENE.pr.name : RAUMEBENE.st.name, stadt: KIEZ_I18N.ort("stadt") }));
   tab.appendChild(cap);
-  var kopf = el("tr"); [P.raumebene === "planungsraum" ? "Planungsraum" : "Stadtteil", "Wert", "Zähler", "Nenner"].forEach(function (x) { var th = el("th", null, x); th.scope = "col"; kopf.appendChild(th); });
+  var kopf = el("tr"); [P.raumebene === "planungsraum" ? RAUMEBENE.pr.einzahl : RAUMEBENE.st.einzahl, tt("planer.sp_wert"), tt("planer.sp_zaehler"), tt("planer.sp_nenner")].forEach(function (x) { var th = el("th", null, x); th.scope = "col"; kopf.appendChild(th); });
   var th = el("thead"); th.appendChild(kopf); tab.appendChild(th);
   function reihe(teil, nr, name, w, fuss) {
     var tr = el("tr", fuss ? "vg-stadt" : null), c = el("th", null, (nr ? nr + " " : "") + name); c.scope = "row"; tr.appendChild(c);
-    tr.appendChild(el("td", null, !w || w.wert == null ? "kein Wert" : zahl(w.wert) + NB + w.einheit));
+    tr.appendChild(el("td", null, !w || w.wert == null ? tt("planer.kein_wert") : zahl(w.wert) + NB + w.einheit));
     tr.appendChild(el("td", null, w && w.zaehler != null ? fmt.format(w.zaehler) : ""));
     tr.appendChild(el("td", null, w && w.nenner != null ? fmt.format(w.nenner) : ""));
     teil.appendChild(tr);
@@ -558,21 +557,21 @@ function vergleich() {
     var R = P.raeume[nr]; reihe(tb, nr, R.name, R.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0], false);
   });
   tab.appendChild(tb);
-  if (P.gesamt) { var tf = el("tfoot"); reihe(tf, "", "Ganz Potsdam", P.gesamt.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0], true); tab.appendChild(tf); }
+  if (P.gesamt) { var tf = el("tfoot"); reihe(tf, "", KIEZ_I18N.ort("ganze_stadt"), P.gesamt.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0], true); tab.appendChild(tf); }
   box.appendChild(tab);
   var G = P.gesamt && P.gesamt.werte.filter(function (w) { return wertSchluessel(w) === sel.value; })[0];
-  box.appendChild(el("p", "fuss vg-hinweis", (w0.zaehler_text ? "Zähler: " + w0.zaehler_text + ". Nenner: " + w0.nenner_text + ". " : "Ohne Zähler und Nenner (Median über die Zellen). ") +
-    statusText(w0) + (G ? ". " + G.unsicherheit : ". Für ganz Potsdam gibt es hier keinen Wert.") + " Hinweise je Raumeinheit stehen in der Versorgungstabelle oben."));
+  box.appendChild(el("p", "fuss vg-hinweis", (w0.zaehler_text ? tt("planer.vg_zn", { zaehler: w0.zaehler_text, nenner: w0.nenner_text }) : tt("planer.vg_ohne_zn")) +
+    statusText(w0) + (G ? ". " + G.unsicherheit : tt("planer.vg_kein_gesamt", { stadt: KIEZ_I18N.ort("stadt") })) + tt("planer.vg_hinweise")));
 }
 $("vg-laden").addEventListener("click", function () { vgOffen = true; this.hidden = true; $("vg-auswahl").hidden = false; vergleich(); });
 $("vg-kennzahl").addEventListener("change", vergleich);
 
 // ---------- Fragen als Einstieg: jede setzt den Zustand und erklärt nebenbei eine Funktion
 var FRAGEN = [
-  { titel: "Wie weit ist es zur nächsten Kita?", text: "Färbt jede bewohnte Zelle nach der Entfernung zur nächsten Kita. Klick auf einen Kreis zeigt Plätze und Quelle.", ein: ["kita"], zu: "kita" },
-  { titel: "Liegt eine Grundschule in der Nähe?", text: "Entfernung zur nächsten Grundschule. Vorläufig, denn Grundschulen werden über Schulbezirke geplant, die hier noch fehlen.", ein: ["grundschule"], zu: "grundschule" },
-  { titel: "Wo ist das nächste Grün?", text: "Entfernung zur nächsten öffentlichen Grünfläche" + (OSM_DA ? ", dazu Spielplätze aus OpenStreetMap." : "; Spielplätze folgen mit dem OpenStreetMap-Auszug."), ein: ["spielplatz"], zu: "gruen" },
-  { titel: "Wie ist ein " + (PR && !FIXTURE ? "Planungsraum" : "Stadtteil") + " versorgt?", text: (PR && !FIXTURE ? "Planungsraum" : "Stadtteil") + " wählen: Die Tabelle nennt je Zeile Wert, Methode, Status und Quelle.", ein: ["kita", "hort", "grundschule"], zu: "", raum: true }
+  { titel: tt("planer.frage.kita"), text: tt("planer.frage.kita_text"), ein: ["kita"], zu: "kita" },
+  { titel: tt("planer.frage.gs"), text: tt("planer.frage.gs_text"), ein: ["grundschule"], zu: "grundschule" },
+  { titel: tt("planer.frage.gruen"), text: tt("planer.frage.gruen_text") + (OSM_DA ? tt("planer.frage.gruen_osm") : tt("planer.frage.gruen_folgt")), ein: ["spielplatz"], zu: "gruen" },
+  { titel: tt("planer.frage.raum", { einheit: (PR && !FIXTURE ? RAUMEBENE.pr : RAUMEBENE.st).einzahl }), text: tt("planer.frage.raum_text", { einheit: (PR && !FIXTURE ? RAUMEBENE.pr : RAUMEBENE.st).einzahl }), ein: ["kita", "hort", "grundschule"], zu: "", raum: true }
 ];
 function fragenBauen() {
   var ul = $("fragen");
@@ -609,8 +608,8 @@ $("zoom-raum").addEventListener("click", function () {
 $("link-teilen").addEventListener("click", function () {
   hashSchreiben();
   var url = location.href, hin = $("teilen-hinweis");
-  function ok() { hin.textContent = "Link kopiert. Er öffnet genau diese Ansicht."; }
-  function zeigen() { hin.textContent = "Link: " + url; }
+  function ok() { hin.textContent = tt("planer.link_kopiert"); }
+  function zeigen() { hin.textContent = tt("planer.link", { url: url }); }
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(ok, zeigen); else zeigen();
 });
 var seiteEl = $("seite"), griff = $("seite-griff");
@@ -621,8 +620,8 @@ var letzteMeldung = "";
 function meldung(t) { letzteMeldung = t; $("kartenstatus").textContent = t; var h = $("teilen-hinweis"); if (h) h.textContent = t; }
 function status() {
   var m = letzteMeldung; letzteMeldung = "";
-  $("kartenstatus").textContent = (m ? m + " " : "") + "Karte zeigt: " + (S.ein.length ? S.ein.map(function (a) { return art(a).kurz; }).join(", ") : "keine Einrichtungen") +
-    (S.zu ? "; Entfernung zur nächsten " + art(S.zu).kurz + " in " + (S.weg === "fuss" ? "Fußweg" : "Luftlinie") : "") + (S.r ? "; gewählt " + S.r + " " + RAUM[S.r].properties.name : "") + ".";
+  $("kartenstatus").textContent = (m ? m + " " : "") + tt("planer.status", { ein: S.ein.length ? S.ein.map(function (a) { return art(a).kurz; }).join(", ") : tt("planer.status_keine") }) +
+    (S.zu ? tt("planer.status_zu", { art: art(S.zu).kurz, weg: S.weg === "fuss" ? METHODE.fussweg : METHODE.luftlinie }) : "") + (S.r ? tt("planer.status_wahl", { teil: S.r + " " + RAUM[S.r].properties.name }) : "") + ".";
 }
 
 // ---------- Klicks in der Karte (keine Kamerabewegung)
@@ -632,13 +631,13 @@ function popupEinrichtung(e, f) {
   var p = x.f.properties, A = art(p.art), Q = x.d.quellen[p.q] || { vermerk: p.q }, osm = x.quelle === "ein_odbl", h = "";
   h += "<b>" + esc(osm ? A.name : (p.name || A.name)) + "</b><br>" + esc(A.name) + (p.unterart && !osm ? ", " + esc(wort(p.unterart)) : "");
   var tab = "";
-  if (p.plaetze != null) tab += zeile("Plätze", fmt.format(p.plaetze));
-  if (p.schueler != null) tab += zeile("Schüler", fmt.format(p.schueler) + (p.schueler_stand ? " (Stand " + esc(p.schueler_stand) + ")" : ""));
+  if (p.plaetze != null) tab += zeile(tt("planer.plaetze"), fmt.format(p.plaetze));
+  if (p.schueler != null) tab += zeile(tt("planer.schueler"), fmt.format(p.schueler) + (p.schueler_stand ? tt("planer.schueler_stand", { stand: esc(p.schueler_stand) }) : ""));
   if (tab) h += "<table class='pop-tab'>" + tab + "</table>";
-  if (p.plaetze != null) h += "<div class='pop-q'>Genehmigte Plätze laut Betriebserlaubnis. Wie viele frei sind, steht nicht in den Daten.</div>";
-  if (p.status === "lage_ohne_kapazitaet" || osm) h += "<div class='pop-q'>Nur Lage, ohne Kapazität" + (NUR_LAGE[p.art] ? "; keine Aussage zur Versorgung" : "") + ".</div>";
+  if (p.plaetze != null) h += "<div class='pop-q'>" + tt("planer.pop_plaetze") + "</div>";
+  if (p.status === "lage_ohne_kapazitaet" || osm) h += "<div class='pop-q'>" + tt("planer.pop_nur_lage") + (NUR_LAGE[p.art] ? tt("planer.pop_keine_aussage") : "") + ".</div>";
   if (p.hinweis) h += "<div class='pop-q'>" + esc(p.hinweis) + "</div>";
-  else if (p.in_potsdam === false) h += "<div class='pop-q'>Außerhalb der Stadtgrenze; zählt für die Entfernungen mit.</div>";
+  else if (p.in_potsdam === false) h += "<div class='pop-q'>" + tt("planer.pop_aussen") + "</div>";
   h += "<div class='pop-q'>" + vermerkHtml(Q.vermerk) + "</div>";
   new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(x.f.geometry.coordinates).setHTML(h).addTo(map);
   return true;
@@ -653,9 +652,9 @@ map.on("click", function (e) {
     if (c.length && d && t) {
       zelleGezeigt = true;
       var v = Number(c[0].properties[t.id]);
-      new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(e.lngLat).setHTML("<b>Gitterzelle 100 × 100 m</b><table class='pop-tab'>" +
-        zeile("Nächste " + esc(art(S.zu).kurz), fmt.format(v) + NB + esc(d.einheit) + " " + METHODE[d.methode]) + "</table><div class='pop-q'>" +
-        vermerkHtml(vermerke(d.quellen).join(" ")) + " Zellen: Zensus 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class=\"link\" href=\"" + DLDE + "\">Lizenztext</a>), Daten verändert (eigene Berechnung).</div>").addTo(map);
+      new maplibregl.Popup({ maxWidth: "290px" }).setLngLat(e.lngLat).setHTML("<b>" + tt("planer.zelle") + "</b><table class='pop-tab'>" +
+        zeile(tt("planer.naechste", { art: esc(art(S.zu).kurz) }), fmt.format(v) + NB + esc(d.einheit) + " " + METHODE[d.methode]) + "</table><div class='pop-q'>" +
+        vermerkHtml(vermerke(d.quellen).join(" ")) + tt("planer.pop_zellen") + " Zensus 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0 (<a class=\"link\" href=\"" + DLDE + "\">" + tt("planer.lizenztext") + "</a>)" + tt("planer.daten_veraendert") + ".</div>").addTo(map);
     }
   }
   var r = map.queryRenderedFeatures(e.point, { layers: ["raum-flaeche"] });
@@ -701,7 +700,7 @@ function pruefeBereit() {
 function methode() {
   holen("planer", function (P) {
     var box = $("richtwerte"); if (!box) return;
-    if (!P) { box.appendChild(el("p", "fuss", "Die Versorgungsdatei ließ sich nicht laden.")); window.KIEZ_BEREIT = true; return; }
+    if (!P) { box.appendChild(el("p", "fuss", tt("planer.fehler_datei"))); window.KIEZ_BEREIT = true; return; }
     var gesehen = {}, zeilen = [];
     Object.keys(P.raeume).forEach(function (k) {
       P.raeume[k].werte.forEach(function (w) {
@@ -710,17 +709,17 @@ function methode() {
       });
     });
     var tab = el("table", "tabelle richt-tabelle"), kopf = el("tr");
-    ["Kennzahl", "Maßstab", "Status", "Quelle"].forEach(function (t) { kopf.appendChild(el("th", null, t)); });
+    [tt("planer.sp_kennzahl"), tt("planer.sp_massstab"), tt("planer.sp_status"), tt("planer.sp_quelle")].forEach(function (t) { kopf.appendChild(el("th", null, t)); });
     var th = el("thead"); th.appendChild(kopf); tab.appendChild(th); var tb = el("tbody");
     zeilen.forEach(function (w) {
       var tr = el("tr");
       tr.appendChild(el("td", null, kennzahlText(w)));
-      tr.appendChild(el("td", null, w.richtwert ? zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : "") : "ohne festen Wert"));
-      tr.appendChild(el("td", null, statusText(w) + (w.vorlaeufig ? "; vorläufig, ohne Schulbezirk" : "")));
+      tr.appendChild(el("td", null, w.richtwert ? zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : "") : tt("planer.ohne_wert")));
+      tr.appendChild(el("td", null, statusText(w) + (w.vorlaeufig ? "; " + tt("planer.vorlaeufig") : "")));
       var td = el("td"), Q = P.quellen[(w.richtwert || w).q] || { vermerk: (w.richtwert || w).q };
       td.appendChild(vermerkKnoten(Q.vermerk)); if (w.richtwert && w.richtwert.seite) td.appendChild(document.createTextNode(", " + w.richtwert.seite));
       // Maßstab aus einem Dokument ohne Lizenz: dazu die Quelle der Daten mit ihrem Vermerk (Lizenz)
-      if (w.richtwert && w.q && w.q !== w.richtwert.q && P.quellen[w.q]) { td.appendChild(document.createTextNode(". Daten: ")); td.appendChild(vermerkKnoten(P.quellen[w.q].vermerk)); }
+      if (w.richtwert && w.q && w.q !== w.richtwert.q && P.quellen[w.q]) { td.appendChild(document.createTextNode(tt("planer.daten_q"))); td.appendChild(vermerkKnoten(P.quellen[w.q].vermerk)); }
       tr.appendChild(td); tb.appendChild(tr);
     });
     tab.appendChild(tb); box.appendChild(tab);
@@ -730,11 +729,11 @@ function methode() {
     var PW = P.fixture ? null : P.pruefwerte;
     if (PW) {
       var stellen = { ganz: { maximumFractionDigits: 0 }, eins: { minimumFractionDigits: 1, maximumFractionDigits: 1 }, genau: { maximumFractionDigits: 3 } };
-      document.querySelectorAll("[data-pw]").forEach(function (n) { var x = PW[n.getAttribute("data-pw")]; if (x) n.textContent = new Intl.NumberFormat("de-DE", stellen[n.getAttribute("data-format") || "genau"]).format(x.wert); });
-      document.querySelectorAll("[data-pw-stand]").forEach(function (n) { var x = PW[n.getAttribute("data-pw-stand")]; if (x) n.textContent = new Date(x.stand + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" }); });
+      document.querySelectorAll("[data-pw]").forEach(function (n) { var x = PW[n.getAttribute("data-pw")]; if (x) n.textContent = KIEZ_I18N.fmt.nf(stellen[n.getAttribute("data-format") || "genau"]).format(x.wert); });
+      document.querySelectorAll("[data-pw-stand]").forEach(function (n) { var x = PW[n.getAttribute("data-pw-stand")]; if (x) n.textContent = KIEZ_I18N.fmt.datum(x.stand + "T12:00:00", { day: "numeric", month: "long", year: "numeric" }); });
       document.querySelectorAll("[data-pw-beleg]").forEach(function (n) { var x = PW[n.getAttribute("data-pw-beleg")]; if (x) n.textContent = x.beleg; });
     }
-    var h = $("planer-hinweis"); if (h) h.textContent = (P.hinweis || "") + " Einwohnerzahlen sind auf " + fmt.format(P.rundung.ew) + " gerundet. Raumebene der Datei: " + (P.raumebene === "stadtteil" ? "Stadtteile" : "Planungsräume") + ", Stand der Auswertung " + P.stand.split("-").reverse().join(".") + ".";
+    var h = $("planer-hinweis"); if (h) h.textContent = (P.hinweis || "") + tt("planer.methode_hinweis", { rundung: fmt.format(P.rundung.ew), ebene: P.raumebene === "stadtteil" ? tt("planer.ebene.st") : tt("planer.ebene.pr"), stand: P.stand.split("-").reverse().join(".") });
     window.KIEZ_BEREIT = true;
   });
 }

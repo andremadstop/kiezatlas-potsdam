@@ -27,13 +27,14 @@ WURZEL = Path(__file__).resolve().parent.parent
 # daten/fixtures/ (Beispielwerte), daten/schema/ (Verträge, nur im Repo), Rohdaten.
 SEITEN = ["index.html", "karte.html", "404.html", "planer.html", "planer-methode.html", "planer-daten.html",
           "jahre.html", "jahre-methode.html", "jahre-daten.html"]
-DATEIEN = ["atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "karte.js", "planer.js", "jahre.js",
-           "themen.js", "kopf.js", "schaugrafik.js", "favicon.svg", "og.png",
+DATEIEN = ["basis.css", "atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "karte.js", "planer.js", "jahre.js",
+           "themen.js", "kopf.js", "schaugrafik.js", "i18n.js", "favicon.svg", "og.png",
            # Belegfilme auf der Startseite (Abschnitt „Im Film“); Skripte und READMEs bleiben im Repo
            "docs/filme/karte/film.mp4", "docs/filme/karte/vorschau.jpg",
            "docs/filme/terminal/film.mp4", "docs/filme/terminal/vorschau.jpg"]
-ORDNER = ["vendor", "fonts", "daten"]
-AUSSER = ["daten/fixtures", "daten/schema"]
+ORDNER = ["vendor", "fonts", "daten", "texte"]
+# texte/<lang>/bloecke/: lange Texte, die skripte/30_seiten.py beim Bauen in die Seiten setzt (nur im Repo)
+AUSSER = ["daten/fixtures", "daten/schema", "texte/de/bloecke"]
 # Nicht im Repo (Lizenz ohne Open Source), aber auf der Website gebraucht: vorher skripte/vendor_holen.sh
 PFLICHT_UNVERFOLGT = ["vendor/gsap.min.js", "vendor/ScrollTrigger.min.js"]
 
@@ -52,6 +53,12 @@ def dateiliste():
     fehlt += [p for p in PFLICHT_UNVERFOLGT if not (WURZEL / p).is_file()]
     if fehlt:
         sys.exit("fehlt: " + ", ".join(fehlt))
+    # Jeder lokale Verweis einer Seite muss mitkommen, sonst lädt die Website eine Datei nicht (404)
+    drin = {str(p) for p in out}
+    ohne = sorted({f"{s}: {m.group(2)}" for s in SEITEN
+                   for m in VERWEIS.finditer((WURZEL / s).read_text(encoding="utf-8")) if m.group(2) not in drin})
+    if ohne:
+        sys.exit("Verweis ohne Datei in der Kopie: " + ", ".join(ohne))
     return out
 
 

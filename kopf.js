@@ -1,7 +1,8 @@
-/* Kiezatlas Potsdam: gemeinsamer Kopf der vier Kartenseiten (index, karte, planer, jahre).
+/* Kiezatlas: gemeinsamer Kopf aller Seiten.
    1. Gestapelt oder nebeneinander: eine Abfrage für CSS und JS (Karte oben und Text darunter nur am Handy hoch).
    2. Kopfleiste klappt beim Lesen (Scrollen nach unten) ein und kommt beim Hochscrollen wieder (Andre 07.11.2026).
-   3. Kopfzahlen sofort füllen, bevor die großen Datendateien da sind (gegen Layoutsprünge, nur Startseite). */
+   3. Kopfzahlen sofort füllen, bevor die großen Datendateien da sind (gegen Layoutsprünge, nur Startseite).
+   Sprachschalter, Sprachhinweis und Kennzeichnung Beispieldaten der erzeugten Seiten: rahmen.js. */
 // Muss wörtlich mit den @media-Abfragen „Gestapelt“ in atlas.css, karte.css und jahre.css übereinstimmen (pruefen/seiten.mjs prüft das)
 window.KIEZ_GESTAPELT = "(max-width:599px),(max-width:699px) and (orientation:portrait)";
 (function () {
@@ -38,17 +39,17 @@ window.KIEZ_GESTAPELT = "(max-width:599px),(max-width:699px) and (orientation:po
 })();
 (function () {
   var K = window.KIEZ_KENNZAHLEN; if (!K) return;
-  var fmt = new Intl.NumberFormat("de-DE"), fmt1 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  var fmt = KIEZ_I18N.fmt.nf(), fmt1 = KIEZ_I18N.fmt.nf({ minimumFractionDigits: 1, maximumFractionDigits: 1 });
   function setze(f, w) { document.querySelectorAll('[data-feld="' + f + '"]').forEach(function (n) { n.textContent = w; }); }
   var nrs = Object.keys(K.stadtteile).sort(function (a, b) { return a - b; });
   setze("anzahl-teile", String(nrs.length)); setze("nr-erste", nrs[0]); setze("nr-letzte", nrs[nrs.length - 1]);
-  setze("stand", new Date(K.stand_auswertung).toLocaleDateString("de-DE"));
+  setze("stand", KIEZ_I18N.fmt.datum(K.stand_auswertung));
   setze("flaeche-stadt", fmt1.format(K.stadt.flaeche_km2)); setze("zellen-stadt", fmt.format(K.stadt.zellen));
   var box = document.getElementById("stadtzahlen"); if (!box || box.children.length) return;
   K.stadt.kacheln.forEach(function (k) {
     var d = document.createElement("div"), dd = document.createElement("dd"), dt = document.createElement("dt");
     dt.textContent = k.titel; dd.title = k.quelle;
-    if (k.anzeige === "summe") dd.textContent = "rund " + fmt.format(k.wert >= 1000 ? Math.round(k.wert / 100) * 100 : Math.round(k.wert / 10) * 10);
+    if (k.anzeige === "summe") dd.textContent = KIEZ_I18N.t("kern.rund", { zahl: fmt.format(k.wert >= 1000 ? Math.round(k.wert / 100) * 100 : Math.round(k.wert / 10) * 10) });
     else { dd.textContent = fmt1.format(k.wert); var s = document.createElement("small"); s.textContent = "%"; dd.appendChild(s); }
     d.appendChild(dt); d.appendChild(dd); box.appendChild(d);
   });

@@ -1,0 +1,100 @@
+/* Kiezatlas: Kartenseiten im Textrahmen (Erreichbarkeit, Kamienice, Wohnungsbestand), Modul kartenseite.js.
+   Baut auf atlas.css (Farben, Chips, Knöpfe, Tabellen) und rahmen.css (Textseite) auf. Eigene Klassen ks-…,
+   damit die Vollbild-Regeln von .werkzeug und .legende hier nicht greifen. Violett nur für Auswahl und Fokus. */
+.ks{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:0;margin:1.25rem 0 2rem;border:1px solid var(--ink);background:var(--surface)}
+.ks__karte{position:relative;min-height:520px;height:min(78vh,720px);background:#e6e9e4;border-right:1px solid var(--line)}
+.ks__karte #karte{position:absolute;inset:0}
+.ks__karte .maplibregl-ctrl-top-right{top:0;bottom:auto}
+.ks__karte .maplibregl-ctrl-attrib{max-width:calc(100% - 110px);font-size:.6875rem}
+.ks-werkzeug{position:absolute;left:10px;top:10px;right:56px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none;z-index:2}
+.ks-werkzeug>*{pointer-events:auto}
+.ks-werkzeug .chip{min-height:34px}
+.ks-legende{position:absolute;left:10px;bottom:34px;width:min(290px,calc(100% - 20px));max-height:calc(100% - 110px);overflow:auto;background:rgba(250,251,248,.97);border:1px solid var(--line);padding:10px 12px 8px;font-size:.8125rem;line-height:1.35;z-index:2}
+.ks-legende[hidden]{display:none}
+.ks-legende__titel{font:600 .875rem/1.25 var(--f-text);margin:0 0 6px}
+.ks-legende ul{list-style:none;margin:6px 0 0;padding:0}
+.ks-legende li{display:flex;align-items:center;gap:7px;margin:3px 0}
+.ks-legende p{margin:6px 0 0;color:var(--muted)}
+.ks-zeichen{display:inline-block;flex:0 0 auto;width:12px;height:12px;border:1.5px solid var(--ink);border-radius:50%;box-sizing:border-box}
+.ks-zeichen--flaeche{border-radius:0;width:14px;height:10px;border-width:1px}
+.ks-blatt{max-height:min(78vh,720px);min-height:520px;overflow:auto;padding:16px 18px 22px;overscroll-behavior:contain}
+.ks-block{padding:0 0 16px;margin:0 0 16px;border-bottom:1px solid var(--line)}
+.ks-block:last-child{border-bottom:0;margin-bottom:0}
+.ks-block h2{font:600 1.1rem/1.2 var(--f-display);margin:0 0 8px;letter-spacing:.01em}
+.ks-block h3{font:600 .9375rem/1.3 var(--f-text);margin:12px 0 4px}
+.ks-block p,.ks-block li{font-size:.9rem;line-height:1.45;max-width:none}
+.ks-block p{margin:0 0 8px}
+.ks-wahlhinweis{margin:0 0 .5rem;padding:.5rem .75rem;border-left:3px solid var(--accent);background:var(--surface)}.ks-wahlhinweis[hidden]{display:none}
+.ks-fuss{color:var(--muted);font-size:.8125rem!important}
+.ks-fragen{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.ks-fragen li{border-bottom:1px solid var(--line);margin:0}
+.ks-frage{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1.8em minmax(0,1fr);gap:8px;width:100%;padding:10px 4px;position:relative;isolation:isolate}
+.ks-frage::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--accent-soft);transform-origin:50% 100%;scale:1 0;transition:scale .4s var(--ease)}
+.ks-frage[aria-pressed="true"]::before{scale:1 1}
+.ks-frage__nr{font:600 1.25rem/1 var(--f-display);color:var(--muted)}
+.ks-frage__text{display:flex;flex-direction:column;gap:2px;font-size:.85rem;line-height:1.4;color:var(--muted)}
+.ks-frage__text b{font:600 .95rem/1.25 var(--f-text);color:var(--ink)}
+@media (hover:hover){.ks-frage:hover::before{scale:1 1}}
+.ks-frage:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ks-chips{display:flex;flex-wrap:wrap;gap:4px;border:0;margin:0 0 10px;padding:0;min-width:0}
+.ks-chips legend{font:600 .8125rem/1.2 var(--f-text);color:var(--muted);padding:0;margin:0 0 6px}
+.ks-chips .chip{min-height:34px}
+/* Bauzeit-Chips sind zugleich Legende: aktiv hell mit dunklem Rand, damit der Farbpunkt auf hellem Grund lesbar
+   bleibt (auf dem dunklen Grund des allgemeinen Chips verschwanden die dunklen Stufen); aus = gedämpft; 0 Treffer = gesperrt. Nur Chips mit Farbpunkt; die Zielchips auf Dostępność bleiben dunkel gefüllt */
+.ks-chips .chip:has(.ks-zeichen){gap:7px}
+.ks-chips .chip:has(.ks-zeichen)::before{background:var(--surface)}
+.ks-chips .chip:has(.ks-zeichen):has(input:checked){color:var(--ink);border-color:var(--ink);box-shadow:inset 0 -2px 0 var(--ink)}
+.ks-chips .chip:has(.ks-zeichen):not(:has(input:checked)){color:var(--muted)}
+.ks-chips .chip:not(:has(input:checked)) .ks-zeichen{opacity:.4}
+.ks-chips .chip .ks-zeichen{box-shadow:0 0 0 2px #fff}
+.ks-chips .chip:has(input:disabled){opacity:.5;cursor:default;border-style:dashed}
+.ks-chips .chip:has(input:disabled) input{cursor:default}
+.chip--aus{opacity:.45;cursor:not-allowed}
+.ks-wahl{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;font-size:.8125rem;color:var(--muted)}
+.ks-wahl select{font:500 .95rem var(--f-text);padding:7px 9px;min-height:40px;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);max-width:100%}
+.ks-wahl select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ks-zahlen{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--ink)}
+.ks-zahlen li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:7px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.ks-zahlen b{font:600 1.15rem/1.1 var(--f-display);text-align:right;white-space:nowrap}
+.ks-zahlen small{grid-column:1/-1;color:var(--muted);font-size:.78rem;line-height:1.35}
+.ks-abz{display:inline-block;font:500 .7rem/1 var(--f-text);text-transform:uppercase;letter-spacing:.06em;padding:3px 6px;border:1px dashed var(--ink);margin:0 4px 4px 0}
+.ks-abz--fest{border-style:solid}
+.ks-tabelle{overflow-x:auto;margin:8px 0 0}
+.ks-tabelle .tabelle{font-size:.8125rem}
+.ks-tabelle .tabelle th,.ks-tabelle .tabelle td{padding:5px 6px}
+.ks-tabelle tfoot th,.ks-tabelle tfoot td{font-weight:600;border-top:1px solid var(--ink)}
+.ks-knoepfe{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.ks-knoepfe .knopf{min-height:38px;font-size:.85rem;padding:.4em .9em}
+.knopf[aria-pressed="true"]{background:var(--ink);color:#fff}
+.knopf[disabled]{opacity:.5;cursor:not-allowed}
+.ks-status{min-height:1.2em}
+.ks-grenzen{max-width:72ch}
+.ks-grenzen li{margin:0 0 .45em}
+.ks-quellen{font-size:.875rem;color:var(--muted);max-width:90ch}
+.ks-quellen li{margin:0 0 .4em;max-width:none}
+.ks-vermerk{font-size:.78rem;color:var(--muted);word-break:break-word}
+.maplibregl-popup-content .pop-q{word-break:break-word}
+
+@media (max-width:860px){
+  .ks{grid-template-columns:minmax(0,1fr)}
+  .ks__karte{height:62svh;min-height:340px;border-right:0;border-bottom:1px solid var(--line)}
+  .ks-blatt{max-height:none;min-height:0}
+  .ks-werkzeug{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;right:52px}
+  .ks-werkzeug::-webkit-scrollbar{display:none}
+  .ks-legende{width:auto;max-width:min(230px,calc(100% - 96px));padding:8px 10px 6px;bottom:58px;max-height:calc(100% - 120px)}
+}
+@media (max-width:420px){
+  .textseite main:has(.ks){padding-left:12px;padding-right:12px}
+  .ks{margin-left:0;margin-right:0}
+  .ks-blatt{padding:14px 12px 18px}
+}
+@media (pointer:coarse){.ks-werkzeug .chip,.ks-chips .chip{min-height:44px}.ks-knoepfe .knopf{min-height:44px}}
+.chip--knopf{font:500 .875rem/1 var(--f-text);color:var(--ink);cursor:pointer}
+.chip--knopf[aria-pressed="true"]{color:#fff;border-color:var(--accent)}
+.chip--knopf[aria-pressed="true"]::before{scale:1 1;background:var(--accent)}
+.chip--knopf:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ks-legende .stufen{height:12px;margin-top:4px}
+.ks-legende .stufen span{height:100%}
+.ks-legende-knopf{position:absolute;left:10px;bottom:34px;z-index:3;min-height:30px!important;font-size:.8125rem}
+.ks-legende{bottom:70px}
+@media (max-width:860px){.ks-legende-knopf{bottom:30px}.ks-legende{bottom:66px}}

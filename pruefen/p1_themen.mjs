@@ -121,7 +121,7 @@ async function probe(basis, art) {
     return o;
   });
 
-  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "HQ", "KLASSEN", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
+  const soll = ["BEZIRKFARBE", "FARBE", "GANZ", "GRAU", "GRUNDKARTE", "HASH", "HQ", "KLASSEN", "LUFTBILD", "STUFEN", "TEIL", "THEMA", "THEMEN", "ebenen", "esc", "farbe", "fmt", "fmt1",
     "grundLuft", "grundkarte", "hoehe", "kachel", "klasse", "klassen", "laden", "name", "polys", "proBezirk", "proz", "rundEw", "umriss", "unscharf", "v"];
   pruef(JSON.stringify(r.schluessel) === JSON.stringify(soll), `Objekt KIEZ_THEMEN hat genau die ${soll.length} Namen des Vertrags`);
   pruef(r.paare.slice(0, 7).join(",") === "stadtteile/stadtteile,ew/ew,d_alter/alter,q_u18/u18,q_65p/65p,q_v1949/vor1949,q_fern/fern" && r.hashOk,

@@ -1,0 +1,28 @@
+<section class="grenzfall" id="grenzfall" aria-labelledby="h-grenz">
+  <div class="grenz__bild">
+    <figure>
+      <div id="grenz-figur" class="grenz__figur"></div>
+      <figcaption class="fuss" id="grenz-cap"></figcaption>
+    </figure>
+  </div>
+  <div class="grenz__text">
+    <h2 id="h-grenz" class="abschnitt">Grenzfall: Wem gehört eine Zelle auf der Grenze?</h2>
+    <p class="grenz__lead" id="grenz-lead"></p>
+    <p>Gezählt wird nach dem Mittelpunkt der Zelle; zur Probe rechnet die Datenbank dieselben Einwohner nach dem Flächenanteil. Die Beispielzelle links zeigt beide Wege.</p>
+    <div class="umschalter" role="group" aria-label="Zählweise der Beispielzelle">
+      <button type="button" class="umschalter__k" data-modus="mittelpunkt" aria-pressed="true">Nach Mittelpunkt</button>
+      <button type="button" class="umschalter__k" data-modus="flaeche" aria-pressed="false">Nach Fläche</button>
+    </div>
+    <p id="grenz-zelle-text" class="grenz__zelle" aria-live="polite"></p>
+    <p class="grenz__kern" id="grenz-kern"></p>
+  </div>
+  <div class="grenz__tabelle">
+    <table class="tabelle" id="grenz-tab">
+      <caption class="nur-sr">Einwohner je Stadtteil nach Mittelpunkt und nach Flächenanteil</caption>
+      <thead><tr><th scope="col">Stadtteil</th><th scope="col">nach Mittelpunkt</th><th scope="col">nach Fläche</th><th scope="col">Abweichung</th><th scope="col">in Personen</th><th scope="col">Grenzzellen</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" class="mehr" id="grenz-mehr" aria-expanded="false" aria-controls="grenz-tab">Alle Stadtteile zeigen</button>
+    <p class="fuss">Sortiert nach der Größe der Abweichung. Welche Methode richtiger ist, hängt von der Frage ab: Der Mittelpunkt zählt jede Person genau einmal und ganz, der Flächenanteil nimmt an, dass Menschen gleichmäßig über die Zelle verteilt wohnen. Kleine Stadtteile schwanken in Prozent stark, obwohl es nur wenige Personen sind. Für Vergleiche über die Zeit kommt es vor allem darauf an, immer dieselbe Methode zu nehmen.</p>
+  </div>
+</section>

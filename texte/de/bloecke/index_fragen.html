@@ -1,0 +1,79 @@
+  <ol class="fragen" id="fragen" aria-label="Fragen an die Karte">
+    <li class="frage" id="frage-1" data-schritt="1">
+      <p class="frage__nr">Frage 1</p>
+      <h2 class="frage__titel">Wie viele Menschen wohnen in meiner Nachbarschaft?</h2>
+      <p>Jetzt zeigt die Karte das Zensus-Gitter. Jede Zelle misst 100 mal 100 Meter; je dunkler sie ist, desto mehr Menschen wohnen darin. Beim Zensus im Mai 2022 lag die vollste Zelle im Stadtteil <b data-q="ew-max-teil"></b> mit rund <b data-q="ew-max"></b> Einwohnern; in der Hälfte aller Zellen waren es höchstens <span data-q="ew-median"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Eine Zelle anklicken oder antippen zeigt ihre Werte mit Quelle. Verschieben durch Ziehen, zoomen per Doppelklick oder mit den Knöpfen rechts; am Handy mit zwei Fingern.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-2" data-schritt="2">
+      <p class="frage__nr">Frage 2</p>
+      <h2 class="frage__titel">Wie alt ist meine Nachbarschaft?</h2>
+      <p>Das Gitter zeigt nun das Durchschnittsalter je Zelle. Unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern ist der Anteil der Menschen ab 65 im Stadtteil <b data-q="alt-hoch"></b> am höchsten (<span data-q="alt-hoch-wert"></span>) und im Stadtteil <b data-q="alt-tief"></b> am niedrigsten (<span data-q="alt-tief-wert"></span>); für ganz Potsdam sind es <span data-q="alt-stadt"></span> (Zensus, Mai 2022).</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Thema wechselt in der Leiste über der Karte. Die Legende erklärt die Farben; grau sind Zellen, deren Wert zu unscharf ist.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="2"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-3" data-schritt="3">
+      <p class="frage__nr">Frage 3</p>
+      <h2 class="frage__titel">Wo wohnen die meisten Kinder?</h2>
+      <p>Die meisten Kinder und Jugendlichen unter 18 lebten im Mai 2022 im Stadtteil <b data-q="kind-teil"></b>: rund <span data-q="kind-zahl"></span> von rund <span data-q="kind-nenner"></span> Einwohnern, also <span data-q="kind-anteil"></span>. <span data-q="kind-anteilig"></span></p>
+      <p class="frage__kann"><b>So geht’s:</b> Einen Stadtteil wählen per Klick in die Karte, in der Liste der Stadtteile oder im Steckbrief. Kennzahlen und Verteilungen weiter unten folgen der Auswahl.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="3"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Auf der Karte zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-4" data-schritt="4">
+      <p class="frage__nr">Frage 4</p>
+      <h2 class="frage__titel">Wie alt sind die Häuser in meinem Stadtteil?</h2>
+      <p>Gefärbt ist jetzt der Anteil der Wohnungen in Gebäuden von vor 1949. Im Stadtteil <b data-q="altbau-teil"></b> sind es <span data-q="altbau-wert"></span>, in ganz Potsdam <span data-q="altbau-stadt"></span>.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Die Gebäude eines Stadtteils lassen sich dreidimensional zeigen (Knopf unten oder „3D-Häuser“ in der Leiste), Umrisse aus ALKIS, Höhe aus der amtlichen Objekthöhe (bei 96 % der Gebäude; sonst Geschosse × 3 m bzw. 3 m).</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="4" data-gebaeude="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Gebäude in 3D zeigen</span></button>
+    </li>
+    <li class="frage" id="frage-5" data-schritt="5">
+      <p class="frage__nr">Frage 5</p>
+      <h2 class="frage__titel">Womit wird bei uns geheizt?</h2>
+      <p>Im Mai 2022 hingen in Potsdam <span data-q="fern-stadt"></span> der Wohnungen an der Fernwärme. Am höchsten ist der Anteil im Stadtteil <b data-q="fern-hoch"></b> (<span data-q="fern-hoch-wert"></span>), am niedrigsten im Stadtteil <b data-q="fern-tief"></b> (<span data-q="fern-tief-wert"></span>), jeweils unter den Stadtteilen mit mindestens <span data-q="schwelle"></span> Einwohnern.</p>
+      <p class="frage__kann"><b>So geht’s:</b> Das Luftbild der Landesvermessung ersetzt auf Wunsch die graue Hintergrundkarte; so wird sichtbar, welche Bebauung zu den Zellen gehört.</p>
+      <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="5" data-luftbild="1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Luftbild einblenden</span></button>
+    </li>
+    <li class="frage frage--grenze" id="frage-6" data-schritt="6">
+      <p class="frage__nr">Frage 6</p>
+      <h2 class="frage__titel">Wem gehört eine Zelle auf der Grenze?</h2>
+      <p>Gitter und Stadtteilgrenzen passen nicht aufeinander. Diese Zelle mit <span data-q="gz-ew"></span> Einwohnern liegt zum Teil im Stadtteil <b data-q="gz-a"></b>, zum Teil im Stadtteil <b data-q="gz-b"></b>. Gezählt wird sie ganz für den Stadtteil, in dem ihr Mittelpunkt liegt: <b data-q="gz-eigner"></b>.</p>
+      <p class="frage__kann"><b>Nachgerechnet:</b> Die Datenbank zählt alle Einwohner zur Probe auch nach Flächenanteil. Der Abschnitt Grenzfall zeigt, wie viel das je Stadtteil ausmacht.</p>
+      <a class="knopf knopf--rand" href="#grenzfall"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Zum Grenzfall</span></a>
+    </li>
+    <li class="frage" id="frage-7" data-schritt="7">
+      <p class="frage__nr">Frage 7</p>
+      <h2 class="frage__titel">Und wie kommt das ins Heft?</h2>
+      <p>Jedes Gebiet, auch mehrere zum Vergleich, lässt sich als Schaugrafik mitnehmen: als SVG, als PNG in Druckauflösung oder über die Druckansicht als PDF. Titel, Stichtag und Quellenvermerk stehen immer mit drauf.</p>
+      <a class="knopf knopf--rand" href="#schaugrafik"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Schaugrafik gestalten</span></a>
+    </li>
+    <li class="frage" id="frage-8" data-schritt="8">
+      <p class="frage__nr">Frage 8</p>
+      <h2 class="frage__titel">Wie weit ist es zur nächsten Kita?</h2>
+      <p>Für jede bewohnte Zelle ist die Entfernung zur nächsten Kita, Grundschule und Grünfläche berechnet, in Luftlinie und als Fußweg auf dem Wegenetz aus OpenStreetMap. Der Knopf öffnet den Planer mit dem Fußweg zur nächsten Kita. Dazu kommt je Planungsraum der Stadt eine Versorgungstabelle mit Plätzen je Kind, Einwohnern je Einrichtung und Grün je Einwohner, jede Zeile mit Methode, Status und Quelle. Die Karte hier zeigt, wo die Kinder wohnen.</p>
+      <p class="frage__kann"><b>Mehr dazu:</b> Die Planer-Seite zeigt Einrichtungen und Entfernungen. Unter Daten liegen dieselben Werte als GeoPackage und CSV für QGIS.</p>
+      <div class="frage__knoepfe">
+        <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="8"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Kinder auf der Karte zeigen</span></button>
+        <a class="knopf knopf--voll" href="planer.html#ein=kita&amp;zu=kita&amp;weg=fuss"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Im Planer öffnen</span></a>
+      </div>
+    </li>
+    <li class="frage" id="frage-9" data-schritt="9">
+      <p class="frage__nr">Frage 9</p>
+      <h2 class="frage__titel">Wann wurde mein Viertel gebaut?</h2>
+      <p>Der Zensus 2022 zählt die Gebäude mit Wohnraum je Zelle nach Baujahr. Die Seite Bauzeiten zeigt das Gitter Klasse für Klasse und ab Stadtteil-Zoom jedes Gebäude mit seiner Bauzeitklasse. Das ist fast immer eine Schätzung und so gekennzeichnet, keine Aussage über einzelne Grundstücke.</p>
+      <p class="frage__kann"><b>Mehr dazu:</b> Die Methodenseite der Bauzeiten nennt für jede Stufe der Schätzung, wie oft sie im Rücktest stimmt.</p>
+      <div class="frage__knoepfe">
+        <button class="knopf knopf--rand frage__zeigen" type="button" data-zeige="9"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Altbau auf der Karte zeigen</span></button>
+        <a class="knopf knopf--voll" href="jahre.html"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Bauzeiten öffnen</span></a>
+      </div>
+    </li>
+    <li class="frage frage--frei" id="frage-10" data-schritt="10">
+      <p class="frage__nr">Selbst erkunden</p>
+      <h2 class="frage__titel">Jetzt gehört die Karte Ihnen.</h2>
+      <p>Alle Themen stehen in der Leiste über der Karte. Ein Klick auf einen Stadtteil wählt ihn aus; darunter lassen sich alle Stadtteile vergleichen. Ohne Führung, ohne Kamerafahrten und mit teilbarem Link: die Karte zum freien Erkunden.</p>
+      <div class="frage__knoepfe">
+        <a class="knopf knopf--voll" href="karte.html"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Karte frei erkunden</span></a>
+        <a class="knopf knopf--rand" href="#stadtteile"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Stadtteile vergleichen</span></a>
+      </div>
+    </li>
+  </ol>

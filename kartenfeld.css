@@ -1,0 +1,6 @@
+/* Kiezatlas: Kartenfläche auf Textseiten (kartenfeld.js). Die Regeln für die Vollbildkarte in atlas.css
+   (Steuerung über der Legende) gelten hier nicht. */
+.kartenfeld{position:relative;height:min(70vh,560px);min-height:320px;margin:1.5rem 0;background:#e6e9e4;border:1px solid var(--line)}
+.kartenfeld #karte{position:absolute;inset:0}
+.kartenfeld .maplibregl-ctrl-top-right{top:0;bottom:auto}
+.kartenfeld .maplibregl-ctrl-attrib{max-width:calc(100% - 110px);font-size:.6875rem}

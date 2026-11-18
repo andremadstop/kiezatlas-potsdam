@@ -29,6 +29,10 @@ const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0
 const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json" };
 const GRENZE_JS_KB = 320;   // 06.11.: +16 KB gz für die Vektor-Grundkarte (daten/grundkarte.js) statt Rasterkacheln
+// Seit dem gemeinsamen Code (16.11.2026) liefert die Seite die Textschicht mit aus (daten/ort.js, i18n.js, texte/<lang>/*.js);
+// die Grenze steigt um genau deren gz-Gewicht, wie es die Seite lädt.
+const TEXTSCHICHT = /\/(daten\/ort\.js|i18n\.js|texte\/[^/]+\/[^/]+\.js)$/;
+const grenzeJs = (geladen) => GRENZE_JS_KB + Math.round([...new Set(geladen)].filter((u) => TEXTSCHICHT.test(u.split(/[?#]/)[0])).reduce((s, u) => s + gz(u), 0) / 1024 * 10) / 10;
 
 const befunde = [];
 const bericht = { stand: new Date().toISOString(), wurzel: WURZEL, laeufe: [] };
@@ -107,7 +111,7 @@ async function planerEcht(basis, art) {
   console.log(`planer.html über ${art}, echte Daten`);
   const { ctx, page, fehler, abgewiesen, geladen } = await oeffnen(basis, "planer.html");
   const js = jsGewicht(geladen);
-  pruef(js <= GRENZE_JS_KB, `Startgewicht ${js} KB gz JS mit echten Daten (Grenze ${GRENZE_JS_KB})`);
+  pruef(js <= grenzeJs(geladen), `Startgewicht ${js} KB gz JS mit echten Daten (Grenze ${grenzeJs(geladen)})`);
   pruef(!geladen.some((u) => /\/daten\/fixtures\//.test(u)), "keine Datei aus daten/fixtures/ geladen");
   pruef(await page.evaluate(() => document.getElementById("beispiel").hidden), "kein Hinweis „Beispieldaten“");
   const sperre = await page.evaluate(() => ({
@@ -180,7 +184,7 @@ async function planer(basis, art) {
   console.log(`planer.html über ${art}, Beispieldaten`);
   const { ctx, page, fehler, abgewiesen, geladen } = await oeffnen(basis, "planer.html" + FIX);
   const js = jsGewicht(geladen);
-  pruef(js <= GRENZE_JS_KB, `Startgewicht ${js} KB gz JS (Grenze ${GRENZE_JS_KB}); geladen: ${[...new Set(geladen)].filter((u) => u.endsWith(".js")).map((u) => u.split("/").slice(-2).join("/")).join(", ")}`);
+  pruef(js <= grenzeJs(geladen), `Startgewicht ${js} KB gz JS (Grenze ${grenzeJs(geladen)}); geladen: ${[...new Set(geladen)].filter((u) => u.endsWith(".js")).map((u) => u.split("/").slice(-2).join("/")).join(", ")}`);
   const zellenAmStart = geladen.some((u) => u.endsWith("/daten/zellen.js"));
   pruef(!zellenAmStart, "zellen.js lädt nicht beim Start, erst bei einer Entfernung");
   const planerAmStart = geladen.some((u) => /\/daten\/(fixtures\/)?planer(_fuss_odbl)?\.js$/.test(u));

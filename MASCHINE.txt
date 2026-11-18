@@ -1,0 +1,27 @@
+# Dateien der Kiezatlas-Maschine (Pfade relativ zur Wurzel, gleich in jeder Stadt). Eine Stadt holt sie mit
+# skripte/maschine.py holen; die Liste selbst und das Werkzeug gehören dazu.
+MASCHINE.txt
+skripte/maschine.py
+# Grundgestaltung (vom Seitenrahmen geladen) und Seitenstile der Kartenblatt-Erzählung (stile: atlas.css)
+basis.css
+atlas.css
+favicon.svg
+# Laufzeit (Seiten, Karte, Sprachen)
+i18n.js
+rahmen.js
+rahmen.css
+themen.js
+kopf.js
+schaugrafik.js
+kartenfeld.js
+kartenfeld.css
+kartenseite.js
+kartenseite.css
+themenseite.js
+themenseite.css
+# Seitenbau (Vorlagen + Texte + Ortskonfiguration -> fertige HTML-Seiten je Sprache)
+vorlagen/_rahmen.html
+skripte/30_seiten.py
+skripte/31_ort.py
+skripte/ort_konfig.py
+skripte/textschicht.py

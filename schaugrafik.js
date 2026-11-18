@@ -1,28 +1,28 @@
-/* Kiezatlas Potsdam: Schaugrafik für den Druck (SVG, PNG 300 dpi, Druckansicht/PDF).
+/* Kiezatlas: Schaugrafik für den Druck (SVG, PNG 300 dpi, Druckansicht/PDF).
    Alles im Browser, ohne Server, auch per Doppelklick (file://). Keine Kartenkacheln: die Karte
    wird aus den eigenen Gitter- und Stadtteildaten gezeichnet. Maße in Millimetern. */
 (function () {
 "use strict";
 var K = window.KIEZ_KENNZAHLEN, ST = window.KIEZ_STADTTEILE, Z = window.KIEZ_ZELLEN, A = window.KIEZ, KT = window.KIEZ_THEMEN;
 if (!A || !KT) return;
-var fmt = KT.fmt, fmt1 = KT.fmt1, PT = 0.3528, NB = " ";
+var fmt = KT.fmt, fmt1 = KT.fmt1, PT = 0.3528, NB = " ", tt = KIEZ_I18N.t;
 var INK = "#13212a", MUTED = "#4f5d64", LINE = "#cdd1cc", ACC = "#6a2c82";
 var TINTEN = ["#13212a", "#3b7684", "#6a2c82", "#8fb5b3"];
 var FORMATE = [
-  { id: "a4h", name: "A4 hoch", w: 210, h: 297, r: 14 },
-  { id: "a4q", name: "A4 quer", w: 297, h: 210, r: 14 },
-  { id: "halb", name: "Halbe Seite quer", w: 210, h: 148, r: 10 },
-  { id: "spalte", name: "Spalte", w: 85, h: 230, r: 6 },
-  { id: "quadrat", name: "Quadrat", w: 200, h: 200, r: 12 }
+  { id: "a4h", name: tt("karte.grafik.format_a4h"), w: 210, h: 297, r: 14 },
+  { id: "a4q", name: tt("karte.grafik.format_a4q"), w: 297, h: 210, r: 14 },
+  { id: "halb", name: tt("karte.grafik.format_halb"), w: 210, h: 148, r: 10 },
+  { id: "spalte", name: tt("karte.grafik.format_spalte"), w: 85, h: 230, r: 6 },
+  { id: "quadrat", name: tt("karte.grafik.format_quadrat"), w: 200, h: 200, r: 12 }
 ];
 var RUBRIKEN = [
-  { id: "kennzahlen", name: "Kennzahlen", an: true },
-  { id: "alter", name: "Alter", an: true },
-  { id: "baujahr", name: "Baujahr", an: true },
-  { id: "heizung", name: "Heizungsart", an: false },
-  { id: "energie", name: "Energieträger", an: false },
-  { id: "karte", name: "Karte (Gitter)", an: true },
-  { id: "gebaeude", name: "Gebäudezahl (ALKIS)", an: false }
+  { id: "kennzahlen", name: tt("karte.grafik.rubrik_kennzahlen"), an: true },
+  { id: "alter", name: tt("karte.grafik.rubrik_alter"), an: true },
+  { id: "baujahr", name: tt("karte.grafik.rubrik_baujahr"), an: true },
+  { id: "heizung", name: tt("karte.grafik.rubrik_heizung"), an: false },
+  { id: "energie", name: tt("karte.grafik.rubrik_energie"), an: false },
+  { id: "karte", name: tt("karte.grafik.rubrik_karte"), an: true },
+  { id: "gebaeude", name: tt("karte.grafik.rubrik_gebaeude"), an: false }
 ];
 var ZAEHLER = 0;
 var STICHTAG = (K.stadt.kacheln[0].quelle.match(/Stichtag ([\d.]+)/) || [])[1] || "";
@@ -53,12 +53,12 @@ function G(nr) { return nr ? K.stadtteile[nr] : K.stadt; }
 // ---------- Bausteine: (x, y, w) -> {s, h}
 function kopf(o, x, y, w, klein) {
   var s = "", h = 0, ein = o.gebiete.length === 1, nr = o.gebiete[0];
-  s += T(x, y + 3, "Kiezatlas Potsdam", { pt: 8, w: 600, fill: ACC }); h += 6;
-  var titel = ein ? KT.name(nr) + " in Zahlen" : o.gebiete.map(KT.name).join(", ").replace(/, ([^,]*)$/, " und $1") + " im Vergleich";
+  s += T(x, y + 3, KIEZ_I18N.ort("name"), { pt: 8, w: 600, fill: ACC }); h += 6;
+  var gn = o.gebiete.map(KT.name), titel = ein ? tt("karte.grafik.titel_eins", { name: KT.name(nr) }) : tt("karte.grafik.titel_vergleich", { liste: gn.slice(0, -1).join(", "), letzter: gn[gn.length - 1] });
   var t = zeilen(x, y + h, titel, w, { pt: klein ? 17 : 24, fam: "d", w: 600, lh: 1.02 }); s += t.s; h += t.h + 1.5;
-  var sub = ein ? (nr ? "Stadtteil " + nr + " der Landeshauptstadt Potsdam, " : "Landeshauptstadt Potsdam, ") + fmt1.format(G(nr).flaeche_km2) + " km². "
-    : "Vergleich von " + o.gebiete.length + " Gebieten. ";
-  sub += "Zensus 2022, Stichtag " + STICHTAG + ".";
+  var sub = ein ? (nr ? tt("karte.art_teil", { nr: nr, amtlich: KIEZ_I18N.ort("stadt_amtlich") }) : KIEZ_I18N.ort("stadt_amtlich")) + ", " + fmt1.format(G(nr).flaeche_km2) + " km². "
+    : tt("karte.grafik.vergleich_gebiete", { n: o.gebiete.length }) + " ";
+  sub += tt("karte.grafik.zensus_stichtag", { stichtag: STICHTAG });
   var u = zeilen(x, y + h, sub, w, { pt: 9, fill: MUTED }); s += u.s; h += u.h + 3;
   s += linie(x, y + h, x + w, y + h, 0.35); h += 4;
   return { s: s, h: h };
@@ -67,10 +67,10 @@ function kopf(o, x, y, w, klein) {
 function kennwerte(nr, o) {
   var g = G(nr), l = [];
   if (o.rubriken.kennzahlen) g.kacheln.forEach(function (k) {
-    l.push({ titel: k.anzeige === "summe" ? k.titel + " (gerundet)" : k.titel, wert: k.wert == null ? "k. A." : k.anzeige === "summe" ? KT.rundEw(k.wert) : fmt1.format(k.wert) + NB + "%" });
+    l.push({ titel: k.anzeige === "summe" ? tt("karte.grafik.gerundet", { titel: k.titel }) : k.titel, wert: k.wert == null ? tt("kern.k_a") : k.anzeige === "summe" ? KT.rundEw(k.wert) : fmt1.format(k.wert) + NB + "%" });
   });
-  if (o.rubriken.gebaeude) l.push({ titel: "Gebäude laut ALKIS, davon " + fmt.format((g.gebaeude || {}).wohngebaeude || 0) + " Wohngebäude", kurz: "Gebäude laut ALKIS", wert: fmt.format((g.gebaeude || {}).anzahl || 0) });
-  if (o.rubriken.gebaeude && o.gebiete.length > 1) l.push({ titel: "davon Wohngebäude", wert: fmt.format((g.gebaeude || {}).wohngebaeude || 0) });
+  if (o.rubriken.gebaeude) l.push({ titel: tt("karte.grafik.geb_alkis", { wohn: fmt.format((g.gebaeude || {}).wohngebaeude || 0) }), kurz: tt("karte.grafik.geb_alkis_kurz"), wert: fmt.format((g.gebaeude || {}).anzahl || 0) });
+  if (o.rubriken.gebaeude && o.gebiete.length > 1) l.push({ titel: tt("karte.grafik.davon_wohngebaeude"), wert: fmt.format((g.gebaeude || {}).wohngebaeude || 0) });
   return l;
 }
 
@@ -119,7 +119,7 @@ function vergleichstabelle(o, x, y, w) {
 function verteilung(key, o, x, y, w) {
   var s = "", h = 0, gs = o.gebiete, ref = G(gs[0]).verteilungen[key];
   var t = zeilen(x, y, A.TITEL[key], w, { pt: 11, fam: "d", w: 600 }); s += t.s; h += t.h + 0.5;
-  var note = gs.length === 1 ? "Anteile an " + fmt.format(ref.insgesamt) + " " + ref.einheit + "." : "Anteile an allen " + ref.einheit + " im Gebiet.";
+  var note = gs.length === 1 ? tt("karte.grafik.anteile_an", { anzahl: fmt.format(ref.insgesamt), einheit: ref.einheit }) : tt("karte.grafik.anteile_alle", { einheit: ref.einheit });
   var u = zeilen(x, y + h, note, w, { pt: 7.5, fill: MUTED }); s += u.s; h += u.h + 1.5;
   var klassen = ref.werte.map(function (wv) { return wv[0]; }).filter(function (lab) {
     if (key !== "energie" && key !== "heizung") return true;
@@ -202,15 +202,15 @@ function karte(o, x, y, w, maxH) {
   // Legende
   var lg = "", lx = Math.max(x, ox);
   if (gitter) {
-    var kl = KT.KLASSEN[t.id], r = function (v) { return t.einheit === "Personen" ? fmt.format(Math.round(v)) : fmt1.format(v); };
-    lg += T(lx, y + h + 3, t.name + " (" + t.einheit + ")" + (t.id === "ew" ? "" : ", je 100-m-Zelle"), { pt: 8, w: 600 });
+    var kl = KT.KLASSEN[t.id], r = function (v) { return t.id === "ew" ? fmt.format(Math.round(v)) : fmt1.format(v); };
+    lg += T(lx, y + h + 3, t.id === "ew" ? tt("karte.grafik.legende_titel", { name: t.name, einheit: t.einheit }) : tt("karte.grafik.legende_titel_zelle", { name: t.name, einheit: t.einheit }), { pt: 8, w: 600 });
     var sw = Math.min(14, (w - 2) / 5);
     KT.STUFEN.slice(0, kl.grenzen.length + 1).forEach(function (c, i) { lg += rect(lx + i * sw, y + h + 4.5, sw - 0.4, 2.4, c); });
     var marken = [kl.min].concat(kl.grenzen, [kl.max]);
     marken.forEach(function (v, i) { lg += T(lx + i * sw, y + h + 10, r(v), { pt: 7, fill: MUTED, anchor: i === 0 ? "start" : i === marken.length - 1 ? "end" : "middle" }); });
-    if (t.nenner) lg += rect(lx + 5 * sw + 3, y + h + 4.5, 2.4, 2.4, KT.GRAU) + T(lx + 5 * sw + 6.5, y + h + 6.7, "unscharf, unter 10 " + (t.nenner === "a_ges" ? "Personen" : "Wohnungen"), { pt: 7, fill: MUTED });
+    if (t.nenner) lg += rect(lx + 5 * sw + 3, y + h + 4.5, 2.4, 2.4, KT.GRAU) + T(lx + 5 * sw + 6.5, y + h + 6.7, (t.nenner === "a_ges" ? tt("karte.grafik.unscharf_personen") : tt("karte.grafik.unscharf_wohnungen")), { pt: 7, fill: MUTED });
     h += 12;
-  } else { lg += T(lx, y + h + 3, "Stadtteile, Farbton je Stadtbezirk", { pt: 8, w: 600 }); h += 6; }
+  } else { lg += T(lx, y + h + 3, tt("karte.grafik.legende_teile"), { pt: 8, w: 600 }); h += 6; }
   return { s: s + lg, h: h + 3 };
 }
 
@@ -221,11 +221,11 @@ function fuss(o, x, w, klein) {
   if (o.rubriken.kennzahlen) g.kacheln.forEach(function (k) { zensus(k.quelle); });
   ["alter", "baujahr", "heizung", "energie"].forEach(function (k) { if (o.rubriken[k]) zensus(g.verteilungen[k].quelle); });
   if (o.rubriken.karte && o.kartenthema !== "stadtteile") zensus(K.stadt.kacheln[0].quelle);
-  Object.keys(z).forEach(function (b) { teile.push(b + "; eigene Auswertung (" + z[b].join(", ") + ")."); });
-  teile.push("Stadtteile: © Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/zero-2-0.");
+  Object.keys(z).forEach(function (b) { teile.push(tt("karte.grafik.eigene_auswertung", { basis: b, stichtage: z[b].join(", ") })); });
+  teile.push(KIEZ_I18N.sprachwert(KIEZ_ORT.karte.teile_bildzeile));
   if (o.rubriken.gebaeude) teile.push("Gebäude: ALKIS vereinfacht, © GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert).");
-  teile.push("Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), souverain-systems.de/kiezatlas. Auswertung vom " + new Date(K.stand_auswertung).toLocaleDateString("de-DE") + ".");
-  teile.push("Grafik: CC BY 4.0 (creativecommons.org/licenses/by/4.0). Abdruck und Weitergabe mit dieser Bildzeile; die Daten behalten die oben genannten Lizenzen.");
+  teile.push(tt("karte.grafik.zitierzeile", { zitierzeile: KIEZ_I18N.ort("zitierzeile"), datum: KIEZ_I18N.fmt.datum(K.stand_auswertung) }));
+  teile.push(tt("karte.grafik.lizenz"));
   var pt = klein ? 6 : 6.5, s = "", h = 2.5;
   teile.forEach(function (tx) { var t = zeilen(x, h, tx, w, { pt: pt, fill: MUTED, lh: 1.25 }); s += t.s; h += t.h + 0.6; });
   return { s: s, h: h };
@@ -255,7 +255,7 @@ function baueEinmal(o) {
   var hoehe = (y - y0) + Math.max.apply(null, spalten.map(function (s) { return s.h; }));
   var verfuegbar = footY - 3 - y0, sk = Math.min(1, verfuegbar / Math.max(hoehe, 1));
   var tr = sk < 1 ? ' transform="translate(' + n2(r + cw * (1 - sk) / 2) + "," + n2(y0) + ") scale(" + n2(sk * 1000) / 1000 + ") translate(" + n2(-r) + "," + n2(-y0) + ')"' : "";
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Schaugrafik: ' + esc(o.gebiete.map(KT.name).join(", ")) + '">' +
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(tt("karte.grafik.aria", { gebiete: o.gebiete.map(KT.name).join(", ") })) + '">' +
     "<!--FONTS-->" + rect(0, 0, W, H, "#ffffff") + k.s + "<g" + tr + ">" + body + "</g>" +
     linie(r, footY, r + cw, footY, 0.25) + '<g transform="translate(0,' + n2(footY) + ')">' + ft.s + "</g></svg>";
   return { svg: svg, w: W, h: H, skala: sk, format: f };
@@ -285,7 +285,7 @@ function haken(name, wert, text, an, typ, extra) {
   if (extra) { var sm = document.createElement("small"); sm.textContent = extra; l.appendChild(sm); }
   return l;
 }
-liste.appendChild(haken("gebiet", "", "Ganz Potsdam", true));
+liste.appendChild(haken("gebiet", "", KIEZ_I18N.ort("ganze_stadt"), true));
 ST.features.forEach(function (f) { liste.appendChild(haken("gebiet", f.properties.nr, f.properties.nr + " " + f.properties.name, false)); });
 var rb = document.getElementById("schau-rubriken");
 RUBRIKEN.forEach(function (x) { rb.appendChild(haken("rubrik", x.id, x.name, x.an)); });
@@ -303,7 +303,7 @@ var aktuell = null;
 function zeichne() {
   var o = lesen(), n = o.gebiete.length;
   form.querySelectorAll('input[name="gebiet"]').forEach(function (i) { i.disabled = !i.checked && n >= MAXG; });
-  document.getElementById("schau-zaehler").textContent = n + " von höchstens " + MAXG;
+  document.getElementById("schau-zaehler").textContent = tt("karte.grafik.zaehler", { anzahl: n, max: MAXG });
   kt.disabled = !o.rubriken.karte;
   aktuell = baue(o);
   var blatt = document.getElementById("schau-blatt"); blatt.dataset.format = o.format;
@@ -311,8 +311,8 @@ function zeichne() {
   var sv = blatt.querySelector("svg"); sv.removeAttribute("width"); sv.removeAttribute("height"); blatt.style.setProperty("--ar", (aktuell.w / aktuell.h).toFixed(4));
   document.getElementById("schau-mass").textContent = aktuell.format.name + ", " + aktuell.w + " × " + aktuell.h + " mm";
   var hin = document.getElementById("schau-hinweis");
-  hin.textContent = (aktuell.weg.length ? "Passt nicht auf dieses Format und fehlt deshalb: " + aktuell.weg.join(", ") + ". Ein größeres Format oder weniger Rubriken wählen. " : "") +
-    (aktuell.skala < 0.85 ? "Die Grafik ist auf " + Math.round(aktuell.skala * 100) + " % verkleinert, die Schrift wird im Druck klein." : "");
+  hin.textContent = (aktuell.weg.length ? tt("karte.grafik.passt_nicht", { liste: aktuell.weg.join(", ") }) + " " : "") +
+    (aktuell.skala < 0.85 ? tt("karte.grafik.verkleinert", { prozent: Math.round(aktuell.skala * 100) }) : "");
 }
 form.addEventListener("change", zeichne);
 A.schauGebiet = function (nr) {
@@ -344,11 +344,11 @@ function laden(blob, name) {
 }
 var hinweis = function (t) { document.getElementById("schau-hinweis").textContent = t; };
 document.getElementById("schau-svg").addEventListener("click", function () {
-  schriften().then(function (F) { laden(new Blob([mitSchriften(aktuell.svg, F)], { type: "image/svg+xml" }), dateiname("svg")); hinweis("SVG erzeugt: " + dateiname("svg") + ". Schriften sind eingebettet."); })
-    .catch(function () { hinweis("Die Schriften für den Export konnten nicht geladen werden."); });
+  schriften().then(function (F) { laden(new Blob([mitSchriften(aktuell.svg, F)], { type: "image/svg+xml" }), dateiname("svg")); hinweis(tt("karte.grafik.svg_fertig", { datei: dateiname("svg") })); })
+    .catch(function () { hinweis(tt("karte.grafik.schriften_fehler")); });
 });
 document.getElementById("schau-png").addEventListener("click", function () {
-  var knopf = this; knopf.disabled = true; hinweis("PNG wird gerechnet …");
+  var knopf = this; knopf.disabled = true; hinweis(tt("karte.grafik.png_laeuft"));
   schriften().then(function (F) {
     var dpi = 300, pw = Math.round(aktuell.w / 25.4 * dpi), ph = Math.round(aktuell.h / 25.4 * dpi);
     var url = URL.createObjectURL(new Blob([mitSchriften(aktuell.svg, F)], { type: "image/svg+xml" })), img = new Image();
@@ -357,12 +357,12 @@ document.getElementById("schau-png").addEventListener("click", function () {
         var c = document.createElement("canvas"); c.width = pw; c.height = ph;
         var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, pw, ph); x.drawImage(img, 0, 0, pw, ph);
         URL.revokeObjectURL(url);
-        c.toBlob(function (b) { knopf.disabled = false; if (!b) { hinweis("PNG konnte nicht erzeugt werden."); return; } laden(b, dateiname("png")); hinweis("PNG erzeugt: " + pw + " × " + ph + " Pixel, " + dpi + " dpi bei " + aktuell.w + " × " + aktuell.h + " mm."); }, "image/png");
+        c.toBlob(function (b) { knopf.disabled = false; if (!b) { hinweis(tt("karte.grafik.png_fehler")); return; } laden(b, dateiname("png")); hinweis(tt("karte.grafik.png_fertig", { pw: pw, ph: ph, dpi: dpi, w: aktuell.w, h: aktuell.h })); }, "image/png");
       }, 120);
     };
-    img.onerror = function () { knopf.disabled = false; hinweis("PNG konnte nicht erzeugt werden."); };
+    img.onerror = function () { knopf.disabled = false; hinweis(tt("karte.grafik.png_fehler")); };
     img.src = url;
-  }).catch(function () { knopf.disabled = false; hinweis("Die Schriften für den Export konnten nicht geladen werden."); });
+  }).catch(function () { knopf.disabled = false; hinweis(tt("karte.grafik.schriften_fehler")); });
 });
 document.getElementById("schau-druck").addEventListener("click", function () {
   var d = document.getElementById("druck"); d.innerHTML = aktuell.svg.replace("<!--FONTS-->", "").replace(/sg-kc-(\d+)/g, "sg-kc-$1-druck");
