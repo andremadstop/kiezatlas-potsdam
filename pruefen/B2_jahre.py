@@ -6,7 +6,7 @@
      (Die Handstichprobe von 20 Einträgen steht im Bericht berichte/B2_genaue_jahre.md.)
   3. Zahl genau datierter Gebäude (Prüfspalte und Kaskade getrennt, keine Schwelle)
   4. Im Abrufprotokoll keine Anfrage auf /w/, /sparql, /search oder /api/
-  5. Keine Adressen und keine Beschreibungstexte in den B2-Dateien im Repo (berichte/B2_*, quellen-b2.md) und
+  5. Keine Adressen und keine Beschreibungstexte in den B2-Dateien im Repo (berichte/B2_*, docs/quellen/quellen-b2.md) und
      keine B2-Ausgabe unter daten/
 
 Aufruf wie skripte/22_jahre_genau.py (PG*-Umgebung als kiezatlas_rechnen):
@@ -29,7 +29,7 @@ PROTOKOLL = KIEZ_DATEN / "abrufprotokoll.tsv"
 SNAPSHOT = "auswertung.gebaeude_stand_20261105"
 GESPERRT = re.compile(r"/w/|/sparql|/search|/api/|api\.github\.com|raw\.githubusercontent\.com|overpass-api|"
                       r"opendata\.potsdam\.de|nominatim|taginfo|geofabrik|bbbike")
-B2_DATEIEN = [*sorted((WURZEL / "berichte").glob("B2_*")), WURZEL / "quellen-b2.md",
+B2_DATEIEN = [*sorted((WURZEL / "berichte").glob("B2_*")), WURZEL / "docs/quellen/quellen-b2.md",
               *sorted((WURZEL / "belege").glob("N3_*"))]
 ADRESSE = re.compile(r"\b[A-ZÄÖÜ][a-zäöüß-]+(straße|str\.|allee|weg|platz|ring|damm|gasse|ufer|chaussee)\s+\d+",
                      re.IGNORECASE)
