@@ -129,4 +129,6 @@ QUELLEN (Liste, zwei Spalten)    FUSS (Impressumszeile, Stand)
   Progressive disclosure, Cognitive load, Common region). Methodenseiten beginnen mit „Kurz“ (Serial position, Pareto).
   Planer: ein Aktiv-Stil je Leiste, Messweg abgesetzt (Similarity, Proximity), Symbole der Chips wie in der Legende,
   Handy mit halb offenem Blatt (Paradox of the active user). Bewusste Ausnahme: Die Belegfilme stehen jetzt im
-  eingeklappten Abschnitt „Wie die Zahlen entstehen“ statt offen auf der Seite.
+  eingeklappten Abschnitt „Wie die Zahlen entstehen“ statt offen auf der Seite. Zweite bewusste Ausnahme: Solange das Blatt
+  des Planers am Handy halb offen steht, verdeckt es Legende und Kartenknöpfe; sie erscheinen, sobald eine Frage
+  gewählt, die Karte berührt oder das Blatt geschlossen wird (Führung vor Werkzeug beim ersten Aufruf).
