@@ -23,6 +23,7 @@ rahmen: eigen
 <noscript><link rel="stylesheet" href="vendor/maplibre-gl.css"></noscript>
 <link rel="stylesheet" href="basis.css">
 <link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="start.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Kiezatlas Potsdam","description":"Kennzahlen je Stadtteil der Landeshauptstadt Potsdam aus dem Zensus 2022 (100-m-Gitter), amtlichen Stadtteilen und ALKIS-Gebäuden.","inLanguage":"de","spatialCoverage":"Potsdam","creator":{"@type":"Organization","name":"Stiebitz Souverain Systems UG (haftungsbeschränkt)","address":"Potsdam"}}</script>
 </head>
 <body>
@@ -60,7 +61,7 @@ rahmen: eigen
     <p class="lede">Wer wo wohnt, wie alt die Häuser sind und womit geheizt wird, für Potsdam und jeden seiner <span data-feld="anzahl-teile"></span> Stadtteile: aus dem Zensus 2022 im 100-Meter-Gitter, den amtlichen Stadtteilen und den Gebäuden der Landesvermessung. Jede Zahl nennt ihre Quelle.</p>
     <div class="auftakt__aktion">
       <a class="knopf knopf--voll" href="#frage-1"><span class="knopf__flut" aria-hidden="true"></span><span class="knopf__text">Mit der ersten Frage beginnen</span></a>
-      <span class="entwurf">Prototyp, Stand <span data-feld="stand"></span>.</span>
+      <span class="entwurf">Prototyp, Datenstand <span data-feld="stand"></span>.</span>
     </div>
     <dl class="stadtzahlen" id="stadtzahlen" aria-label="Ganz Potsdam in Zahlen"></dl>
     <p class="stadtzahlen__quelle"><span data-feld="flaeche-stadt"></span> km² Stadtgebiet, <span data-feld="zellen-stadt"></span> Gitterzellen mit Zensuswerten. Zensus 2022, Stichtag 15. Mai 2022, © Statistische Ämter des Bundes und der Länder, dl-de/by-2-0, eigene Auswertung.</p>
@@ -86,7 +87,12 @@ rahmen: eigen
   {{block:index_fragen}}
 </section>
 
-<!-- ============ STADTTEILE: Register und Steckbrief ============ -->
+<!-- ============ VERTIEFUNG: eingeklappt, damit die Startseite kurz bleibt (Regel-Review 23.11.2026);
+     die Kopfnavigation und jeder Link auf einen Abschnitt klappen ihn auf (atlas.js) ============ -->
+<section class="vertiefung" aria-labelledby="h-vertiefung">
+<h2 class="vertiefung__titel" id="h-vertiefung">Tiefer einsteigen</h2>
+<details class="aufklapp" id="auf-stadtteile">
+<summary><span class="aufklapp__titel">Die <span data-feld="anzahl-teile"></span> Stadtteile</span><span class="aufklapp__satz">Sortieren, vergleichen, Steckbrief und Verteilungen je Stadtteil</span></summary>
 <section class="register" id="stadtteile" aria-labelledby="h-teile">
   <div class="register__kopf">
     <h2 id="h-teile" class="abschnitt">Die <span data-feld="anzahl-teile"></span> Stadtteile</h2>
@@ -115,7 +121,11 @@ rahmen: eigen
   </div>
 </section>
 
+</details>
+
 <!-- ============ SCHAUGRAFIK ============ -->
+<details class="aufklapp" id="auf-schaugrafik">
+<summary><span class="aufklapp__titel">Schaugrafik für den Druck</span><span class="aufklapp__satz">Bis zu vier Gebiete als SVG, PNG oder PDF, Abdruck frei unter CC BY 4.0</span></summary>
 <section class="schaugrafik" id="schaugrafik" aria-labelledby="h-schau">
   <div class="schau__kopf">
     <h2 id="h-schau" class="abschnitt">Schaugrafik für den Druck</h2>
@@ -148,14 +158,26 @@ rahmen: eigen
   </figure>
 </section>
 
+</details>
+
 <!-- ============ GRENZFALL ============ -->
+<details class="aufklapp" id="auf-grenzfall">
+<summary><span class="aufklapp__titel">Grenzfall</span><span class="aufklapp__satz">Wem gehört eine Zelle auf der Grenze? Zwei Rechenwege im Vergleich</span></summary>
 {{block:index_grenzfall}}
+</details>
 
 <!-- ============ METHODE ============ -->
+<details class="aufklapp" id="auf-methode">
+<summary><span class="aufklapp__titel">Wie die Zahlen entstehen</span><span class="aufklapp__satz">Weg der Daten, Geheimhaltung, Grenzen der Aussage, zwei Belegfilme</span></summary>
 {{block:index_methode}}
+</details>
 
 <!-- ============ QUELLEN ============ -->
+<details class="aufklapp" id="auf-quellen">
+<summary><span class="aufklapp__titel">Quellen und Lizenzen</span><span class="aufklapp__satz">Jede Datenquelle mit Vermerk, Lizenz und Link</span></summary>
 {{block:index_quellen}}
+</details>
+</section>
 </main>
 
 <footer class="fuss-seite">
@@ -163,7 +185,7 @@ rahmen: eigen
   <p>Zusammengestellt von André Stiebitz, Stiebitz Souverain Systems UG (haftungsbeschränkt), Potsdam. Code mit KI-Unterstützung geschrieben. Kennzahlen, Verteilungen und Karte werden aus der Datenbank berechnet und beim Neuerzeugen aktualisiert; im Fließtext stehen keine von Hand eingesetzten Ergebniszahlen. Import zuletzt: <span data-feld="import"></span>.</p>
   <p id="datenschutz"><b>Datenschutz:</b> Diese Seite setzt keine Cookies und zählt keine Besuche; Schriften, Bibliotheken und Daten liegen auf demselben Server. Beim Laden der Karte holt der Browser jedoch Kartenkacheln und die Schrift der Kartenbeschriftung von basemap.de (Bundesamt für Kartographie und Geodäsie) und, wenn das Luftbild eingeschaltet ist, Luftbilder von der Landesvermessung Brandenburg (LGB); diese Server sehen dabei die IP-Adresse. Der Knopf „Meinen Standort zeigen“ fragt den Browser nach der Position; sie bleibt im Browser und wird nicht übertragen. Mehr in der <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutzerklärung</a>.</p>
   <p class="fuss-seite__links"><a class="link" href="planer.html">Planer</a> <a class="link" href="jahre.html">Bauzeiten</a> <a class="link" href="planer-daten.html">Daten</a> <a class="link" href="https://souverain-systems.de/impressum/">Impressum</a> <a class="link" href="https://souverain-systems.de/datenschutz/">Datenschutz</a> <a class="link" href="#oben">Zum Anfang</a></p>
-  <p class="fuss-seite__stand">Stand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
+  <p class="fuss-seite__stand">Seitenstand <span data-kiez-version>Entwicklungsstand</span>. Zitieren: Kiezatlas Potsdam, Stiebitz Souverain Systems UG (haftungsbeschränkt), https://souverain-systems.de/kiezatlas/ mit Stand (Vorschlag in <a class="link" href="https://github.com/andremadstop/kiezatlas-potsdam/blob/main/CITATION.cff">CITATION.cff</a>). Fehler gefunden? <a class="link" href="mailto:kontakt@souverain-systems.de">kontakt@souverain-systems.de</a></p>
 </footer>
 
 <div id="druck" aria-hidden="true"></div>

@@ -610,9 +610,34 @@ document.getElementById("sb-karte").addEventListener("click", function () {
   document.getElementById("frage-10").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth", block: "center" });
 });
 document.getElementById("sb-grafik").addEventListener("click", function () {
+  aufklappen("schaugrafik");
   if (A.schauGebiet) A.schauGebiet(S.nr);
   document.getElementById("schaugrafik").scrollIntoView({ behavior: RUHIG ? "auto" : "smooth" });
 });
+
+// =====================================================================
+// Vertiefung: Stadtteile, Schaugrafik, Grenzfall, Methode und Quellen stehen eingeklappt (Regel-Review 23.11.2026).
+// Ein Link auf einen Abschnitt oder auf etwas darin (Kopfnavigation, „Stadtteile vergleichen“, #quellen, Adresse
+// mit Anker) klappt ihn vorher auf; danach rechnet ScrollTrigger die Positionen neu.
+// =====================================================================
+function aufklappen(id) {
+  var z = id && document.getElementById(id), d = z && (z.matches("details.aufklapp") ? z : z.closest("details.aufklapp"));
+  if (d && !d.open) d.open = true;
+  return d;
+}
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest('a[href^="#"]');
+  if (a) aufklappen(decodeURIComponent(a.getAttribute("href").slice(1)));
+}, true);
+addEventListener("hashchange", function () { aufklappen(decodeURIComponent(location.hash.slice(1))); });
+if (location.hash && aufklappen(decodeURIComponent(location.hash.slice(1)))) {
+  var ziel = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (ziel) requestAnimationFrame(function () { ziel.scrollIntoView(); });
+}
+document.querySelectorAll("details.aufklapp").forEach(function (d) {
+  d.addEventListener("toggle", function () { if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+});
+A.aufklappen = aufklappen;
 
 // =====================================================================
 // Grenzfall

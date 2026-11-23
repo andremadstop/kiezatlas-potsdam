@@ -217,6 +217,15 @@ async function startseite(basis, art) {
   // Gegenprobe 2: „3D-Häuser“ steht vor den Themen (auf dem Handy im ersten Bild)
   const erster = await page.$eval(".werkzeug .chip", (e) => e.innerText.trim());
   pruef(erster === "3D-Häuser", `erster Chip der Leiste: ${erster}`);
+  // Vertiefung eingeklappt (Regel-Review 23.11.2026): anfangs zu; der Link der Kopfnavigation klappt „Stadtteile“ auf,
+  // ein Klick auf die Zeile „Schaugrafik“ klappt diese auf
+  const zuAnfang = await page.$$eval("details.aufklapp", (l) => l.map((d) => d.open));
+  await page.evaluate(() => document.querySelector('.kopf-unter a[href="#stadtteile"]').click());
+  await page.waitForTimeout(300);
+  await page.click("#auf-schaugrafik > summary"); await page.waitForTimeout(300);
+  const offen = await page.$$eval("details.aufklapp", (l) => l.map((d) => d.id + ":" + d.open));
+  pruef(zuAnfang.length === 5 && zuAnfang.every((o) => !o) && offen.includes("auf-stadtteile:true") && offen.includes("auf-schaugrafik:true"),
+    `Vertiefung: ${zuAnfang.length} Abschnitte anfangs eingeklappt, nach Link und Klick offen (${offen.join(", ")})`);
   // Register-Sortierung
   const sorten = await page.$$eval('#sortierung input[name="sort"]', (l) => l.map((i) => i.value));
   const ersteJe = {};
@@ -347,7 +356,8 @@ async function startseiteHaeuser(basis, art) {
   const r = await page.evaluate(() => { const b = document.querySelector("label:has(#dreid)").getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
   await page.mouse.click(r.x, r.y); await haeuser(); await ruhe();
   const z0 = await lage();
-  // B1 Liste (Auswahlfeld im Steckbrief)
+  // B1 Liste (Auswahlfeld im Steckbrief); der Abschnitt Stadtteile steht seit 23.11.2026 eingeklappt, aufklappen scrollt nicht
+  await page.evaluate(() => window.KIEZ.aufklappen("stadtteile"));
   await page.selectOption("#gebiet", "72"); await page.waitForTimeout(300); await haeuser(); await ruhe();
   const z1 = await lage();
   pruef(z0.d3 && z1.nr === "72" && z1.d3 && z1.z >= 15.5 && z1.n > 0 && z1.mitte === "72",

@@ -1,0 +1,33 @@
+/* Kiezatlas Potsdam: Startseite. Vertiefende Abschnitte eingeklappt (Regel-Review 23.11.2026: kurz vorn, Tiefe dahinter).
+   Gesetze: Progressive disclosure, Cognitive load, Common region (eine Zeile je Abschnitt in einem Block). */
+.vertiefung{padding:clamp(48px,6vw,88px) var(--gut) clamp(32px,4vw,56px);border-top:1px solid var(--ink);background:var(--ground)}
+.vertiefung__titel{font:600 var(--t-l)/1.1 var(--f-display);letter-spacing:-.01em;margin:0 0 16px}
+.aufklapp{border-top:1px solid var(--line);margin:0 calc(-1 * var(--gut))}
+.aufklapp:last-child{border-bottom:1px solid var(--line)}
+.aufklapp>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr) 24px;gap:4px clamp(16px,3vw,48px);align-items:baseline;padding:18px var(--gut);position:relative;isolation:isolate}
+.aufklapp>summary::-webkit-details-marker{display:none}
+.aufklapp>summary::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--accent-soft);transform-origin:50% 100%;scale:1 0;transition:scale .35s var(--ease)}
+.aufklapp>summary::after{content:"";justify-self:end;width:9px;height:9px;border-right:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);rotate:45deg;translate:0 -3px;transition:rotate .35s var(--ease)}
+.aufklapp[open]>summary::after{rotate:225deg;translate:0 2px}
+.aufklapp>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media (hover:hover){.aufklapp>summary:hover::before{scale:1 1}}
+.aufklapp__titel{font:600 var(--t-m)/1.15 var(--f-display)}
+.aufklapp__satz{color:var(--muted);font-size:.9375rem;line-height:1.4}
+/* Der Titel steht schon in der Zeile; die Überschrift im Abschnitt bleibt für Vorleseprogramme und Anker */
+.aufklapp h2.abschnitt{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.aufklapp>section{border-top:0}
+@media (max-width:860px){
+  .aufklapp>summary{grid-template-columns:minmax(0,1fr) 24px;min-height:44px}
+  .aufklapp__satz{grid-column:1;grid-row:2;font-size:.875rem}
+  .aufklapp>summary::after{grid-column:2;grid-row:1 / span 2;align-self:center}
+}
+@media (prefers-reduced-motion:reduce){.aufklapp>summary::before,.aufklapp>summary::after{transition:none}}
+@media print{.aufklapp>summary{display:none}.aufklapp>*{display:block}}
+/* Handy hoch (gleiche Abfrage wie window.KIEZ_GESTAPELT): Luft zwischen den Fragen knapper als im gemeinsamen atlas.css
+   (9svh oben, 26svh unten), damit die Startseite am Telefon kurz bleibt; jede Frage bleibt länger als der Platz unter der Karte */
+@media (max-width:599px),(max-width:699px) and (orientation:portrait){
+  .fragen{padding-bottom:8svh}
+  .frage{padding:6svh 0 15svh 18px}
+  .frage::before{top:6svh}
+  .vertiefung{padding-top:40px}
+}

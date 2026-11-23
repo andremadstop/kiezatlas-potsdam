@@ -27,7 +27,7 @@ WURZEL = Path(__file__).resolve().parent.parent
 # daten/fixtures/ (Beispielwerte), daten/schema/ (Verträge, nur im Repo), Rohdaten.
 SEITEN = ["index.html", "karte.html", "404.html", "planer.html", "planer-methode.html", "planer-daten.html",
           "jahre.html", "jahre-methode.html", "jahre-daten.html"]
-DATEIEN = ["basis.css", "atlas.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "karte.js", "planer.js", "jahre.js",
+DATEIEN = ["basis.css", "atlas.css", "start.css", "karte.css", "planer.css", "jahre.css", "atlas.js", "karte.js", "planer.js", "jahre.js",
            "themen.js", "kopf.js", "schaugrafik.js", "i18n.js", "favicon.svg", "og.png",
            # Belegfilme auf der Startseite (Abschnitt „Im Film“); Skripte und READMEs bleiben im Repo
            "docs/filme/karte/film.mp4", "docs/filme/karte/vorschau.jpg",
