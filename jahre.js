@@ -154,6 +154,36 @@ function gebaeudeZahlen() {
   }
   if (M.umrisse_stand) setze("g-umrisse-stand", KIEZ_I18N.fmt.datum(M.umrisse_stand));
   if (M.darstellung) setze("g-mindest-n", fmt.format(M.darstellung.mindest_n));
+  // Gegenprobe gegen die Statistik der Stadt, Gruppe 1949 bis 1990 (Plattenbau-Riegel = ein Umriss)
+  var lhpDdr = M.lhp && M.lhp.gruppen.filter(function (x) { return x.gruppe === KL[2].split("–")[0] + "–" + KL[3].split("–")[1]; })[0];
+  if (lhpDdr) { setze("g-lhp-ddr", vz(lhpDdr.kaskade_abw)); setze("g-lhp-ddr-w", mehrWeniger(lhpDdr.kaskade_abw)); setze("g-lhp-ddr-k", lhpDdr.gruppe.replace("–", " bis ")); }
+  if (M.darstellung) kurzRuecktest();
+}
+// Kurzbefund des Rücktests (Regel-Review 23.11.2026, Fund 1): Spanne statt Bestwert, alles aus M.ruecktest gerechnet.
+// Spanne = kleinste und größte Quote „alle Stufen“ der Prüfsätze mit genug bewerteten Gebäuden; „eindeutig“ = Luftbild-
+// Prüfgebäude, deren abgelesene Spanne in einer Klasse liegt (ohne „mehrdeutig“); „ohne Klasse mitgezählt“ = Treffer
+// durch alle Prüfgebäude des Satzes, ungünstigster Satz; 1919 bis 1990 = Prüfgebäude mit bekannter Bauzeit in diesen Klassen.
+function kurzRuecktest() {
+  var mind = M.darstellung.mindest_n, proz = function (a, b) { return fmt.format(Math.round(100 * a / b)) + NB + "%"; };
+  var alle = M.ruecktest.map(function (r) { return { r: r, x: r.je_stufe.filter(function (y) { return y.stufe === "alle Stufen"; })[0] }; })
+    .filter(function (o) { return o.x && o.x.bewertet >= mind; });
+  if (!alle.length) return;
+  var q = alle.map(function (o) { return Math.round(o.x.quote); });
+  setze("k-spanne", fmt.format(Math.min.apply(null, q)) + " bis " + fmt.format(Math.max.apply(null, q)) + NB + "%");
+  var lb = M.ruecktest.filter(function (r) { return r.id === "luftbild"; })[0];
+  if (lb) {
+    var ein = lb.je_bauzeit.filter(function (x) { return x.bewertet && !/^mehrdeutig/.test(x.bauzeit); });
+    var t = ein.reduce(function (s, x) { return s + x.treffer; }, 0), b = ein.reduce(function (s, x) { return s + x.bewertet; }, 0);
+    if (b) setze("k-eindeutig", proz(t, b) + " (" + fmt.format(t) + " von " + fmt.format(b) + ")");
+  }
+  var schlecht = alle.slice().sort(function (a, b) { return a.x.treffer / a.x.n - b.x.treffer / b.x.n; })[0];
+  setze("k-mit-ohne", proz(schlecht.x.treffer, schlecht.x.n) + " (" + schlecht.r.name + ": " + fmt.format(schlecht.x.treffer) + " von " + fmt.format(schlecht.x.n) + ")");
+  var mitte = KL.slice(1, 4), teile = [];
+  M.ruecktest.forEach(function (r) {
+    var n = r.je_bauzeit.filter(function (x) { return mitte.indexOf(x.bauzeit) > -1; }).reduce(function (s, x) { return s + x.n; }, 0);
+    teile.push(r.name.split(" (")[0].split(",")[0] + " " + fmt.format(n));
+  });
+  setze("k-mitte", teile.join(", "));
 }
 
 // Schichtband: Anteile der Klassen als ein Streifen (Startseite der Bauzeiten, Steckbrief, Liste)
@@ -210,9 +240,15 @@ function karte() {
   var marken = document.getElementById("j-stadtmarken");
   KL.forEach(function (n, k) { var li = el("li"), i = el("i"); i.style.background = PALETTE[k]; li.appendChild(i); li.appendChild(el("span", null, n)); li.appendChild(el("b", null, pz(anteil(STAT.stadt, k, k)))); marken.appendChild(li); });
   var zahlen = document.getElementById("j-zahlen");
-  [["Gebäude mit Wohnraum", "rund " + rund(STAT.stadt.g)], ["Zellen mit Gebäuden", fmt.format(STAT.zellen)], ["vor 1949 gebaut", pz(anteil(STAT.stadt, 0, 1))], ["seit 1991 gebaut", pz(anteil(STAT.stadt, 4, KL.length - 1))]]
+  // Einheit in jeder Beschriftung: Hier zählen Gebäude, auf der Startseite Wohnungen (Regel-Review 23.11.2026, Fund 4)
+  var wohnAlt = K && K.stadt && K.stadt.kacheln.filter(function (k) { return k.id === "altbau"; })[0];
+  [["Gebäude mit Wohnraum", "rund " + rund(STAT.stadt.g)], ["Zellen mit Gebäuden", fmt.format(STAT.zellen)],
+    ["der Gebäude mit Wohnraum vor 1949 gebaut" + (wohnAlt ? " (Wohnungen: " + T.fmt1.format(wohnAlt.wert) + NB + "%)" : ""), pz(anteil(STAT.stadt, 0, 1))],
+    ["der Gebäude mit Wohnraum seit 1991 gebaut", pz(anteil(STAT.stadt, 4, KL.length - 1))]]
     .forEach(function (z) { var d = el("div"); d.appendChild(el("dt", null, z[0])); d.appendChild(el("dd", null, z[1])); zahlen.appendChild(d); });
-  document.getElementById("j-zahlen-quelle").textContent = D.beschriftung + ". Anteile genähert aus den Zellen, Zahlen gerundet. " + D.quellen[Object.keys(D.quellen)[0]].vermerk + ".";
+  document.getElementById("j-zahlen-quelle").textContent = D.beschriftung + ". Anteile genähert aus den Zellen, Zahlen gerundet; deshalb kann die Summe zweier gerundeter Klassen um einen Punkt von der Kennzahl abweichen. " +
+    "Gezählt werden Gebäude, nicht Wohnungen: Die Startseite zeigt den Anteil der Wohnungen in Gebäuden vor 1949, nach den Baujahresklassen der Wohnungen im Zensus, deren Grenzen nach 2000 anders liegen als die Gebäudeklassen hier. " +
+    D.quellen[Object.keys(D.quellen)[0]].vermerk + ".";
 
   // ---------- Karte
   var LEER = { type: "FeatureCollection", features: [] }, bereit = false;

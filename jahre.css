@@ -72,7 +72,7 @@
 .j-legende__skala{display:inline-flex;flex-direction:column;gap:1px}
 .j-legende__stufen{display:flex;gap:1px}
 .j-legende__stufen i{width:26px;height:10px}
-.j-legende__marken{display:flex;justify-content:space-between;width:134px;margin-left:-3px;font-size:.6875rem}
+.j-legende__marken{display:flex;justify-content:space-between;width:134px;margin-left:-3px;font-size:.75rem}
 .j-legende__eintrag{display:inline-flex;align-items:center;gap:5px}
 .j-legende__muster{width:12px;height:12px;flex:0 0 auto;outline:1px solid var(--line)}
 .j-legende__muster--schraffur{background:repeating-linear-gradient(135deg,var(--ink) 0 1px,var(--papier) 1px 4px)}
@@ -141,6 +141,14 @@
 .j-dateien .knopf{justify-self:end}
 .j-dateien .knopf[disabled]::after{display:none}
 .j-status{min-height:1.5em;font-size:.9375rem;margin:12px 0 0}
+/* Kurzbefund oben auf Methodenseiten (Regel-Review 23.11.2026: Urteil vorn, Herleitung dahinter) */
+.kurz{border:1px solid var(--ink);background:var(--surface);padding:clamp(16px,2.4vw,28px);margin:0 0 clamp(32px,5vw,56px)}
+.kurz h2{font:600 var(--t-m)/1.1 var(--f-display);margin:0 0 12px}
+.kurz__liste{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px clamp(20px,3vw,40px);margin:0}
+.kurz__liste dt{font:600 .875rem/1.2 var(--f-text);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 4px}
+.kurz__liste dd{margin:0;line-height:1.45}
+.kurz>.fuss{margin:14px 0 0}
+@media (max-width:860px){.kurz__liste{grid-template-columns:minmax(0,1fr)}}
 .j-blatt .methode{margin:clamp(40px,6vw,72px) calc(-1 * var(--gut))}
 .j-blatt .kette__nr{color:var(--b3)}
 .j-blatt .methode .kette__nr{color:#b8b2cf}
@@ -164,9 +172,9 @@
   .j-leiste__kopf{min-height:24px}
   .j-leiste__titel{display:none}
   .j-leiste__status{font-size:.8125rem}
-  .j-klasse{font-size:.6875rem;min-height:40px}
+  .j-klasse{font-size:.75rem;min-height:40px}
   .j-klasse__balken{height:18px}
-  .j-legende__quelle{font-size:.6875rem;line-height:1.3}
+  .j-legende__quelle{font-size:.75rem;line-height:1.3}
   /* vier Chips passen ins Bild wie vor „3D-Häuser“ (sonst nur „Lu…“ von Luftbild) */
   .j-buehne .werkzeug{gap:4px;padding-left:8px;padding-right:8px}
   .j-buehne .chip{padding:0 8px;font-size:.8125rem}
@@ -200,8 +208,8 @@
   .j-leiste{padding:6px 10px calc(6px + var(--sa-unten))}
   .j-leiste__titel{display:none}
   .j-leiste__kopf{min-height:24px}
-  .j-klasse{font-size:.6875rem;min-height:40px}
-  .j-klasse__balken{height:16px}
+  .j-klasse{font-size:.75rem;min-height:40px}
+  .j-klasse__balken{height:13px}
   .j-regler{height:22px;margin:0 0 2px}
   /* Offene Legende als Ebene über der Karte, links neben den Knöpfen; in der Leiste drückte sie die Karte auf 180 von 390 px
      (Gegenprobe 07.11.). Höhe bis unter die Chips (100 % = Höhe der Leiste), Rest scrollt; die Quelle steht im „i“ */

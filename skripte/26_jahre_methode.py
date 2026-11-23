@@ -164,17 +164,24 @@ def erzeugen() -> str:
         fehler("Abdeckungstabelle unvollständig")
 
     ruecktest = []
-    for praefix, rid, art in (("Sichtprüfung Luftbilder", "luftbild",
-                               "Sichtprüfung von Luftbildern, ein Stadtteil (Bornstedt)"),
-                              ("Wikidata, genaue Jahre", "wikidata", "Baudenkmale mit genauem Jahr aus Wikidata; "
-                               "die Schätzung wird ohne diese Jahre gerechnet"),
-                              ("Wikipedia-Denkmalliste", "denkmale",
-                               "Baudenkmale mit Jahr aus der Wikipedia-Liste, nur Prüfspalte")):
+    # Anzeigename: Der Bericht B4 (SHA256 auf der Seite) heißt die Luftbild-Referenz „Sichtprüfung“; abgelesen hat
+    # sie ein KI-Agent ohne menschliche Zweitprüfung (pruefen/B3_protokoll.md). Damit das nicht nach menschlicher
+    # Prüfung klingt, nennt die Seite sie „KI-Ablesung“ (Regel-Review 23.11.2026, Fund 2); gesucht wird weiter nach
+    # der Überschrift im Bericht, der Bericht selbst bleibt unverändert.
+    for praefix, rid, name, art in (("Sichtprüfung Luftbilder", "luftbild",
+                                     "KI-Ablesung von Luftbildern (Bornstedt, ohne menschliche Zweitprüfung)",
+                                     "Bauzeiten der Prüfgebäude hat ein KI-Agent (Claude) aus Luftbildern verschiedener "
+                                     "Jahre abgelesen, ohne zweite Bewertung durch einen Menschen (Protokoll "
+                                     "pruefen/B3_protokoll.md); nur ein Stadtteil (Bornstedt), kein amtliches Baujahr"),
+                                    ("Wikidata, genaue Jahre", "wikidata", None, "Baudenkmale mit genauem Jahr aus "
+                                     "Wikidata; die Schätzung wird ohne diese Jahre gerechnet"),
+                                    ("Wikipedia-Denkmalliste", "denkmale", None,
+                                     "Baudenkmale mit Jahr aus der Wikipedia-Liste, nur Prüfspalte")):
         kopf, tabs = suche(ab, praefix)
         if len(tabs) != 2:
             fehler(f"{kopf}: {len(tabs)} Tabellen statt 2")
         m = re.search(r":\s*([\d.]+) Gebäude$", kopf)
-        ruecktest.append({"id": rid, "name": kopf.split(":")[0].split(" (")[0], "art": art,
+        ruecktest.append({"id": rid, "name": name or kopf.split(":")[0].split(" (")[0], "art": art,
                           "n": zahl(m.group(1)) if m else None,
                           "je_stufe": ruecktest_tabelle(tabs[0], "stufe"),
                           "je_bauzeit": ruecktest_tabelle(tabs[1], "bauzeit")})
