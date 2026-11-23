@@ -3,6 +3,18 @@
 Jeder veröffentlichte Stand bekommt einen Tag `stand-JJJJ-MM-TT` (bei mehreren am Tag mit Buchstabe) und steht hier.
 Die Seiten nennen den Stand im Fuß. Entscheidungen: `docs/entscheidungen.md`; Prüfstände: `belege/pruefstand-*`.
 
+## 2026-11-23 (kommender Stand, noch ohne Tag)
+
+- Regel-Review (Entscheidung A21): Rücktest der Bauzeiten als Spanne 65 bis 74 % mit den ungünstigeren Lesarten
+  (Kasten „Kurz“ auf der Methodenseite, README); Luftbild-Referenz heißt „KI-Ablesung von Luftbildern (Bornstedt, ohne
+  menschliche Zweitprüfung)“; Einheiten an „vor 1949“ (Gebäude gegen Wohnungen); Basis der Zensus-Zahlen in Tabellen.
+- Startseite: Stadtteile, Schaugrafik, Grenzfall, Methode und Quellen aufklappbar unter „Tiefer einsteigen“ (`start.css`),
+  am Telefon 23.852 auf rund 8.600 px; Hero „Datenstand“, Fuß „Seitenstand“.
+- Methode Planer: Kasten „Kurz“, Maßstäbe mit Fußnoten; Daten Planer: GeoPackage, CSV und QGIS zuerst, die
+  JavaScript-Dateien unter „Für Entwickler“.
+- Planer: Chip-Symbole wie in der Legende, „Messweg“ als eigene Gruppe, am Handy Blatt halb offen mit den Fragen,
+  Schrift von Legende, Leiste und Maßstab mindestens 12 px; „Einwohner je Sportstätte“, keine Klammer in der Klammer.
+
 ## 2026-11-08 (kommender Stand, noch ohne Tag)
 
 - Drei Belegfilme unter `docs/filme/` (Übersicht `docs/filme/README.md`): „Potsdam wächst aus den Daten“ (Karte,

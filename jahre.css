@@ -251,3 +251,6 @@
 @media (prefers-reduced-motion:reduce){
   .jahreseite *,.jahreseite *::before,.jahreseite *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
+
+/* Maßstab der Karte mindestens 12 px (MapLibre setzt 10 px; Regel-Review 23.11.2026) */
+.jahreseite .maplibregl-ctrl-scale{font-size:12px}

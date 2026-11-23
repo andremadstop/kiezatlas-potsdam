@@ -104,6 +104,8 @@
   T["planer.kz.anteil"] = "Anteil {gruppe} mit {art}";
   T["planer.kz.der_einwohner"] = "der Einwohner";
   T["planer.kz.ew_je"] = "Einwohner je {art}";
+  T["planer.je.sport"] = "Sportstätte";
+  T["planer.je.sonstiger_gemeinbedarf"] = "sonstiger Gemeinbedarfseinrichtung";
   T["planer.kz.gruen"] = "Grünfläche je Einwohner";
   T["planer.kz.in_naehe"] = " in der Nähe";
   T["planer.kz.in_radius"] = " in {radius}";

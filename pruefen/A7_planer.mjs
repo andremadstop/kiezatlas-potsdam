@@ -28,7 +28,8 @@ const LEERBILD = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0
 // Grundkarte (Vektor): Kacheln und Schriften als leere Protobuf-Antwort, alles andere als leeres PNG
 const fremdAntwort = (u) => /\.pbf(\?|$)/.test(u) ? { status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) } : { status: 200, contentType: "image/png", body: LEERBILD };
 const TYP = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".json": "application/json" };
-const GRENZE_JS_KB = 320;   // 06.11.: +16 KB gz für die Vektor-Grundkarte (daten/grundkarte.js) statt Rasterkacheln
+const GRENZE_JS_KB = 321;   // 06.11.: +16 KB gz für die Vektor-Grundkarte (daten/grundkarte.js) statt Rasterkacheln;
+// 23.11.: +1 KB gz für den Regel-Review (Fußnoten der Maßstäbe, Blatt halb offen am Handy, Texte „je …“; planer.js +0,4 KB gz)
 // Seit dem gemeinsamen Code (16.11.2026) liefert die Seite die Textschicht mit aus (daten/ort.js, i18n.js, texte/<lang>/*.js);
 // die Grenze steigt um genau deren gz-Gewicht, wie es die Seite lädt.
 const TEXTSCHICHT = /\/(daten\/ort\.js|i18n\.js|texte\/[^/]+\/[^/]+\.js)$/;

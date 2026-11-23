@@ -40,94 +40,6 @@
 <main id="inhalt">
   <h1>Daten zum Weiterverwenden</h1>
   <p class="lede">Jede Datei, aus der die Seiten zeichnen, steht hier mit Lizenz und Quellenvermerk. Wer sie weitergibt, nennt den Vermerk. Dateien mit OpenStreetMap-Anteil sind getrennt und stehen unter der Open Database License.</p>
-  <p>Die Dateien sind JavaScript mit GeoJSON bzw. JSON darin (eine Zeile <code>window.KIEZ_… = {…}</code>), damit die Seiten auch ohne Server laufen. Der Aufbau jeder Datei ist in <code>daten/schema/</code> im Quellcode beschrieben. Was noch nicht berechnet ist, steht als „folgt“ ohne Link.</p>
-
-  <h2>Planer: Einrichtungen, Entfernungen, Versorgung</h2>
-  <ul class="dateiliste">
-    <li data-datei="einrichtungen.js" data-schema="einrichtungen.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/einrichtungen.js">einrichtungen.js</a><span class="stand">vorhanden</span>
-      <p class="was">Kitas, Horte und Schulen (Bildungsministerium Brandenburg) und Gemeinbedarf aus dem Liegenschaftskataster als Punkte, ohne Adresse und ohne Kontaktdaten.</p>
-      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>). Vermerk je Quelle in der Datei, mit „Daten verändert (eigene Berechnung)“.</p>
-    </li>
-    <li data-datei="einrichtungen_odbl.js" data-schema="einrichtungen_odbl.json" data-da="ja" data-odbl="ja">
-      <a class="datei link" href="daten/einrichtungen_odbl.js">einrichtungen_odbl.js</a><span class="stand">vorhanden</span>
-      <p class="was">Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze aus OpenStreetMap als Punkte, ohne Namen.</p>
-      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz.</p>
-    </li>
-    <li data-datei="erreichbar.js" data-schema="erreichbar.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/erreichbar.js">erreichbar.js</a><span class="stand">vorhanden</span>
-      <p class="was">Entfernung in Luftlinie von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung je Art, in der Reihenfolge von <code>zellen.js</code>.</p>
-      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
-    </li>
-    <li data-datei="erreichbar_fuss_odbl.js" data-schema="erreichbar_fuss_odbl.json" data-da="ja" data-odbl="ja">
-      <a class="datei link" href="daten/erreichbar_fuss_odbl.js">erreichbar_fuss_odbl.js</a><span class="stand">vorhanden</span>
-      <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap (Stand 31.10.2026), in der Reihenfolge von <code>zellen.js</code>.</p>
-      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
-    </li>
-    <li data-datei="planer.js" data-schema="planer.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/planer.js">planer.js</a><span class="stand">vorhanden</span>
-      <p class="was">Versorgung je Raumeinheit in Luftlinie: Anteile in Reichweite, Einwohner je Einrichtung, Plätze je Kind, Grün je Einwohner. Jeder Wert mit Methode, Status, Stand, Unsicherheit und Quelle.</p>
-      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
-    </li>
-    <li data-datei="planer_fuss_odbl.js" data-schema="planer_fuss_odbl.json" data-da="ja" data-odbl="ja">
-      <a class="datei link" href="daten/planer_fuss_odbl.js">planer_fuss_odbl.js</a><span class="stand">vorhanden</span>
-      <p class="was">Dieselben Versorgungswerte als Fußweg.</p>
-      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
-    </li>
-  </ul>
-
-  <h2>Grundlage: Gitter, Stadtteile, Gebäude</h2>
-  <ul class="dateiliste">
-    <li data-datei="zellen.js" data-schema="zellen.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/zellen.js">zellen.js</a><span class="stand">vorhanden</span>
-      <p class="was">Bewohnte Zellen des Zensus-Gitters (100 m) mit Einwohnern, Alter, Wohnungen nach Baujahr und Fernwärme.</p>
-      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
-    </li>
-    <li data-datei="stadtteile.js" data-schema="stadtteile.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/stadtteile.js">stadtteile.js</a><span class="stand">vorhanden</span>
-      <p class="was">Die amtlichen Stadtteile mit Nummer, Name und Fläche.</p>
-      <p class="lizenz">© Landeshauptstadt Potsdam, dl-de/zero-2-0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
-    </li>
-    <li data-datei="planungsraeume.js" data-schema="planungsraeume.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/planungsraeume.js">planungsraeume.js</a><span class="stand">vorhanden</span>
-      <p class="was">Die 19 Planungsräume der Stadt mit Nummer, Name und Fläche; auf dieser Ebene rechnet die Versorgungstabelle.</p>
-      <p class="lizenz">© Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (Grenzen auf 3 m vereinfacht, Koordinaten gerundet, Felder ausgewählt).</p>
-    </li>
-    <li data-datei="kennzahlen.js" data-schema="kennzahlen.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/kennzahlen.js">kennzahlen.js</a><span class="stand">vorhanden</span>
-      <p class="was">Kennzahlen und Verteilungen je Stadtteil und für die Stadt; dieselben Werte als <a class="link" href="daten/kennzahlen.json">kennzahlen.json</a>.</p>
-      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; Gebäudezahlen © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
-    </li>
-    <li data-datei="gebaeude/*.js" data-schema="gebaeude.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/gebaeude/11.js">gebaeude/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
-      <p class="was">Gebäudeumrisse je Stadtteil mit Funktion, Geschosszahl und Höhe in Metern (ALKIS-Objekthöhe, sonst Geschosse × 3 m), eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11).</p>
-      <p class="lizenz">© GeoBasis-DE/LGB, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
-    </li>
-    <li data-datei="grundkarte.js" data-schema="grundkarte.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/grundkarte.js">grundkarte.js</a><span class="stand">vorhanden</span>
-      <p class="was">Kartenstil der Grundkarte: gekürzter Auszug aus dem Stil „bm_web_gry“ von basemap.de Web Vektor (ohne Gebäude, ohne Bildsymbole). Enthält keine Geodaten; die Kacheln lädt der Browser bei sgx.geodatenzentrum.de. Erzeugt mit skripte/27_grundkarte.py.</p>
-      <p class="lizenz">© <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026), <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert.</p>
-    </li>
-  </ul>
-
-  <h2>Gebäudejahre</h2>
-  <ul class="dateiliste">
-    <li data-datei="jahre_zellen.js" data-schema="jahre_zellen.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/jahre_zellen.js">jahre_zellen.js</a><span class="stand">vorhanden</span>
-      <p class="was">Gebäude mit Wohnraum nach Baujahr je Zelle aus dem Zensus 2022.</p>
-      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
-    </li>
-    <li data-datei="jahre/*.js" data-schema="jahre_gebaeude.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/jahre/11.js">jahre/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
-      <p class="was">Bauzeitklasse je Gebäude, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11); Schätzungen gekennzeichnet, keine Aussage über einzelne Grundstücke, kein Einzeljahr bei Gebäuden mit Wohnraum.</p>
-      <p class="lizenz">dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>); Vermerk je Quelle in der Datei.</p>
-    </li>
-    <li data-datei="jahre_methode.js" data-schema="jahre_methode.json" data-da="ja" data-odbl="nein">
-      <a class="datei link" href="daten/jahre_methode.js">jahre_methode.js</a><span class="stand">vorhanden</span>
-      <p class="was">Zahlen der Methodenseite „Bauzeiten“: Gebäude je Stufe der Schätzung, Rücktest je Bauzeit und Stufe mit Fallzahl, Vergleich mit dem Zensus.</p>
-      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
-    </li>
-  </ul>
 
   <h2>Für Geoinformationssysteme</h2>
   <p>Für die Arbeit in QGIS oder ArcGIS stehen dieselben Inhalte als GeoPackage und CSV bereit, Koordinaten in ETRS89 / UTM 33N (EPSG:25833). Die Lizenzgrenze bleibt: eine Datei ohne OpenStreetMap-Anteil, eine getrennte mit <code>_odbl</code>. Raumebene sind die 19 Planungsräume der Stadt; die 32 Stadtteile liegen als eigene Ebene zur Orientierung bei.</p>
@@ -169,6 +81,96 @@
         <li><a class="link" href="daten/export/steckbriefe/603.html">603 Waldstadt I, Industriegelände</a></li>
         <li><a class="link" href="daten/export/steckbriefe/604.html">604 Waldstadt II</a></li>
       </ul></li>
+  </ul>
+
+  <h2 class="daten-entwickler">Für Entwickler: die Dateien der Seiten</h2>
+  <p>Die Dateien sind JavaScript mit GeoJSON bzw. JSON darin (eine Zeile <code>window.KIEZ_… = {…}</code>), damit die Seiten auch ohne Server laufen. Der Aufbau jeder Datei ist in <code>daten/schema/</code> im Quellcode beschrieben. Was noch nicht berechnet ist, steht als „folgt“ ohne Link.</p>
+
+  <h3>Planer: Einrichtungen, Entfernungen, Versorgung</h3>
+  <ul class="dateiliste">
+    <li data-datei="einrichtungen.js" data-schema="einrichtungen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/einrichtungen.js">einrichtungen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kitas, Horte und Schulen (Bildungsministerium Brandenburg) und Gemeinbedarf aus dem Liegenschaftskataster als Punkte, ohne Adresse und ohne Kontaktdaten.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>). Vermerk je Quelle in der Datei, mit „Daten verändert (eigene Berechnung)“.</p>
+    </li>
+    <li data-datei="einrichtungen_odbl.js" data-schema="einrichtungen_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/einrichtungen_odbl.js">einrichtungen_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze aus OpenStreetMap als Punkte, ohne Namen.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende. Weitergabe nur unter derselben Lizenz.</p>
+    </li>
+    <li data-datei="erreichbar.js" data-schema="erreichbar.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/erreichbar.js">erreichbar.js</a><span class="stand">vorhanden</span>
+      <p class="was">Entfernung in Luftlinie von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung je Art, in der Reihenfolge von <code>zellen.js</code>.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="erreichbar_fuss_odbl.js" data-schema="erreichbar_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/erreichbar_fuss_odbl.js">erreichbar_fuss_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Entfernungen als Fußweg über das Wegenetz aus OpenStreetMap (Stand 31.10.2026), in der Reihenfolge von <code>zellen.js</code>.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
+    </li>
+    <li data-datei="planer.js" data-schema="planer.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planer.js">planer.js</a><span class="stand">vorhanden</span>
+      <p class="was">Versorgung je Raumeinheit in Luftlinie: Anteile in Reichweite, Einwohner je Einrichtung, Plätze je Kind, Grün je Einwohner. Jeder Wert mit Methode, Status, Stand, Unsicherheit und Quelle.</p>
+      <p class="lizenz">Datenlizenz Deutschland Namensnennung 2.0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung). Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="planer_fuss_odbl.js" data-schema="planer_fuss_odbl.json" data-da="ja" data-odbl="ja">
+      <a class="datei link" href="daten/planer_fuss_odbl.js">planer_fuss_odbl.js</a><span class="stand">vorhanden</span>
+      <p class="was">Dieselben Versorgungswerte als Fußweg.</p>
+      <p class="lizenz">Open Database License 1.0 (<a class="link" href="https://opendatacommons.org/licenses/odbl/1-0/">Lizenztext</a>). © OpenStreetMap-Mitwirkende; amtliche Anteile mit ihrem Vermerk in der Datei.</p>
+    </li>
+  </ul>
+
+  <h3>Grundlage: Gitter, Stadtteile, Gebäude</h3>
+  <ul class="dateiliste">
+    <li data-datei="zellen.js" data-schema="zellen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/zellen.js">zellen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Bewohnte Zellen des Zensus-Gitters (100 m) mit Einwohnern, Alter, Wohnungen nach Baujahr und Fernwärme.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="stadtteile.js" data-schema="stadtteile.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/stadtteile.js">stadtteile.js</a><span class="stand">vorhanden</span>
+      <p class="was">Die amtlichen Stadtteile mit Nummer, Name und Fläche.</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, dl-de/zero-2-0 (<a class="link" href="https://www.govdata.de/dl-de/zero-2-0">Lizenztext</a>).</p>
+    </li>
+    <li data-datei="planungsraeume.js" data-schema="planungsraeume.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/planungsraeume.js">planungsraeume.js</a><span class="stand">vorhanden</span>
+      <p class="was">Die 19 Planungsräume der Stadt mit Nummer, Name und Fläche; auf dieser Ebene rechnet die Versorgungstabelle.</p>
+      <p class="lizenz">© Landeshauptstadt Potsdam, Stand 31.12.2025, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (Grenzen auf 3 m vereinfacht, Koordinaten gerundet, Felder ausgewählt).</p>
+    </li>
+    <li data-datei="kennzahlen.js" data-schema="kennzahlen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/kennzahlen.js">kennzahlen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kennzahlen und Verteilungen je Stadtteil und für die Stadt; dieselben Werte als <a class="link" href="daten/kennzahlen.json">kennzahlen.json</a>.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; Gebäudezahlen © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="gebaeude/*.js" data-schema="gebaeude.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/gebaeude/11.js">gebaeude/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
+      <p class="was">Gebäudeumrisse je Stadtteil mit Funktion, Geschosszahl und Höhe in Metern (ALKIS-Objekthöhe, sonst Geschosse × 3 m), eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11).</p>
+      <p class="lizenz">© GeoBasis-DE/LGB, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="grundkarte.js" data-schema="grundkarte.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/grundkarte.js">grundkarte.js</a><span class="stand">vorhanden</span>
+      <p class="was">Kartenstil der Grundkarte: gekürzter Auszug aus dem Stil „bm_web_gry“ von basemap.de Web Vektor (ohne Gebäude, ohne Bildsymbole). Enthält keine Geodaten; die Kacheln lädt der Browser bei sgx.geodatenzentrum.de. Erzeugt mit skripte/27_grundkarte.py.</p>
+      <p class="lizenz">© <a class="link" href="https://www.bkg.bund.de">GeoBasis-DE / BKG</a> (2026), <a class="link" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Kartenstil verändert.</p>
+    </li>
+  </ul>
+
+  <h3>Gebäudejahre</h3>
+  <ul class="dateiliste">
+    <li data-datei="jahre_zellen.js" data-schema="jahre_zellen.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_zellen.js">jahre_zellen.js</a><span class="stand">vorhanden</span>
+      <p class="was">Gebäude mit Wohnraum nach Baujahr je Zelle aus dem Zensus 2022.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
+    <li data-datei="jahre/*.js" data-schema="jahre_gebaeude.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre/11.js">jahre/&lt;Nr&gt;.js</a><span class="stand">vorhanden</span>
+      <p class="was">Bauzeitklasse je Gebäude, eine Datei je Stadtteilnummer (der Link zeigt Stadtteil 11); Schätzungen gekennzeichnet, keine Aussage über einzelne Grundstücke, kein Einzeljahr bei Gebäuden mit Wohnraum.</p>
+      <p class="lizenz">dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>); Vermerk je Quelle in der Datei.</p>
+    </li>
+    <li data-datei="jahre_methode.js" data-schema="jahre_methode.json" data-da="ja" data-odbl="nein">
+      <a class="datei link" href="daten/jahre_methode.js">jahre_methode.js</a><span class="stand">vorhanden</span>
+      <p class="was">Zahlen der Methodenseite „Bauzeiten“: Gebäude je Stufe der Schätzung, Rücktest je Bauzeit und Stufe mit Fallzahl, Vergleich mit dem Zensus.</p>
+      <p class="lizenz">© Statistische Ämter des Bundes und der Länder, Zensus 2022; © GeoBasis-DE/LGB; jeweils dl-de/by-2-0 (<a class="link" href="https://www.govdata.de/dl-de/by-2-0">Lizenztext</a>), Daten verändert (eigene Berechnung).</p>
+    </li>
   </ul>
 </main>
 

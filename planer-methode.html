@@ -39,7 +39,17 @@
 
 <main id="inhalt">
   <h1>Wie der Planer rechnet</h1>
-  <p class="lede">Der Planer beantwortet zwei Fragen: Wie weit ist es von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung, und wie ist eine Raumeinheit insgesamt versorgt. Im Planer trägt jede Zahl Methode, Status und Quelle. Die Tabelle der Maßstäbe, die Zahl der Planungsräume und die drei Prüfwerte im Text (Umweg des Fußwegs, Landeszuordnung der Haltestellen, Anteil der Kitas in OpenStreetMap) liest diese Seite aus der Versorgungsdatei. Jeder Prüfwert steht dort mit Stand und der Belegdatei, aus der ihn das Auswertungsskript liest.</p>
+  <p class="lede">Der Planer beantwortet zwei Fragen: Wie weit ist es von jeder bewohnten 100-Meter-Zelle zur nächsten Einrichtung, und wie ist eine Raumeinheit insgesamt versorgt. Im Planer trägt jede Zahl Methode, Status und Quelle.</p>
+
+  <section class="kurz" aria-labelledby="pm-kurz">
+    <h2 id="pm-kurz">Kurz</h2>
+    <dl class="kurz__liste">
+      <div><dt>Was trägt</dt><dd>Entfernungen je Zelle in Luftlinie, so wie die Potsdamer Fachpläne messen, und Versorgungswerte je Planungsraum mit Zähler, Nenner und Quelle. „Amtlicher Maßstab“ heißt nur, was ein geltendes Dokument mit gelesener Fundstelle nennt.</dd></div>
+      <div><dt>Wo es abweicht</dt><dd>Der Fußweg ist im Median rund 1,4-mal so lang wie die Luftlinie. Kita-Plätze rechnet der Planer je Planungsraum ohne die Nachbarräume, anders als das Baulandmodell; die Kennzahl steht deshalb nur als Orientierung.</dd></div>
+      <div><dt>Wo die Aussage endet</dt><dd>Ohne die Schulbezirke sind alle Grundschulwerte vorläufig. Radien wie Kita 500&nbsp;m haben keinen Primärbeleg. Einwohner stammen vom Zensus-Stichtag 15. Mai 2022; Ärzte, Apotheken und Pflege zeigen nur die Lage, keine Kapazität.</dd></div>
+    </dl>
+    <p class="fuss">Die Tabelle der Maßstäbe, die Zahl der Planungsräume und die Prüfwerte im Text (Umweg des Fußwegs, Landeszuordnung der Haltestellen, Anteil der Kitas in OpenStreetMap) liest diese Seite aus der Versorgungsdatei, jeden Prüfwert mit Stand und Belegdatei.</p>
+  </section>
   <p class="fuss" id="beispiel" hidden>Beispieldaten: Die Tabelle unten zeigt unechte Werte und dient nur dem Aufbau.</p>
 
   <h2>Luftlinie und Fußweg</h2>
@@ -53,7 +63,7 @@
   <h2>Kita und Hort</h2>
   <p>In Brandenburg gilt das Wunsch- und Wahlrecht, Kitas haben keine Einzugsbereiche. Plätze je Kind bezieht der Planer deshalb auf die Raumeinheit und nicht auf einen Radius. Plätze sind die genehmigten Plätze laut Betriebserlaubnis; wie viele frei sind, steht nicht in den Daten. Hat eine Kita Häuser in zwei Planungsräumen, stehen alle ihre Plätze am Hauptstandort; die Hinweise beider Räume nennen das. Die Kinderzahlen stammen aus dem Zensus vom 15. Mai 2022, die Plätze vom Tag des Abrufs; beide Stände stehen an jeder Zeile. Kindertagespflege fehlt in den Daten, das unterschätzt die Versorgung der Jüngsten.</p>
   <p>Plätze je Bedarfsplatz vergleicht alle Plätze in Krippe, Kindergarten und Hort mit dem rechnerischen Bedarf nach den Versorgungsquoten des Potsdamer Baulandmodells. Diese Quoten sind schon um Kapazitätsreserven vermindert: Ein Wert von 1,0 heißt rechnerisch gedeckt, ohne Reserve. Die Relation je Planungsraum ist ein Anhaltspunkt, keine Versorgungsquote einzelner Familien.</p>
-  <p>Abweichend von Nr. 3.4.4 (Kita-Bedarfsplanung) ohne angrenzende Planungsräume gerechnet: Das Baulandmodell bezieht beim Abgleich der Plätze Kitas und Grundschulen in angrenzenden Planungsräumen ein (Nr. 3.4.4, S. 14 und 15), der Planer rechnet jeden Planungsraum für sich. Die Kennzahl steht deshalb als Orientierung und nicht als amtlicher Maßstab. Eine Fassung mit den angrenzenden Planungsräumen ist noch nicht gebaut.</p>
+  <p>Der Planer rechnet jeden Planungsraum für sich. Das Baulandmodell bezieht beim Abgleich der Plätze dagegen Kitas und Grundschulen in angrenzenden Planungsräumen ein (Nr. 3.4.4 Kita-Bedarfsplanung, S. 14 und 15). Die Kennzahl steht deshalb als Orientierung und nicht als amtlicher Maßstab. Eine Fassung mit den angrenzenden Planungsräumen ist noch nicht gebaut.</p>
 
   <h2>Grundschule</h2>
   <p>Grundschulen werden über Schulbezirke geplant (§ 106 Brandenburgisches Schulgesetz). Ohne die Schulbezirke ist jeder Grundschulwert vorläufig und so gekennzeichnet.</p>
@@ -72,12 +82,12 @@
   <p>Feuerwehr, Bibliotheken, Sport, Jugend- und Seniorentreffs stammen aus den Gebäudefunktionen und der Flächennutzung des Liegenschaftskatasters. Sie zeigen nur die Lage, keine Kapazität. Ärzte, Apotheken, Pflege, Lebensmittelmärkte und Spielplätze stammen aus OpenStreetMap (Auszug mit Stand 31. Oktober 2026, ODbL). Für sie nennt der Planer nur Lage und Entfernung im Fußweg, keine Versorgungsaussage: Ärzte plant die Kassenärztliche Vereinigung auf größeren Bereichen, und OpenStreetMap kennt keine Kapazitäten. OpenStreetMap wird freiwillig erfasst; wie vollständig diese Arten darin sind, ist nicht geprüft. Zum Vergleich: Von den amtlichen Kita-Standorten stehen 78&nbsp;% auch in OpenStreetMap (genau 78,1&nbsp;%, Abgleich vom 5. November 2026, <code>belege/N1_osm_fussweg_20261105.md</code>). Fehlt ein Standort, ist die Entfernung zu groß.</p>
 
   <h2>Richtwerte und ihr Status</h2>
-  <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein geltendes Potsdamer oder Brandenburger Dokument ihn nennt und die Fundstelle gelesen ist. Werte ohne solchen Beleg, aus einem Dokument mit abgelaufener Geltung oder mit einer Rechenweise, die vom Dokument abweicht, stehen als <b>Orientierung, kein Richtwert</b> daneben und sind in der Versorgungstabelle gestrichelt umrandet. Kennzahlen ohne Maßstab, etwa Einwohner je Feuerwehrstandort, tragen <b>amtliche Daten, kein Maßstab</b>: Die Zahlen stammen aus amtlichen Quellen, eine Norm für sie gibt es nicht. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>
+  <p>Ein Wert heißt <b>amtlicher Maßstab</b>, wenn ein geltendes Potsdamer oder Brandenburger Dokument ihn nennt und die Fundstelle gelesen ist. Werte ohne solchen Beleg, aus einem Dokument mit abgelaufener Geltung oder mit einer Rechenweise, die vom Dokument abweicht, tragen den Status <b>„Orientierung, kein Richtwert“</b> und sind in der Versorgungstabelle gestrichelt umrandet. Kennzahlen ohne Maßstab, etwa Einwohner je Feuerwehrstandort, tragen den Status <b>„amtliche Daten, kein Maßstab“</b>: Die Zahlen stammen aus amtlichen Quellen, eine Norm für sie gibt es nicht. Die folgende Tabelle liest die Maßstäbe aus der Versorgungsdatei.</p>
   <div class="tabellenrahmen" id="richtwerte"></div>
   <p class="fuss" id="planer-hinweis"></p>
 
   <h2>Geheimhaltung, Rundung, Stichtag</h2>
-  <p>Der Zensus verändert kleine Werte mit dem Cell-Key-Verfahren. Summen vieler kleiner Zellen weichen darum ab. Der Planer rundet Einwohnerzahlen und nennt bei jeder Zeile, wie unsicher sie ist. Feine Altersklassen zeigt er nur für Raumeinheiten mit genug Einwohnern, nie je Zelle.</p>
+  <p>Der Zensus verändert kleine Werte zur Geheimhaltung leicht und zufällig (Cell-Key-Verfahren). Summen vieler kleiner Zellen weichen darum ab. Der Planer rundet Einwohnerzahlen und nennt bei jeder Zeile, wie unsicher sie ist. Feine Altersklassen zeigt er nur für Raumeinheiten mit genug Einwohnern, nie je Zelle.</p>
   <p>Zu jeder Quote stehen Zähler und Nenner in der Datei und im Planer. Personen und Bedarfsplätze sind auf 10 gerundet, Plätze, Schüler und Standorte genau; der Wert selbst ist aus den ungerundeten Zahlen gerechnet. Ganz Potsdam ist die Summe der veröffentlichten Zähler und Nenner. Planungsräume ohne Wert zählen dort nicht mit und sind im Hinweis genannt, damit sich kein zurückgehaltener Wert aus der Differenz zurückrechnen lässt.</p>
   <p>Stichtag des Zensus ist der 15. Mai 2022. Neubaugebiete, die danach bezogen wurden, fehlen in den Einwohnerzahlen, zum Beispiel in Krampnitz, im Bornstedter Feld und in Golm.</p>
 

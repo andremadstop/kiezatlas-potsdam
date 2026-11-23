@@ -124,3 +124,9 @@ QUELLEN (Liste, zwei Spalten)    FUSS (Impressumszeile, Stand)
   - *Chipzeile* auf Touch und schmal in einer Zeile, seitlich wischbar.
   - *Aussparungen:* `viewport-fit=cover`, Abstände aus `env(safe-area-inset-*)` an Kopfleiste, Rand (`--gut`), Kartenknöpfen, Blatt und Leiste.
   - Das Mausrad scrollt am Desktop weiter die Seite.
+- **Regel-Review (23.11.2026, Entscheidung A21):** Die Startseite trägt nicht mehr den ganzen Atlas. Unter den Fragen
+  steht „Tiefer einsteigen“ mit fünf aufklappbaren Zeilen (Stadtteile, Schaugrafik, Grenzfall, Methode, Quellen; Gesetze
+  Progressive disclosure, Cognitive load, Common region). Methodenseiten beginnen mit „Kurz“ (Serial position, Pareto).
+  Planer: ein Aktiv-Stil je Leiste, Messweg abgesetzt (Similarity, Proximity), Symbole der Chips wie in der Legende,
+  Handy mit halb offenem Blatt (Paradox of the active user). Bewusste Ausnahme: Die Belegfilme stehen jetzt im
+  eingeklappten Abschnitt „Wie die Zahlen entstehen“ statt offen auf der Seite.

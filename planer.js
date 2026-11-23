@@ -91,12 +91,14 @@ function art(a) {
 function wort(s) { return s == null ? "" : String(s).replace(/_/g, " "); }
 
 // ---------- Kennzahlen lesbar machen
+// keine Klammer in der Klammer
+function zusatz(z) { return z ? " (" + String(z).replace(/\s*\(([^()]*)\)/g, ", $1") + ")" : ""; }
 var KENNZAHL = {
   anteil_in_radius: function (w) { return tt("planer.kz.anteil", { gruppe: w.zielgruppe || tt("planer.kz.der_einwohner"), art: art(w.art).kurz }) + (w.richtwert ? tt("planer.kz.in_radius", { radius: zahl(w.richtwert.wert) + NB + w.richtwert.einheit }) : tt("planer.kz.in_naehe")); },
-  ew_je_einrichtung: function (w) { return tt("planer.kz.ew_je", { art: art(w.art).kurz }); },
-  plaetze_je_kind: function (w) { return tt("planer.kz.plaetze_kind", { art: art(w.art).kurz }) + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
+  ew_je_einrichtung: function (w) { var je = tt("planer.je." + w.art); return tt("planer.kz.ew_je", { art: je === "planer.je." + w.art ? art(w.art).kurz : je }); },
+  plaetze_je_kind: function (w) { return tt("planer.kz.plaetze_kind", { art: art(w.art).kurz }) + zusatz(w.zielgruppe); },
   plaetze_je_bedarf: function () { return tt("planer.kz.plaetze_bedarf"); },
-  schueler_je_kind: function (w) { return tt("planer.kz.schueler_kind") + (w.zielgruppe ? " (" + w.zielgruppe + ")" : ""); },
+  schueler_je_kind: function (w) { return tt("planer.kz.schueler_kind") + zusatz(w.zielgruppe); },
   oepnv_erschliessung: function () { return tt("planer.kz.oepnv"); },
   oepnv_takt: function () { return tt("planer.kz.oepnv_takt"); },
   gruen_m2_je_ew: function () { return tt("planer.kz.gruen"); }
@@ -613,8 +615,15 @@ $("link-teilen").addEventListener("click", function () {
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(ok, zeigen); else zeigen();
 });
 var seiteEl = $("seite"), griff = $("seite-griff");
-function seite(an) { seiteEl.classList.toggle("offen", an); griff.setAttribute("aria-expanded", String(an)); }
-griff.addEventListener("click", function () { seite(!seiteEl.classList.contains("offen")); });
+function seite(an) { seiteEl.classList.remove("halb"); seiteEl.classList.toggle("offen", an); griff.setAttribute("aria-expanded", String(an)); }
+// Handy, ohne geteilte Ansicht: Blatt halb offen mit den Fragen (Review 23.11.)
+function seiteHalb() {
+  if (!GESTAPELT.matches || location.hash.length > 1) return;
+  seiteEl.classList.add("halb"); griff.setAttribute("aria-expanded", "true");
+}
+griff.addEventListener("click", function () { seite(seiteEl.classList.contains("halb") || !seiteEl.classList.contains("offen")); });
+map.on("dragstart", function () { if (seiteEl.classList.contains("halb")) seite(false); });
+map.on("click", function () { if (seiteEl.classList.contains("halb")) seite(false); });
 addEventListener("keydown", function (e) { if (e.key === "Escape" && seiteEl.classList.contains("offen") && GESTAPELT.matches) { seite(false); griff.focus(); } });
 var letzteMeldung = "";
 function meldung(t) { letzteMeldung = t; $("kartenstatus").textContent = t; var h = $("teilen-hinweis"); if (h) h.textContent = t; }
@@ -675,7 +684,7 @@ map.on("moveend", hashSchreiben);
 // ---------- Aufbau, sobald Karte und Startdaten da sind
 var kartenGeladen = false, datenDa = false;
 map.on("load", function () { kartenGeladen = true; if (datenDa) aufbauenKarte(); });
-function aufbauen() { datenDa = true; einBauen(); zuBauen(); raumBauen(); fragenBauen(); versorgung(); if (kartenGeladen) aufbauenKarte(); }
+function aufbauen() { datenDa = true; einBauen(); zuBauen(); raumBauen(); fragenBauen(); versorgung(); seiteHalb(); if (kartenGeladen) aufbauenKarte(); }
 function aufbauenKarte() {
   bereitKarte = true;
   map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
@@ -701,7 +710,14 @@ function methode() {
   holen("planer", function (P) {
     var box = $("richtwerte"); if (!box) return;
     if (!P) { box.appendChild(el("p", "fuss", tt("planer.fehler_datei"))); window.KIEZ_BEREIT = true; return; }
-    var gesehen = {}, zeilen = [];
+    var gesehen = {}, zeilen = [], FN = [];
+    // Fußnote + Lizenz kurz, Vermerk unten
+    function fussnote(td, vermerk) {
+      var i = FN.indexOf(vermerk); if (i < 0) { FN.push(vermerk); i = FN.length - 1; }
+      var a = el("a", "link", "[" + (i + 1) + "]"); a.href = "#rq-" + (i + 1); td.appendChild(a);
+      var liz = String(vermerk).match(/dl-de\/[a-z]+-2-0|ODbL( 1\.0)?|CC BY( [\d.]+)?|CC0/);
+      if (liz) td.appendChild(document.createTextNode(" " + liz[0]));
+    }
     Object.keys(P.raeume).forEach(function (k) {
       P.raeume[k].werte.forEach(function (w) {
         var key = [w.kennzahl, w.art, statusKlasse(w), w.richtwert ? w.richtwert.wert + w.richtwert.einheit : "-"].join("|");
@@ -717,12 +733,15 @@ function methode() {
       tr.appendChild(el("td", null, w.richtwert ? zahl(w.richtwert.wert) + NB + w.richtwert.einheit + (wegText(w) ? " " + wegText(w) : "") : tt("planer.ohne_wert")));
       tr.appendChild(el("td", null, statusText(w) + (w.vorlaeufig ? "; " + tt("planer.vorlaeufig") : "")));
       var td = el("td"), Q = P.quellen[(w.richtwert || w).q] || { vermerk: (w.richtwert || w).q };
-      td.appendChild(vermerkKnoten(Q.vermerk)); if (w.richtwert && w.richtwert.seite) td.appendChild(document.createTextNode(", " + w.richtwert.seite));
+      fussnote(td, Q.vermerk); if (w.richtwert && w.richtwert.seite) td.appendChild(document.createTextNode(", " + w.richtwert.seite));
       // Maßstab aus einem Dokument ohne Lizenz: dazu die Quelle der Daten mit ihrem Vermerk (Lizenz)
-      if (w.richtwert && w.q && w.q !== w.richtwert.q && P.quellen[w.q]) { td.appendChild(document.createTextNode(tt("planer.daten_q"))); td.appendChild(vermerkKnoten(P.quellen[w.q].vermerk)); }
+      if (w.richtwert && w.q && w.q !== w.richtwert.q && P.quellen[w.q]) { td.appendChild(document.createTextNode(tt("planer.daten_q"))); fussnote(td, P.quellen[w.q].vermerk); }
       tr.appendChild(td); tb.appendChild(tr);
     });
     tab.appendChild(tb); box.appendChild(tab);
+    var ol = el("ol", "vs-quellen richt-quellen"); ol.setAttribute("aria-label", tt("planer.quellen_aria"));
+    FN.forEach(function (v, i) { var li = el("li"), a = el("span"); li.id = "rq-" + (i + 1); a.appendChild(vermerkKnoten(v)); li.appendChild(a); ol.appendChild(li); });
+    box.appendChild(ol);
     // Zahl der Planungsräume aus der Datei statt fest im Text (K28); Beispieldaten rechnen auf Stadtteilen
     if (P.raumebene === "planungsraum" && !P.fixture) document.querySelectorAll('[data-feld="anzahl-raeume"]').forEach(function (n) { n.textContent = String(Object.keys(P.raeume).length); });
     // Prüfwerte mit Beleg aus der Datei (Audit K28): Zahl, Stand und Belegdatei; ohne Datei bleibt der Text im HTML

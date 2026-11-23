@@ -72,13 +72,27 @@
 .beispiel{position:absolute;right:12px;bottom:40px;max-width:min(320px,calc(100% - 24px));margin:0;padding:8px 10px;background:var(--ink);color:#fff;font-size:.8125rem;line-height:1.35;z-index:4}
 .beispiel[hidden]{display:none}
 .weg .chip--schalter{min-width:0}
+/* Messweg als eigene Gruppe neben der Entfernung: Abstand, Trennlinie, Titel; gleicher Aktiv-Stil wie die übrigen Chips
+   (vorher violett, zwei Aktivfarben in einer Leiste; Regel-Review 23.11.2026, Gesetze Similarity und Proximity) */
+.planerseite .weg{align-items:center;gap:4px;margin-left:6px;padding:0 4px 0 10px;border-left:1px solid var(--ink);background:rgba(250,251,248,.95);pointer-events:auto}
+.weg__titel{font:600 .75rem/1 var(--f-text);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px;white-space:nowrap}
+.weg .chip--schalter:has(input:checked)::before{background:var(--ink)}
+.weg .chip--schalter:has(input:checked){border-color:var(--ink)}
+/* Einrichtungs-Chips: aktiv hell mit Rand und Unterstrich, damit das Symbol wie in Karte und Legende aussieht
+   (auf dunklem Grund wirkte die gefüllte Kita wie ein Ring und die Grundschule wie ein Punkt) */
+.chip--ein::before{background:var(--line-soft)}
+.chip--ein:has(input:checked){color:var(--ink);border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--ink)}
+.chip--ein:has(input:checked)::before{scale:1 0}
+@media (hover:hover){.chip--ein:has(input:checked):hover::before{scale:1 0}}
+.chip--ein:not(:has(input:checked)) .zeichen{opacity:.5}
+.chip--ein:not(:has(input:checked)){color:var(--muted)}
 .planerseite .werkzeug{gap:8px 12px}
 
 @media (max-width:860px){
   .planerseite .legende,html.kopf-weg .planerseite .legende{max-width:min(300px,calc(100% - 92px));top:auto;bottom:74px}
   .planerseite .legende__weg{display:none}
-  .planerseite .legende__vermerk{font-size:.6875rem}
-  .planerseite .legende__arten{font-size:.6875rem;gap:2px 8px;margin-top:5px;padding-top:4px}
+  .planerseite .legende__vermerk{font-size:.75rem}
+  .planerseite .legende__arten{font-size:.75rem;gap:2px 8px;margin-top:5px;padding-top:4px}
   .beispiel{top:58px;bottom:auto;right:8px;left:auto;max-width:calc(100% - 16px);padding:6px 8px;font-size:.75rem}
 }
 
@@ -94,6 +108,15 @@
 .richt-tabelle{border-collapse:collapse;width:100%;font-size:.875rem}
 .richt-tabelle th,.richt-tabelle td{text-align:left;vertical-align:top;padding:8px 12px 8px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
 .richt-tabelle th{font-weight:600}
+.richt-quellen{margin-top:14px}
+/* Kurzbefund oben auf der Methodenseite (gleich wie auf den Bauzeiten, jahre.css) */
+.kurz{border:1px solid var(--ink);background:var(--surface);padding:clamp(16px,2.4vw,28px);margin:0 0 clamp(28px,4vw,48px)}
+.textseite .kurz h2{font:600 var(--t-m)/1.1 var(--f-display);margin:0 0 12px}
+.kurz__liste{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px clamp(20px,3vw,40px);margin:0}
+.kurz__liste dt{font:600 .875rem/1.2 var(--f-text);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 4px}
+.kurz__liste dd{margin:0;line-height:1.45}
+.kurz>.fuss{margin:14px 0 0}
+@media (max-width:860px){.kurz__liste{grid-template-columns:minmax(0,1fr)}}
 .dateiliste{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
 .dateiliste li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--line);max-width:none}
 .dateiliste .datei{font:600 1rem/1.3 var(--f-text);overflow-wrap:anywhere}
@@ -105,3 +128,4 @@
 .dateiliste .steckbriefliste li{display:block;padding:3px 0;border:0;break-inside:avoid}
 .textseite .fuss-seite{margin-top:48px}
 @media (max-width:560px){.dateiliste li{grid-template-columns:1fr}.dateiliste .stand{justify-self:start}}
+

@@ -32,6 +32,7 @@ Entschieden hat jeweils André Stiebitz; Vorschläge, Prüfberichte und Umsetzun
 | A18 | 3D heißt Häuser: keine Zellsäulen mehr auf allen Seiten, ein Klick zu den Häusern | 07.11.2026 | Beleg H1 bis H10 |
 | A19 | Voll responsive: Kopfleiste klappt beim Lesen ein, Karte und Text ab Handy quer nebeneinander | 07.11.2026 | Beleg `responsive_20261107.md` (Zeile am 08.11.2026 nachgetragen) |
 | A20 | Belegfilme: jede Zahl im Bild beim Rendern aus einer Datei im Repository gelesen und abgeglichen | 08.11.2026 | Beleg `filme_20261108.md` |
+| A21 | Regel-Review: Quoten als Spanne, KI-Ablesung benannt, Startseite eingeklappt, Kurzbefund oben | 23.11.2026 | Regel-Review vom 23.11.2026 (interner Vault) |
 
 ## A1: OpenStreetMap nur in eigenen `_odbl`-Dateien
 
@@ -245,6 +246,42 @@ Zahlen als Konstanten in den Skripten; die Filmskripte in `pruefen.sh` aufnehmen
 Paketen wie `bpy`, `manim` und `pycairo`, die nicht in `requirements.txt` stehen; geprüft wird beim Rendern). Offen bei
 André: das Prüfprotokoll vom 08.11.2026 als `belege/pruefstand-20261108-a057522/` ablegen; bis dahin liegt es neben dem
 Terminalfilm. Beleg `belege/filme_20261108.md`.
+
+## A21: Regel-Review vom 23.11.2026
+
+Anlass: Prüfung aller Seiten gegen die 20 Design-Gesetze, die Regel „Verstehen darf nicht länger dauern als Erstellen“
+und den Faktencheck „was misst die Zahl“ (Bericht im internen Vault der UG). André: „ja alles so gut es geht richtig
+stellen“.
+
+Entscheidungen:
+
+- **Trefferquote nur als Spanne.** Die Seiten nennen den Rücktest als „je nach Prüfsatz 65 bis 74 %“ mit den
+  ungünstigeren Lesarten daneben (eindeutig abgelesene Bauzeit 30 von 45, Gebäude ohne Klasse als Fehlgriff bei Wikidata
+  44 %, 1919 bis 1990 kaum Prüfgebäude). Alle Werte rechnet `jahre.js` aus `daten/jahre_methode.js`; nichts steht von
+  Hand im Text. Die Prüfung schlug „eindeutig 64 %“ vor; das galt nur für 2011–2019 (25 von 39). Alle eindeutigen
+  Zeilen zusammen sind 30 von 45 (67 %), so steht es jetzt da.
+- **„KI-Ablesung“ statt „Sichtprüfung“.** Die Luftbild-Referenz für Bornstedt hat ein KI-Agent ohne menschliche
+  Zweitprüfung abgelesen (`pruefen/B3_protokoll.md`). Seite und Tabellen nennen das im Namen und in der Unterschrift.
+  Der Bericht `berichte/B4_holdout.md` bleibt unverändert (SHA256 steht auf der Seite); umbenannt wird in
+  `skripte/26_jahre_methode.py`.
+- **Einheit an jeder „vor 1949“-Zahl.** Bauzeiten zählen Gebäude, die Startseite Wohnungen; beide Kennzahlen tragen
+  die Einheit, die Bauzeiten nennen den Wohnungsanteil daneben. Tabellen nennen ihre Basis („Summe der bekannten
+  Klassen“ gegen „hochgerechnet auf alle Gebäude“).
+- **Kurz vorn, Tiefe dahinter.** Methodenseiten beginnen mit einem Kasten „Kurz“ (was trägt, wo es abweicht, wo die
+  Aussage endet). Auf der Startseite stehen Stadtteile, Schaugrafik, Grenzfall, Methode und Quellen als aufklappbare
+  Zeilen; jeder Link auf einen Abschnitt klappt ihn auf. Am Handy ist die Luft zwischen den Fragen knapper
+  (`start.css`, die gemeinsame `atlas.css` bleibt unverändert). Telefon: 23.852 px auf rund 8.600 px.
+- **Planer.** Einrichtungs-Chips aktiv hell mit Unterstrich, damit das Symbol wie in der Legende aussieht; „Messweg“
+  als eigene Gruppe im gleichen Aktiv-Stil; am Handy steht das Blatt beim ersten Aufruf halb offen mit den Fragen;
+  Legende und Maßstab mindestens 12 px. Maßstäbe-Tabelle mit Fußnoten statt sieben gleicher Vermerke, die Lizenz
+  bleibt je Zeile lesbar. Startgewicht des Planers dafür um 1 KB gz höher (`pruefen/A7_planer.mjs`).
+
+Verworfen: die Abschnitte der Startseite auf eigene Unterseiten verschieben (Register, Steckbrief und Schaugrafik
+hängen an Karte und Zustand der Startseite; Aufklappen behält alles auf einer Seite); den Bestwert „74 %“ mit Fußnote
+stehen lassen.
+
+Offen: Der Entwurf an den Lüscher-Kreis (interner Vault) nennt noch „rund drei von vier“; die Sitemap von
+souverain-systems.de führt den Kiezatlas nicht. Beides liegt außerhalb dieses Repositoriums.
 
 ## Nicht geprüft sind
 

@@ -52,16 +52,23 @@
   html.kopf-weg .kartenseite .legende{top:62px}
   .seite{position:absolute;left:0;right:0;bottom:0;height:min(72svh,640px);padding-top:0;border-left:0;border-top:1px solid var(--ink);overflow:hidden;display:flex;flex-direction:column;z-index:6;translate:0 calc(100% - 64px - var(--sa-unten));transition:translate .45s var(--ease);box-shadow:0 -8px 24px rgba(19,33,42,.12)}
   .seite.offen{translate:0 0}
+  /* Planer beim ersten Aufruf: halb offen, die Fragen im Bild (planer.js seiteHalb) */
+  .seite.halb{translate:0 calc(100% - min(46svh,380px) - var(--sa-unten))}
+  .seite.halb .seite__inhalt{visibility:visible}
+  .seite.halb .seite__titel,.seite.halb .seite__lede{display:none}
   .seite__griff{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:64px;padding:8px 16px 10px;cursor:pointer;flex:0 0 auto;background:var(--surface)}
   .seite__griff:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
   .seite__griffstrich{width:44px;height:4px;background:var(--line)}
   .seite__grifftext{display:flex;gap:8px;align-items:baseline;font-size:.875rem;color:var(--muted)}
   .seite__grifftext b{font:600 1.15rem/1.1 var(--f-display);color:var(--ink)}
   .seite__inhalt{overflow:auto;overscroll-behavior:contain;flex:1 1 auto;padding-bottom:var(--sa-unten)}
-  .seite:not(.offen) .seite__inhalt{visibility:hidden}
+  .seite:not(.offen):not(.halb) .seite__inhalt{visibility:hidden}
 }
 @media (prefers-reduced-motion:reduce){.seite{transition:none}}
 .seite__titel{font:600 var(--t-l)/1.05 var(--f-display);letter-spacing:-.01em;margin:0 0 6px}
 .seite__lede{margin:0 0 14px}
 .treffer[aria-pressed="true"]:hover::before{background:var(--ink)}
 .seite a.link,.seite .fuss a{padding-block:4px;display:inline-block}
+
+/* Maßstab der Karte mindestens 12 px (MapLibre setzt 10 px; Regel-Review 23.11.2026) */
+.kartenseite .maplibregl-ctrl-scale{font-size:12px}
