@@ -31,3 +31,6 @@
   .frage::before{top:6svh}
   .vertiefung{padding-top:40px}
 }
+/* Auftakt als Frage nach Bielefelder Muster (Slop-Check 24.11.2026) */
+.auftakt__vorzeile{font:500 .9375rem/1 var(--f-display);color:var(--muted);margin:0 0 14px;letter-spacing:.02em}
+.titel--frage{font-size:clamp(2.4rem,1.2rem + 3.6vw,5rem);line-height:.95}

@@ -69,6 +69,11 @@ var farbe = T.farbe;
   var kk = kachel(K.stadtteile[kz], "u18");
   q("kind-teil", name(kz)); q("kind-zahl", T.rundEw(kk.zaehler)); q("kind-nenner", T.rundEw(kk.nenner)); q("kind-anteil", proz(kk.wert));
   var ka = extrem("u18", true);
+  // Auftakt: die drei Stadtteile mit dem höchsten Anteil unter 18 als Spanne, weil die Abstände klein sind (24.11.: 22,2 / 21,5 / 21,1 %)
+  var kd = gross.slice().sort(function (a, b) { return kachel(K.stadtteile[b], "u18").wert - kachel(K.stadtteile[a], "u18").wert; }).slice(0, 3);
+  var kdw = kd.map(function (nr) { return kachel(K.stadtteile[nr], "u18").wert; });
+  q("kind-vorn-teile", kd.slice(0, -1).map(name).join(", ") + " und " + name(kd[kd.length - 1]));
+  q("kind-vorn-spanne", Math.round(Math.min.apply(null, kdw)) + " bis " + Math.round(Math.max.apply(null, kdw)) + "\u00a0%");
   q("kind-anteilig", ka === kz ? tt("karte.kind_auch", { schwelle: fmt.format(SCHWELLE) })
     : tt("karte.kind_vorn", { name: name(ka), wert: proz(kachel(K.stadtteile[ka], "u18").wert), schwelle: fmt.format(SCHWELLE) }));
   A.FRAGE.kind = kz;
